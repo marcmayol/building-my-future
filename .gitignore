@@ -16,3 +16,6 @@ build/
 *.jks
 *.keystore
 keystore.properties
+
+# Kotlin (sesiones del compilador)
+.kotlin/
