@@ -33,9 +33,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.ExerciseGuides
 import com.marc.gymplan100.data.ExerciseImages
+import com.marc.gymplan100.data.MuscleTargets
 import java.net.URLEncoder
 
 /**
@@ -118,6 +120,32 @@ fun ExerciseGuideSheet(
 
             GuideSection("Músculos que trabaja") {
                 Text(guide.muscles, style = MaterialTheme.typography.bodyMedium)
+                val targets = MuscleTargets.forName(exerciseName)
+                if (targets.isNotEmpty()) {
+                    Spacer(Modifier.height(4.dp))
+                    MuscleMap(
+                        highlighted = targets,
+                        bodyColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.22f),
+                        highlightColor = MaterialTheme.colorScheme.primary,
+                        separatorColor = MaterialTheme.colorScheme.surface
+                    )
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            "Frente",
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            "Espalda",
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             GuideSection("Cómo se hace") {

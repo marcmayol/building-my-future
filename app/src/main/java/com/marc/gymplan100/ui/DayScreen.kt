@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,6 +37,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,6 +67,8 @@ fun DayScreen(
     val template = day.template
     val progress by viewModel.progress.collectAsState()
     val completed = day.number in progress.completedDays
+    // Ejercicio cuya ficha ("¿Cómo se hace?" + mapa muscular) se está mostrando, o null.
+    var guideFor by remember { mutableStateOf<Exercise?>(null) }
 
     Scaffold(
         topBar = {
@@ -147,7 +153,8 @@ fun DayScreen(
                     done = log?.done ?: false,
                     onWeight = { viewModel.setLog(day.number, index, weight = it) },
                     onReps = { viewModel.setLog(day.number, index, reps = it) },
-                    onDone = { viewModel.setLog(day.number, index, done = it) }
+                    onDone = { viewModel.setLog(day.number, index, done = it) },
+                    onShowGuide = { guideFor = exercise }
                 )
             }
 
@@ -192,6 +199,14 @@ fun DayScreen(
                 }
             }
         }
+
+        guideFor?.let { ex ->
+            ExerciseGuideSheet(
+                exerciseName = ex.name,
+                scheme = ex.scheme,
+                onDismiss = { guideFor = null }
+            )
+        }
     }
 }
 
@@ -203,7 +218,8 @@ private fun ExerciseCard(
     done: Boolean,
     onWeight: (String) -> Unit,
     onReps: (String) -> Unit,
-    onDone: (Boolean) -> Unit
+    onDone: (Boolean) -> Unit,
+    onShowGuide: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(14.dp),
@@ -268,6 +284,14 @@ private fun ExerciseCard(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f)
                 )
+            }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onShowGuide,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Filled.Info, contentDescription = null)
+                Text("  ¿Cómo se hace? · músculos y técnica")
             }
         }
     }
