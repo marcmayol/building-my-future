@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Pictograma propio del "dead bug" (no hay imagen libre en wger/Wikimedia): tumbado boca
+    arriba, un brazo hacia el techo y el otro extendido tras la cabeza, una rodilla flexionada
+    a 90° y la pierna contraria estirada sin tocar el suelo. Estilo de línea, como el resto.
+    La cabeza va al final con relleno blanco para tapar el cruce con el brazo trasero.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="450dp"
+    android:height="230dp"
+    android:viewportWidth="900"
+    android:viewportHeight="460">
+
+    <!-- Suelo -->
+    <path
+        android:pathData="M60,414 L860,414"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="6"
+        android:strokeLineCap="round" />
+
+    <!-- Brazo extendido tras la cabeza, sin tocar el suelo -->
+    <path
+        android:pathData="M710,368 L885,300"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="22"
+        android:strokeLineCap="round" />
+
+    <!-- Tronco tumbado (espalda pegada al suelo) -->
+    <path
+        android:pathData="M715,368 L492,372"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="34"
+        android:strokeLineCap="round" />
+
+    <!-- Brazo hacia el techo -->
+    <path
+        android:pathData="M690,360 L690,165"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="22"
+        android:strokeLineCap="round" />
+
+    <!-- Pierna flexionada: muslo vertical y espinilla paralela al suelo (90/90) -->
+    <path
+        android:pathData="M498,372 L498,208 L380,210"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="26"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Pierna contraria estirada, en el aire cerca del suelo -->
+    <path
+        android:pathData="M487,372 L170,298"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="26"
+        android:strokeLineCap="round" />
+
+    <!-- Cabeza (última, rellena de blanco para ocultar el brazo que pasa por detrás) -->
+    <path
+        android:pathData="M725,352 a40,40 0 1,0 80,0 a40,40 0 1,0 -80,0"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="13" />
+</vector>

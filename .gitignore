@@ -1,0 +1,18 @@
+# Android / Gradle
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+/app/build/
+/app/release/
+build/
+
+# Firmas (nunca versionar)
+*.jks
+*.keystore
+keystore.properties
