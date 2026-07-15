@@ -7,13 +7,16 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,9 +29,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -121,12 +126,20 @@ fun ExerciseGuideSheet(
             GuideSection("Músculos que trabaja") {
                 Text(guide.muscles, style = MaterialTheme.typography.bodyMedium)
                 val targets = MuscleTargets.forName(exerciseName)
-                if (targets.isNotEmpty()) {
+                if (targets != null) {
+                    val primaryColor = MaterialTheme.colorScheme.primary
+                    val secondaryColor = lerp(
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.primary,
+                        0.45f
+                    )
                     Spacer(Modifier.height(4.dp))
                     MuscleMap(
-                        highlighted = targets,
+                        primary = targets.primary,
+                        secondary = targets.secondary,
                         bodyColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.22f),
-                        highlightColor = MaterialTheme.colorScheme.primary,
+                        primaryColor = primaryColor,
+                        secondaryColor = secondaryColor,
                         separatorColor = MaterialTheme.colorScheme.surface
                     )
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -144,6 +157,27 @@ fun ExerciseGuideSheet(
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                    if (targets.secondary.isNotEmpty()) {
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            LegendDot(primaryColor)
+                            Text(
+                                "  Principal    ",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            LegendDot(secondaryColor)
+                            Text(
+                                "  Secundario",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -178,6 +212,16 @@ private fun GuideSection(title: String, content: @Composable () -> Unit) {
         )
         content()
     }
+}
+
+@Composable
+private fun LegendDot(color: Color) {
+    Box(
+        modifier = Modifier
+            .size(12.dp)
+            .clip(CircleShape)
+            .background(color)
+    )
 }
 
 @Composable

@@ -44,9 +44,11 @@ private val backHead = Offset(1022f, 96f) to Size(124f, 138f)
 
 @Composable
 fun MuscleMap(
-    highlighted: Set<String>,
+    primary: Set<String>,
+    secondary: Set<String>,
     bodyColor: Color,
-    highlightColor: Color,
+    primaryColor: Color,
+    secondaryColor: Color,
     separatorColor: Color,
     modifier: Modifier = Modifier
 ) {
@@ -57,8 +59,8 @@ fun MuscleMap(
     ) {
         val scale = size.width / 1448f
         withTransform({ scale(scale, scale, pivot = Offset.Zero) }) {
-            drawBody(frontPaths, highlighted, bodyColor, highlightColor, separatorColor)
-            drawBody(backPaths, highlighted, bodyColor, highlightColor, separatorColor)
+            drawBody(frontPaths, primary, secondary, bodyColor, primaryColor, secondaryColor, separatorColor)
+            drawBody(backPaths, primary, secondary, bodyColor, primaryColor, secondaryColor, separatorColor)
             // Cabezas limpias por encima del cuello.
             drawOval(bodyColor, topLeft = frontHead.first, size = frontHead.second)
             drawOval(bodyColor, topLeft = backHead.first, size = backHead.second)
@@ -68,22 +70,29 @@ fun MuscleMap(
 
 private fun DrawScope.drawBody(
     paths: Map<String, List<Path>>,
-    highlighted: Set<String>,
+    primary: Set<String>,
+    secondary: Set<String>,
     bodyColor: Color,
-    highlightColor: Color,
+    primaryColor: Color,
+    secondaryColor: Color,
     separatorColor: Color
 ) {
-    // 1) Relleno del cuerpo (músculos no trabajados).
+    // 1) Cuerpo (músculos no trabajados).
     paths.forEach { (slug, list) ->
-        if (slug in NO_DRAW || slug in highlighted) return@forEach
+        if (slug in NO_DRAW || slug in primary || slug in secondary) return@forEach
         list.forEach { drawPath(it, color = bodyColor) }
     }
-    // 2) Relleno de los músculos trabajados, por encima.
+    // 2) Músculos secundarios (tono suave).
     paths.forEach { (slug, list) ->
-        if (slug in NO_DRAW || slug !in highlighted) return@forEach
-        list.forEach { drawPath(it, color = highlightColor) }
+        if (slug in NO_DRAW || slug in primary || slug !in secondary) return@forEach
+        list.forEach { drawPath(it, color = secondaryColor) }
     }
-    // 3) Líneas de separación entre músculos (aspecto segmentado).
+    // 3) Músculos principales (tono fuerte), por encima.
+    paths.forEach { (slug, list) ->
+        if (slug in NO_DRAW || slug !in primary) return@forEach
+        list.forEach { drawPath(it, color = primaryColor) }
+    }
+    // 4) Líneas de separación entre músculos (aspecto segmentado).
     paths.forEach { (slug, list) ->
         if (slug in NO_SEPARATOR) return@forEach
         list.forEach { drawPath(it, color = separatorColor, style = Stroke(width = 2f)) }
