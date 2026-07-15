@@ -1,59 +1,68 @@
 package com.marc.gymplan100.data
 
-import androidx.annotation.DrawableRes
-import com.marc.gymplan100.R
+import android.content.Context
 
 /**
- * Imagen de referencia por ejercicio (para identificar la máquina y el movimiento).
- * Clave: nombre exacto del ejercicio en el plan.
- * La del tríceps la aportó el usuario; el resto son de wger (licencia libre) y pueden
- * ser aproximadas. La plancha lateral es de Wikimedia Commons (everkinetic, CC BY-SA 3.0)
- * y la del dead bug es un pictograma vectorial propio (no había imagen libre).
- * Los ejercicios sin imagen disponible simplemente no muestran nada.
+ * Ilustración de referencia de cada ejercicio, en versión masculina (`_m`) y femenina (`_f`).
+ * Son ilustraciones propias (generadas con gpt-image a partir de la referencia de pose/máquina),
+ * en el estilo de la app: dos fotogramas, camiseta naranja, contorno negro, fondo blanco.
+ *
+ * Se resuelven por nombre de recurso con getIdentifier (`ex_<slug>_m` / `ex_<slug>_f`) para no
+ * tener que enumerar 52 drawables a mano.
  */
 object ExerciseImages {
 
-    private val map: Map<String, Int> = mapOf(
-        "Press de pecho en máquina" to R.drawable.ex_press_pecho_maquina,
-        "Press de pecho" to R.drawable.ex_press_pecho,
-        "Press inclinado o pec deck" to R.drawable.ex_press_inclinado_o,
-        "Press inclinado" to R.drawable.ex_press_inclinado,
-        "Pec deck (aperturas en máquina)" to R.drawable.ex_pec_deck,
-        "Remo sentado en máquina" to R.drawable.ex_remo_sentado,
-        "Remo sentado" to R.drawable.ex_remo_sentado2,
-        "Remo en máquina" to R.drawable.ex_remo_maquina,
-        "Remo en máquina o con mancuerna" to R.drawable.ex_remo_mancuerna,
-        "Curl de bíceps con mancuernas" to R.drawable.ex_curl_biceps_mancuernas,
-        "Curl de bíceps" to R.drawable.ex_curl_biceps,
-        "Curl de bíceps + curl martillo" to R.drawable.ex_curl_martillo,
-        "Curl martillo" to R.drawable.ex_curl_martillo,
-        "Extensión de tríceps en polea" to R.drawable.ex_extension_triceps_polea,
-        "Fondos en máquina o press francés" to R.drawable.ex_fondos_triceps,
-        "Elevaciones laterales" to R.drawable.ex_elevaciones_laterales,
-        "Jalón al pecho (polea)" to R.drawable.ex_jalon_pecho,
-        "Jalón al pecho" to R.drawable.ex_jalon_pecho,
-        "Jalón al pecho agarre neutro" to R.drawable.ex_jalon_neutro,
-        "Press de hombros en máquina" to R.drawable.ex_press_hombros_maquina,
-        "Press de hombros" to R.drawable.ex_press_hombros,
-        "Face pull en polea" to R.drawable.ex_face_pull_polea,
-        "Face pull" to R.drawable.ex_face_pull,
-        "Plancha" to R.drawable.ex_plancha,
-        "Plancha lateral + dead bug" to R.drawable.ex_plancha_lateral,
-        "Plancha lateral" to R.drawable.ex_plancha_lateral,
-        "Dead bug" to R.drawable.ex_dead_bug,
-        "Hip thrust o puente de glúteos" to R.drawable.ex_hip_thrust,
-        "Hip thrust" to R.drawable.ex_hip_thrust,
-        "Prensa de piernas" to R.drawable.ex_prensa_piernas,
-        "Curl de piernas (máquina)" to R.drawable.ex_curl_piernas,
-        "Curl de piernas" to R.drawable.ex_curl_piernas,
-        "Extensión de piernas" to R.drawable.ex_extension_piernas,
-        "Elevación de gemelos" to R.drawable.ex_gemelos,
-        "Sentadilla a banco/cajón" to R.drawable.ex_sentadilla_cajon,
-        "Sentadilla goblet con mancuerna" to R.drawable.ex_goblet_mancuerna,
-        "Sentadilla goblet o en máquina" to R.drawable.ex_goblet_maquina,
-        "Sentadilla goblet" to R.drawable.ex_goblet,
+    /** Nombre del ejercicio en el plan -> slug base de su ilustración. */
+    private val nameToSlug: Map<String, String> = mapOf(
+        "Press de pecho en máquina" to "seated-chest-press",
+        "Press de pecho" to "seated-chest-press",
+        "Press inclinado o pec deck" to "incline-chest-press-machine",
+        "Press inclinado" to "incline-chest-press-machine",
+        "Pec deck (aperturas en máquina)" to "butterflies",
+        "Remo sentado en máquina" to "seated-row-machine",
+        "Remo sentado" to "seated-cable-back-rows",
+        "Remo en máquina" to "seated-row-machine",
+        "Remo en máquina o con mancuerna" to "seated-row-machine",
+        "Curl de bíceps con mancuernas" to "alternating-dumbbell-biceps-curl",
+        "Curl de bíceps" to "alternating-dumbbell-biceps-curl",
+        "Curl de bíceps + curl martillo" to "dumbbell-hammer-biceps-curl",
+        "Curl martillo" to "dumbbell-hammer-biceps-curl",
+        "Extensión de tríceps en polea" to "triceps-pushdown",
+        "Fondos en máquina o press francés" to "dips-machine",
+        "Elevaciones laterales" to "dumbbell-lateral-raises",
+        "Jalón al pecho (polea)" to "chest-pulldown",
+        "Jalón al pecho" to "chest-pulldown",
+        "Jalón al pecho agarre neutro" to "close-grip-chest-pulldown",
+        "Press de hombros en máquina" to "machine-shoulder-press",
+        "Press de hombros" to "seated-dumbbell-overhead-shoulder-press",
+        "Face pull en polea" to "face-pull",
+        "Face pull" to "face-pull",
+        "Plancha" to "plank",
+        "Plancha lateral + dead bug" to "side-plank",
+        "Plancha lateral" to "side-plank",
+        "Dead bug" to "dead-bug",
+        "Hip thrust o puente de glúteos" to "barbell-hip-thrust",
+        "Hip thrust" to "barbell-hip-thrust",
+        "Prensa de piernas" to "leg-press",
+        "Curl de piernas (máquina)" to "seated-leg-curl",
+        "Curl de piernas" to "lying-leg-curls",
+        "Extensión de piernas" to "seated-leg-extensions",
+        "Elevación de gemelos" to "seated-calf-raises",
+        "Sentadilla a banco/cajón" to "box-squat",
+        "Sentadilla goblet con mancuerna" to "goblet-squats",
+        "Sentadilla goblet o en máquina" to "goblet-squats",
+        "Sentadilla goblet" to "goblet-squats",
+        "Finisher: press de pecho ligero al fallo" to "seated-chest-press",
     )
 
-    @DrawableRes
-    fun forName(name: String): Int? = map[name]
+    /**
+     * Drawable de la ilustración del ejercicio para el género indicado (femenino si [female],
+     * masculino en caso contrario), o null si el ejercicio no tiene imagen.
+     */
+    fun forName(context: Context, name: String, female: Boolean): Int? {
+        val slug = nameToSlug[name] ?: return null
+        val res = "ex_" + slug.replace('-', '_') + if (female) "_f" else "_m"
+        val id = context.resources.getIdentifier(res, "drawable", context.packageName)
+        return if (id != 0) id else null
+    }
 }

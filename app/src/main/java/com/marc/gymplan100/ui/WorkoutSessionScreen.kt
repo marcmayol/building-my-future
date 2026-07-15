@@ -56,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -184,6 +185,9 @@ private fun WorkingContent(
         mutableStateOf(viewModel.suggestedWeight(s))
     }
     var showGuide by remember { mutableStateOf(false) }
+    // Se leen aquí (contexto @Composable) porque dentro del LazyColumn no se puede.
+    val context = LocalContext.current
+    val female = LocalIsFemale.current
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -221,7 +225,7 @@ private fun WorkingContent(
                 }
             }
         }
-        val imageRes = ExerciseImages.forName(exercise.name)
+        val imageRes = ExerciseImages.forName(context, exercise.name, female)
         if (imageRes != null) {
             item {
                 Image(

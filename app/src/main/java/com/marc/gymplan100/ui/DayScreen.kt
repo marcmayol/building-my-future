@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -226,7 +227,7 @@ private fun ExerciseCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            val imageRes = ExerciseImages.forName(exercise.name)
+            val imageRes = ExerciseImages.forName(LocalContext.current, exercise.name, LocalIsFemale.current)
             if (imageRes != null) {
                 Image(
                     painter = painterResource(imageRes),

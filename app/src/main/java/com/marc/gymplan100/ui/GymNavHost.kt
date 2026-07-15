@@ -2,9 +2,11 @@ package com.marc.gymplan100.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -28,6 +30,9 @@ object Routes {
     fun session(n: Int) = "session/$n"
 }
 
+/** Género del perfil, para elegir la ilustración del ejercicio (true = mujer). */
+val LocalIsFemale = staticCompositionLocalOf { false }
+
 @Composable
 fun GymNavHost(
     openSessionDay: Int? = null,
@@ -36,6 +41,7 @@ fun GymNavHost(
     val navController = rememberNavController()
     val viewModel: PlanViewModel = viewModel()
     val celebration by viewModel.celebration.collectAsState()
+    val profile by viewModel.profile.collectAsState()
 
     // Deep-link desde la notificación de la cuenta atrás: abre directamente la sesión en curso.
     LaunchedEffect(openSessionDay) {
@@ -45,6 +51,7 @@ fun GymNavHost(
         }
     }
 
+    CompositionLocalProvider(LocalIsFemale provides (profile.gender == "Mujer")) {
     Box {
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
@@ -138,5 +145,6 @@ fun GymNavHost(
                 onPlayAnthem = { viewModel.playChampionsVideo() }
             )
         }
+    }
     }
 }

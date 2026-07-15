@@ -57,7 +57,7 @@ fun ExerciseGuideSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val guide = ExerciseGuides.forName(exerciseName)
-    val imageRes = ExerciseImages.forName(exerciseName)
+    val imageRes = ExerciseImages.forName(LocalContext.current, exerciseName, LocalIsFemale.current)
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
