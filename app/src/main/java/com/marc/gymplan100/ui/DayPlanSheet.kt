@@ -2,6 +2,7 @@
 
 package com.marc.gymplan100.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,10 +32,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.Exercise
+import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.data.setCountFromScheme
 
@@ -151,31 +157,49 @@ private fun PlanRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(bubbleColor)
-        ) {
-            when {
-                isCurrent -> Icon(
-                    Icons.Filled.PlayArrow,
-                    contentDescription = "En curso",
-                    tint = bubbleContent,
-                    modifier = Modifier.size(18.dp)
+        // Miniatura del ejercicio con la insignia de estado encima: identificar la
+        // máquina de un vistazo es lo que más ayuda en el gimnasio.
+        val imageRes = ExerciseImages.forName(LocalContext.current, exercise.name, LocalIsFemale.current)
+        Box(contentAlignment = Alignment.BottomStart) {
+            if (imageRes != null) {
+                Image(
+                    painter = painterResource(imageRes),
+                    contentDescription = exercise.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White)
                 )
-                isDone -> Icon(
-                    Icons.Filled.Check,
-                    contentDescription = "Hecho",
-                    tint = bubbleContent,
-                    modifier = Modifier.size(18.dp)
-                )
-                else -> Text(
-                    "$position",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = bubbleContent
-                )
+            } else {
+                Box(modifier = Modifier.size(64.dp))
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(26.dp)
+                    .clip(CircleShape)
+                    .background(bubbleColor)
+            ) {
+                when {
+                    isCurrent -> Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = "En curso",
+                        tint = bubbleContent,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    isDone -> Icon(
+                        Icons.Filled.Check,
+                        contentDescription = "Hecho",
+                        tint = bubbleContent,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    else -> Text(
+                        "$position",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = bubbleContent
+                    )
+                }
             }
         }
         Column(modifier = Modifier.weight(1f)) {
