@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
@@ -578,6 +579,10 @@ private fun RestingContent(
     }
 
     var showNextGuide by remember { mutableStateOf(false) }
+    // Plan completo del día, consultable durante el descanso.
+    var showDayPlan by remember { mutableStateOf(false) }
+    // Ejercicio elegido desde el plan del día para ver su ficha.
+    var guideFromPlan by remember { mutableStateOf<com.marc.gymplan100.data.Exercise?>(null) }
 
     // El siguiente ejercicio se mide por tiempo (planchas, isométricos): no hay peso que preparar.
     val nextIsTimed = nextExercise != null && secondsPerSetFromScheme(nextExercise.scheme) != null
@@ -670,6 +675,15 @@ private fun RestingContent(
                 )
             }
         }
+        Spacer(Modifier.height(12.dp))
+        // Ver el entreno entero sin salir del descanso: qué queda, qué está hecho.
+        OutlinedButton(
+            onClick = { showDayPlan = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(Icons.AutoMirrored.Filled.List, contentDescription = null)
+            Text("  Plan de hoy")
+        }
         Spacer(Modifier.height(16.dp))
         Button(
             onClick = { viewModel.endRest() },
@@ -688,6 +702,24 @@ private fun RestingContent(
             exerciseName = nextExercise.name,
             scheme = nextExercise.scheme,
             onDismiss = { showNextGuide = false }
+        )
+    }
+
+    if (showDayPlan) {
+        DayPlanSheet(
+            day = day,
+            session = s,
+            // Se cierra el plan antes de abrir la ficha para no anidar dos paneles.
+            onExerciseClick = { ex -> showDayPlan = false; guideFromPlan = ex },
+            onDismiss = { showDayPlan = false }
+        )
+    }
+
+    guideFromPlan?.let { ex ->
+        ExerciseGuideSheet(
+            exerciseName = ex.name,
+            scheme = ex.scheme,
+            onDismiss = { guideFromPlan = null }
         )
     }
 }
