@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.em
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,7 +34,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -63,7 +61,6 @@ fun HomeScreen(
     onOpenPhase: (Int) -> Unit,
     onOpenDay: (Int) -> Unit,
     onResumeSession: (Int) -> Unit,
-    onStartExtra: () -> Unit,
     onOpenSpecial: () -> Unit,
     onOpenAchievements: () -> Unit,
     onOpenWeights: () -> Unit,
@@ -73,7 +70,6 @@ fun HomeScreen(
 ) {
     val progress by viewModel.progress.collectAsState()
     val activeSession by viewModel.activeSession.collectAsState()
-    var showExtraConfirm by remember { mutableStateOf(false) }
     val done = progress.completedDays.count { it in 1..PlanData.TOTAL_DAYS }
     val fraction = done.toFloat() / PlanData.TOTAL_DAYS
 
@@ -273,41 +269,11 @@ fun HomeScreen(
                     }
                     Spacer(Modifier.height(10.dp))
                     OutlinedButton(
-                        onClick = { showExtraConfirm = true },
+                        onClick = onOpenSpecial,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Filled.Star, contentDescription = null)
-                        Text("  Registrar entrenamiento extra")
-                    }
-                }
-            }
-        }
-
-        item {
-            Card(
-                onClick = onOpenSpecial,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("🔥", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(Modifier.size(12.dp))
-                    Column {
-                        Text(
-                            "Entrenamientos especiales",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            "Libre, Rutina Militar y Quema Grasa",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Text("  Entrenamientos especiales")
                     }
                 }
             }
@@ -494,29 +460,6 @@ fun HomeScreen(
         }
     }
 
-    if (showExtraConfirm) {
-        AlertDialog(
-            onDismissRequest = { showExtraConfirm = false },
-            icon = { Icon(Icons.Filled.Star, contentDescription = null) },
-            title = { Text("¿Entrenamiento extra?") },
-            text = {
-                Text(
-                    "Es un entreno adicional (p. ej. te llaman por la tarde para ir con tu tío) " +
-                        "que NO cuenta como día del plan: tu progreso de 100 días no cambia. " +
-                        "Solo es un cronómetro que corre hasta que pulses \"Finalizar\", " +
-                        "y se guardará como entreno extra en Resultados."
-                )
-            },
-            confirmButton = {
-                Button(onClick = { showExtraConfirm = false; onStartExtra() }) {
-                    Text("Sí, empezar extra")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showExtraConfirm = false }) { Text("Cancelar") }
-            }
-        )
-    }
 }
 
 @Composable

@@ -76,10 +76,6 @@ fun GymNavHost(
                         navController.navigate(Routes.session(day))
                     }
                 },
-                onStartExtra = {
-                    val refDay = viewModel.startExtraSession()
-                    navController.navigate(Routes.session(refDay))
-                },
                 onOpenSpecial = { navController.navigate(Routes.SPECIAL) },
                 onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                 onOpenWeights = { navController.navigate(Routes.WEIGHTS) },
