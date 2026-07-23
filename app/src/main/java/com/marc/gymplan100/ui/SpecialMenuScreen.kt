@@ -77,8 +77,8 @@ fun SpecialMenuScreen(
             item {
                 OptionCard(
                     emoji = "⏱️",
-                    title = "Entrenamiento libre",
-                    subtitle = "Cronómetro simple, como hasta ahora. Tú marcas el ritmo.",
+                    title = "Entrenamiento libre (extra)",
+                    subtitle = "El entreno extra de siempre: cronómetro simple, tú marcas el ritmo.",
                     onClick = onFreeWorkout
                 )
             }
