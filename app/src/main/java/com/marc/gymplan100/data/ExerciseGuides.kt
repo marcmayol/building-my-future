@@ -455,23 +455,85 @@ object ExerciseGuides {
         videoQuery = "dead bug ejercicio técnica abdomen"
     )
 
-    private val circuitoCore = ExerciseGuide(
+    // Los circuitos son de peso corporal y encadenan 3 ejercicios: la ficha
+    // describe CADA movimiento paso a paso, que es lo que hace falta en el gym.
+    private val circuitoRodillas = ExerciseGuide(
         muscles = "Todo el core: abdomen, oblicuos y lumbar.",
-        howTo = "Es un circuito: haces los ejercicios indicados uno detrás de otro, con poco o " +
-            "ningún descanso entre ellos, y al terminar la ronda descansas. Cada 'vuelta' es una " +
-            "ronda completa del circuito. Cuida la técnica de cada ejercicio aunque vayas con algo " +
-            "de fatiga; mejor parar que hacerlo mal.",
+        howTo = "Circuito de suelo, sin peso: haz los 3 ejercicios seguidos con poco descanso " +
+            "entre ellos; al terminar los 3 has completado una vuelta. Marca \"Serie hecha\" al " +
+            "acabar cada vuelta.\n\n" +
+            "1) PLANCHA (~30 s). Antebrazos y puntas de los pies en el suelo, codos bajo los " +
+            "hombros, cuerpo en línea recta de la cabeza a los talones apretando abdomen y " +
+            "glúteos. Aguanta respirando normal.\n\n" +
+            "2) RODILLAS AL PECHO / escalador (~20-30 s). Desde la posición de plancha pero " +
+            "sobre las manos (plancha alta), lleva una rodilla hacia el pecho y vuelve, " +
+            "alternando piernas a ritmo constante, como si corrieras en el sitio. Cadera baja, " +
+            "sin subir el culo.\n\n" +
+            "3) PLANCHA LATERAL (~20 s por lado). De lado, apoyado en un antebrazo con el codo " +
+            "bajo el hombro, sube la cadera hasta formar una línea recta y aguanta. Cambia de " +
+            "lado. Luego descansas y empiezas la siguiente vuelta.",
         mistakes = listOf(
-            "Ir tan rápido que pierdes la técnica.",
-            "Saltarte el descanso entre vueltas si lo necesitas.",
-            "Arquear la lumbar en los ejercicios de suelo."
+            "Subir el culo o hundir la cadera en las planchas.",
+            "Ir tan rápido en las rodillas que pierdes la postura de plancha.",
+            "Dejar caer la cadera al suelo en la plancha lateral."
         ),
         alternatives = listOf(
-            "Sustituye cualquier ejercicio del circuito por una plancha.",
-            "Reduce el número de vueltas si vienes cansado.",
-            "Cámbialo por 3 series de plancha + dead bug."
+            "Rodillas al pecho tumbado boca arriba si el escalador te cuesta.",
+            "Plancha lateral con la rodilla de abajo apoyada (más fácil).",
+            "Reduce el número de vueltas si vienes cansado."
         ),
-        videoQuery = "circuito core abdominales rutina"
+        videoQuery = "circuito core plancha escalador plancha lateral"
+    )
+
+    private val circuitoRueda = ExerciseGuide(
+        muscles = "Todo el core: abdomen (recto), oblicuos y flexores de cadera.",
+        howTo = "Circuito de suelo, sin peso (salvo la rueda): haz los 3 ejercicios seguidos con " +
+            "poco descanso; al terminar los 3 es una vuelta. Marca \"Serie hecha\" al acabar cada " +
+            "vuelta.\n\n" +
+            "1) PLANCHA (~30 s). Antebrazos y pies en el suelo, cuerpo en línea recta apretando " +
+            "abdomen y glúteos.\n\n" +
+            "2) RUEDA ABDOMINAL (~8-10 reps). De rodillas, agarra la rueda con las dos manos y " +
+            "rueda hacia delante estirando el cuerpo todo lo que controles SIN que la lumbar se " +
+            "arquee; vuelve tirando con el abdomen. Si no tienes rueda, usa una barra con discos.\n\n" +
+            "3) ELEVACIÓN DE PIERNAS (~10-12 reps). Tumbado boca arriba, manos bajo los glúteos o " +
+            "agarrado a algo detrás de la cabeza; sube las piernas rectas hasta la vertical y " +
+            "bájalas despacio sin tocar el suelo y sin despegar la lumbar. Luego descansas.",
+        mistakes = listOf(
+            "Arquear la lumbar en la rueda (empieza con recorrido corto).",
+            "Bajar las piernas de golpe o despegar la zona lumbar del suelo.",
+            "Aguantar la respiración; espira en el esfuerzo."
+        ),
+        alternatives = listOf(
+            "Rueda: sustitúyela por \"plancha con avance\" o toques de talón.",
+            "Elevación de piernas con rodillas dobladas si estiradas te cuesta.",
+            "Reduce vueltas o reps si pierdes la técnica."
+        ),
+        videoQuery = "circuito core plancha rueda abdominal elevacion piernas"
+    )
+
+    private val circuitoDeadBug = ExerciseGuide(
+        muscles = "Todo el core: abdomen profundo, oblicuos y lumbar.",
+        howTo = "Circuito de suelo, sin peso: 3 ejercicios seguidos con poco descanso; los 3 son " +
+            "una vuelta. Marca \"Serie hecha\" al acabar cada vuelta.\n\n" +
+            "1) PLANCHA (~30 s). Antebrazos y pies en el suelo, cuerpo recto de cabeza a talones, " +
+            "abdomen y glúteos apretados.\n\n" +
+            "2) PLANCHA LATERAL (~20 s por lado). De lado sobre un antebrazo, codo bajo el hombro, " +
+            "sube la cadera hasta la línea recta y aguanta; cambia de lado.\n\n" +
+            "3) DEAD BUG (~10 reps alternando). Boca arriba, brazos hacia el techo y rodillas a " +
+            "90°. Con la lumbar pegada al suelo, baja despacio a la vez un brazo por detrás de la " +
+            "cabeza y la pierna contraria estirándola; vuelve al centro y cambia de lado. Control, " +
+            "no prisa. Luego descansas.",
+        mistakes = listOf(
+            "Hundir o subir la cadera en las planchas.",
+            "Arquear la lumbar en el dead bug: debe quedar pegada al suelo.",
+            "Ir con impulso en vez de movimiento lento y controlado."
+        ),
+        alternatives = listOf(
+            "Plancha lateral con la rodilla de abajo apoyada (más fácil).",
+            "Dead bug solo con las piernas si te cuesta coordinar brazos y piernas.",
+            "Reduce el número de vueltas si vienes cansado."
+        ),
+        videoQuery = "circuito core plancha plancha lateral dead bug"
     )
 
     private val finisher = ExerciseGuide(
@@ -536,9 +598,9 @@ object ExerciseGuides {
         "Plancha lateral + dead bug" to planchaLateral,
         "Plancha lateral" to planchaLateral,
         "Dead bug" to deadBug,
-        "Circuito core (plancha, rodillas, plancha lateral)" to circuitoCore,
-        "Circuito core (plancha, rueda, elevación piernas)" to circuitoCore,
-        "Circuito core (plancha, plancha lateral, dead bug)" to circuitoCore,
+        "Circuito core (plancha, rodillas, plancha lateral)" to circuitoRodillas,
+        "Circuito core (plancha, rueda, elevación piernas)" to circuitoRueda,
+        "Circuito core (plancha, plancha lateral, dead bug)" to circuitoDeadBug,
         "Finisher: press de pecho ligero al fallo" to finisher,
     )
 

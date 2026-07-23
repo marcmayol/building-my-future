@@ -161,6 +161,13 @@ fun secondsPerSetFromScheme(scheme: String): Int? {
 }
 
 /**
+ * Ejercicio de peso corporal sin carga que registrar (circuitos "por vueltas"):
+ * no tiene sentido pedir kilos. Ej: "3 vueltas" -> true, "3 x 12" -> false.
+ */
+fun isBodyweightScheme(scheme: String): Boolean =
+    Regex("""\d+\s*vuelta""").containsMatchIn(scheme.lowercase())
+
+/**
  * Repeticiones objetivo indicadas en el esquema, para usarlas por defecto.
  * Ej: "3 x 12" -> "12", "4 x 8-10" -> "8-10", "3 vueltas" -> "".
  */

@@ -56,13 +56,52 @@ object ExerciseImages {
     )
 
     /**
+     * Movimientos ilustrables de cada circuito, en orden (etiqueta -> slug de imagen).
+     * Un circuito no tiene una sola imagen: mostramos la de cada sub-ejercicio que tengamos.
+     * Los slugs sin drawable (p. ej. escalador, rueda) simplemente no aparecen.
+     */
+    private val nameToCircuitMoves: Map<String, List<Pair<String, String>>> = mapOf(
+        "Circuito core (plancha, rodillas, plancha lateral)" to listOf(
+            "Plancha" to "plank",
+            "Rodillas al pecho" to "mountain-climber",
+            "Plancha lateral" to "side-plank",
+        ),
+        "Circuito core (plancha, rueda, elevación piernas)" to listOf(
+            "Plancha" to "plank",
+            "Rueda abdominal" to "ab-wheel",
+            "Elevación de piernas" to "lying-leg-raise",
+        ),
+        "Circuito core (plancha, plancha lateral, dead bug)" to listOf(
+            "Plancha" to "plank",
+            "Plancha lateral" to "side-plank",
+            "Dead bug" to "dead-bug",
+        ),
+    )
+
+    private fun drawableFor(context: Context, slug: String, female: Boolean): Int {
+        val res = "ex_" + slug.replace('-', '_') + if (female) "_f" else "_m"
+        return context.resources.getIdentifier(res, "drawable", context.packageName)
+    }
+
+    /**
      * Drawable de la ilustración del ejercicio para el género indicado (femenino si [female],
      * masculino en caso contrario), o null si el ejercicio no tiene imagen.
      */
     fun forName(context: Context, name: String, female: Boolean): Int? {
         val slug = nameToSlug[name] ?: return null
-        val res = "ex_" + slug.replace('-', '_') + if (female) "_f" else "_m"
-        val id = context.resources.getIdentifier(res, "drawable", context.packageName)
+        val id = drawableFor(context, slug, female)
         return if (id != 0) id else null
+    }
+
+    /**
+     * Ilustraciones de los movimientos de un circuito (etiqueta -> drawable), solo las que existen.
+     * Vacío si el nombre no es un circuito conocido.
+     */
+    fun circuitMoves(context: Context, name: String, female: Boolean): List<Pair<String, Int>> {
+        val moves = nameToCircuitMoves[name] ?: return emptyList()
+        return moves.mapNotNull { (label, slug) ->
+            val id = drawableFor(context, slug, female)
+            if (id != 0) label to id else null
+        }
     }
 }

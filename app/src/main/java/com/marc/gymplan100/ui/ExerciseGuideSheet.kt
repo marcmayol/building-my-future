@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -89,6 +90,41 @@ fun ExerciseGuideSheet(
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White)
                 )
+            } else {
+                // Circuitos: no hay una sola imagen, mostramos la de cada movimiento.
+                val moves = ExerciseImages.circuitMoves(
+                    LocalContext.current, exerciseName, LocalIsFemale.current
+                )
+                if (moves.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        moves.forEach { (label, res) ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(res),
+                                    contentDescription = label,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .size(150.dp)
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(Color.White)
+                                )
+                                Text(
+                                    label,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             // Vídeo: abre una búsqueda en YouTube del movimiento (devuelve shorts y tutoriales).

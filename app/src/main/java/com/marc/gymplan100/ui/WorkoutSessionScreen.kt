@@ -68,6 +68,7 @@ import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SessionPhase
+import com.marc.gymplan100.data.isBodyweightScheme
 import com.marc.gymplan100.data.secondsPerSetFromScheme
 import com.marc.gymplan100.data.setCountFromScheme
 import kotlinx.coroutines.delay
@@ -180,6 +181,8 @@ private fun WorkingContent(
     // Si el ejercicio se mide por tiempo (planchas, isométricos) no pedimos peso:
     // se hará con una cuenta atrás que avisa al terminar la serie.
     val timedSecs = secondsPerSetFromScheme(exercise.scheme)
+    // Circuitos de peso corporal (por vueltas): tampoco hay kilos que registrar.
+    val bodyweight = isBodyweightScheme(exercise.scheme)
 
     // Peso por serie: precargado con el sugerido (serie anterior) y editable.
     var weight by remember(s.exerciseIndex, s.setNumber) {
@@ -251,6 +254,19 @@ private fun WorkingContent(
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Text("  Empezar serie · ${formatSecs(timedSecs)}")
+                }
+            }
+        } else if (bodyweight) {
+            // Peso corporal: nada de kilos, solo confirmar la vuelta hecha.
+            item {
+                Button(
+                    onClick = { viewModel.completeSet("") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ) {
+                    Icon(Icons.Filled.Check, contentDescription = null)
+                    Text("  Vuelta hecha")
                 }
             }
         } else {
@@ -584,8 +600,9 @@ private fun RestingContent(
     // Ejercicio elegido desde el plan del día para ver su ficha.
     var guideFromPlan by remember { mutableStateOf<com.marc.gymplan100.data.Exercise?>(null) }
 
-    // El siguiente ejercicio se mide por tiempo (planchas, isométricos): no hay peso que preparar.
+    // El siguiente no lleva kilos que preparar: por tiempo (planchas) o circuito corporal.
     val nextIsTimed = nextExercise != null && secondsPerSetFromScheme(nextExercise.scheme) != null
+    val nextIsBodyweight = nextExercise != null && isBodyweightScheme(nextExercise.scheme)
     // Peso preparado para la próxima serie: precargado con la sugerencia y editable.
     var plannedWeight by remember(s.restStartMillis) {
         mutableStateOf(s.plannedWeight.ifBlank { viewModel.plannedWeightSuggestion(s) })
@@ -641,7 +658,7 @@ private fun RestingContent(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        if (nextExercise != null && !nextIsTimed) {
+        if (nextExercise != null && !nextIsTimed && !nextIsBodyweight) {
             Spacer(Modifier.height(12.dp))
             // Aprovecha el descanso para dejar la máquina preparada con el peso adecuado:
             // se precarga con la sugerencia y lo que dejes aquí precarga la siguiente serie.
