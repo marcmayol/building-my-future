@@ -64,6 +64,7 @@ fun HomeScreen(
     onOpenDay: (Int) -> Unit,
     onResumeSession: (Int) -> Unit,
     onStartExtra: () -> Unit,
+    onOpenSpecial: () -> Unit,
     onOpenAchievements: () -> Unit,
     onOpenWeights: () -> Unit,
     onOpenResults: () -> Unit,
@@ -191,8 +192,11 @@ fun HomeScreen(
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                             Text(
-                                if (session.extra) "Entrenamiento extra · toca para reanudar"
-                                else "Día ${session.dayNumber} · toca para reanudar",
+                                when {
+                                    session.routineId != null -> "Rutina especial · toca para reanudar"
+                                    session.extra -> "Entrenamiento extra · toca para reanudar"
+                                    else -> "Día ${session.dayNumber} · toca para reanudar"
+                                },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
@@ -274,6 +278,36 @@ fun HomeScreen(
                     ) {
                         Icon(Icons.Filled.Star, contentDescription = null)
                         Text("  Registrar entrenamiento extra")
+                    }
+                }
+            }
+        }
+
+        item {
+            Card(
+                onClick = onOpenSpecial,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("🔥", style = MaterialTheme.typography.headlineSmall)
+                    Spacer(Modifier.size(12.dp))
+                    Column {
+                        Text(
+                            "Entrenamientos especiales",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            "Libre, Rutina Militar y Quema Grasa",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }

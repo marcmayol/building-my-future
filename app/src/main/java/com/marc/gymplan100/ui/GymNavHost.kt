@@ -25,9 +25,14 @@ object Routes {
     const val RESULTS = "results"
     const val STATS = "stats"
     const val SETTINGS = "settings"
+    const val SPECIAL = "special"
+    const val FATBURN = "fatburn"
+    const val FATBURN_EX = "fatburn/{id}"
+    const val ROUTINE = "routine"
     fun phase(n: Int) = "phase/$n"
     fun day(n: Int) = "day/$n"
     fun session(n: Int) = "session/$n"
+    fun fatburnEx(id: String) = "fatburn/$id"
 }
 
 /** Género del perfil, para elegir la ilustración del ejercicio (true = mujer). */
@@ -43,10 +48,15 @@ fun GymNavHost(
     val celebration by viewModel.celebration.collectAsState()
     val profile by viewModel.profile.collectAsState()
 
-    // Deep-link desde la notificación de la cuenta atrás: abre directamente la sesión en curso.
+    // Deep-link desde la notificación de la cuenta atrás: abre la sesión en curso. Si es una
+    // rutina especial, abre su pantalla de rutina en vez de la sesión normal del plan.
     LaunchedEffect(openSessionDay) {
         if (openSessionDay != null && openSessionDay > 0) {
-            navController.navigate(Routes.session(openSessionDay))
+            if (viewModel.activeSession.value?.isRoutine == true) {
+                navController.navigate(Routes.ROUTINE)
+            } else {
+                navController.navigate(Routes.session(openSessionDay))
+            }
             onSessionConsumed()
         }
     }
@@ -59,11 +69,18 @@ fun GymNavHost(
                 viewModel = viewModel,
                 onOpenPhase = { navController.navigate(Routes.phase(it)) },
                 onOpenDay = { navController.navigate(Routes.day(it)) },
-                onResumeSession = { navController.navigate(Routes.session(it)) },
+                onResumeSession = { day ->
+                    if (viewModel.activeSession.value?.isRoutine == true) {
+                        navController.navigate(Routes.ROUTINE)
+                    } else {
+                        navController.navigate(Routes.session(day))
+                    }
+                },
                 onStartExtra = {
                     val refDay = viewModel.startExtraSession()
                     navController.navigate(Routes.session(refDay))
                 },
+                onOpenSpecial = { navController.navigate(Routes.SPECIAL) },
                 onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                 onOpenWeights = { navController.navigate(Routes.WEIGHTS) },
                 onOpenResults = { navController.navigate(Routes.RESULTS) },
@@ -132,6 +149,46 @@ fun GymNavHost(
             val n = entry.arguments?.getInt("n") ?: 1
             WorkoutSessionScreen(
                 dayNumber = n,
+                viewModel = viewModel,
+                onExit = { navController.popBackStack(Routes.HOME, inclusive = false) }
+            )
+        }
+        composable(Routes.SPECIAL) {
+            SpecialMenuScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onFreeWorkout = {
+                    val refDay = viewModel.startExtraSession()
+                    navController.navigate(Routes.session(refDay))
+                },
+                onOpenMilitary = {
+                    viewModel.startMilitarySession()
+                    navController.navigate(Routes.ROUTINE)
+                },
+                onOpenFatburn = { navController.navigate(Routes.FATBURN) }
+            )
+        }
+        composable(Routes.FATBURN) {
+            FatburnListScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onOpenExercise = { id -> navController.navigate(Routes.fatburnEx(id)) }
+            )
+        }
+        composable(
+            route = Routes.FATBURN_EX,
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { entry ->
+            val id = entry.arguments?.getString("id") ?: ""
+            FatburnExerciseScreen(
+                exerciseId = id,
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onStarted = { navController.navigate(Routes.ROUTINE) }
+            )
+        }
+        composable(Routes.ROUTINE) {
+            RoutineSessionScreen(
                 viewModel = viewModel,
                 onExit = { navController.popBackStack(Routes.HOME, inclusive = false) }
             )

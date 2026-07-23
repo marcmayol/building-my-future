@@ -83,4 +83,5 @@ dependencies {
     implementation(libs.play.services.wearable)
     implementation(libs.androidx.health.connect.client)
     debugImplementation(libs.androidx.ui.tooling)
+    testImplementation(libs.junit)
 }

@@ -324,7 +324,11 @@ class SkipActionReceiver : BroadcastReceiver() {
                 val session = repo.activeSession.first()
                 if (session != null) {
                     val now = System.currentTimeMillis()
-                    val next = when (session.phase) {
+                    val next = if (session.isRoutine) {
+                        // Rutina especial: la transición la calcula su propio motor puro.
+                        val data = com.marc.gymplan100.data.SpecialWorkoutsLoader.load(appContext)
+                        com.marc.gymplan100.data.SpecialSessionEngine.skipFromNotification(data, session, now)
+                    } else when (session.phase) {
                         SessionPhase.WARMUP -> SessionEngine.endWarmup(session)
                         SessionPhase.TIMED_SET -> SessionEngine.completeSet(session, "", now)
                         SessionPhase.RESTING -> SessionEngine.endRest(session, now)

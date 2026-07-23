@@ -11,11 +11,18 @@ import com.marc.gymplan100.data.Motivation
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.ProgressState
+import com.marc.gymplan100.data.EjercicioCatalogo
+import com.marc.gymplan100.data.Protocolo
+import com.marc.gymplan100.data.Rutina
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.data.SessionRecord
+import com.marc.gymplan100.data.SpecialSessionEngine
+import com.marc.gymplan100.data.SpecialWorkoutsData
+import com.marc.gymplan100.data.SpecialWorkoutsLoader
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.data.UserProfile
+import com.marc.gymplan100.data.WeeklyFrequency
 import com.marc.gymplan100.data.secondsPerSetFromScheme
 import com.marc.gymplan100.health.HealthConnectManager
 import com.marc.gymplan100.notify.RestReminder
@@ -285,6 +292,112 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         return refDay
     }
 
+    // --- Entrenamientos especiales (Rutina Militar / Quema Grasa) ----------
+
+    /** Definición de las rutinas especiales, cargada del asset la primera vez que se usa. */
+    val specialWorkouts: SpecialWorkoutsData by lazy {
+        runCatching { SpecialWorkoutsLoader.load(getApplication()) }.getOrElse { SpecialWorkoutsData() }
+    }
+
+    /** Estado de frecuencia de la Rutina Militar esta semana (para el aviso no bloqueante). */
+    fun militaryFrequency(): WeeklyFrequency.Status {
+        val rutina = specialWorkouts.militar ?: return WeeklyFrequency.Status(0, 0, false)
+        return WeeklyFrequency.militaryStatus(_history.value, rutina.frecuencia_semanal)
+    }
+
+    /** Estado de frecuencia de un ejercicio de quema grasa esta semana. */
+    fun exerciseFrequency(exercise: EjercicioCatalogo): WeeklyFrequency.Status =
+        WeeklyFrequency.exerciseStatus(_history.value, exercise)
+
+    /** Programa (o cancela) el aviso de la cuenta atrás según la fase de una sesión de rutina. */
+    private fun scheduleRoutineReminder(s: ActiveSession) {
+        val app = getApplication<Application>()
+        when (s.phase) {
+            SessionPhase.TIMED_SET -> {
+                if (s.timedTargetSeconds > 0 && !s.timedPaused) {
+                    RestReminder.schedule(
+                        app,
+                        s.timedStartMillis + s.timedTargetSeconds * 1000L,
+                        RestReminder.KIND_TIMED_SET,
+                        s.dayNumber
+                    )
+                } else RestReminder.cancel(app)
+            }
+            SessionPhase.RESTING -> RestReminder.schedule(
+                app,
+                s.restStartMillis + s.restTargetSeconds * 1000L,
+                RestReminder.KIND_BETWEEN_SETS,
+                s.dayNumber
+            )
+            else -> RestReminder.cancel(app) // WORKING (reps) / FINISHED: sin cuenta atrás
+        }
+    }
+
+    /** Inicia la Rutina Militar (secuencia guiada de pasos). Descarta cualquier sesión en curso. */
+    fun startMilitarySession() {
+        val rutina = specialWorkouts.militar ?: return
+        RestReminder.cancel(getApplication())
+        val now = System.currentTimeMillis()
+        val session = SpecialSessionEngine.startMilitary(rutina, nextDay(), now)
+        scheduleRoutineReminder(session)
+        saveActive(session)
+    }
+
+    /** Marca el paso militar actual como hecho ([reps] para los de repeticiones) y avanza. */
+    fun completeMilitaryStep(reps: String = "") {
+        val s = _active.value ?: return
+        val rutina = specialWorkouts.militar ?: return
+        if (s.routineId != rutina.id) return
+        val next = SpecialSessionEngine.advanceMilitary(rutina, s, reps, System.currentTimeMillis())
+        scheduleRoutineReminder(next)
+        saveActive(next)
+    }
+
+    /** En el paso con alternativa (burpees), cambia a la variante por tiempo (jumping jacks). */
+    fun chooseMilitaryAlternative() {
+        val s = _active.value ?: return
+        val rutina = specialWorkouts.militar ?: return
+        val next = SpecialSessionEngine.chooseMilitaryAlternative(rutina, s, System.currentTimeMillis())
+        if (next !== s) {
+            scheduleRoutineReminder(next)
+            saveActive(next)
+        }
+    }
+
+    /** Inicia un ejercicio de quema grasa con el protocolo elegido. Descarta la sesión en curso. */
+    fun startFatburnSession(exercise: EjercicioCatalogo, protocol: Protocolo) {
+        RestReminder.cancel(getApplication())
+        val now = System.currentTimeMillis()
+        val session = SpecialSessionEngine.startFatburn(exercise, protocol, nextDay(), now)
+        scheduleRoutineReminder(session)
+        saveActive(session)
+    }
+
+    /** Completa la unidad (ronda/serie) actual de quema grasa y avanza (descanso o fin). */
+    fun completeFatburnUnit(reps: String = "") {
+        val s = _active.value ?: return
+        val protocol = currentFatburnProtocol(s) ?: return
+        val next = SpecialSessionEngine.completeFatburnUnit(protocol, s, reps, System.currentTimeMillis())
+        scheduleRoutineReminder(next)
+        saveActive(next)
+    }
+
+    /** Termina el descanso entre rondas/series de quema grasa y arranca la siguiente. */
+    fun endRoutineRest() {
+        val s = _active.value ?: return
+        if (s.phase != SessionPhase.RESTING) return
+        val protocol = currentFatburnProtocol(s) ?: return
+        RestReminder.cancel(getApplication())
+        val next = SpecialSessionEngine.endFatburnRest(protocol, s, System.currentTimeMillis())
+        scheduleRoutineReminder(next)
+        saveActive(next)
+    }
+
+    private fun currentFatburnProtocol(s: ActiveSession): Protocolo? {
+        val exercise = specialWorkouts.ejercicio(s.exerciseId ?: return null) ?: return null
+        return exercise.protocolos.firstOrNull { it.nombre == s.protocolName }
+    }
+
     // --- Calentamiento -----------------------------------------------------
 
     /** Pausa la cuenta atrás del calentamiento y cancela su aviso. */
@@ -512,13 +625,26 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             totalSets = s.completedSets.size,
             totalRestSeconds = totalRest,
             special = s.special,
-            extra = s.extra
+            extra = s.extra,
+            routineId = s.routineId,
+            exerciseId = s.exerciseId,
+            // La militar cuenta para la frecuencia solo si se completó (finalizar aparece al llegar
+            // al último paso). La quema grasa cuenta por ejercicio (usa exerciseId, no este flag).
+            routineCompleted = s.routineId == SpecialWorkoutsLoader.MILITAR_ID
         )
         viewModelScope.launch { repo.appendHistory(record) }
         _history.value = _history.value + record
 
         // Vuelca el entreno a Health Connect (Google Health) si el usuario lo conectó.
         syncToHealthConnect(s, record)
+
+        // Las rutinas especiales (militar / quema grasa) son un bonus: se guardan en el historial
+        // (para la frecuencia semanal y Resultados) pero NO marcan día ni disparan celebración.
+        if (s.isRoutine) {
+            RestReminder.cancel(getApplication())
+            saveActive(null)
+            return
+        }
 
         // Un entrenamiento EXTRA es un bonus: se guarda en el historial pero NO marca
         // ningún día del plan ni toca los pesos ni dispara celebración de hito.
@@ -557,6 +683,11 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         if (!healthConnect.isAvailable) return
         val day = PlanData.dayByNumber(session.dayNumber)
         val title = when {
+            session.routineId == SpecialWorkoutsLoader.MILITAR_ID -> "Rutina Militar"
+            session.routineId != null -> {
+                val exName = specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre
+                "Quema grasa · ${exName ?: "ejercicio"}"
+            }
             session.extra -> "Entrenamiento extra"
             else -> "Día ${session.dayNumber} · ${day?.template?.title ?: "Entrenamiento"}"
         }
@@ -595,7 +726,11 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         day: TrainingDay?
     ): String {
         val sb = StringBuilder()
-        if (session.special || day == null) {
+        if (session.isRoutine) {
+            val name = if (session.routineId == SpecialWorkoutsLoader.MILITAR_ID) "Rutina Militar"
+            else specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre ?: "Quema grasa"
+            sb.append("$name.\n")
+        } else if (session.special || day == null) {
             sb.append("Sesión libre guiada.\n")
         } else {
             val byExercise = session.completedSets.groupBy { it.exerciseIndex }

@@ -30,7 +30,9 @@ data class CompletedSet(
     val setNumber: Int,
     val weight: String = "",
     /** Descanso real (segundos) tomado tras esta serie. 0 si fue la última. */
-    val restSeconds: Int = 0
+    val restSeconds: Int = 0,
+    /** Repeticiones registradas (número, texto o AMRAP). Solo en rutinas especiales por reps. */
+    val reps: String = ""
 )
 
 /** Sesión de entrenamiento en curso. Se persiste para poder reanudarla. */
@@ -86,8 +88,26 @@ data class ActiveSession(
     /** Segundos ya transcurridos acumulados antes del tramo en marcha actual. */
     val timedElapsedBeforePause: Int = 0,
     /** Si el temporizador de la serie por tiempo está pausado. */
-    val timedPaused: Boolean = false
+    val timedPaused: Boolean = false,
+    // --- Rutinas especiales (militar / quema grasa) ---
+    /**
+     * Identificador de la rutina especial en curso (ver `entrenamientos_especiales.json`):
+     * "militar_basica" o "quema_grasa". Null = sesión normal del plan de 100 días.
+     */
+    val routineId: String? = null,
+    /** Ejercicio del catálogo de quema grasa en curso (null en la militar). */
+    val exerciseId: String? = null,
+    /** Nombre del protocolo elegido para el ejercicio de quema grasa. */
+    val protocolName: String? = null,
+    /** Índice del paso actual (militar) o de la ronda/serie actual (quema grasa), base 0. */
+    val stepIndex: Int = 0,
+    /** Total de pasos (militar) o de rondas/series (quema grasa). */
+    val totalUnits: Int = 0,
+    /** En el paso con alternativa (burpees/jumping jacks), si se eligió la alternativa. */
+    val useAlternative: Boolean = false
 ) {
+    /** Es una rutina especial (militar o quema grasa), no una sesión del plan de 100 días. */
+    val isRoutine: Boolean get() = routineId != null
     /** Segundos de calentamiento transcurridos en el instante [now]. */
     fun warmupElapsed(now: Long): Int =
         if (warmupPaused) warmupElapsedBeforePause
@@ -110,7 +130,13 @@ data class SessionRecord(
     /** Entrenamiento especial/libre (cronómetro guiado, sin series). */
     val special: Boolean = false,
     /** Entrenamiento EXTRA (bonus que no cuenta como día del plan). */
-    val extra: Boolean = false
+    val extra: Boolean = false,
+    /** Rutina especial de la que proviene la sesión ("militar_basica"/"quema_grasa"), o null. */
+    val routineId: String? = null,
+    /** Ejercicio del catálogo de quema grasa (null en militar o sesiones normales). */
+    val exerciseId: String? = null,
+    /** Solo militar: la sesión llegó hasta el último paso (cuenta para la frecuencia semanal). */
+    val routineCompleted: Boolean = false
 ) {
     val durationSeconds: Int get() = ((endMillis - startMillis) / 1000).toInt().coerceAtLeast(0)
 }
