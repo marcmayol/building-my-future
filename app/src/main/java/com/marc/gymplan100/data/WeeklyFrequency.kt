@@ -12,17 +12,20 @@ import java.time.ZoneId
  * determinista. Reutiliza [Statistics.weekStart] para el lunes de la semana.
  *
  * Reglas (de `entrenamientos_especiales.json`):
- *  - Militar: cuenta por rutina COMPLETA (solo sesiones que llegaron al último paso).
- *  - Quema grasa: cuenta por ejercicio individual.
- *  - El aviso nunca bloquea: solo informa si el contador ya alcanzó [FrecuenciaSemanal.max].
+ *  - Rutinas de secuencia fija (Militar, Altura y Postura): cuentan por rutina COMPLETA (solo
+ *    sesiones que llegaron al último paso, marcadas con `routineCompleted`).
+ *  - Militar: aviso semanal (frecuencia_semanal.max). Altura y Postura: aviso DIARIO
+ *    (periodicidad_aviso="diaria", frecuencia_diaria.max) porque está pensada para hacerse a diario.
+ *  - Quema grasa: cuenta por ejercicio individual (semanal).
+ *  - El aviso nunca bloquea: solo informa si el contador ya alcanzó el máximo aplicable.
  */
 object WeeklyFrequency {
 
-    /** Resultado de comprobar la frecuencia de una rutina o ejercicio esta semana. */
+    /** Resultado de comprobar la frecuencia de una rutina o ejercicio. */
     data class Status(
         val count: Int,
         val max: Int,
-        /** Ya se alcanzó (o superó) la recomendación semanal: procede mostrar el aviso. */
+        /** Ya se alcanzó (o superó) la recomendación: procede mostrar el aviso. */
         val reached: Boolean
     )
 
@@ -33,16 +36,55 @@ object WeeklyFrequency {
     private fun inCurrentWeek(record: SessionRecord, today: LocalDate, zone: ZoneId): Boolean =
         Statistics.weekStart(dateOf(record.endMillis, zone)) == Statistics.weekStart(today)
 
+    /** Sesiones COMPLETADAS de una rutina (secuencia fija) esta semana. */
+    fun routineSessionsThisWeek(
+        history: List<SessionRecord>,
+        routineId: String,
+        today: LocalDate = LocalDate.now(),
+        zone: ZoneId = ZoneId.systemDefault()
+    ): Int = history.count {
+        it.routineId == routineId && it.routineCompleted && inCurrentWeek(it, today, zone)
+    }
+
+    /** Sesiones COMPLETADAS de una rutina (secuencia fija) HOY. */
+    fun routineSessionsToday(
+        history: List<SessionRecord>,
+        routineId: String,
+        today: LocalDate = LocalDate.now(),
+        zone: ZoneId = ZoneId.systemDefault()
+    ): Int = history.count {
+        it.routineId == routineId && it.routineCompleted && dateOf(it.endMillis, zone) == today
+    }
+
+    /**
+     * Estado de frecuencia de una rutina de secuencia fija. Si [daily] es true el contador es por
+     * DÍA (frente a [dailyMax]); si no, por semana natural (frente a [frecuencia].max). El máximo
+     * se lee siempre del JSON, nunca se asume.
+     */
+    fun routineStatus(
+        history: List<SessionRecord>,
+        routineId: String,
+        frecuencia: FrecuenciaSemanal,
+        daily: Boolean = false,
+        dailyMax: Int = 0,
+        today: LocalDate = LocalDate.now(),
+        zone: ZoneId = ZoneId.systemDefault()
+    ): Status {
+        return if (daily) {
+            val count = routineSessionsToday(history, routineId, today, zone)
+            Status(count, dailyMax, dailyMax > 0 && count >= dailyMax)
+        } else {
+            val count = routineSessionsThisWeek(history, routineId, today, zone)
+            Status(count, frecuencia.max, frecuencia.max > 0 && count >= frecuencia.max)
+        }
+    }
+
     /** Sesiones de la Rutina Militar COMPLETADAS esta semana. */
     fun militarySessionsThisWeek(
         history: List<SessionRecord>,
         today: LocalDate = LocalDate.now(),
         zone: ZoneId = ZoneId.systemDefault()
-    ): Int = history.count {
-        it.routineId == SpecialWorkoutsLoader.MILITAR_ID &&
-            it.routineCompleted &&
-            inCurrentWeek(it, today, zone)
-    }
+    ): Int = routineSessionsThisWeek(history, SpecialWorkoutsLoader.MILITAR_ID, today, zone)
 
     /** Sesiones registradas esta semana de un ejercicio concreto de quema grasa. */
     fun exerciseSessionsThisWeek(

@@ -79,9 +79,12 @@ fun RoutineSessionScreen(
         return
     }
 
-    val isMilitary = s.routineId == SpecialWorkoutsLoader.MILITAR_ID
-    val title = if (isMilitary) "Rutina Militar"
-    else viewModel.specialWorkouts.ejercicio(s.exerciseId ?: "")?.nombre ?: "Quema Grasa"
+    val rutina = viewModel.specialWorkouts.rutina(s.routineId ?: "")
+    val isFixed = rutina?.esSecuenciaFija == true
+    val title = when {
+        isFixed -> rutina?.nombre ?: "Rutina"
+        else -> viewModel.specialWorkouts.ejercicio(s.exerciseId ?: "")?.nombre ?: "Quema Grasa"
+    }
 
     Scaffold(
         topBar = {
@@ -110,7 +113,7 @@ fun RoutineSessionScreen(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if (isMilitary) MilitaryContent(s, now, viewModel)
+            if (isFixed) FixedSequenceContent(s, now, viewModel)
             else FatburnContent(s, now, viewModel)
 
             if (s.phase == SessionPhase.FINISHED) {
@@ -140,37 +143,50 @@ fun RoutineSessionScreen(
     }
 }
 
-// ------------------------------------------------------------------ Militar
+// --------------------------------------------------------- Secuencia fija
 
+/** Ejecución de una rutina de secuencia fija: Militar (1 serie/paso) o Altura y Postura (2-3 series). */
 @Composable
-private fun MilitaryContent(s: ActiveSession, now: Long, viewModel: PlanViewModel) {
-    val rutina = viewModel.specialWorkouts.militar ?: return
-    val steps = rutina.pasosOrdenados
-    val paso = steps.getOrNull(s.stepIndex) ?: return
+private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanViewModel) {
+    val rutina = viewModel.specialWorkouts.rutina(s.routineId ?: "") ?: return
+    val paso = rutina.pasosOrdenados.getOrNull(s.stepIndex) ?: return
     val usingAlt = s.useAlternative && paso.alternativa != null
     val nombre = if (usingAlt) paso.alternativa!!.nombre else paso.nombre
+    val hasSeries = paso.numSeries > 1
+    // Se puede terminar el ejercicio antes (elegir 2 de 3) una vez hechas las series mínimas.
+    val canEndEarly = hasSeries && s.setNumber >= paso.minSeries && s.setNumber < paso.numSeries
 
     AssistChip(onClick = {}, label = { Text("Paso ${s.stepIndex + 1} de ${s.totalUnits}") })
+    if (hasSeries) {
+        Text(
+            "Serie ${s.setNumber} de ${paso.numSeries}",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
     Text(nombre, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-    if (paso.nota.isNotBlank()) NoteCard(paso.nota)
+    if (paso.notas.isNotBlank()) NoteCard(paso.notas)
 
     when (s.phase) {
         SessionPhase.TIMED_SET -> {
             val target = if (usingAlt) paso.alternativa!!.duracion_seg else paso.objetivoSeg
             CountdownCircle(elapsed = s.timedElapsed(now), target = target)
             TimerButtons(s, viewModel)
-            PrimaryAdvance("Siguiente paso") { viewModel.completeMilitaryStep("") }
+            PrimaryAdvance(if (hasSeries) "Serie hecha" else "Siguiente paso") {
+                viewModel.completeFixedSerie("")
+            }
+            if (canEndEarly) EndExerciseButton { viewModel.completeFixedSerie("", endExercise = true) }
         }
         SessionPhase.WORKING -> {
             RepsTarget(paso)
-            // Alternativa (solo en el paso de burpees): permite cambiar a jumping jacks por tiempo.
+            // Alternativa (solo en el paso de burpees de la militar): jumping jacks por tiempo.
             if (paso.alternativa != null && !usingAlt) {
                 OutlinedButton(
-                    onClick = { viewModel.chooseMilitaryAlternative() },
+                    onClick = { viewModel.chooseAlternative() },
                     modifier = Modifier.fillMaxWidth()
                 ) { Text(paso.alternativa.nombre + " en su lugar") }
             }
-            var reps by remember(s.stepIndex) { mutableStateOf("") }
+            var reps by remember(s.stepIndex, s.setNumber) { mutableStateOf("") }
             OutlinedTextField(
                 value = reps,
                 onValueChange = { reps = it },
@@ -179,10 +195,35 @@ private fun MilitaryContent(s: ActiveSession, now: Long, viewModel: PlanViewMode
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
-            PrimaryAdvance("Paso hecho") { viewModel.completeMilitaryStep(reps) }
+            PrimaryAdvance(if (hasSeries) "Serie hecha" else "Paso hecho") {
+                viewModel.completeFixedSerie(reps)
+            }
+            if (canEndEarly) EndExerciseButton { viewModel.completeFixedSerie(reps, endExercise = true) }
         }
-        SessionPhase.FINISHED -> FinishedNote("¡Rutina militar completada!")
+        SessionPhase.RESTING -> {
+            Text(
+                if (s.restBetweenExercises) "Descanso · siguiente ejercicio" else "Descanso entre series",
+                style = MaterialTheme.typography.titleMedium
+            )
+            CountdownCircle(
+                elapsed = ((now - s.restStartMillis) / 1000).toInt().coerceAtLeast(0),
+                target = s.restTargetSeconds
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedButton(onClick = { viewModel.adjustRest(-15) }) { Text("-15 s") }
+                OutlinedButton(onClick = { viewModel.adjustRest(15) }) { Text("+15 s") }
+            }
+            PrimaryAdvance("Saltar descanso") { viewModel.endRoutineRest() }
+        }
+        SessionPhase.FINISHED -> FinishedNote("¡Rutina completada!")
         else -> {}
+    }
+}
+
+@Composable
+private fun EndExerciseButton(onClick: () -> Unit) {
+    OutlinedButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Text("Terminar ejercicio · pasar al siguiente")
     }
 }
 
@@ -290,7 +331,7 @@ private fun TimerButtons(s: ActiveSession, viewModel: PlanViewModel) {
 private fun RepsTarget(paso: PasoMilitar) {
     val target = when {
         paso.reps.equals("AMRAP", ignoreCase = true) -> "Máximas repeticiones con buena forma (AMRAP)"
-        paso.reps.isNotBlank() -> "Objetivo: ${paso.reps}"
+        paso.repsObjetivo.isNotBlank() -> "Objetivo: ${paso.repsObjetivo} reps"
         else -> ""
     }
     if (target.isNotBlank()) {

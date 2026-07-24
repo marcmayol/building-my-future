@@ -135,7 +135,11 @@ fun GymNavHost(
                 dayNumber = n,
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
-                onStartSession = { navController.navigate(Routes.session(it)) }
+                onStartSession = { navController.navigate(Routes.session(it)) },
+                onStartFreeSession = { day ->
+                    viewModel.startSpecialSession(day)
+                    navController.navigate(Routes.session(day))
+                }
             )
         }
         composable(
@@ -161,7 +165,11 @@ fun GymNavHost(
                     viewModel.startMilitarySession()
                     navController.navigate(Routes.ROUTINE)
                 },
-                onOpenFatburn = { navController.navigate(Routes.FATBURN) }
+                onOpenFatburn = { navController.navigate(Routes.FATBURN) },
+                onOpenPosture = {
+                    viewModel.startPostureSession()
+                    navController.navigate(Routes.ROUTINE)
+                }
             )
         }
         composable(Routes.FATBURN) {

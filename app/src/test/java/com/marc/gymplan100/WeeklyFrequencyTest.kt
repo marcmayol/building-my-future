@@ -109,4 +109,68 @@ class WeeklyFrequencyTest {
         assertEquals(0, WeeklyFrequency.exerciseSessionsThisWeek(history, "burpees_hiit", today, zone))
         assertEquals(0, WeeklyFrequency.exerciseStatus(history, burpees, today, zone).count)
     }
+
+    // ------------------------------ Altura y Postura (aviso DIARIO, max 7/semana)
+
+    private val alturaId = "altura_postura"
+    private val freqAltura = FrecuenciaSemanal(min = 5, max = 7)
+
+    private fun altura(date: LocalDate) = SessionRecord(
+        dayNumber = 0,
+        startMillis = millisAt(date),
+        endMillis = millisAt(date),
+        totalSets = 5,
+        totalRestSeconds = 0,
+        routineId = alturaId,
+        routineCompleted = true
+    )
+
+    private fun alturaStatus(history: List<SessionRecord>, refDay: LocalDate) =
+        WeeklyFrequency.routineStatus(
+            history, alturaId, freqAltura, daily = true, dailyMax = 1, today = refDay, zone = zone
+        )
+
+    @Test fun `altura no avisa haciendola en dias distintos de la misma semana`() {
+        // Lun..Sab hechas; el domingo (7º día, aún sin hacer) no debe avisar: contador diario 0.
+        val history = (0..5).map { altura(monday.plusDays(it.toLong())) }
+        val sunday = monday.plusDays(6)
+        val status = alturaStatus(history, sunday)
+        assertEquals(6, WeeklyFrequency.routineSessionsThisWeek(history, alturaId, sunday, zone))
+        assertEquals(0, status.count)      // hoy (domingo) aún no se ha hecho
+        assertFalse(status.reached)
+    }
+
+    @Test fun `altura avisa en la segunda vez del mismo dia`() {
+        // Ya hecha una vez hoy: al ir a repetirla el mismo día, el aviso salta (max diario 1).
+        val history = listOf(altura(today))
+        val status = alturaStatus(history, today)
+        assertEquals(1, status.count)
+        assertTrue(status.reached)
+    }
+
+    @Test fun `altura no avisa el primer intento del dia aunque la semana este llena`() {
+        // 7 sesiones en días distintos (semana "llena"), pero hoy es un día nuevo sin sesión.
+        val history = (0..6).map { altura(monday.plusDays(it.toLong())) }
+        val nextMonday = monday.plusWeeks(1)
+        val status = alturaStatus(history, nextMonday)
+        assertEquals(0, status.count)
+        assertFalse(status.reached)
+    }
+
+    @Test fun `altura solo cuenta sesiones completadas`() {
+        val incompleta = altura(today).copy(routineCompleted = false)
+        val status = alturaStatus(listOf(incompleta), today)
+        assertEquals(0, status.count)
+        assertFalse(status.reached)
+    }
+
+    @Test fun `militar y altura no se mezclan entre si`() {
+        // Una militar y una altura, ambas hoy: cada rutina cuenta solo la suya.
+        val history = listOf(militar(today, completed = true), altura(today))
+        assertEquals(1, WeeklyFrequency.militarySessionsThisWeek(history, today, zone))
+        assertEquals(1, WeeklyFrequency.routineSessionsToday(history, alturaId, today, zone))
+        assertEquals(1, WeeklyFrequency.routineSessionsToday(history, "militar_basica", today, zone))
+        // La altura (diaria) no se ve afectada por la militar.
+        assertEquals(1, alturaStatus(history, today).count)
+    }
 }

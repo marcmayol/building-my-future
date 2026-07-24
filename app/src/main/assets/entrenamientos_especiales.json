@@ -3,7 +3,8 @@
   "regla_avisos": {
     "descripcion": "El usuario siempre puede iniciar cualquier rutina o ejercicio. Si en la semana actual (lunes-domingo) el numero de sesiones registradas ya alcanza frecuencia_semanal.max, mostrar aviso_frecuencia como notificacion no bloqueante.",
     "nivel_militar": "rutina completa",
-    "nivel_quema_grasa": "por ejercicio"
+    "nivel_quema_grasa": "por ejercicio",
+    "nivel_altura_postura": "rutina completa"
   },
   "rutinas": [
     {
@@ -161,6 +162,25 @@
           "notas_forma": "No saltarse el trabajo de espalda; es el grupo muscular mas grande del tren superior.",
           "aviso_frecuencia": "Las dominadas estan recomendadas 2-3 veces por semana y ya has cumplido la recomendacion esta semana."
         }
+      ]
+    },
+    {
+      "id": "altura_postura",
+      "nombre": "Rutina Altura y Postura",
+      "tipo": "secuencia_fija",
+      "descripcion": "Cinco ejercicios de postura, movilidad y descompresion de columna: corregir la postura y descomprimir los discos para recuperar altura visible. Baja intensidad, apta a diario.",
+      "duracion_estimada_min": 15,
+      "frecuencia_semanal": { "min": 5, "max": 7, "fuente": "transcripcion" },
+      "periodicidad_aviso": "diaria",
+      "frecuencia_diaria": { "max": 1 },
+      "descanso_entre_ejercicios_seg": { "min": 30, "max": 60 },
+      "aviso_frecuencia": "Esta rutina esta pensada para hacerse a diario, asi que hoy ya has cumplido la sesion recomendada. Puedes repetirla sin problema: es de baja intensidad.",
+      "pasos": [
+        { "orden": 1, "nombre": "Wall angels (angeles de pared)", "tipo": "repeticiones", "reps": 10, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Espalda, gluteos y cabeza pegados a la pared; codos a la altura de los hombros; manos, codos y espalda tocando la pared todo el recorrido; repeticiones lentas y controladas." },
+        { "orden": 2, "nombre": "Puente de gluteos", "tipo": "repeticiones", "reps_min": 10, "reps_max": 15, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Tumbado boca arriba, rodillas dobladas, pies planos; empujar con los talones, subir caderas y apretar fuerte los gluteos arriba; bajar lento." },
+        { "orden": 3, "nombre": "Estiramiento de cobra", "tipo": "repeticiones", "reps_min": 8, "reps_max": 10, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Boca abajo, manos bajo los hombros; subir el pecho con los brazos manteniendo caderas y piernas en el suelo; mantener 1-2 segundos arriba respirando profundo; cuanto mas lento, mejor." },
+        { "orden": 4, "nombre": "Dead hang (colgarse de una barra)", "tipo": "tiempo", "duracion_seg_min": 20, "duracion_seg_max": 30, "series_min": 2, "series_max": 3, "descanso_entre_series_seg_min": 30, "descanso_entre_series_seg_max": 60, "registro": "tiempo", "notas_forma": "Cuerpo suelto, sin balancearse ni contraer musculos; dejar que la gravedad estire la columna. Principiantes: puntas de los pies rozando el suelo." },
+        { "orden": 5, "nombre": "Gato-vaca (cat-cow)", "tipo": "repeticiones", "reps_min": 10, "reps_max": 15, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 30, "registro": "repeticiones", "notas_forma": "En cuatro patas, manos bajo hombros y rodillas bajo caderas; alternar espalda redondeada (barbilla al pecho) y espalda arqueada (pecho arriba, mirada al frente); inhalar al levantar el pecho, exhalar al redondear." }
       ]
     }
   ]

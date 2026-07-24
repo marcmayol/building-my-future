@@ -43,11 +43,14 @@ fun SpecialMenuScreen(
     onBack: () -> Unit,
     onFreeWorkout: () -> Unit,
     onOpenMilitary: () -> Unit,
-    onOpenFatburn: () -> Unit
+    onOpenFatburn: () -> Unit,
+    onOpenPosture: () -> Unit
 ) {
     val militar = viewModel.specialWorkouts.militar
-    // Aviso no bloqueante: si ya se cumplió la frecuencia semanal, se muestra antes de empezar.
+    val altura = viewModel.specialWorkouts.altura
+    // Aviso no bloqueante: si ya se cumplió la frecuencia recomendada, se muestra antes de empezar.
     var militaryWarning by remember { mutableStateOf<String?>(null) }
+    var postureWarning by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -103,6 +106,19 @@ fun SpecialMenuScreen(
                     onClick = onOpenFatburn
                 )
             }
+            item {
+                OptionCard(
+                    emoji = "🧘",
+                    title = altura?.nombre ?: "Rutina Altura y Postura",
+                    subtitle = altura?.descripcion
+                        ?: "Cinco ejercicios de postura y descompresión de columna. Baja intensidad.",
+                    onClick = {
+                        val status = viewModel.postureFrequency()
+                        if (status.reached && altura != null) postureWarning = altura.aviso_frecuencia
+                        else onOpenPosture()
+                    }
+                )
+            }
         }
     }
 
@@ -111,6 +127,14 @@ fun SpecialMenuScreen(
             text = text,
             onContinue = { militaryWarning = null; onOpenMilitary() },
             onCancel = { militaryWarning = null }
+        )
+    }
+
+    postureWarning?.let { text ->
+        FrequencyWarningDialog(
+            text = text,
+            onContinue = { postureWarning = null; onOpenPosture() },
+            onCancel = { postureWarning = null }
         )
     }
 }

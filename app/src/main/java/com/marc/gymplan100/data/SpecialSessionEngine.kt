@@ -18,37 +18,43 @@ object SpecialSessionEngine {
     /** Descanso por defecto entre series de quema grasa cuando el protocolo no lo especifica. */
     const val DEFAULT_SERIES_REST = 90
 
-    // ---------------------------------------------------------------- Militar
+    // -------------------------------------------------------- Secuencia fija
 
-    /** Construye la sesión militar en su primer paso, en marcha. */
-    fun startMilitary(rutina: Rutina, dayNumber: Int, now: Long): ActiveSession {
-        val steps = rutina.pasosOrdenados
+    /**
+     * Construye una sesión de secuencia fija (Militar o Altura y Postura) en su primer paso/serie.
+     * El flujo es común: la militar es el caso degenerado (1 serie por paso, sin descansos), y la
+     * de altura añade 2-3 series con descanso entre series y descanso entre ejercicios.
+     */
+    fun startFixedSequence(rutina: Rutina, dayNumber: Int, now: Long): ActiveSession {
         val base = ActiveSession(
             dayNumber = dayNumber,
             startMillis = now,
             routineId = rutina.id,
-            totalUnits = steps.size,
-            stepIndex = 0
+            totalUnits = rutina.pasosOrdenados.size,
+            stepIndex = 0,
+            setNumber = 1
         )
-        return militaryStepState(rutina, base, 0, useAlternative = false, now = now)
+        return fixedSerieState(rutina, base, 0, 1, useAlternative = false, now = now)
     }
 
-    /** Estado de la sesión para el paso [stepIndex] de la militar (fija fase y temporizador). */
-    private fun militaryStepState(
+    /** Estado para el paso [stepIndex] y la serie [serie] (fija fase y temporizador). */
+    private fun fixedSerieState(
         rutina: Rutina,
         base: ActiveSession,
         stepIndex: Int,
+        serie: Int,
         useAlternative: Boolean,
         now: Long
     ): ActiveSession {
-        val steps = rutina.pasosOrdenados
-        val paso = steps.getOrNull(stepIndex) ?: return base.copy(phase = SessionPhase.FINISHED)
+        val paso = rutina.pasosOrdenados.getOrNull(stepIndex)
+            ?: return base.copy(phase = SessionPhase.FINISHED)
         val altTime = useAlternative && paso.alternativa != null
         val esTiempo = altTime || paso.esTiempo
         val target = if (altTime) paso.alternativa!!.duracion_seg else paso.objetivoSeg
         return if (esTiempo) {
             base.copy(
                 stepIndex = stepIndex,
+                setNumber = serie,
                 useAlternative = useAlternative,
                 phase = SessionPhase.TIMED_SET,
                 timedTargetSeconds = target,
@@ -59,6 +65,7 @@ object SpecialSessionEngine {
         } else {
             base.copy(
                 stepIndex = stepIndex,
+                setNumber = serie,
                 useAlternative = useAlternative,
                 phase = SessionPhase.WORKING
             )
@@ -66,29 +73,67 @@ object SpecialSessionEngine {
     }
 
     /**
-     * Marca el paso actual como hecho ([repsLogged] para los de repeticiones) y avanza al
-     * siguiente. Si era el último, la sesión pasa a FINISHED (cuenta como rutina completa).
+     * Completa la serie actual ([repsLogged] para las de repeticiones) y avanza. Con
+     * [forceEndExercise] se da el paso por terminado aunque queden series (elegir 2 en vez de 3).
+     * Orden: si quedan series -> descanso entre series; si era la última -> descanso entre
+     * ejercicios y siguiente paso; si era el último paso -> FINISHED (cuenta como rutina completa).
      */
-    fun advanceMilitary(rutina: Rutina, s: ActiveSession, repsLogged: String, now: Long): ActiveSession {
+    fun advanceFixedSerie(
+        rutina: Rutina,
+        s: ActiveSession,
+        repsLogged: String,
+        now: Long,
+        forceEndExercise: Boolean = false
+    ): ActiveSession {
         if (s.routineId != rutina.id) return s
+        val paso = rutina.pasosOrdenados.getOrNull(s.stepIndex) ?: return s
         val done = CompletedSet(
             exerciseIndex = s.stepIndex,
-            setNumber = s.stepIndex + 1,
+            setNumber = s.setNumber,
             reps = repsLogged.trim()
         )
         val withLog = s.copy(completedSets = s.completedSets + done, useAlternative = false)
-        val nextIndex = s.stepIndex + 1
-        if (nextIndex >= rutina.pasosOrdenados.size) {
-            return withLog.copy(phase = SessionPhase.FINISHED, stepIndex = s.stepIndex)
+
+        val lastSerie = forceEndExercise || s.setNumber >= paso.numSeries
+        if (!lastSerie) {
+            val rest = paso.descansoEntreSeriesSeg
+            return if (rest > 0) withLog.copy(
+                phase = SessionPhase.RESTING,
+                restStartMillis = now,
+                restTargetSeconds = rest,
+                restBetweenExercises = false
+            ) else fixedSerieState(rutina, withLog, s.stepIndex, s.setNumber + 1, false, now)
         }
-        return militaryStepState(rutina, withLog, nextIndex, useAlternative = false, now = now)
+
+        val nextStep = s.stepIndex + 1
+        if (nextStep >= rutina.pasosOrdenados.size) {
+            return withLog.copy(phase = SessionPhase.FINISHED)
+        }
+        val rest = rutina.descansoEntreEjerciciosSeg
+        return if (rest > 0) withLog.copy(
+            phase = SessionPhase.RESTING,
+            restStartMillis = now,
+            restTargetSeconds = rest,
+            restBetweenExercises = true
+        ) else fixedSerieState(rutina, withLog, nextStep, 1, false, now)
+    }
+
+    /** Termina el descanso de una secuencia fija y arranca la siguiente serie o el siguiente paso. */
+    fun endFixedRest(rutina: Rutina, s: ActiveSession, now: Long): ActiveSession {
+        if (s.phase != SessionPhase.RESTING) return s
+        val cleared = s.copy(restTargetSeconds = 0)
+        return if (s.restBetweenExercises) {
+            fixedSerieState(rutina, cleared, s.stepIndex + 1, 1, false, now)
+        } else {
+            fixedSerieState(rutina, cleared, s.stepIndex, s.setNumber + 1, false, now)
+        }
     }
 
     /** En el paso con alternativa (burpees -> jumping jacks), la cambia por la variante por tiempo. */
-    fun chooseMilitaryAlternative(rutina: Rutina, s: ActiveSession, now: Long): ActiveSession {
+    fun chooseAlternative(rutina: Rutina, s: ActiveSession, now: Long): ActiveSession {
         val paso = rutina.pasosOrdenados.getOrNull(s.stepIndex) ?: return s
         if (paso.alternativa == null || s.useAlternative) return s
-        return militaryStepState(rutina, s, s.stepIndex, useAlternative = true, now = now)
+        return fixedSerieState(rutina, s, s.stepIndex, s.setNumber, useAlternative = true, now = now)
     }
 
     // ------------------------------------------------------------ Quema grasa
@@ -188,9 +233,13 @@ object SpecialSessionEngine {
      */
     fun skipFromNotification(data: SpecialWorkoutsData, s: ActiveSession, now: Long): ActiveSession {
         val routineId = s.routineId ?: return s
-        if (routineId == SpecialWorkoutsLoader.MILITAR_ID) {
-            val rutina = data.militar ?: return s
-            return if (s.phase == SessionPhase.TIMED_SET) advanceMilitary(rutina, s, "", now) else s
+        val rutina = data.rutina(routineId)
+        if (rutina != null && rutina.esSecuenciaFija) {
+            return when (s.phase) {
+                SessionPhase.TIMED_SET -> advanceFixedSerie(rutina, s, "", now)
+                SessionPhase.RESTING -> endFixedRest(rutina, s, now)
+                else -> s
+            }
         }
         val exercise = data.ejercicio(s.exerciseId ?: return s) ?: return s
         val protocol = exercise.protocolos.firstOrNull { it.nombre == s.protocolName } ?: return s

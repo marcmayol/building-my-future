@@ -43,6 +43,14 @@ data class FrecuenciaSemanal(
     val fuente: String = ""
 )
 
+/** Límite de sesiones por día (rutinas de periodicidad diaria, p. ej. Altura y Postura). */
+@Serializable
+data class FrecuenciaDiaria(val max: Int = 0)
+
+/** Rango de segundos (mín/máx) usado para descansos configurables. */
+@Serializable
+data class RangoSeg(val min: Int = 0, val max: Int = 0)
+
 /** Alternativa que el usuario puede elegir para un paso (p. ej. jumping jacks en vez de burpees). */
 @Serializable
 data class Alternativa(
@@ -52,7 +60,11 @@ data class Alternativa(
     val condicion: String = ""
 )
 
-/** Un paso de una secuencia fija (Rutina Militar). Es "tiempo" o "repeticiones". */
+/**
+ * Un paso de una secuencia fija (Rutina Militar o Rutina Altura y Postura). Es "tiempo" o
+ * "repeticiones". La militar no usa series (1 por paso); la de altura tiene 2-3 series con
+ * descanso entre ellas y rangos de repeticiones.
+ */
 @Serializable
 data class PasoMilitar(
     val orden: Int = 0,
@@ -62,11 +74,38 @@ data class PasoMilitar(
     val duracion_seg_min: Int = 0,
     val duracion_seg_max: Int = 0,
     @Serializable(with = FlexString::class) val reps: String = "",
+    val reps_min: Int = 0,
+    val reps_max: Int = 0,
+    val series_min: Int = 0,
+    val series_max: Int = 0,
+    val descanso_entre_series_seg: Int = 0,
+    val descanso_entre_series_seg_min: Int = 0,
+    val descanso_entre_series_seg_max: Int = 0,
     val registro: String = "",
     val nota: String = "",
+    val notas_forma: String = "",
     val alternativa: Alternativa? = null
 ) {
     val esTiempo: Boolean get() = tipo == "tiempo"
+
+    /** Nº de series del paso: el máximo del rango (objetivo), o 1 si no hay series (militar). */
+    val numSeries: Int
+        get() = when {
+            series_max > 0 -> series_max
+            series_min > 0 -> series_min
+            else -> 1
+        }
+
+    /** Mínimo de series recomendado (a partir de aquí se puede terminar el ejercicio antes). */
+    val minSeries: Int get() = if (series_min > 0) series_min else numSeries
+
+    /** Descanso entre series (segundos): valor exacto o mínimo del rango; 0 si no hay. */
+    val descansoEntreSeriesSeg: Int
+        get() = when {
+            descanso_entre_series_seg > 0 -> descanso_entre_series_seg
+            descanso_entre_series_seg_min > 0 -> descanso_entre_series_seg_min
+            else -> 0
+        }
 
     /** Objetivo de tiempo del paso: el valor exacto o el mínimo de un rango. 0 si no aplica. */
     val objetivoSeg: Int
@@ -84,6 +123,18 @@ data class PasoMilitar(
             duracion_seg_min > 0 -> "$duracion_seg_min s"
             else -> ""
         }
+
+    /** Repeticiones objetivo como texto: valor fijo ("15"/"AMRAP") o rango ("10-15"). */
+    val repsObjetivo: String
+        get() = when {
+            reps.isNotBlank() -> reps
+            reps_min > 0 && reps_max > 0 -> "$reps_min-$reps_max"
+            reps_min > 0 -> "$reps_min"
+            else -> ""
+        }
+
+    /** Notas a mostrar durante la ejecución: prioriza notas_forma (altura) sobre nota (militar). */
+    val notas: String get() = notas_forma.ifBlank { nota }
 }
 
 /** Un protocolo de ejecución de un ejercicio de quema grasa (Tabata, intervalos, series…). */
@@ -181,7 +232,10 @@ data class Rutina(
     val descripcion: String = "",
     val duracion_estimada_min: Int = 0,
     val frecuencia_semanal: FrecuenciaSemanal = FrecuenciaSemanal(),
+    val frecuencia_diaria: FrecuenciaDiaria = FrecuenciaDiaria(),
+    val periodicidad_aviso: String = "",
     val descanso_minimo_entre_sesiones_dias: Int = 0,
+    val descanso_entre_ejercicios_seg: RangoSeg = RangoSeg(),
     val progresion: String = "",
     val aviso_frecuencia: String = "",
     val pasos: List<PasoMilitar> = emptyList(),
@@ -190,6 +244,12 @@ data class Rutina(
     val esSecuenciaFija: Boolean get() = tipo == "secuencia_fija"
     val esCatalogo: Boolean get() = tipo == "catalogo_ejercicios"
     val pasosOrdenados: List<PasoMilitar> get() = pasos.sortedBy { it.orden }
+
+    /** El aviso de frecuencia es diario (rutina apta a diario) en vez de semanal. */
+    val esDiaria: Boolean get() = periodicidad_aviso == "diaria"
+
+    /** Descanso entre ejercicios (segundos): mínimo del rango; 0 si no aplica (militar). */
+    val descansoEntreEjerciciosSeg: Int get() = descanso_entre_ejercicios_seg.min
 }
 
 @Serializable
@@ -197,7 +257,8 @@ data class SpecialWorkoutsData(
     val version: Int = 1,
     val rutinas: List<Rutina> = emptyList()
 ) {
-    val militar: Rutina? get() = rutinas.firstOrNull { it.esSecuenciaFija }
+    val militar: Rutina? get() = rutinas.firstOrNull { it.id == SpecialWorkoutsLoader.MILITAR_ID }
+    val altura: Rutina? get() = rutinas.firstOrNull { it.id == SpecialWorkoutsLoader.ALTURA_ID }
     val quemaGrasa: Rutina? get() = rutinas.firstOrNull { it.esCatalogo }
 
     fun rutina(id: String): Rutina? = rutinas.firstOrNull { it.id == id }
@@ -211,6 +272,7 @@ object SpecialWorkoutsLoader {
     private val json = Json { ignoreUnknownKeys = true }
 
     const val MILITAR_ID = "militar_basica"
+    const val ALTURA_ID = "altura_postura"
     const val ASSET = "entrenamientos_especiales.json"
 
     /** Parsea el contenido del JSON. Separado de [load] para poder testearlo sin Context. */

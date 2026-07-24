@@ -305,6 +305,18 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         return WeeklyFrequency.militaryStatus(_history.value, rutina.frecuencia_semanal)
     }
 
+    /** Estado de frecuencia de la Rutina Altura y Postura (aviso DIARIO: ya hecha hoy). */
+    fun postureFrequency(): WeeklyFrequency.Status {
+        val rutina = specialWorkouts.altura ?: return WeeklyFrequency.Status(0, 0, false)
+        return WeeklyFrequency.routineStatus(
+            _history.value,
+            rutina.id,
+            rutina.frecuencia_semanal,
+            daily = rutina.esDiaria,
+            dailyMax = rutina.frecuencia_diaria.max
+        )
+    }
+
     /** Estado de frecuencia de un ejercicio de quema grasa esta semana. */
     fun exerciseFrequency(exercise: EjercicioCatalogo): WeeklyFrequency.Status =
         WeeklyFrequency.exerciseStatus(_history.value, exercise)
@@ -334,30 +346,40 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Inicia la Rutina Militar (secuencia guiada de pasos). Descarta cualquier sesión en curso. */
-    fun startMilitarySession() {
-        val rutina = specialWorkouts.militar ?: return
+    fun startMilitarySession() = startFixedRoutine(specialWorkouts.militar)
+
+    /** Inicia la Rutina Altura y Postura (secuencia guiada de 5 pasos con series). */
+    fun startPostureSession() = startFixedRoutine(specialWorkouts.altura)
+
+    private fun startFixedRoutine(rutina: com.marc.gymplan100.data.Rutina?) {
+        if (rutina == null) return
         RestReminder.cancel(getApplication())
         val now = System.currentTimeMillis()
-        val session = SpecialSessionEngine.startMilitary(rutina, nextDay(), now)
+        val session = SpecialSessionEngine.startFixedSequence(rutina, nextDay(), now)
         scheduleRoutineReminder(session)
         saveActive(session)
     }
 
-    /** Marca el paso militar actual como hecho ([reps] para los de repeticiones) y avanza. */
-    fun completeMilitaryStep(reps: String = "") {
+    /**
+     * Marca la serie actual de una secuencia fija como hecha ([reps] para las de repeticiones) y
+     * avanza. Con [endExercise] se da el paso por terminado aunque queden series (elegir 2 de 3).
+     */
+    fun completeFixedSerie(reps: String = "", endExercise: Boolean = false) {
         val s = _active.value ?: return
-        val rutina = specialWorkouts.militar ?: return
-        if (s.routineId != rutina.id) return
-        val next = SpecialSessionEngine.advanceMilitary(rutina, s, reps, System.currentTimeMillis())
+        val rutina = specialWorkouts.rutina(s.routineId ?: return) ?: return
+        if (!rutina.esSecuenciaFija) return
+        val next = SpecialSessionEngine.advanceFixedSerie(
+            rutina, s, reps, System.currentTimeMillis(), endExercise
+        )
         scheduleRoutineReminder(next)
         saveActive(next)
     }
 
     /** En el paso con alternativa (burpees), cambia a la variante por tiempo (jumping jacks). */
-    fun chooseMilitaryAlternative() {
+    fun chooseAlternative() {
         val s = _active.value ?: return
-        val rutina = specialWorkouts.militar ?: return
-        val next = SpecialSessionEngine.chooseMilitaryAlternative(rutina, s, System.currentTimeMillis())
+        val rutina = specialWorkouts.rutina(s.routineId ?: return) ?: return
+        val next = SpecialSessionEngine.chooseAlternative(rutina, s, System.currentTimeMillis())
         if (next !== s) {
             scheduleRoutineReminder(next)
             saveActive(next)
@@ -382,13 +404,18 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         saveActive(next)
     }
 
-    /** Termina el descanso entre rondas/series de quema grasa y arranca la siguiente. */
+    /** Termina el descanso de la rutina (entre series/ejercicios de secuencia fija o de quema grasa). */
     fun endRoutineRest() {
         val s = _active.value ?: return
         if (s.phase != SessionPhase.RESTING) return
-        val protocol = currentFatburnProtocol(s) ?: return
         RestReminder.cancel(getApplication())
-        val next = SpecialSessionEngine.endFatburnRest(protocol, s, System.currentTimeMillis())
+        val rutina = specialWorkouts.rutina(s.routineId ?: return)
+        val next = if (rutina != null && rutina.esSecuenciaFija) {
+            SpecialSessionEngine.endFixedRest(rutina, s, System.currentTimeMillis())
+        } else {
+            val protocol = currentFatburnProtocol(s) ?: return
+            SpecialSessionEngine.endFatburnRest(protocol, s, System.currentTimeMillis())
+        }
         scheduleRoutineReminder(next)
         saveActive(next)
     }
@@ -628,9 +655,11 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             extra = s.extra,
             routineId = s.routineId,
             exerciseId = s.exerciseId,
-            // La militar cuenta para la frecuencia solo si se completó (finalizar aparece al llegar
-            // al último paso). La quema grasa cuenta por ejercicio (usa exerciseId, no este flag).
-            routineCompleted = s.routineId == SpecialWorkoutsLoader.MILITAR_ID
+            // Las secuencias fijas (militar, altura y postura) cuentan para la frecuencia solo si se
+            // completaron (finalizar aparece al llegar al último paso). La quema grasa cuenta por
+            // ejercicio (usa exerciseId, no este flag).
+            routineCompleted = s.routineId != null &&
+                specialWorkouts.rutina(s.routineId)?.esSecuenciaFija == true
         )
         viewModelScope.launch { repo.appendHistory(record) }
         _history.value = _history.value + record

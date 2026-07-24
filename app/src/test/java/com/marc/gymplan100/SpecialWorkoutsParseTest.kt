@@ -19,10 +19,11 @@ class SpecialWorkoutsParseTest {
 
     private val data = SpecialWorkoutsLoader.parse(json)
 
-    @Test fun `se cargan las dos rutinas`() {
-        assertEquals(2, data.rutinas.size)
+    @Test fun `se cargan las tres rutinas`() {
+        assertEquals(3, data.rutinas.size)
         assertNotNull(data.militar)
         assertNotNull(data.quemaGrasa)
+        assertNotNull(data.altura)
     }
 
     @Test fun `la militar tiene 13 pasos ordenados`() {
@@ -85,6 +86,72 @@ class SpecialWorkoutsParseTest {
         data.quemaGrasa!!.ejercicios.forEach {
             assertTrue("${it.id} sin aviso", it.aviso_frecuencia.isNotBlank())
             assertTrue("${it.id} sin frecuencia max", it.frecuencia_semanal.max > 0)
+        }
+    }
+
+    // --------------------------------------------- Rutina Altura y Postura
+
+    @Test fun `se carga la rutina de altura y postura con 5 pasos`() {
+        val altura = data.altura!!
+        assertTrue(altura.esSecuenciaFija)
+        assertEquals("altura_postura", altura.id)
+        assertEquals(5, altura.pasos.size)
+        assertEquals((1..5).toList(), altura.pasosOrdenados.map { it.orden })
+    }
+
+    @Test fun `altura es de aviso diario con frecuencia 5-7 y max diario 1`() {
+        val altura = data.altura!!
+        assertTrue(altura.esDiaria)
+        assertEquals("diaria", altura.periodicidad_aviso)
+        assertEquals(5, altura.frecuencia_semanal.min)
+        assertEquals(7, altura.frecuencia_semanal.max)
+        assertEquals(1, altura.frecuencia_diaria.max)
+        assertTrue(altura.aviso_frecuencia.isNotBlank())
+    }
+
+    @Test fun `los pasos de altura tienen series y notas_forma`() {
+        val altura = data.altura!!
+        altura.pasosOrdenados.forEach { p ->
+            assertTrue("${p.nombre} sin series", p.numSeries in 2..3)
+            assertEquals(2, p.minSeries)
+            assertTrue("${p.nombre} sin notas_forma", p.notas.isNotBlank())
+        }
+    }
+
+    @Test fun `wall angels usa reps fijas y descanso entre series de 10s`() {
+        val wall = data.altura!!.pasosOrdenados[0]
+        assertEquals("10", wall.repsObjetivo)
+        assertEquals(10, wall.descansoEntreSeriesSeg)
+        assertEquals(3, wall.numSeries)  // series_max
+    }
+
+    @Test fun `puente de gluteos usa rango de reps`() {
+        val puente = data.altura!!.pasosOrdenados[1]
+        assertEquals("10-15", puente.repsObjetivo)
+    }
+
+    @Test fun `dead hang es por tiempo con rango 20-30 y descanso de series por rango`() {
+        val dead = data.altura!!.pasosOrdenados[3]
+        assertTrue(dead.esTiempo)
+        assertEquals(20, dead.objetivoSeg)             // duracion_seg_min
+        assertEquals("20-30 s", dead.etiquetaTiempo)
+        assertEquals(30, dead.descansoEntreSeriesSeg)  // descanso_entre_series_seg_min
+    }
+
+    @Test fun `altura define descanso entre ejercicios 30-60`() {
+        val altura = data.altura!!
+        assertEquals(30, altura.descansoEntreEjerciciosSeg)  // mínimo del rango
+        assertEquals(60, altura.descanso_entre_ejercicios_seg.max)
+    }
+
+    @Test fun `la militar sigue sin series ni descansos (regresion)`() {
+        val militar = data.militar!!
+        assertEquals(3, militar.frecuencia_semanal.max)
+        assertTrue(!militar.esDiaria)
+        assertEquals(0, militar.descansoEntreEjerciciosSeg)
+        militar.pasosOrdenados.forEach { p ->
+            assertEquals("${p.nombre} deberia tener 1 serie", 1, p.numSeries)
+            assertEquals(0, p.descansoEntreSeriesSeg)
         }
     }
 }

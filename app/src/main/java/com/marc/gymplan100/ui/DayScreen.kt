@@ -62,7 +62,8 @@ fun DayScreen(
     dayNumber: Int,
     viewModel: PlanViewModel,
     onBack: () -> Unit,
-    onStartSession: (Int) -> Unit
+    onStartSession: (Int) -> Unit,
+    onStartFreeSession: (Int) -> Unit
 ) {
     val day = PlanData.dayByNumber(dayNumber) ?: PlanData.days.first()
     val template = day.template
@@ -115,6 +116,20 @@ fun DayScreen(
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Text("  Empezar entrenamiento guiado")
+                }
+            }
+
+            item {
+                // Alternativa al guiado: cronómetro libre (sin series ni pesos) que SÍ cuenta
+                // como el día del plan. Para cuando entrenas a tu aire pero quieres registrar el día.
+                OutlinedButton(
+                    onClick = { onStartFreeSession(day.number) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                ) {
+                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                    Text("  Entrenar libre · cuenta como día")
                 }
             }
 
