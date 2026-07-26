@@ -22,8 +22,10 @@ android {
         applicationId = "com.marc.gymplan100"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3"
+        // Fuente única en gradle.properties: la comparten el reloj y el manifiesto
+        // de actualizaciones, así que no puede haber dos numeraciones desalineadas.
+        versionCode = providers.gradleProperty("appVersionCode").get().toInt()
+        versionName = providers.gradleProperty("appVersionName").get()
         vectorDrawables { useSupportLibrary = true }
     }
 

@@ -6,11 +6,20 @@ App Android nativa (Kotlin + Jetpack Compose) para seguir un plan de entrenamien
 
 ## 📲 Descargar e instalar
 
-1. Ve a la sección [**Releases**](https://github.com/marcmayol/building-my-future/releases) y descarga el archivo `app-release.apk` de la última versión.
+1. Ve a la sección [**Releases**](https://github.com/marcmayol/building-my-future/releases) y descarga el APK de la última versión (`building-my-future-vX.Y.apk`).
 2. Ábrelo en el móvil Android. Si te avisa, permite **instalar apps de orígenes desconocidos** para tu navegador o gestor de archivos.
 3. Instálalo y listo.
 
 Requisitos: Android 8.0 (API 26) o superior. La app es gratuita y todos los datos se quedan en tu teléfono.
+
+**A partir de ahí se actualiza sola.** La app consulta un manifiesto público
+([`updates.json`](https://marcmayol.com/building-my-future/updates.json)) al abrirse y una vez al día,
+avisa con un banner cuando hay versión nueva, descarga el APK, **comprueba su SHA-256** y lo instala.
+Se puede desactivar y forzar a mano en *Configuración → Actualizaciones*. Detalles en
+[`actualizador/README.md`](actualizador/README.md).
+
+La Release incluye también el APK del reloj (`building-my-future-reloj-vX.Y.apk`), que se instala
+por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 
 ## ✨ Características
 
@@ -74,6 +83,21 @@ Con un JDK 17+ y un dispositivo/emulador conectado:
 ```
 
 La APK de release queda en `app/build/outputs/apk/release/app-release.apk`.
+
+La versión (`appVersionCode` / `appVersionName`) vive en `gradle.properties`: es la fuente única que
+comparten el móvil, el reloj y el manifiesto de actualizaciones.
+
+### Publicar una versión
+
+```bash
+python scripts/publicar_release.py --dry-run       # construye y verifica sin publicar
+python scripts/publicar_release.py --notas "…"     # publica Release + manifiesto
+```
+
+El script construye los dos APK firmados, comprueba con `aapt2` que el `versionCode` construido
+coincide con el declarado y supera al publicado, verifica con `apksigner` que la firma sigue siendo
+la de siempre (si cambiara, ninguna instalación existente podría actualizarse), crea la Release con
+`gh` y publica `docs/updates.json` en GitHub Pages comprobando que la URL pública ya lo sirve.
 
 ### Firma de release
 
