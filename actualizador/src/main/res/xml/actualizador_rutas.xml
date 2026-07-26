@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Única ruta compartible: la carpeta de APKs descargados dentro de cacheDir.
+     Nada más del almacenamiento privado de la app queda expuesto. -->
+<paths>
+    <cache-path
+        name="actualizaciones"
+        path="actualizaciones/" />
+</paths>

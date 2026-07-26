@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Descarga del manifiesto y del APK -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Instalar el APK descargado (orígenes desconocidos) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Sin este permiso (API 31+), Android IGNORA el USER_ACTION_NOT_REQUIRED de la
+         sesión y pide confirmación en cada actualización, aunque la app sea su propio
+         instalador registrado. Es de nivel "normal": se concede al instalar. -->
+    <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
+
+    <application>
+        <receiver
+            android:name=".InstallResultReceiver"
+            android:exported="false" />
+
+        <!-- Vía de respaldo de instalación: el APK vive en cacheDir (privado), así
+             que solo puede entregarse al instalador del sistema como content://.
+             El authority lleva el applicationId de la app anfitriona para no chocar
+             con otras apps que usen este mismo módulo. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.actualizador.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/actualizador_rutas" />
+        </provider>
+    </application>
+
+</manifest>

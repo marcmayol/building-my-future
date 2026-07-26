@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "GymPlan100"
 include(":app")
 include(":wear")
+include(":actualizador")
