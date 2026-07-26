@@ -1,8 +1,8 @@
 {
-  "versionCode": 5,
-  "versionName": "1.4",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.4/building-my-future-v1.4.apk",
-  "sha256": "729b8103dc13360ad48ce52af26cec8d64baa0e3a0870712e36718d769c7301e",
-  "notas": "La app ya se actualiza sola: avisa cuando hay version nueva, la descarga, comprueba su firma y la instala. Se puede desactivar en Configuracion > Actualizaciones.",
+  "versionCode": 6,
+  "versionName": "1.5",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.5/building-my-future-v1.5.apk",
+  "sha256": "4bb2f4ec617d7f553561571f8be6943726894d94a014ae7d457da3d254ca6723",
+  "notas": "El reloj vibra cuando termina el descanso, el calentamiento o una serie por tiempo, aunque tengas el movil en el bolsillo. Requiere instalar tambien el APK del reloj de esta misma Release.",
   "check_horas": 24
 }
