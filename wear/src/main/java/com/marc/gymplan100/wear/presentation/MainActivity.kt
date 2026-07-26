@@ -217,6 +217,13 @@ private fun Countdown(endTime: Long, isAmbient: Boolean, ambientTick: Int, color
 
 const val PATH_STATE = "/gym/state"
 const val PATH_COMMAND = "/gym/command"
+const val PATH_ALERT = "/gym/alert"
 const val CMD_PRIMARY = "primary"
 const val CMD_SWAP = "swap"
 const val CMD_START = "start"
+
+// Tipos de aviso que manda el móvil (espejo de RestReminder.KIND_*).
+const val KIND_BETWEEN_SETS = 0
+const val KIND_BETWEEN_EXERCISES = 1
+const val KIND_WARMUP = 2
+const val KIND_TIMED_SET = 3

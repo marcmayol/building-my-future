@@ -22,6 +22,7 @@ import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.data.SessionPhase
+import com.marc.gymplan100.wear.WearBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -301,10 +302,10 @@ object RestReminder {
 class RestAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val pending = goAsync()
-        RestReminder.showRestDone(
-            context,
-            intent.getIntExtra(RestReminder.EXTRA_KIND, RestReminder.KIND_BETWEEN_SETS)
-        )
+        val kind = intent.getIntExtra(RestReminder.EXTRA_KIND, RestReminder.KIND_BETWEEN_SETS)
+        RestReminder.showRestDone(context, kind)
+        // El móvil suele estar en el bolsillo o en el banco: que también avise la muñeca.
+        WearBridge.sendAlert(context, kind)
         RestReminder.playAlert(context) { runCatching { pending.finish() } }
     }
 }

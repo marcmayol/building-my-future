@@ -28,6 +28,8 @@ object WearBridge {
 
     const val PATH_STATE = "/gym/state"
     const val PATH_COMMAND = "/gym/command"
+    /** Móvil -> reloj: "esta fase ha terminado", para que vibre en la muñeca. */
+    const val PATH_ALERT = "/gym/alert"
 
     // --- Comandos que el reloj puede enviar ---
     /** Acción principal contextual: terminar calentamiento / serie hecha / saltar descanso. */
@@ -95,6 +97,25 @@ object WearBridge {
 
         runCatching {
             Wearable.getDataClient(context).putDataItem(req.asPutDataRequest().setUrgent())
+        }
+    }
+
+    /**
+     * Avisa al reloj de que la cuenta atrás ha terminado para que vibre en la muñeca.
+     *
+     * Va por mensaje y no por la Data Layer a propósito: un aviso es un evento puntual, no un
+     * estado, y así llega aunque la app del reloj esté cerrada (la despierta su listener).
+     * [kind] es uno de los `RestReminder.KIND_*`, para que el reloj elija el patrón.
+     */
+    fun sendAlert(context: Context, kind: Int) {
+        val messageClient = Wearable.getMessageClient(context)
+        val payload = byteArrayOf(kind.toByte())
+        runCatching {
+            Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
+                for (node in nodes) {
+                    messageClient.sendMessage(node.id, PATH_ALERT, payload)
+                }
+            }
         }
     }
 
