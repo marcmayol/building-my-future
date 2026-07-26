@@ -1,8 +1,8 @@
 {
-  "versionCode": 4,
-  "versionName": "1.3",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.3/app-release.apk",
-  "sha256": "1d2189d66569bc9fb676f3cf6650f46fa04799ffe1f38d49ad078b486e9e7261",
-  "notas": "Cuarta rutina especial: Altura y Postura.",
+  "versionCode": 5,
+  "versionName": "1.4",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.4/building-my-future-v1.4.apk",
+  "sha256": "729b8103dc13360ad48ce52af26cec8d64baa0e3a0870712e36718d769c7301e",
+  "notas": "La app ya se actualiza sola: avisa cuando hay version nueva, la descarga, comprueba su firma y la instala. Se puede desactivar en Configuracion > Actualizaciones.",
   "check_horas": 24
 }
