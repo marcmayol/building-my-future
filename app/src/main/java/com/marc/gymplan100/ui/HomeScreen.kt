@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.Achievements
@@ -88,6 +89,10 @@ fun HomeScreen(
     }
     val showBatteryHint = !progress.batteryHintDismissed && !ignoringBattery
 
+    // Auto-actualización: el banner solo aparece si hay versión nueva o descarga en curso.
+    val actualizador = remember(context) { (context.applicationContext as GymApp).actualizador }
+    val estadoActualizacion by actualizador.estado.collectAsState()
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 56.dp, bottom = 32.dp),
@@ -119,6 +124,15 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+        }
+
+        if (estadoActualizacion.pintaBanner) {
+            item {
+                BannerActualizacion(
+                    estado = estadoActualizacion,
+                    onActualizar = { actualizador.actualizarAhora() }
+                )
             }
         }
 
