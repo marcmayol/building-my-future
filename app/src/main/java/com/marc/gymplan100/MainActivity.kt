@@ -17,8 +17,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.marc.gymplan100.ui.GymNavHost
 import com.marc.gymplan100.ui.theme.GymPlanTheme
+import com.marcm.actualizador.Modo
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -51,6 +55,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        // Busca versión nueva unos segundos después de abrir, sin estorbar el arranque.
+        // Es silenciosa: si falla (sin red, JSON roto…), no se entera nadie.
+        lifecycleScope.launch {
+            delay(3000)
+            (application as GymApp).actualizador.comprobar(Modo.AUTOMATICO)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Reanuda la actualización si el usuario acaba de conceder el permiso de
+        // instalación, y deshace el "Instalando" cuando lo resolvió el sistema.
+        (application as GymApp).actualizador.onPermisoQuizaConcedido()
     }
 
     override fun onNewIntent(intent: Intent) {

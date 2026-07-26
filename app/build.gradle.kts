@@ -59,6 +59,8 @@ android {
     }
     buildFeatures {
         compose = true
+        // El módulo :actualizador compara contra BuildConfig.VERSION_CODE.
+        buildConfig = true
     }
     lint {
         // Falso positivo: registramos el contrato de permisos de Health Connect sobre una
@@ -68,6 +70,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":actualizador"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
