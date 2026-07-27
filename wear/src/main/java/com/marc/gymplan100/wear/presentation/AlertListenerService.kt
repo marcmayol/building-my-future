@@ -18,6 +18,7 @@ import com.google.android.gms.wearable.WearableListenerService
 class AlertListenerService : WearableListenerService() {
 
     override fun onMessageReceived(event: MessageEvent) {
+        android.util.Log.i("AlertListener", "mensaje ${event.path}")
         if (event.path != PATH_ALERT) return
         val kind = event.data.firstOrNull()?.toInt() ?: KIND_BETWEEN_SETS
         vibrate(this, patternFor(kind))
