@@ -372,14 +372,26 @@ private fun ConsistencySection(
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold
         )
+        Text(
+            "Cada barra es una semana de lunes a domingo, de la más antigua a la de hoy. " +
+                "Debajo, el lunes con el que empieza.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(Modifier.height(10.dp))
-        WeeklyBars(weeks)
+        WeeklyBars(Statistics.trimLeadingEmpty(weeks))
 
         Spacer(Modifier.height(20.dp))
         Text(
             "Últimas semanas",
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold
+        )
+        Text(
+            "Cada columna es una semana y cada fila un día, con el lunes arriba y el " +
+                "domingo abajo.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(10.dp))
         Heatmap(trained)
@@ -395,7 +407,10 @@ private fun WeeklyBars(weeks: List<Statistics.WeekCount>) {
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.Bottom
     ) {
+        val ultima = weeks.lastOrNull()?.weekStart
         weeks.forEach { wc ->
+            // La semana en curso se nombra "Esta": es la referencia para leer el resto.
+            val esLaActual = wc.weekStart == ultima
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -432,9 +447,11 @@ private fun WeeklyBars(weeks: List<Statistics.WeekCount>) {
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "${wc.weekStart.dayOfMonth}/${wc.weekStart.monthValue}",
+                    if (esLaActual) "Esta" else "${wc.weekStart.dayOfMonth}/${wc.weekStart.monthValue}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontWeight = if (esLaActual) FontWeight.Bold else FontWeight.Normal,
+                    color = if (esLaActual) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

@@ -123,6 +123,18 @@ object Statistics {
         }
     }
 
+    /**
+     * Quita las semanas vacías del principio: la gráfica empieza cuando empezaste tú.
+     *
+     * Sin esto, las primeras columnas son ceros de antes del plan y confunden más de lo
+     * que informan. Si aún no hay ningún entreno se dejan las últimas [minimo] semanas,
+     * para que la gráfica no aparezca vacía del todo.
+     */
+    fun trimLeadingEmpty(weeks: List<WeekCount>, minimo: Int = 4): List<WeekCount> {
+        val conDatos = weeks.dropWhile { it.count == 0 }
+        return if (conDatos.isEmpty()) weeks.takeLast(minimo) else conDatos
+    }
+
     /** Días de calendario con al menos un entreno. */
     fun trainedDays(
         history: List<SessionRecord>,
