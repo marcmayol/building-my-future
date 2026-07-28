@@ -111,20 +111,13 @@ object WearBridge {
         val messageClient = Wearable.getMessageClient(context)
         val payload = byteArrayOf(kind.toByte())
         runCatching {
-            Wearable.getNodeClient(context).connectedNodes
-                .addOnSuccessListener { nodes ->
-                    android.util.Log.i(TAG, "sendAlert kind=$kind nodos=${nodes.size}")
-                    for (node in nodes) {
-                        messageClient.sendMessage(node.id, PATH_ALERT, payload)
-                            .addOnSuccessListener { android.util.Log.i(TAG, "enviado a ${node.displayName}") }
-                            .addOnFailureListener { e -> android.util.Log.w(TAG, "falló el envío a ${node.displayName}", e) }
-                    }
+            Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
+                for (node in nodes) {
+                    messageClient.sendMessage(node.id, PATH_ALERT, payload)
                 }
-                .addOnFailureListener { e -> android.util.Log.w(TAG, "no pude listar nodos", e) }
-        }.onFailure { android.util.Log.w(TAG, "sendAlert reventó", it) }
+            }
+        }
     }
-
-    private const val TAG = "WearBridge"
 
     /** Etiqueta del botón de cambio: tras un salto avisa de que se puede seguir saltando. */
     private fun swapLabel(s: ActiveSession): String =
