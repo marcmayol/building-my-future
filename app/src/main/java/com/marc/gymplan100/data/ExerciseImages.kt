@@ -53,6 +53,9 @@ object ExerciseImages {
         "Sentadilla goblet o en máquina" to "goblet-squats",
         "Sentadilla goblet" to "goblet-squats",
         "Finisher: press de pecho ligero al fallo" to "seated-chest-press",
+        // Ilustración propia: un fotograma por ejercicio de la superserie.
+        "Superserie curl + extensión" to "superset-curl-triceps",
+        "Superserie curl + extensión de tríceps" to "superset-curl-triceps",
     )
 
     /**
