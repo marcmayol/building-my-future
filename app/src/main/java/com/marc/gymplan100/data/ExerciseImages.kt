@@ -56,11 +56,12 @@ object ExerciseImages {
     )
 
     /**
-     * Movimientos ilustrables de cada circuito, en orden (etiqueta -> slug de imagen).
-     * Un circuito no tiene una sola imagen: mostramos la de cada sub-ejercicio que tengamos.
-     * Los slugs sin drawable (p. ej. escalador, rueda) simplemente no aparecen.
+     * Movimientos ilustrables de cada ejercicio **compuesto** (circuitos y superseries), en
+     * orden (etiqueta -> slug de imagen). No tienen una sola imagen: mostramos la de cada
+     * sub-ejercicio que tengamos, y como miniatura la del primero. Los slugs sin drawable
+     * (p. ej. escalador, rueda) simplemente no aparecen.
      */
-    private val nameToCircuitMoves: Map<String, List<Pair<String, String>>> = mapOf(
+    private val nameToCompoundMoves: Map<String, List<Pair<String, String>>> = mapOf(
         "Circuito core (plancha, rodillas, plancha lateral)" to listOf(
             "Plancha" to "plank",
             "Rodillas al pecho" to "mountain-climber",
@@ -76,6 +77,15 @@ object ExerciseImages {
             "Plancha lateral" to "side-plank",
             "Dead bug" to "dead-bug",
         ),
+        // Superseries: dos ejercicios encadenados sin descanso, cada uno con su ilustración.
+        "Superserie curl + extensión" to listOf(
+            "Curl de bíceps" to "alternating-dumbbell-biceps-curl",
+            "Extensión de tríceps en polea" to "triceps-pushdown",
+        ),
+        "Superserie curl + extensión de tríceps" to listOf(
+            "Curl de bíceps" to "alternating-dumbbell-biceps-curl",
+            "Extensión de tríceps en polea" to "triceps-pushdown",
+        ),
     )
 
     private fun drawableFor(context: Context, slug: String, female: Boolean): Int {
@@ -88,20 +98,28 @@ object ExerciseImages {
      * masculino en caso contrario), o null si el ejercicio no tiene imagen.
      */
     fun forName(context: Context, name: String, female: Boolean): Int? {
-        val slug = nameToSlug[name] ?: return null
-        val id = drawableFor(context, slug, female)
-        return if (id != 0) id else null
+        nameToSlug[name]?.let { slug ->
+            val id = drawableFor(context, slug, female)
+            if (id != 0) return id
+        }
+        // Un compuesto (circuito o superserie) no tiene imagen propia: vale la del primer
+        // movimiento, que es lo que se ve en la miniatura de la lista.
+        return circuitMoves(context, name, female).firstOrNull()?.second
     }
 
     /**
-     * Ilustraciones de los movimientos de un circuito (etiqueta -> drawable), solo las que existen.
-     * Vacío si el nombre no es un circuito conocido.
+     * Ilustraciones de los movimientos de un ejercicio compuesto (etiqueta -> drawable), solo
+     * las que existen. Vacío si el nombre no es un compuesto conocido.
      */
     fun circuitMoves(context: Context, name: String, female: Boolean): List<Pair<String, Int>> {
-        val moves = nameToCircuitMoves[name] ?: return emptyList()
+        val moves = nameToCompoundMoves[name] ?: return emptyList()
         return moves.mapNotNull { (label, slug) ->
             val id = drawableFor(context, slug, female)
             if (id != 0) label to id else null
         }
     }
+
+    /** ¿Sabemos con qué ilustrar este ejercicio? Slug propio o movimientos de un compuesto. */
+    fun hasVisual(name: String): Boolean =
+        nameToSlug.containsKey(name) || nameToCompoundMoves.containsKey(name)
 }
