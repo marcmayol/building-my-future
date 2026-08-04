@@ -49,6 +49,7 @@ object WearBridge {
     const val KEY_CAN_SWAP = "can_swap"      // Boolean: se puede cambiar de ejercicio ahora
     const val KEY_SWAP_LABEL = "swap_label"  // String: etiqueta del botón de cambio de ejercicio
     const val KEY_END_TIME = "end_time"      // Long: fin de la cuenta atrás (epoch ms), 0 si no aplica
+    const val KEY_START_TIME = "start_time"  // Long: inicio de la sesión (epoch ms), para el cronómetro libre
     const val KEY_PAUSED = "paused"          // Boolean: temporizador en pausa
     const val KEY_DAY = "day"                // Int: día del plan
     const val KEY_NEXT_DAY = "next_day"      // Int: siguiente día pendiente (para el botón "Empezar" sin sesión)
@@ -80,13 +81,18 @@ object WearBridge {
             val now = System.currentTimeMillis()
             val day = PlanData.dayByNumber(session.dayNumber)
             val exercise = day?.template?.exercises?.getOrNull(session.exerciseIndex)
-            val total = exercise?.scheme?.let { setCountFromScheme(it) } ?: 0
+            // En cronómetro libre no se sigue el plan: el ejercicio y las series del día no
+            // dicen nada (el reloj llegó a anunciar "Prensa de piernas · Serie 1 de 3" durante
+            // un entreno libre). Ahí lo honesto es el nombre de la sesión y el tiempo corriendo.
+            val libre = session.phase == SessionPhase.FREE
+            val total = if (libre) 0 else exercise?.scheme?.let { setCountFromScheme(it) } ?: 0
 
             map.putBoolean(KEY_ACTIVE, true)
             map.putString(KEY_PHASE, session.phase.name)
-            map.putString(KEY_EXERCISE, exercise?.name ?: "Entrenamiento")
-            map.putInt(KEY_SET_NUMBER, session.setNumber)
+            map.putString(KEY_EXERCISE, if (libre) tituloLibre(session) else exercise?.name ?: "Entrenamiento")
+            map.putInt(KEY_SET_NUMBER, if (libre) 0 else session.setNumber)
             map.putInt(KEY_TOTAL_SETS, total)
+            map.putLong(KEY_START_TIME, if (libre) session.startMillis else 0L)
             map.putString(KEY_PRIMARY_LABEL, primaryLabel(session.phase))
             map.putInt(KEY_DAY, session.dayNumber)
             map.putBoolean(KEY_CAN_SWAP, canSwap(session))
@@ -117,6 +123,13 @@ object WearBridge {
                 }
             }
         }
+    }
+
+    /** Cómo se llama en el reloj una sesión de cronómetro libre. */
+    private fun tituloLibre(s: ActiveSession): String = when {
+        s.extra -> "Entrenamiento libre"
+        s.special -> "Entrenamiento especial"
+        else -> "Entrenamiento"
     }
 
     /** Etiqueta del botón de cambio: tras un salto avisa de que se puede seguir saltando. */

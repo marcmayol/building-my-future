@@ -88,6 +88,11 @@ object OngoingSession {
             builder.addTemplate("#ejercicio# · #cuenta#")
             builder.addTemplate("#cuenta#")
             builder.addPart("cuenta", Status.TimerPart(state.endTime))
+        } else if (state.startTime > 0L) {
+            // Cronómetro libre: cuenta hacia arriba desde que empezó la sesión.
+            builder.addTemplate("#ejercicio# · #crono#")
+            builder.addTemplate("#crono#")
+            builder.addPart("crono", Status.StopwatchPart(state.startTime))
         } else {
             builder.addTemplate("#ejercicio# · #serie#")
             builder.addTemplate("#ejercicio#")

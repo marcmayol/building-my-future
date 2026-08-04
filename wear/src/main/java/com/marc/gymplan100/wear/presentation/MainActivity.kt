@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +36,8 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import kotlinx.coroutines.delay
 
+private const val SOLICITUD_NOTIFICACIONES = 1
+
 class MainActivity : ComponentActivity() {
 
     /** True mientras el reloj está en modo ambiente (muñeca bajada): la app sigue visible, atenuada. */
@@ -60,20 +62,21 @@ class MainActivity : ComponentActivity() {
 
     private val ambientObserver = AmbientLifecycleObserver(this, ambientCallback)
 
-    /** El chip de la esfera es una notificación: sin este permiso no aparecería. */
-    private val pedirNotificaciones =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Activa el modo always-on: al bajar la muñeca la app se queda visible (atenuada)
         // en vez de cerrarse y volver al watch face.
         lifecycle.addObserver(ambientObserver)
+        // El chip de la esfera es una notificación: sin este permiso no aparecería.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
-            pedirNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                SOLICITUD_NOTIFICACIONES
+            )
         }
         setContent { WearApp(ambient, ambientTick) }
     }
@@ -92,6 +95,8 @@ data class WearState(
     val swapLabel: String = "Máquina ocupada",
     val paused: Boolean = false,
     val endTime: Long = 0L,
+    /** Inicio de la sesión (epoch ms) cuando es cronómetro libre; 0 en las sesiones guiadas. */
+    val startTime: Long = 0L,
     /** Siguiente día pendiente (solo cuando no hay sesión): rotula el botón "Empezar entreno". */
     val nextDay: Int = 0
 )
@@ -181,6 +186,10 @@ private fun SessionContent(
     if (state.endTime > 0L && !state.paused) {
         Spacer(Modifier.height(4.dp))
         Countdown(endTime = state.endTime, isAmbient = isAmbient, ambientTick = ambientTick, color = titleColor)
+    } else if (state.startTime > 0L) {
+        // Cronómetro libre: aquí no hay plan que seguir, lo único que importa es el tiempo.
+        Spacer(Modifier.height(4.dp))
+        Elapsed(startTime = state.startTime, isAmbient = isAmbient, ambientTick = ambientTick, color = titleColor)
     } else if (state.paused) {
         Spacer(Modifier.height(4.dp))
         Text("En pausa", style = MaterialTheme.typography.title2, color = titleColor)
@@ -229,6 +238,29 @@ private fun Countdown(endTime: Long, isAmbient: Boolean, ambientTick: Int, color
     val ss = remaining % 60
     Text(
         text = "%d:%02d".format(mm, ss),
+        style = MaterialTheme.typography.display3,
+        color = color
+    )
+}
+
+/** Tiempo transcurrido desde [startTime], para las sesiones de cronómetro libre. */
+@Composable
+private fun Elapsed(startTime: Long, isAmbient: Boolean, ambientTick: Int, color: Color) {
+    var elapsed by remember(startTime, ambientTick) {
+        mutableStateOf(((System.currentTimeMillis() - startTime) / 1000).coerceAtLeast(0))
+    }
+    LaunchedEffect(startTime, isAmbient) {
+        if (isAmbient) return@LaunchedEffect
+        while (true) {
+            elapsed = ((System.currentTimeMillis() - startTime) / 1000).coerceAtLeast(0)
+            delay(500)
+        }
+    }
+    val hh = elapsed / 3600
+    val mm = (elapsed % 3600) / 60
+    val ss = elapsed % 60
+    Text(
+        text = if (hh > 0) "%d:%02d:%02d".format(hh, mm, ss) else "%d:%02d".format(mm, ss),
         style = MaterialTheme.typography.display3,
         color = color
     )

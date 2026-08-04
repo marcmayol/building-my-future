@@ -63,7 +63,8 @@ internal fun parseState(map: DataMap): WearState {
         canSwap = map.getBoolean("can_swap", false),
         swapLabel = map.getString("swap_label", "Máquina ocupada"),
         paused = map.getBoolean("paused", false),
-        endTime = map.getLong("end_time", 0L)
+        endTime = map.getLong("end_time", 0L),
+        startTime = map.getLong("start_time", 0L)
     )
 }
 
