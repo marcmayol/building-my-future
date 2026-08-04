@@ -1,0 +1,12 @@
+<!-- Mancuerna monocroma para el chip de la esfera y el icono de la notificación:
+     el sistema la tiñe, así que va en blanco sobre fondo transparente. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFFFF">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4,9h2v6h-2z M7,7h2v10h-2z M18,9h2v6h-2z M15,7h2v10h-2z M9,11h6v2h-6z" />
+</vector>

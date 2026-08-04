@@ -6,6 +6,8 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- El chip de "entrenamiento en curso" en la esfera es una notificación ongoing. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -47,6 +49,20 @@
                     android:scheme="wear"
                     android:host="*"
                     android:pathPrefix="/gym/alert" />
+            </intent-filter>
+        </service>
+
+        <!-- Mantiene el chip de la esfera al día: el sistema lo despierta con cada cambio de
+             estado del móvil, aunque la app del reloj esté cerrada. -->
+        <service
+            android:name=".presentation.StateListenerService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data
+                    android:scheme="wear"
+                    android:host="*"
+                    android:pathPrefix="/gym/state" />
             </intent-filter>
         </service>
     </application>

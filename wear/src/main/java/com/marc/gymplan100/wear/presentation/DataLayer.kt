@@ -48,7 +48,8 @@ fun DisposableDataLayer(onState: (WearState) -> Unit) {
     }
 }
 
-private fun parseState(map: DataMap): WearState {
+/** Traduce el DataMap del móvil a [WearState]. Lo usan la pantalla y [StateListenerService]. */
+internal fun parseState(map: DataMap): WearState {
     if (!map.getBoolean("active", false)) {
         return WearState(active = false, nextDay = map.getInt("next_day", 0))
     }

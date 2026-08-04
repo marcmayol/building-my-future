@@ -1,8 +1,12 @@
 package com.marc.gymplan100.wear.presentation
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,11 +60,21 @@ class MainActivity : ComponentActivity() {
 
     private val ambientObserver = AmbientLifecycleObserver(this, ambientCallback)
 
+    /** El chip de la esfera es una notificación: sin este permiso no aparecería. */
+    private val pedirNotificaciones =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Activa el modo always-on: al bajar la muñeca la app se queda visible (atenuada)
         // en vez de cerrarse y volver al watch face.
         lifecycle.addObserver(ambientObserver)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            pedirNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
         setContent { WearApp(ambient, ambientTick) }
     }
 }
@@ -88,7 +102,12 @@ fun WearApp(ambient: State<Boolean>, ambientTick: State<Int>) {
     var state by remember { mutableStateOf(WearState()) }
     val isAmbient = ambient.value
 
-    DisposableDataLayer(onState = { state = it })
+    // El chip de la esfera lo mantiene StateListenerService, pero también se refresca aquí:
+    // así aparece aunque la sesión ya estuviera en marcha antes de abrir la app del reloj.
+    DisposableDataLayer(onState = {
+        state = it
+        OngoingSession.update(context, it)
+    })
 
     MaterialTheme {
         Column(
