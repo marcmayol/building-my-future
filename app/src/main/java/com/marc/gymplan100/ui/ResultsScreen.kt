@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -30,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,8 +57,14 @@ fun ResultsScreen(
 ) {
     val progress by viewModel.progress.collectAsState()
     val history by viewModel.history.collectAsState()
-    val completed = progress.completedDays.filter { it in 1..PlanData.TOTAL_DAYS }.sorted()
-    val extras = history.filter { it.extra }.sortedByDescending { it.endMillis }
+    val newestFirst = progress.resultsNewestFirst
+    val completed = progress.completedDays
+        .filter { it in 1..PlanData.TOTAL_DAYS }
+        .sorted()
+        .let { if (newestFirst) it.reversed() else it }
+    val extras = history.filter { it.extra }
+        .sortedByDescending { it.endMillis }
+        .let { if (newestFirst) it else it.reversed() }
 
     // Estado de la conexión con Google Health (Health Connect).
     val healthGranted by viewModel.healthGranted.collectAsState()
@@ -69,6 +80,18 @@ fun ResultsScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+                actions = {
+                    TextButton(onClick = { viewModel.toggleResultsOrder() }) {
+                        Icon(
+                            if (newestFirst) Icons.Filled.KeyboardArrowDown
+                            else Icons.Filled.KeyboardArrowUp,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(2.dp))
+                        Text(if (newestFirst) "Recientes" else "Antiguos")
                     }
                 }
             )

@@ -785,4 +785,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Oculta para siempre el aviso de optimización de batería. */
     fun dismissBatteryHint() = update { it.copy(batteryHintDismissed = true) }
+
+    /** Invierte el orden de la lista de Resultados (se recuerda entre sesiones). */
+    fun toggleResultsOrder() = update { it.copy(resultsNewestFirst = !it.resultsNewestFirst) }
 }

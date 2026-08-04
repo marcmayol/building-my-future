@@ -19,7 +19,10 @@ data class ProgressState(
     // El usuario ya cerró el aviso de optimización de batería.
     val batteryHintDismissed: Boolean = false,
     // Último peso usado por ejercicio (clave: nombre del ejercicio).
-    val exerciseWeights: Map<String, String> = emptyMap()
+    val exerciseWeights: Map<String, String> = emptyMap(),
+    // En Resultados, el día más reciente arriba (con 30+ días completados, bajar hasta
+    // el último era un scroll interminable).
+    val resultsNewestFirst: Boolean = true
 ) {
     fun completedInPhase(phaseNumber: Int): Int =
         PlanData.daysOfPhase(phaseNumber).count { it.number in completedDays }
