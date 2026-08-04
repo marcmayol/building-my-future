@@ -1,8 +1,8 @@
 {
-  "versionCode": 8,
-  "versionName": "1.7",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.7/building-my-future-v1.7.apk",
-  "sha256": "be234e8d4266031923ee3b61a020a60b4baa452afc7b25b5fcc527fa73ac71f5",
-  "notas": "Resultados: nuevo boton para invertir el orden de la lista. Con mas de 30 dias completados habia que bajar muchisimo para ver el ultimo entreno; ahora el dia mas reciente sale arriba y puedes cambiar el orden cuando quieras. La app recuerda tu eleccion.",
+  "versionCode": 9,
+  "versionName": "1.8",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.8/building-my-future-v1.8.apk",
+  "sha256": "ecd06892951d0ad40d85608748918dda203dd892a948a3fd6a0b29cad30129e5",
+  "notas": "El reloj gana un chip de entrenamiento en curso en la propia esfera: mientras entrenas sale una mancuerna en el watch face y con un toque vuelves a la sesion, sin buscar la app. La cuenta atras la dibuja el sistema, asi que corre al segundo aunque la app del reloj este cerrada. Ademas, en el entrenamiento libre el reloj ya no anuncia un ejercicio del plan que no estabas haciendo: muestra el nombre de la sesion y el cronometro. Para tenerlo en el reloj hay que instalar el segundo APK de esta Release por adb.",
   "check_horas": 24
 }
