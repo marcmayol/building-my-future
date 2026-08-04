@@ -1,8 +1,8 @@
 {
-  "versionCode": 7,
-  "versionName": "1.6",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.6/building-my-future-v1.6.apk",
-  "sha256": "c4430eed49d0efc4a8194dcf9ac7934035b6f38471ff5a1639e47921ab20de61",
-  "notas": "La superserie ya tiene su propia ilustracion (curl y extension, un ejercicio en cada fotograma). La grafica de entrenos por semana se entiende: empieza en tu primera semana, la columna en curso se llama Esta y cada bloque explica que representa.",
+  "versionCode": 8,
+  "versionName": "1.7",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.7/building-my-future-v1.7.apk",
+  "sha256": "be234e8d4266031923ee3b61a020a60b4baa452afc7b25b5fcc527fa73ac71f5",
+  "notas": "Resultados: nuevo boton para invertir el orden de la lista. Con mas de 30 dias completados habia que bajar muchisimo para ver el ultimo entreno; ahora el dia mas reciente sale arriba y puedes cambiar el orden cuando quieras. La app recuerda tu eleccion.",
   "check_horas": 24
 }
