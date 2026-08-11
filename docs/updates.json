@@ -1,8 +1,8 @@
 {
-  "versionCode": 11,
-  "versionName": "2.0",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.0/building-my-future-v2.0.apk",
-  "sha256": "3a3c8d4b60472bc7bac270d089c03abaa35388a8e46678143e0eade77a98731f",
-  "notas": "Dos cosas grandes.\n\nTUS PROPIOS PLANES. La app deja de ser solo el reto de 100 dias: puedes traerte tu plan en Markdown o JSON, o crearlo en la app con el editor. Cada plan guarda su propio progreso, asi que cambias de plan y al volver tus dias, pesos y entrenos siguen ahi. Los logros y las estadisticas se recalculan sobre el plan que sigas.\n\nREDISENO VISUAL. El estado tine la pantalla durante el entreno (ambar preparas, naranja trabajas, magenta esperas), asi de reojo ya sabes si toca darle o descansar. El peso de la serie ya no se teclea: se sube y baja con botones de 2,5 kg. Inicio manda con lo que toca hoy, Estadisticas se ordena en pestanas y hay tipografia propia con cifras que no bailan.",
+  "versionCode": 12,
+  "versionName": "2.0.1",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.0.1/building-my-future-v2.0.1.apk",
+  "sha256": "88bdeb1cea69396bffdd22e07c1c228103b5425417384714f263fee80c6973d3",
+  "notas": "Arreglo visual: el boton de la ficha del ejercicio en la pantalla del dia se partia en dos lineas y dejaba el icono descolgado. Ahora dice 'Como se hace' y cabe en una linea.",
   "check_horas": 24
 }
