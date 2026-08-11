@@ -3,7 +3,9 @@
 package com.marc.gymplan100.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -53,6 +57,9 @@ import com.marc.gymplan100.data.SessionRecord
 import com.marc.gymplan100.data.Statistics
 import com.marc.gymplan100.ui.theme.BrandMagenta
 import com.marc.gymplan100.ui.theme.BrandOrange
+import com.marc.gymplan100.ui.theme.LocalAppColors
+import com.marc.gymplan100.ui.theme.LocalAppTextStyles
+import com.marc.gymplan100.ui.theme.Space
 import java.time.LocalDate
 
 @Composable
@@ -83,38 +90,141 @@ fun StatisticsScreen(
             )
         }
     ) { inner ->
-        if (summary.completedDays == 0 && history.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = inner.calculateTopPadding() + 40.dp, start = 24.dp, end = 24.dp),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Text(
-                    "Aún no hay datos. Cuando completes tu primer entrenamiento, aquí verás tu " +
-                        "progreso: racha, evolución del peso por ejercicio, constancia y records.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            return@Scaffold
-        }
+        val empty = summary.completedDays == 0 && history.isEmpty()
+        var tab by remember { mutableStateOf(0) }
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = inner.calculateTopPadding() + 8.dp,
+                start = Space.screen,
+                end = Space.screen,
+                top = inner.calculateTopPadding() + Space.x2,
                 bottom = 32.dp
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            item { SummarySection(summary) }
-            item { ProgressionSection(progression) }
-            item { ConsistencySection(weeks, trained, history) }
-            item { RecordsSection(records, longest, productive) }
+            // Un dato manda: la racha es lo único que cambia lo que haces hoy. El resto vive
+            // en pestañas para que no compitan seis bloques hermanos por la misma atención.
+            item { StreakHero(summary, empty) }
+
+            if (empty) {
+                item {
+                    Text(
+                        "Esto se llena con el primer entreno. No hay nada que configurar.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                return@LazyColumn
+            }
+
+            item {
+                TabRow(
+                    selectedTabIndex = tab,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    divider = {}
+                ) {
+                    listOf("Resumen", "Pesos", "Constancia").forEachIndexed { i, label ->
+                        Tab(
+                            selected = tab == i,
+                            onClick = { tab = i },
+                            text = {
+                                Text(
+                                    label,
+                                    style = if (tab == i) MaterialTheme.typography.titleMedium
+                                    else MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
+            when (tab) {
+                0 -> {
+                    item { SummarySection(summary) }
+                    item { WeeklySection(weeks) }
+                    item { RecordsSection(records, longest, productive) }
+                }
+                1 -> item { ProgressionSection(progression) }
+                else -> item { ConsistencySection(trained, history) }
+            }
         }
+    }
+}
+
+/** Racha actual, el dato que de verdad cambia el comportamiento de hoy. */
+@Composable
+private fun StreakHero(s: Statistics.Summary, empty: Boolean) {
+    val app = LocalAppColors.current
+    val styles = LocalAppTextStyles.current
+    val dark = isSystemInDarkTheme()
+    val onHero = if (empty) MaterialTheme.colorScheme.onSurfaceVariant
+    else if (dark) Color(0xFF3D0B02) else MaterialTheme.colorScheme.onPrimaryContainer
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .then(
+                when {
+                    empty -> Modifier.border(
+                        1.5.dp,
+                        MaterialTheme.colorScheme.outlineVariant,
+                        MaterialTheme.shapes.large
+                    )
+                    dark -> Modifier.background(app.brandGradient)
+                    else -> Modifier.background(MaterialTheme.colorScheme.primaryContainer)
+                }
+            )
+            .padding(Space.screen)
+    ) {
+        Text("RACHA ACTUAL", style = MaterialTheme.typography.labelMedium, color = onHero)
+        Spacer(Modifier.height(Space.x2))
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                "${s.currentStreak}",
+                style = styles.bigNumber,
+                color = if (empty) MaterialTheme.colorScheme.outlineVariant else onHero
+            )
+            Spacer(Modifier.width(Space.x3))
+            Text(
+                if (s.currentStreak == 1) "día seguido" else "días seguidos",
+                style = MaterialTheme.typography.titleLarge,
+                color = onHero,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+        if (!empty) {
+            Spacer(Modifier.height(Space.x2))
+            Text(
+                when {
+                    s.bestStreak > s.currentStreak ->
+                        "Tu mejor racha son ${s.bestStreak}. Te faltan " +
+                            "${s.bestStreak - s.currentStreak}."
+                    s.currentStreak > 0 -> "Es tu mejor racha hasta hoy."
+                    else -> "Empieza una nueva hoy mismo."
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = onHero
+            )
+        }
+    }
+}
+
+/** La gráfica de entrenos por semana, con su explicación. */
+@Composable
+private fun WeeklySection(weeks: List<Statistics.WeekCount>) {
+    Column {
+        SectionTitle("Entrenos por semana")
+        Text(
+            "Cada barra es una semana de lunes a domingo, de la más antigua a la de hoy. " +
+                "Debajo, el lunes con el que empieza.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(10.dp))
+        WeeklyBars(Statistics.trimLeadingEmpty(weeks))
     }
 }
 
@@ -123,8 +233,8 @@ fun StatisticsScreen(
 @Composable
 private fun SummarySection(s: Statistics.Summary) {
     Column {
-        SectionTitle("Resumen")
-        Spacer(Modifier.height(10.dp))
+        // La racha y la mejor racha ya viven en el héroe: repetirlas aquí era decir lo mismo
+        // dos veces en la misma pantalla.
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatTile(
                 value = "${s.completedDays}/${s.totalDays}",
@@ -132,23 +242,13 @@ private fun SummarySection(s: Statistics.Summary) {
                 modifier = Modifier.weight(1f)
             )
             StatTile(
-                value = "🔥 ${s.currentStreak}",
-                label = "racha actual",
-                modifier = Modifier.weight(1f)
-            )
-            StatTile(
-                value = "${s.bestStreak}",
-                label = "mejor racha",
+                value = "${s.totalWorkouts}",
+                label = if (s.extraWorkouts > 0) "entrenos · ${s.extraWorkouts} extra" else "entrenos",
                 modifier = Modifier.weight(1f)
             )
         }
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatTile(
-                value = "${s.totalWorkouts}",
-                label = if (s.extraWorkouts > 0) "entrenos · ${s.extraWorkouts} extra" else "entrenos",
-                modifier = Modifier.weight(1f)
-            )
             StatTile(
                 value = formatDurationLong(s.totalTrainingSeconds),
                 label = "tiempo total",
@@ -350,14 +450,10 @@ private fun WeightChart(points: List<Statistics.WeightPoint>) {
 
 @Composable
 private fun ConsistencySection(
-    weeks: List<Statistics.WeekCount>,
     trained: Set<LocalDate>,
     history: List<SessionRecord>
 ) {
     Column {
-        SectionTitle("Constancia")
-        Spacer(Modifier.height(10.dp))
-
         val today = LocalDate.now()
         val thisWeek = Statistics.workoutsBetween(history, Statistics.weekStart(today), today)
         val thisMonth = Statistics.workoutsBetween(history, today.withDayOfMonth(1), today)
@@ -365,21 +461,6 @@ private fun ConsistencySection(
             StatTile("$thisWeek", "esta semana", Modifier.weight(1f))
             StatTile("$thisMonth", "este mes", Modifier.weight(1f))
         }
-
-        Spacer(Modifier.height(16.dp))
-        Text(
-            "Entrenos por semana",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            "Cada barra es una semana de lunes a domingo, de la más antigua a la de hoy. " +
-                "Debajo, el lunes con el que empieza.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(10.dp))
-        WeeklyBars(Statistics.trimLeadingEmpty(weeks))
 
         Spacer(Modifier.height(20.dp))
         Text(

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,15 +22,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.ExerciseGuides
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.MuscleTargets
+import com.marc.gymplan100.ui.theme.LocalAppColors
 import java.net.URLEncoder
 
 /**
@@ -68,15 +77,17 @@ fun ExerciseGuideSheet(
                 .padding(start = 20.dp, end = 20.dp, bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            Text(exerciseName, style = MaterialTheme.typography.headlineMedium)
             Text(
-                exerciseName,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                scheme,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                // El esquema y el músculo principal en una línea: es lo que se mira de reojo
+                // cuando ya sabes hacer el ejercicio y solo quieres confirmar.
+                buildString {
+                    append(scheme)
+                    guide?.muscles?.substringBefore(",")?.trim()?.takeIf { it.isNotBlank() }
+                        ?.let { append(" · ${it.lowercase()}") }
+                },
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             if (imageRes != null) {
@@ -128,27 +139,27 @@ fun ExerciseGuideSheet(
             }
 
             // Vídeo: abre una búsqueda en YouTube del movimiento (devuelve shorts y tutoriales).
-            // Más robusto que un enlace fijo (los vídeos se borran/privatizan).
+            // Más robusto que un enlace fijo (los vídeos se borran/privatizan). Va al final de
+            // la ficha, salvo cuando no hay ficha: entonces es la única salida y sube arriba.
             val context = LocalContext.current
             val videoQuery = guide?.videoQuery?.takeIf { it.isNotBlank() } ?: "$exerciseName técnica"
-            FilledTonalButton(
-                onClick = {
-                    val url = "https://www.youtube.com/results?search_query=" +
-                        URLEncoder.encode(videoQuery, "UTF-8")
-                    runCatching {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                Text("  Ver vídeo en YouTube")
+            val abrirVideo = {
+                val url = "https://www.youtube.com/results?search_query=" +
+                    URLEncoder.encode(videoQuery, "UTF-8")
+                runCatching {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                }
+                Unit
             }
 
             if (guide == null) {
+                OutlinedButton(onClick = abrirVideo, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                    Text("  Buscarlo en YouTube")
+                }
                 Text(
                     // Con planes propios este caso es habitual (el ejercicio no está en el
                     // catálogo de la app), y entonces tampoco hay ilustración a la que mirar.
@@ -171,12 +182,10 @@ fun ExerciseGuideSheet(
                 Text(guide.muscles, style = MaterialTheme.typography.bodyMedium)
                 val targets = MuscleTargets.forName(exerciseName)
                 if (targets != null) {
-                    val primaryColor = MaterialTheme.colorScheme.primary
-                    val secondaryColor = lerp(
-                        MaterialTheme.colorScheme.surface,
-                        MaterialTheme.colorScheme.primary,
-                        0.45f
-                    )
+                    // Principal y secundario usan los tokens de estado: el mismo código de
+                    // color que la sesión (magenta = lo que más trabaja, ámbar = lo que ayuda).
+                    val primaryColor = LocalAppColors.current.rest
+                    val secondaryColor = LocalAppColors.current.warmup
                     Spacer(Modifier.height(4.dp))
                     MuscleMap(
                         primary = targets.primary,
@@ -230,18 +239,56 @@ fun ExerciseGuideSheet(
                 Text(guide.howTo, style = MaterialTheme.typography.bodyMedium)
             }
 
-            GuideSection("Errores típicos a evitar") {
+            // Estas dos se consultan de vez en cuando, no en cada serie: van plegadas para que
+            // "Cómo se hace" no quede enterrado.
+            CollapsibleSection("Errores típicos") {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     guide.mistakes.forEach { Bullet(it) }
                 }
             }
 
-            GuideSection("Si está ocupada o no la tienes") {
+            CollapsibleSection("Si está ocupada o no la tienes") {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     guide.alternatives.forEach { Bullet(it) }
                 }
             }
+
+            OutlinedButton(onClick = abrirVideo, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                Text("  Ver vídeo en YouTube")
+            }
         }
+    }
+}
+
+/** Sección plegable: el título siempre visible y el contenido a un toque. */
+@Composable
+private fun CollapsibleSection(title: String, content: @Composable () -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { open = !open }
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                if (open) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        if (open) {
+            content()
+            Spacer(Modifier.height(8.dp))
+        }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 

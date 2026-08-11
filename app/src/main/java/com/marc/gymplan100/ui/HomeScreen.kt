@@ -8,54 +8,73 @@ import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.em
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.Achievements
-import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.Phase
+import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.ui.theme.LocalAppColors
+import com.marc.gymplan100.ui.theme.LocalAppTextStyles
+import com.marc.gymplan100.ui.theme.Space
+import com.marc.gymplan100.ui.theme.Touch
 
+/**
+ * Inicio.
+ *
+ * Jerarquía invertida respecto al diseño anterior: el protagonista es **lo que toca hoy**, no el
+ * marcador "X de N". El progreso del plan queda como una sola lectura (una cifra, un porcentaje
+ * y una barra) en vez de las cuatro formas de decir lo mismo que había antes.
+ */
 @Composable
 fun HomeScreen(
     viewModel: PlanViewModel,
@@ -71,8 +90,12 @@ fun HomeScreen(
 ) {
     val progress by viewModel.progress.collectAsState()
     val activeSession by viewModel.activeSession.collectAsState()
+    val activePlan by viewModel.activePlan.collectAsState()
     val done = progress.completedDays.count { it in 1..PlanData.TOTAL_DAYS }
-    val fraction = done.toFloat() / PlanData.TOTAL_DAYS
+    val total = PlanData.TOTAL_DAYS
+    val nextDay = viewModel.nextDay()
+    val nextTemplate = PlanData.dayByNumber(nextDay)?.template
+    val currentPhase = PlanData.dayByNumber(nextDay)?.phase
 
     // Estado de optimización de batería: se reevalúa al volver a la pantalla.
     val context = LocalContext.current
@@ -95,8 +118,13 @@ fun HomeScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 56.dp, bottom = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        contentPadding = PaddingValues(
+            start = Space.screen,
+            end = Space.screen,
+            top = 44.dp,
+            bottom = 32.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(Space.x3)
     ) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -104,28 +132,41 @@ fun HomeScreen(
                     painter = painterResource(R.drawable.logo_icon),
                     contentDescription = "Logo Building My Future",
                     modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(10.dp))
                 )
-                Spacer(Modifier.size(14.dp))
-                Column {
-                    Text(
-                        text = "Building My Future",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = (-0.02).em,
-                        lineHeight = 1.1.em
-                    )
-                    Text(
-                        // Los días son los del plan que se esté siguiendo, no siempre 100.
-                        text = "${PlanData.TOTAL_DAYS} DÍAS",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.16.em,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Spacer(Modifier.size(Space.x3))
+                Text(
+                    text = "Building My Future",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(
+                    onClick = onOpenSettings,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                ) {
+                    Icon(
+                        Icons.Filled.Settings,
+                        contentDescription = "Configuración",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
+        }
+
+        item {
+            // El plan y la fase, en una línea: con planes propios saber cuál sigues importa.
+            Text(
+                buildString {
+                    append(if (activePlan.builtin) "PLAN DE $total DÍAS" else activePlan.name.uppercase())
+                    currentPhase?.let { append(" · FASE ${it.number} ${it.name.uppercase()}") }
+                },
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         if (estadoActualizacion.pintaBanner) {
@@ -143,27 +184,20 @@ fun HomeScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     ),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            "Para que suenen los avisos",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(Modifier.height(4.dp))
+                    Column(modifier = Modifier.padding(Space.x4)) {
+                        Text("Para que suenen los avisos", style = MaterialTheme.typography.titleMedium)
+                        Spacer(Modifier.height(Space.x1))
                         Text(
                             "Desactiva el ahorro de batería para esta app. Así el aviso del " +
                                 "descanso sonará puntual aunque tengas la pantalla apagada.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(Modifier.height(10.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
+                        Spacer(Modifier.height(Space.x3))
+                        Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                             Button(
                                 onClick = { openBatterySettings(context) },
                                 modifier = Modifier.weight(1f)
@@ -178,295 +212,63 @@ fun HomeScreen(
             }
         }
 
-        activeSession?.let { session ->
-            item {
-                Card(
-                    onClick = { onResumeSession(session.dayNumber) },
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                "Entrenamiento en curso",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                            Text(
-                                when {
-                                    session.routineId != null -> "Rutina especial · toca para reanudar"
-                                    session.extra -> "Entrenamiento extra · toca para reanudar"
-                                    else -> "Día ${session.dayNumber} · toca para reanudar"
-                                },
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        }
-                        Icon(
-                            Icons.Filled.PlayArrow,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
+        item {
+            val session = activeSession
+            if (session != null) {
+                HeroEnCurso(
+                    dayNumber = session.dayNumber,
+                    subtitle = when {
+                        session.extra -> "Entrenamiento extra · no cuenta día"
+                        session.special -> "Sesión libre en marcha"
+                        else -> PlanData.dayByNumber(session.dayNumber)?.template?.title.orEmpty()
+                    },
+                    onResume = { onResumeSession(session.dayNumber) }
+                )
+            } else {
+                HeroHoy(
+                    dayNumber = nextDay,
+                    subtitle = nextTemplate?.let {
+                        "${it.title} · ${it.exercises.size} ejercicios"
+                    }.orEmpty(),
+                    everStarted = done > 0,
+                    onStart = { onOpenDay(nextDay) },
+                    onSeeDay = { onOpenDay(nextDay) }
+                )
             }
         }
 
-        item {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        Text(
-                            text = "$done de ${PlanData.TOTAL_DAYS}",
-                            style = MaterialTheme.typography.headlineLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = "${(fraction * 100).toInt()}%",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "días completados",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(Modifier.height(14.dp))
-                    LinearProgressIndicator(
-                        progress = { fraction },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(10.dp),
-                        trackColor = MaterialTheme.colorScheme.surface,
-                    )
-                    Spacer(Modifier.height(18.dp))
-                    val active = activeSession
-                    Button(
-                        onClick = {
-                            if (active != null) onResumeSession(active.dayNumber)
-                            else onOpenDay(viewModel.nextDay())
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                        Spacer(Modifier.height(0.dp))
-                        Text(
-                            text = when {
-                                active != null && active.extra -> "  Reanudar entrenamiento extra"
-                                active != null -> "  Reanudar entrenamiento (día ${active.dayNumber})"
-                                done == 0 -> "  Empezar día 1"
-                                else -> "  Continuar (día ${viewModel.nextDay()})"
-                            }
-                        )
-                    }
-                    Spacer(Modifier.height(10.dp))
-                    OutlinedButton(
-                        onClick = onOpenSpecial,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Filled.Star, contentDescription = null)
-                        Text("  Entrenamientos especiales")
-                    }
-                }
-            }
-        }
+        item { ProgresoDelPlan(done = done, total = total) }
+
+        item { FilaEspeciales(onClick = onOpenSpecial) }
 
         item {
-            Card(
-                onClick = onOpenAchievements,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("🏆", style = MaterialTheme.typography.headlineSmall)
-                        Spacer(Modifier.size(12.dp))
-                        Column {
-                            Text(
-                                "Logros",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                "Desbloquea hitos del reto",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                    Text(
-                        "${Achievements.unlockedIds(progress).size}/${Achievements.all.size}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        }
-
-        item {
-            Card(
-                onClick = onOpenWeights,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("🏋️", style = MaterialTheme.typography.headlineSmall)
-                        Spacer(Modifier.size(12.dp))
-                        Column {
-                            Text(
-                                "Mis pesos",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                "El peso de cada máquina, siempre a mano",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        item {
-            Card(
-                onClick = onOpenResults,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("📋", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(Modifier.size(12.dp))
-                    Column {
-                        Text(
-                            "Resultados",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            "Tiempo y pesos de cada día",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
-
-        item {
-            Card(
-                onClick = onOpenStats,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("📊", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(Modifier.size(12.dp))
-                    Column {
-                        Text(
-                            "Estadísticas",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            "Racha, progresión, constancia y records",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-        }
-
-        item {
-            Card(
-                onClick = onOpenSettings,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("⚙️", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(Modifier.size(12.dp))
-                    Column {
-                        Text(
-                            "Configuración",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            "Peso, altura y género para el cálculo de calorías",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+            Column {
+                AccesoFila(
+                    icon = R.drawable.ic_logros,
+                    label = "Logros",
+                    trailing = "${Achievements.unlockedIds(progress).size}/${Achievements.all.size}",
+                    onClick = onOpenAchievements
+                )
+                AccesoFila(R.drawable.ic_pesos, "Mis pesos", onClick = onOpenWeights)
+                AccesoFila(R.drawable.ic_resultados, "Resultados", onClick = onOpenResults)
+                AccesoFila(
+                    R.drawable.ic_estadisticas, "Estadísticas",
+                    onClick = onOpenStats, divider = false
+                )
             }
         }
 
         item {
             Text(
-                text = "Fases",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 6.dp)
+                "FASES DEL PLAN",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = Space.x2)
             )
         }
 
         items(PlanData.phases, key = { it.number }) { phase ->
-            PhaseCard(
+            PhaseRow(
                 phase = phase,
                 completed = progress.completedInPhase(phase.number),
                 total = PlanData.daysOfPhase(phase.number).size,
@@ -474,72 +276,290 @@ fun HomeScreen(
             )
         }
     }
-
 }
 
+/** Héroe con entreno a medias: el degradado de marca avisa de que hay algo abierto. */
 @Composable
-private fun PhaseCard(
-    phase: Phase,
-    completed: Int,
-    total: Int,
-    onClick: () -> Unit
+private fun HeroEnCurso(
+    dayNumber: Int,
+    subtitle: String,
+    onResume: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
+    val app = LocalAppColors.current
+    val styles = LocalAppTextStyles.current
+    val onHero = Color(0xFF3D0B02)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(Brush.linearGradient(listOf(app.work, app.rest)))
+            .clickable(onClick = onResume)
+            .padding(Space.screen)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Fase ${phase.number}: ${phase.name}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = "$completed/$total",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
+        Text(
+            "EN CURSO · TOCA PARA REANUDAR",
+            style = MaterialTheme.typography.labelMedium,
+            color = onHero
+        )
+        Spacer(Modifier.height(Space.x2))
+        Text("Día $dayNumber", style = styles.displayCard, color = onHero)
+        if (subtitle.isNotBlank()) {
+            Spacer(Modifier.height(Space.x1))
+            Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = onHero)
+        }
+        Spacer(Modifier.height(Space.x4))
+        Button(
+            onClick = onResume,
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1C0410),
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = Touch.primary)
+        ) { Text("Reanudar") }
+    }
+}
+
+/** Héroe sin entreno: lo que toca hoy, con el gesto de empezar a un dedo. */
+@Composable
+private fun HeroHoy(
+    dayNumber: Int,
+    subtitle: String,
+    everStarted: Boolean,
+    onStart: () -> Unit,
+    onSeeDay: () -> Unit
+) {
+    val styles = LocalAppTextStyles.current
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(Space.screen)
+    ) {
+        Text(
+            if (everStarted) "HOY TE TOCA" else "PLAN NUEVO · EMPIEZA CUANDO QUIERAS",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Spacer(Modifier.height(Space.x2))
+        Text(
+            "Día $dayNumber",
+            style = styles.displayCard,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        if (subtitle.isNotBlank()) {
+            Spacer(Modifier.height(Space.x1))
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+        Spacer(Modifier.height(Space.x4))
+        Button(
+            onClick = onStart,
+            shape = CircleShape,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = Touch.primary)
+        ) { Text("Empezar día $dayNumber") }
+        Spacer(Modifier.height(Space.x2))
+        Text(
+            "Ver el día antes de empezar",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clickable(onClick = onSeeDay)
+                .padding(Space.x2)
+        )
+    }
+}
+
+/** El progreso del plan, en una sola lectura: cifra, porcentaje y cinta. */
+@Composable
+private fun ProgresoDelPlan(done: Int, total: Int) {
+    val app = LocalAppColors.current
+    val percent = if (total > 0) done * 100 / total else 0
+    Column(modifier = Modifier.padding(top = Space.x2)) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                "$done de $total días",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            Text("$percent %", style = MaterialTheme.typography.titleMedium)
+        }
+        Spacer(Modifier.height(Space.x2))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            if (done > 0) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = (done.toFloat() / total).coerceIn(0f, 1f))
+                        .height(8.dp)
+                        .clip(CircleShape)
+                        .background(app.brandGradient)
                 )
             }
-            Spacer(Modifier.height(2.dp))
+        }
+        if (done == 0) {
+            Spacer(Modifier.height(Space.x2))
             Text(
-                text = "${phase.range}  ·  ${phase.weeks}",
+                "Aún no hay progreso: la barra se llena a partir de hoy.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = phase.description,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(Modifier.height(10.dp))
-            LinearProgressIndicator(
-                progress = { if (total == 0) 0f else completed.toFloat() / total },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
             )
         }
     }
 }
 
+/** Los especiales salen de la tarjeta de progreso: ya no compiten con el botón del día. */
+@Composable
+private fun FilaEspeciales(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .padding(horizontal = Space.x4, vertical = Space.x4),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Entrenamientos especiales",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            "no cuentan día",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/** Acceso como fila con icono lineal: los emoji se quedan en Logros, donde son contenido. */
+@Composable
+private fun AccesoFila(
+    icon: Int,
+    label: String,
+    trailing: String? = null,
+    divider: Boolean = true,
+    onClick: () -> Unit
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .heightIn(min = Touch.primary)
+                .padding(vertical = Space.x3),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.dp)
+            )
+            Spacer(Modifier.size(Space.x4))
+            Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            if (trailing != null) {
+                Text(
+                    trailing,
+                    style = LocalAppTextStyles.current.tabular,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        if (divider) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        }
+    }
+}
+
+/** Una fase del plan. El número de fases y de días es siempre el del plan activo. */
+@Composable
+private fun PhaseRow(
+    phase: Phase,
+    completed: Int,
+    total: Int,
+    onClick: () -> Unit
+) {
+    val app = LocalAppColors.current
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(onClick = onClick)
+            .padding(Space.x4)
+    ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                "${phase.number} · ${phase.name}",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                "$completed/$total",
+                style = LocalAppTextStyles.current.tabular,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        Spacer(Modifier.height(Space.x1))
+        Text(
+            "${phase.range} · ${phase.weeks}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(Space.x3))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .clip(CircleShape)
+                // El track va translúcido: con `surface` a secas, en claro es blanco puro y la
+                // barra vacía llamaba más la atención que la llena.
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f))
+        ) {
+            if (completed > 0 && total > 0) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = (completed.toFloat() / total).coerceIn(0f, 1f))
+                        .height(6.dp)
+                        .clip(CircleShape)
+                        .background(app.brandGradient)
+                )
+            }
+        }
+    }
+}
+
+/** ¿La app está exenta del ahorro de batería? Si no, los avisos pueden llegar tarde. */
 private fun isIgnoringBatteryOptimizations(context: Context): Boolean {
-    val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+    val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return true
     return pm.isIgnoringBatteryOptimizations(context.packageName)
 }
 
 private fun openBatterySettings(context: Context) {
-    val packageUri = Uri.parse("package:${context.packageName}")
-    val direct = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, packageUri)
-    val opened = runCatching { context.startActivity(direct) }.isSuccess
-    if (!opened) {
+    val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+        data = Uri.parse("package:${context.packageName}")
+    }
+    runCatching { context.startActivity(intent) }.onFailure {
         runCatching {
-            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri))
+            context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
         }
     }
 }

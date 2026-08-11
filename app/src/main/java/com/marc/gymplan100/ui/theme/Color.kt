@@ -1,56 +1,21 @@
 package com.marc.gymplan100.ui.theme
 
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-// Colores de marca (degradado del logo): ámbar -> naranja -> magenta.
+// ─── Marca ────────────────────────────────────────────────────────────────────
+// El degradado del logo es un reloj: ámbar = preparas, naranja = trabajas, magenta = esperas.
+// El degradado completo se reserva a la marca y al progreso del plan; nunca va detrás de texto.
 val BrandAmber = Color(0xFFFFB24D)
 val BrandOrange = Color(0xFFFF6A3D)
 val BrandMagenta = Color(0xFFFF2E6E)
+val BrandBlack = Color(0xFF0A0708)
 
-// --- Tema claro ---
-val LightPrimary = Color(0xFFD23A1C)
-val OnLightPrimary = Color(0xFFFFFFFF)
-val LightPrimaryContainer = Color(0xFFFFDACE)
-val OnLightPrimaryContainer = Color(0xFF3C0D02)
-
-val LightSecondary = Color(0xFFD81B60)
-val OnLightSecondary = Color(0xFFFFFFFF)
-val LightSecondaryContainer = Color(0xFFFFD9E2)
-val OnLightSecondaryContainer = Color(0xFF3E0418)
-
-val LightBackground = Color(0xFFFBF6F4)
-val OnLightBackground = Color(0xFF221A17)
-val LightSurface = Color(0xFFFFFFFF)
-val OnLightSurface = Color(0xFF221A17)
-val LightSurfaceVariant = Color(0xFFF1E7E2)
-val OnLightSurfaceVariant = Color(0xFF58504B)
-
-// --- Tema oscuro (negro premium del logo) ---
-val DarkPrimary = Color(0xFFFF6A4D)
-val OnDarkPrimary = Color(0xFF44100A)
-val DarkPrimaryContainer = Color(0xFF8A2616)
-val OnDarkPrimaryContainer = Color(0xFFFFDAD0)
-
-val DarkSecondary = Color(0xFFFF5E8A)
-val OnDarkSecondary = Color(0xFF45041E)
-val DarkSecondaryContainer = Color(0xFF6E1334)
-val OnDarkSecondaryContainer = Color(0xFFFFD9E2)
-
-val DarkBackground = Color(0xFF0A0708)
-val OnDarkBackground = Color(0xFFF2EDEA)
-val DarkSurface = Color(0xFF161013)
-val OnDarkSurface = Color(0xFFF2EDEA)
-val DarkSurfaceVariant = Color(0xFF2A2024)
-val OnDarkSurfaceVariant = Color(0xFFCBBFB9)
-
-// --- Tokens de estado ---------------------------------------------------------
-// M3 no tiene un rol para "esto es calentamiento" o "esto es descanso", y esos significados
-// los necesitan las pantallas de planes y el editor. Van aparte, por CompositionLocal.
-
-/** Versión "tinta" del degradado para fondos claros. */
+/** Versión "tinta" para el tema claro: más saturada, aguanta la luz del gimnasio. */
 val InkAmber = Color(0xFFC87A16)
 val InkOrange = Color(0xFFD4451A)
 val InkMagenta = Color(0xFFB3134C)
@@ -58,6 +23,50 @@ val InkMagenta = Color(0xFFB3134C)
 val BrandGradient = Brush.linearGradient(listOf(BrandAmber, BrandOrange, BrandMagenta))
 val InkGradient = Brush.linearGradient(listOf(InkAmber, InkOrange, InkMagenta))
 
+// ─── ColorScheme M3 ───────────────────────────────────────────────────────────
+val LightColors = lightColorScheme(
+    primary = Color(0xFFC8391B),            // antes #D23A1C: no llegaba a 4.5:1 en texto pequeño
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFFFDACE),
+    onPrimaryContainer = Color(0xFF3D0B02),
+    secondary = Color(0xFFB3134C),          // antes #D81B60
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFFFD9E2),
+    onSecondaryContainer = Color(0xFF3D0616),
+    background = Color(0xFFFBF6F4),
+    onBackground = Color(0xFF221A17),
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF221A17),
+    surfaceVariant = Color(0xFFF1E7E2),
+    onSurfaceVariant = Color(0xFF58504B),
+    outline = Color(0xFF8A7A73),
+    outlineVariant = Color(0xFFE4D6D0),
+    error = Color(0xFFB3134C),
+    onError = Color(0xFFFFFFFF),
+)
+
+val DarkColors = darkColorScheme(
+    primary = Color(0xFFFF6A4D),
+    onPrimary = Color(0xFF44100A),
+    primaryContainer = Color(0xFF8A2616),
+    onPrimaryContainer = Color(0xFFFFDACE),
+    secondary = Color(0xFFFF5E8A),
+    onSecondary = Color(0xFF3D0616),
+    secondaryContainer = Color(0xFF6E0B2C),
+    onSecondaryContainer = Color(0xFFFFD9E2),
+    background = BrandBlack,
+    onBackground = Color(0xFFF2EDEA),
+    surface = Color(0xFF161013),
+    onSurface = Color(0xFFF2EDEA),
+    surfaceVariant = Color(0xFF2A2024),
+    onSurfaceVariant = Color(0xFFCBBFB9),
+    outline = Color(0xFFA2938D),
+    outlineVariant = Color(0xFF2A2024),
+    error = Color(0xFFFF5E8A),
+    onError = Color(0xFF3D0616),
+)
+
+// ─── Tokens propios de estado (M3 no tiene rol para esto) ─────────────────────
 @Immutable
 data class AppColors(
     val warmup: Color,        // ámbar · preparas
@@ -65,14 +74,15 @@ data class AppColors(
     val rest: Color,          // magenta · esperas
     val streak: Color,
     val special: Color,
-    val positive: Color,
-    val warmupSurface: Color,
+    val positive: Color,      // "+5 este mes"
+    val warmupSurface: Color, // fondo teñido de la pantalla de sesión
     val workSurface: Color,
     val restSurface: Color,
     val brandGradient: Brush,
+    /** Superficies elevadas SIN sombra (en oscuro, sobre negro, una sombra no se ve). */
     val surface1: Color,
     val surface2: Color,
-    /** Borde de un control sobre fondo teñido. */
+    /** Borde de botón secundario cuando va sobre un fondo teñido. */
     val onTintOutline: Color,
 )
 
@@ -99,3 +109,13 @@ val DarkAppColors = AppColors(
 )
 
 val LocalAppColors = staticCompositionLocalOf { DarkAppColors }
+
+/**
+ * Halo radial del estado, para el fondo de la sesión guiada. En claro devuelve un brush
+ * transparente: allí el tinte va en la superficie, no en el halo.
+ */
+fun stateHalo(color: Color, dark: Boolean): Brush =
+    if (dark) Brush.radialGradient(
+        colors = listOf(color.copy(alpha = 0.32f), Color.Transparent),
+        radius = 900f,
+    ) else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))
