@@ -150,8 +150,16 @@ fun ExerciseGuideSheet(
 
             if (guide == null) {
                 Text(
-                    "Todavía no hay ficha para este ejercicio. Fíjate en la imagen y haz el " +
-                        "movimiento controlando el peso, con la espalda neutra y sin impulso.",
+                    // Con planes propios este caso es habitual (el ejercicio no está en el
+                    // catálogo de la app), y entonces tampoco hay ilustración a la que mirar.
+                    if (imageRes != null) {
+                        "Todavía no hay ficha para este ejercicio. Fíjate en la imagen y haz el " +
+                            "movimiento controlando el peso, con la espalda neutra y sin impulso."
+                    } else {
+                        "Este ejercicio no está en el catálogo de la app, así que no hay ficha " +
+                            "ni ilustración. El vídeo de aquí arriba te lo busca en YouTube; " +
+                            "hazlo controlando el peso, con la espalda neutra y sin impulso."
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

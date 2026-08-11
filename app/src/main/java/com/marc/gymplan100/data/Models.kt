@@ -28,7 +28,7 @@ data class Phase(
     val templates: List<WorkoutTemplate>
 )
 
-/** Un día concreto numerado dentro del programa de 100 días. */
+/** Un día concreto numerado dentro del plan. */
 data class TrainingDay(
     val number: Int,
     val phase: Phase,

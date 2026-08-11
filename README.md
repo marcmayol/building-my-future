@@ -31,6 +31,12 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 - Botón **"máquina ocupada"**: reordena el ejercicio al final y pasa al siguiente pendiente.
 - Guía de cada ejercicio ("¿cómo se hace?", máquina y alternativas) con imágenes de referencia.
 
+**Tu propio plan**
+- El reto de 100 días viene de serie, pero puedes **traerte el tuyo o crearlo en la app**: fases con las semanas que quieras, sus días y sus ejercicios. La duración es libre.
+- **Importa un archivo** en **Markdown** (se escribe como en una libreta) o en **JSON**; el formato se ve y se copia desde *Mis planes → Ver el formato*.
+- **Editor dentro de la app** para crear un plan desde cero o retocar uno importado, reordenando fases, días y ejercicios.
+- **Cada plan guarda su progreso por separado**: puedes alternar entre planes y al volver tus días, pesos y entrenos siguen ahí. Los hitos y las estadísticas se recalculan sobre el plan activo.
+
 **Seguimiento y motivación**
 - **Estadísticas**: resumen (racha actual y máxima, días completados, tiempo total, series), **gráfica de progresión de peso** por ejercicio, **constancia** (entrenos por semana + mapa de calor tipo calendario) y **records personales**.
 - **Logros / hitos** del reto con celebración al desbloquearlos (y sorpresa al completar los 100 días 🏆).
@@ -59,7 +65,12 @@ app/src/main/java/com/marc/gymplan100/
 ├── MainActivity.kt
 ├── PlanViewModel.kt
 ├── data/
-│   ├── PlanData.kt            las 4 fases y los 100 días
+│   ├── PlanData.kt            ventana al plan activo (lo que usa toda la app)
+│   ├── BuiltinPlan.kt         el reto de 100 días que viene de serie
+│   ├── TrainingPlan.kt        un plan cualquiera: fases -> días numerados
+│   ├── PlanJson.kt            formato de intercambio y validación
+│   ├── PlanMarkdown.kt        lector de planes escritos en Markdown
+│   ├── PlanStore.kt           planes guardados y cuál está activo
 │   ├── Models.kt / ProgressModels.kt / SessionModels.kt
 │   ├── SessionEngine.kt       transiciones de la sesión (funciones puras)
 │   ├── ProgressRepository.kt  persistencia con DataStore
@@ -102,6 +113,13 @@ la de siempre (si cambiara, ninguna instalación existente podría actualizarse)
 ### Firma de release
 
 La firma se lee de `keystore.properties` (en la raíz, **fuera del control de versiones**), que apunta al keystore `.jks`. Ambos están en `.gitignore` y **nunca se suben al repo**. Si el archivo no existe, el proyecto compila igualmente (sin firma configurada), por lo que se puede clonar y compilar en depuración sin nada extra.
+
+## 🎨 Diseño
+
+[`docs/handoff-diseno.md`](docs/handoff-diseno.md) cuenta la app entera desde el punto de vista del
+diseño: para quién es, dónde se usa, la paleta y la tipografía actuales, todas las pantallas con sus
+estados, el reloj, las notificaciones y qué se puede tocar y qué no en un rediseño. Está escrito para
+entenderse sin leer el código.
 
 ## 📄 Licencia
 

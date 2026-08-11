@@ -117,7 +117,8 @@ fun HomeScreen(
                         lineHeight = 1.1.em
                     )
                     Text(
-                        text = "100 DÍAS",
+                        // Los días son los del plan que se esté siguiendo, no siempre 100.
+                        text = "${PlanData.TOTAL_DAYS} DÍAS",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 0.16.em,

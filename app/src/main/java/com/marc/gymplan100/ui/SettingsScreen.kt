@@ -58,9 +58,11 @@ private val GENDERS = listOf("Hombre", "Mujer", "Otro")
 @Composable
 fun SettingsScreen(
     viewModel: PlanViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenPlans: () -> Unit = {}
 ) {
     val profile by viewModel.profile.collectAsState()
+    val activePlan by viewModel.activePlan.collectAsState()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -107,6 +109,30 @@ fun SettingsScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item {
+                Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text(
+                            "Plan de entrenamiento",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(Modifier.size(4.dp))
+                        Text(
+                            "Sigues «${activePlan.name}» · ${activePlan.totalDays} días. " +
+                                "Puedes traerte tu propio plan y alternar entre ellos sin " +
+                                "perder el progreso de ninguno.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.size(12.dp))
+                        Button(onClick = onOpenPlans, modifier = Modifier.fillMaxWidth()) {
+                            Text("Mis planes")
+                        }
+                    }
+                }
+            }
+
             item {
                 Text(
                     "Tus datos personales. Sirven para estimar las calorías de cada entreno, " +

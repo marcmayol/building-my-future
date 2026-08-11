@@ -6,6 +6,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -25,6 +26,8 @@ object Routes {
     const val RESULTS = "results"
     const val STATS = "stats"
     const val SETTINGS = "settings"
+    const val PLANS = "plans"
+    const val PLAN_EDITOR = "plan-editor"
     const val SPECIAL = "special"
     const val FATBURN = "fatburn"
     const val FATBURN_EX = "fatburn/{id}"
@@ -43,10 +46,17 @@ fun GymNavHost(
     openSessionDay: Int? = null,
     onSessionConsumed: () -> Unit = {}
 ) {
-    val navController = rememberNavController()
     val viewModel: PlanViewModel = viewModel()
     val celebration by viewModel.celebration.collectAsState()
     val profile by viewModel.profile.collectAsState()
+    val activePlan by viewModel.activePlan.collectAsState()
+
+    CompositionLocalProvider(LocalIsFemale provides (profile.gender == "Mujer")) {
+    Box {
+    // Al cambiar de plan se rehace la navegación desde el principio: las pantallas abiertas
+    // hablaban de días y fases que el plan nuevo puede no tener.
+    key(activePlan.id) {
+    val navController = rememberNavController()
 
     // Deep-link desde la notificación de la cuenta atrás: abre la sesión en curso. Si es una
     // rutina especial, abre su pantalla de rutina en vez de la sesión normal del plan.
@@ -61,8 +71,6 @@ fun GymNavHost(
         }
     }
 
-    CompositionLocalProvider(LocalIsFemale provides (profile.gender == "Mujer")) {
-    Box {
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
             HomeScreen(
@@ -86,6 +94,20 @@ fun GymNavHost(
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onOpenPlans = { navController.navigate(Routes.PLANS) }
+            )
+        }
+        composable(Routes.PLANS) {
+            PlansScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onEditPlan = { navController.navigate(Routes.PLAN_EDITOR) }
+            )
+        }
+        composable(Routes.PLAN_EDITOR) {
+            PlanEditorScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )
@@ -197,6 +219,7 @@ fun GymNavHost(
                 onExit = { navController.popBackStack(Routes.HOME, inclusive = false) }
             )
         }
+    }
     }
 
         celebration?.let {

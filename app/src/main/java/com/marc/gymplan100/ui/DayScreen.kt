@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -108,11 +109,13 @@ fun DayScreen(
             }
 
             item {
+                // Altura mínima en vez de fija: con el texto del sistema grande, una altura
+                // clavada recorta la etiqueta a media palabra.
                 Button(
                     onClick = { onStartSession(day.number) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp)
+                        .heightIn(min = 52.dp)
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Text("  Empezar entrenamiento guiado")
@@ -126,7 +129,7 @@ fun DayScreen(
                     onClick = { onStartFreeSession(day.number) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp)
+                        .heightIn(min = 52.dp)
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Text("  Entrenar libre · cuenta como día")

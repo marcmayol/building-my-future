@@ -1,6 +1,7 @@
 package com.marc.gymplan100
 
 import android.app.Application
+import com.marc.gymplan100.data.PlanStore
 import com.marcm.actualizador.Actualizador
 import com.marcm.actualizador.ActualizadorConfig
 
@@ -23,6 +24,9 @@ class GymApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Deja cargado el plan activo antes que nada: el proceso también arranca desde el
+        // servicio del reloj o el aviso de descanso, y allí ya se pregunta por el plan.
+        PlanStore.load(this)
         // Comprobación periódica en segundo plano (WorkManager, solo con red).
         actualizador.programarPeriodica()
     }

@@ -1,6 +1,7 @@
 package com.marc.gymplan100
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.marc.gymplan100.data.Achievements
@@ -8,7 +9,15 @@ import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.Celebration
 import com.marc.gymplan100.data.ExerciseLog
 import com.marc.gymplan100.data.Motivation
+import com.marc.gymplan100.data.DiaDto
+import com.marc.gymplan100.data.EjercicioDto
+import com.marc.gymplan100.data.FaseDto
+import com.marc.gymplan100.data.PlanCodec
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.PlanDto
+import com.marc.gymplan100.data.PlanImport
+import com.marc.gymplan100.data.PlanMarkdownParser
+import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.EjercicioCatalogo
@@ -21,12 +30,15 @@ import com.marc.gymplan100.data.SpecialSessionEngine
 import com.marc.gymplan100.data.SpecialWorkoutsData
 import com.marc.gymplan100.data.SpecialWorkoutsLoader
 import com.marc.gymplan100.data.TrainingDay
+import com.marc.gymplan100.data.TrainingPlan
 import com.marc.gymplan100.data.UserProfile
 import com.marc.gymplan100.data.WeeklyFrequency
 import com.marc.gymplan100.data.secondsPerSetFromScheme
 import com.marc.gymplan100.health.HealthConnectManager
 import com.marc.gymplan100.notify.RestReminder
 import com.marc.gymplan100.wear.WearBridge
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -104,6 +116,144 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    // --- Planes de entrenamiento -----------------------------------------
+
+    private val _activePlan = MutableStateFlow(PlanData.active)
+    /** El plan que se está siguiendo. La navegación se rehace cuando cambia. */
+    val activePlan: StateFlow<TrainingPlan> = _activePlan.asStateFlow()
+
+    private val _plans = MutableStateFlow(PlanStore.allPlans(app))
+    /** El plan que viene con la app más los que haya importado el usuario. */
+    val plans: StateFlow<List<TrainingPlan>> = _plans.asStateFlow()
+
+    private val _planProgress = MutableStateFlow<Map<String, Int>>(emptyMap())
+    /** Días completados de cada plan (por id), para enseñarlos en la lista sin activarlos. */
+    val planProgress: StateFlow<Map<String, Int>> = _planProgress.asStateFlow()
+
+    private fun refreshPlans() {
+        _plans.value = PlanStore.allPlans(getApplication())
+        _activePlan.value = PlanData.active
+        viewModelScope.launch {
+            _planProgress.value = _plans.value.associate { it.id to repo.completedDaysOf(it.id) }
+        }
+    }
+
+    /** Cambiar de plan a mitad de un entreno dejaría la sesión apuntando a otro día. */
+    val canSwitchPlan: Boolean get() = _active.value == null
+
+    /**
+     * Lee el archivo que ha elegido el usuario y lo guarda como plan nuevo, sin activarlo:
+     * primero lo ve en la lista y luego decide. Devuelve el resultado para poder contarle
+     * qué ha fallado si el archivo no vale.
+     */
+    fun importPlan(uri: Uri, onResult: (PlanImport) -> Unit) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                val text = runCatching {
+                    getApplication<Application>().contentResolver.openInputStream(uri)?.use { input ->
+                        input.readBytes().toString(Charsets.UTF_8)
+                    }
+                }.getOrNull()
+                when {
+                    text == null -> PlanImport.Error("No se pudo abrir el archivo.")
+                    !PlanCodec.isProbablyText(text) -> PlanImport.Error(
+                        "Ese archivo no es un plan: elige un .md o un .json."
+                    )
+                    // El formato se deduce del contenido y no de la extensión: los archivos
+                    // llegan del selector del sistema y muchos gestores no conservan el .md.
+                    text.trimStart().startsWith("{") -> PlanCodec.parseJson(text)
+                    else -> PlanMarkdownParser.parse(text)
+                }
+            }
+            if (result is PlanImport.Ok) {
+                PlanStore.save(getApplication(), result.dto)
+                refreshPlans()
+            }
+            onResult(result)
+        }
+    }
+
+    /** Pasa a seguir otro plan y recarga su progreso (el del plan anterior se queda guardado). */
+    fun activatePlan(id: String) {
+        if (!canSwitchPlan) return
+        _activePlan.value = PlanStore.setActive(getApplication(), id)
+        viewModelScope.launch {
+            _progress.value = repo.progress.first()
+            _history.value = repo.history.first()
+            refreshPlans()
+            // El reloj enseña el siguiente día pendiente: ahora es otro.
+            WearBridge.publishState(getApplication(), null, nextDay = nextDay())
+        }
+    }
+
+    // --- Editor de planes -------------------------------------------------
+
+    private val _draft = MutableStateFlow<PlanDto?>(null)
+    /** Plan que se está editando. Vive aquí y no en la pantalla para no perderlo al girar. */
+    val draft: StateFlow<PlanDto?> = _draft.asStateFlow()
+
+    /**
+     * Abre el editor: con [planId] nulo empieza un plan en blanco con un día de ejemplo (una
+     * pantalla vacía del todo no dice por dónde empezar); con un id, edita ese plan CONSERVANDO
+     * su identidad, así que al guardar mantiene el progreso que ya llevabas en él.
+     */
+    fun startDraft(planId: String?) {
+        _draft.value = if (planId == null) {
+            PlanDto(
+                nombre = "",
+                fases = listOf(
+                    FaseDto(
+                        nombre = "Fase 1",
+                        semanas = 4,
+                        dias = listOf(DiaDto(dia = "Lunes", ejercicios = listOf(EjercicioDto())))
+                    )
+                ),
+                origen = "editor"
+            )
+        } else {
+            // Se conserva el origen: un plan importado sigue diciendo de dónde vino aunque
+            // luego se retoque aquí.
+            PlanStore.storedDto(getApplication(), planId)
+        }
+    }
+
+    fun discardDraft() { _draft.value = null }
+
+    /** Cambia el borrador. Todas las ediciones de la pantalla pasan por aquí. */
+    fun editDraft(transform: (PlanDto) -> PlanDto) {
+        _draft.value = _draft.value?.let(transform)
+    }
+
+    /**
+     * Valida y guarda el borrador. Devuelve el resultado para que la pantalla enseñe el error
+     * concreto sin cerrarse: lo escrito no se pierde por una coma mal puesta.
+     */
+    fun saveDraft(onResult: (PlanImport) -> Unit) {
+        val dto = _draft.value ?: return
+        val result = PlanCodec.fromDto(dto)
+        if (result is PlanImport.Ok) {
+            PlanStore.save(getApplication(), result.dto)
+            // Si se ha editado el plan que se está siguiendo, la app tiene que verlo ya.
+            if (result.plan.id == PlanData.active.id) {
+                _activePlan.value = PlanStore.setActive(getApplication(), result.plan.id)
+            }
+            _draft.value = null
+            refreshPlans()
+        }
+        onResult(result)
+    }
+
+    /** Borra un plan del usuario y su progreso. Si era el activo, se vuelve al de la app. */
+    fun deletePlan(id: String) {
+        viewModelScope.launch {
+            PlanStore.delete(getApplication(), id)
+            repo.clearPlanData(id)
+            _progress.value = repo.progress.first()
+            _history.value = repo.history.first()
+            refreshPlans()
+        }
+    }
+
     fun clearCelebration() { _celebration.value = null }
 
     val unlockedAchievements: Int
@@ -115,6 +265,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             _history.value = repo.history.first()
             _profile.value = repo.profile.first()
         }
+        refreshPlans()
         refreshHealthPermissions()
         // Observa la sesión activa de forma continua: así los cambios hechos desde la
         // notificación persistente (SkipActionReceiver, en segundo plano) se reflejan al

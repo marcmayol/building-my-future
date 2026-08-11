@@ -71,7 +71,7 @@ fun SpecialMenuScreen(
         ) {
             item {
                 Text(
-                    "Elige qué entrenar hoy. Ninguno cuenta como día del plan de 100 días: son " +
+                    "Elige qué entrenar hoy. Ninguno cuenta como día de tu plan: son " +
                         "extras que se guardan aparte.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
