@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -305,12 +307,19 @@ private fun ExerciseCard(
                 )
             }
             Spacer(Modifier.height(8.dp))
+            // Etiqueta corta: con el texto largo el botón se partía en dos líneas y el icono
+            // quedaba descolgado. Lo que hay dentro (músculos y técnica) ya lo cuenta la ficha.
             OutlinedButton(
                 onClick = onShowGuide,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Filled.Info, contentDescription = null)
-                Text("  ¿Cómo se hace? · músculos y técnica")
+                Icon(
+                    Icons.Filled.Info,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text("Cómo se hace")
             }
         }
     }
