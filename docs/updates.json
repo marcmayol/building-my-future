@@ -1,8 +1,8 @@
 {
-  "versionCode": 9,
-  "versionName": "1.8",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v1.8/building-my-future-v1.8.apk",
-  "sha256": "ecd06892951d0ad40d85608748918dda203dd892a948a3fd6a0b29cad30129e5",
-  "notas": "El reloj gana un chip de entrenamiento en curso en la propia esfera: mientras entrenas sale una mancuerna en el watch face y con un toque vuelves a la sesion, sin buscar la app. La cuenta atras la dibuja el sistema, asi que corre al segundo aunque la app del reloj este cerrada. Ademas, en el entrenamiento libre el reloj ya no anuncia un ejercicio del plan que no estabas haciendo: muestra el nombre de la sesion y el cronometro. Para tenerlo en el reloj hay que instalar el segundo APK de esta Release por adb.",
+  "versionCode": 11,
+  "versionName": "2.0",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.0/building-my-future-v2.0.apk",
+  "sha256": "3a3c8d4b60472bc7bac270d089c03abaa35388a8e46678143e0eade77a98731f",
+  "notas": "Dos cosas grandes.\n\nTUS PROPIOS PLANES. La app deja de ser solo el reto de 100 dias: puedes traerte tu plan en Markdown o JSON, o crearlo en la app con el editor. Cada plan guarda su propio progreso, asi que cambias de plan y al volver tus dias, pesos y entrenos siguen ahi. Los logros y las estadisticas se recalculan sobre el plan que sigas.\n\nREDISENO VISUAL. El estado tine la pantalla durante el entreno (ambar preparas, naranja trabajas, magenta esperas), asi de reojo ya sabes si toca darle o descansar. El peso de la serie ya no se teclea: se sube y baja con botones de 2,5 kg. Inicio manda con lo que toca hoy, Estadisticas se ordena en pestanas y hay tipografia propia con cifras que no bailan.",
   "check_horas": 24
 }
