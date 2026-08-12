@@ -49,7 +49,9 @@ class SpecialWorkoutsParseTest {
     }
 
     @Test fun `el paso isometrico usa el minimo del rango como objetivo`() {
-        val iso = data.militar!!.pasosOrdenados.first { it.nombre.contains("isometrica") }
+        // Por el número de paso y no por el nombre: buscarlo por texto ataba el test a la
+        // ortografía del JSON y se rompió al ponerle las tildes al catálogo.
+        val iso = data.militar!!.pasosOrdenados.first { it.orden == 12 }
         assertEquals(30, iso.objetivoSeg)     // duracion_seg_min
         assertEquals("30-45 s", iso.etiquetaTiempo)
     }
