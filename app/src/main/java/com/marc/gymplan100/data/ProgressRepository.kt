@@ -98,7 +98,7 @@ class ProgressRepository(private val context: Context) {
         }
     }
 
-    /** Perfil del usuario (peso, altura, género) para el cálculo de calorías. */
+    /** Perfil del usuario (peso para las calorías, género para las ilustraciones, reloj). */
     val profile: Flow<UserProfile> = context.dataStore.data.map { prefs ->
         val raw = prefs[profileKey]
         if (raw.isNullOrEmpty()) UserProfile()

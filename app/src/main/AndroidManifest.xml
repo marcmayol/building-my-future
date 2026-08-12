@@ -12,9 +12,8 @@
     <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />
     <!-- Calorías activas: lo que el coach de Google Health necesita para contar el entreno. -->
     <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" />
-    <!-- Leer peso y altura para poder rellenar el perfil desde Google Health. -->
+    <!-- Leer el peso para poder rellenar el perfil desde Google Health. -->
     <uses-permission android:name="android.permission.health.READ_WEIGHT" />
-    <uses-permission android:name="android.permission.health.READ_HEIGHT" />
 
     <!-- En Android 13 e inferiores, Health Connect es una app aparte; hay que poder verla. -->
     <queries>

@@ -83,7 +83,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { _healthGranted.value = healthConnect.hasAllPermissions() }
     }
 
-    // --- Perfil del usuario (peso / altura / género) ----------------------
+    // --- Perfil del usuario (peso / género / reloj) -----------------------
     private val _profile = MutableStateFlow(UserProfile())
     val profile: StateFlow<UserProfile> = _profile.asStateFlow()
 
@@ -94,22 +94,18 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Rellena peso y altura leyéndolos de Google Health. Llama a [onDone] con `true` si se
-     * importó algún dato. Requiere que el permiso de lectura esté concedido (si no, no hay
-     * datos y devuelve `false`); la UI se encarga de pedirlo antes.
+     * Rellena el peso leyéndolo de Google Health. Llama a [onDone] con `true` si se importó.
+     * Requiere que el permiso de lectura esté concedido (si no, no hay datos y devuelve
+     * `false`); la UI se encarga de pedirlo antes.
      */
     fun importProfileFromHealth(onDone: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             val weight = healthConnect.latestWeightKg()
-            val height = healthConnect.latestHeightCm()
-            if (weight == null && height == null) {
+            if (weight == null) {
                 onDone(false)
                 return@launch
             }
-            val merged = _profile.value.copy(
-                weightKg = weight?.let { Math.round(it).toInt() } ?: _profile.value.weightKg,
-                heightCm = height?.let { Math.round(it).toInt() } ?: _profile.value.heightCm
-            )
+            val merged = _profile.value.copy(weightKg = Math.round(weight).toInt())
             _profile.value = merged
             repo.saveProfile(merged)
             onDone(true)

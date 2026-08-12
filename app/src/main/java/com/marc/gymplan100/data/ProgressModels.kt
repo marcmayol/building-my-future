@@ -29,20 +29,24 @@ data class ProgressState(
 }
 
 /**
- * Datos personales del usuario. Se usan para estimar las calorías activas de cada
- * entrenamiento (que es lo que el coach de Google Health necesita para contarlo) y
- * pueden rellenarse manualmente con las ruedas de Configuración o importarse desde
- * Google Health. Un valor a 0 / vacío significa "sin definir".
+ * Datos personales del usuario, y cada uno con su porqué:
+ *  - [weightKg] estima las calorías activas del entreno (fórmula MET) para Google Health.
+ *  - [gender] elige si las ilustraciones de los ejercicios son masculinas o femeninas.
+ *  - [usesWatch] decide si estimamos calorías o dejamos que las ponga el pulso del reloj.
+ *
+ * Hubo también una altura: se pedía "para las calorías" pero no entraba en ningún cálculo,
+ * así que se quitó en la v2.2. El perfil guardado que aún la traiga se lee igual, porque el
+ * `Json` del repositorio ignora las claves desconocidas.
+ *
+ * Un valor a 0 / vacío significa "sin definir".
  */
 @Serializable
 data class UserProfile(
     val weightKg: Int = 0,
-    val heightCm: Int = 0,
     val gender: String = "",
     // El usuario lleva reloj/pulsómetro (Wear OS): Google Health ya obtiene calorías reales
     // de su pulso, así que NO escribimos la estimación MET para no contar el doble.
     val usesWatch: Boolean = false
 ) {
     val isWeightSet: Boolean get() = weightKg > 0
-    val isHeightSet: Boolean get() = heightCm > 0
 }

@@ -1,4 +1,7 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(
+    androidx.compose.material3.ExperimentalMaterial3Api::class,
+    androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
 
 package com.marc.gymplan100.ui
 
@@ -7,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -57,7 +61,6 @@ import com.marcm.actualizador.TipoError
 import kotlinx.coroutines.launch
 
 private val WEIGHTS = (30..200).toList()      // kg
-private val HEIGHTS = (120..220).toList()     // cm
 private val GENDERS = listOf("Hombre", "Mujer", "Otro")
 
 @Composable
@@ -72,10 +75,9 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Valores por defecto razonables cuando aún no hay perfil, para que la rueda no arranque
-    // en el extremo: 75 kg y 170 cm.
+    // Valor por defecto razonable cuando aún no hay perfil, para que la rueda no arranque
+    // en el extremo.
     val weight = if (profile.isWeightSet) profile.weightKg else 75
-    val height = if (profile.isHeightSet) profile.heightCm else 170
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = PermissionController.createRequestPermissionResultContract()
@@ -84,8 +86,8 @@ fun SettingsScreen(
         viewModel.importProfileFromHealth { imported ->
             scope.launch {
                 snackbar.showSnackbar(
-                    if (imported) "Datos importados desde Google Health"
-                    else "Google Health no tiene peso ni altura guardados"
+                    if (imported) "Peso importado desde Google Health"
+                    else "Google Health no tiene ningún peso guardado"
                 )
             }
         }
@@ -148,15 +150,18 @@ fun SettingsScreen(
                 )
                 Spacer(Modifier.size(Space.x1))
                 Text(
-                    "Sirven para estimar las calorías de cada entreno, que es lo que Google " +
-                        "Health necesita para contarlo en tus objetivos.",
+                    "Solo se guarda lo que la app usa de verdad. Cada uno dice para qué sirve.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             item {
-                WheelCard(title = "Peso") {
+                WheelCard(
+                    title = "Peso",
+                    explicacion = "Con él se estiman las calorías de cada entreno, que es lo " +
+                        "que Google Health necesita para contarlo en tus objetivos."
+                ) {
                     CarrilDeScroll {
                         WheelPicker(
                             items = WEIGHTS.map { "$it kg" },
@@ -171,32 +176,23 @@ fun SettingsScreen(
             }
 
             item {
-                WheelCard(title = "Altura") {
-                    CarrilDeScroll {
-                        WheelPicker(
-                            items = HEIGHTS.map { "$it cm" },
-                            selectedIndex = HEIGHTS.indexOf(height).coerceAtLeast(0),
-                            onSelectedIndexChange = { i ->
-                                viewModel.updateProfile(profile.copy(heightCm = HEIGHTS[i]))
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-
-            item {
-                WheelCard(title = "Género") {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                WheelCard(
+                    title = "Género",
+                    explicacion = "Elige si las ilustraciones de los ejercicios son de hombre " +
+                        "o de mujer. No entra en ningún cálculo."
+                ) {
+                    // Cada chip ocupa lo que necesita y salta de línea si no cabe: repartidos
+                    // a tercios, "Hombre" se partía por la mitad con el texto del sistema grande.
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                        verticalArrangement = Arrangement.spacedBy(Space.x2)
                     ) {
                         GENDERS.forEach { g ->
                             FilterChip(
                                 selected = profile.gender == g,
                                 onClick = { viewModel.updateProfile(profile.copy(gender = g)) },
-                                label = { Text(g) },
-                                modifier = Modifier.weight(1f)
+                                label = { Text(g, maxLines = 1) }
                             )
                         }
                     }
@@ -244,7 +240,7 @@ fun SettingsScreen(
                     )
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        "Trae tu peso y altura más recientes guardados en Google Health.",
+                        "Trae el peso más reciente que tengas guardado en Google Health.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -390,11 +386,24 @@ private fun Bloque(content: @Composable () -> Unit) {
     ) { content() }
 }
 
+/** Un dato del perfil: su nombre, para qué sirve, y el control para cambiarlo. */
 @Composable
-private fun WheelCard(title: String, content: @Composable () -> Unit) {
+private fun WheelCard(
+    title: String,
+    explicacion: String = "",
+    content: @Composable () -> Unit
+) {
     Bloque {
         Text(title, style = MaterialTheme.typography.titleMedium)
-        Spacer(Modifier.size(Space.x1))
+        if (explicacion.isNotBlank()) {
+            Spacer(Modifier.size(2.dp))
+            Text(
+                explicacion,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.size(Space.x2))
         content()
     }
 }
@@ -403,8 +412,8 @@ private fun WheelCard(title: String, content: @Composable () -> Unit) {
  * Carril de scroll alrededor de una rueda.
  *
  * La rueda va estrecha y centrada a propósito: a todo el ancho se comía cualquier arrastre
- * vertical, así que bajar por la pantalla te cambiaba el peso o la altura sin querer. Con los
- * laterales libres queda sitio para desplazar la lista.
+ * vertical, así que bajar por la pantalla te cambiaba el dato sin querer. Con los laterales
+ * libres queda sitio para desplazar la lista.
  */
 @Composable
 private fun CarrilDeScroll(content: @Composable () -> Unit) {

@@ -5,7 +5,6 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.records.metadata.Metadata
 import androidx.health.connect.client.request.ReadRecordsRequest
@@ -22,8 +21,9 @@ import java.time.ZoneId
  * activas estimadas. Ese registro de calorías es imprescindible para que el coach y los
  * objetivos de Google Health cuenten el entreno; la sesión sola no aporta métrica.
  *
- * Leemos (solo si el usuario concede permiso): su peso y altura más recientes, para poder
- * rellenar el perfil de la app desde Google Health.
+ * Leemos (solo si el usuario concede permiso): su peso más reciente, para poder rellenar el
+ * perfil de la app desde Google Health. La altura se leía también, pero la app no la usaba
+ * para nada, así que en la v2.2 se dejó de pedir ese permiso.
  */
 class HealthConnectManager(private val context: Context) {
 
@@ -34,13 +34,11 @@ class HealthConnectManager(private val context: Context) {
     private val writeCalories =
         HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class)
 
-    /** Permisos de lectura para nutrir el perfil desde Google Health. */
+    /** Permiso de lectura para nutrir el perfil desde Google Health. */
     private val readWeight = HealthPermission.getReadPermission(WeightRecord::class)
-    private val readHeight = HealthPermission.getReadPermission(HeightRecord::class)
 
     /** Conjunto completo que se solicita al conectar con Google Health. */
-    val permissions: Set<String> =
-        setOf(writeExercise, writeCalories, readWeight, readHeight)
+    val permissions: Set<String> = setOf(writeExercise, writeCalories, readWeight)
 
     /** Health Connect está instalado y disponible en este dispositivo. */
     val isAvailable: Boolean
@@ -64,8 +62,8 @@ class HealthConnectManager(private val context: Context) {
      */
     suspend fun hasAllPermissions(): Boolean = granted().contains(writeExercise)
 
-    /** True si podemos leer peso/altura del usuario. */
-    suspend fun canReadProfile(): Boolean = granted().containsAll(setOf(readWeight, readHeight))
+    /** True si podemos leer el peso del usuario. */
+    suspend fun canReadProfile(): Boolean = granted().contains(readWeight)
 
     /**
      * Inserta la sesión de ejercicio (tipo fuerza) y, si tenemos permiso y una estimación,
@@ -126,16 +124,4 @@ class HealthConnectManager(private val context: Context) {
         }.getOrNull()
     }
 
-    /** Altura más reciente registrada en Google Health, en cm (null si no hay o falta permiso). */
-    suspend fun latestHeightCm(): Double? {
-        if (readHeight !in granted()) return null
-        return runCatching {
-            client.readRecords(
-                ReadRecordsRequest(
-                    recordType = HeightRecord::class,
-                    timeRangeFilter = TimeRangeFilter.before(Instant.now())
-                )
-            ).records.maxByOrNull { it.time }?.height?.inMeters?.let { it * 100.0 }
-        }.getOrNull()
-    }
 }
