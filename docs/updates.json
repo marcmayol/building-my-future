@@ -1,8 +1,8 @@
 {
-  "versionCode": 12,
-  "versionName": "2.0.1",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.0.1/building-my-future-v2.0.1.apk",
-  "sha256": "88bdeb1cea69396bffdd22e07c1c228103b5425417384714f263fee80c6973d3",
-  "notas": "Arreglo visual: el boton de la ficha del ejercicio en la pantalla del dia se partia en dos lineas y dejaba el icono descolgado. Ahora dice 'Como se hace' y cabe en una linea.",
+  "versionCode": 13,
+  "versionName": "2.1",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.1/building-my-future-v2.1.apk",
+  "sha256": "7e95aca78d7a059052f751bdb7840e5e99ed9b5ff160ece34505af0b90b74ec6",
+  "notas": "El rediseño llega a toda la app. Ajustes ya se puede desplazar: las ruedas de peso y altura se comían el arrastre y te cambiaban los datos sin querer. Las rutinas especiales van con sus tildes y el protocolo «Intervalos largos» de los burpees por fin arranca como intervalos.",
   "check_horas": 24
 }
