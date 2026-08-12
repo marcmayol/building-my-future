@@ -1,7 +1,7 @@
 {
   "version": 1,
   "regla_avisos": {
-    "descripcion": "El usuario siempre puede iniciar cualquier rutina o ejercicio. Si en la semana actual (lunes-domingo) el numero de sesiones registradas ya alcanza frecuencia_semanal.max, mostrar aviso_frecuencia como notificacion no bloqueante.",
+    "descripcion": "El usuario siempre puede iniciar cualquier rutina o ejercicio. Si en la semana actual (lunes-domingo) el número de sesiones registradas ya alcanza frecuencia_semanal.max, mostrar aviso_frecuencia como notificación no bloqueante.",
     "nivel_militar": "rutina completa",
     "nivel_quema_grasa": "por ejercicio",
     "nivel_altura_postura": "rutina completa"
@@ -9,27 +9,27 @@
   "rutinas": [
     {
       "id": "militar_basica",
-      "nombre": "Rutina Militar (basica)",
+      "nombre": "Rutina Militar (básica)",
       "tipo": "secuencia_fija",
-      "descripcion": "Entrenamiento de estres compuesto: fuerza, quema de grasa y resistencia en una sola sesion continua, sin descansos sentado.",
+      "descripcion": "Entrenamiento de estrés compuesto: fuerza, quema de grasa y resistencia en una sola sesión continua, sin descansos sentado.",
       "duracion_estimada_min": 30,
       "frecuencia_semanal": { "min": 3, "max": 3, "fuente": "transcripcion" },
       "descanso_minimo_entre_sesiones_dias": 1,
-      "progresion": "Cada semana anadir 1-2 repeticiones a cada ejercicio de repeticiones.",
-      "aviso_frecuencia": "Esta rutina esta recomendada 3 veces por semana con al menos un dia de descanso entre sesiones, y ya la has completado esta semana. Puedes hacerla igualmente, pero tu cuerpo necesita tiempo para adaptarse.",
+      "progresion": "Cada semana añadir 1-2 repeticiones a cada ejercicio de repeticiones.",
+      "aviso_frecuencia": "Esta rutina está recomendada 3 veces por semana con al menos un día de descanso entre sesiones, y ya la has completado esta semana. Puedes hacerla igualmente, pero tu cuerpo necesita tiempo para adaptarse.",
       "pasos": [
         { "orden": 1,  "nombre": "Calentamiento caminando/trote suave", "tipo": "tiempo", "duracion_seg": 300, "registro": "tiempo" },
-        { "orden": 2,  "nombre": "Flexiones (maximas con buena forma)", "tipo": "repeticiones", "reps": "AMRAP", "registro": "repeticiones" },
+        { "orden": 2,  "nombre": "Flexiones (máximas con buena forma)", "tipo": "repeticiones", "reps": "AMRAP", "registro": "repeticiones" },
         { "orden": 3,  "nombre": "Sentadillas con peso corporal", "tipo": "repeticiones", "reps": 15, "registro": "repeticiones", "nota": "Sin descanso tras las flexiones" },
-        { "orden": 4,  "nombre": "Recuperacion activa caminando", "tipo": "tiempo", "duracion_seg": 30, "registro": "tiempo", "nota": "No sentarse" },
-        { "orden": 5,  "nombre": "Flexiones (segunda serie, maximas)", "tipo": "repeticiones", "reps": "AMRAP", "registro": "repeticiones", "nota": "Se haran menos que en la primera serie; es lo esperado" },
+        { "orden": 4,  "nombre": "Recuperación activa caminando", "tipo": "tiempo", "duracion_seg": 30, "registro": "tiempo", "nota": "No sentarse" },
+        { "orden": 5,  "nombre": "Flexiones (segunda serie, máximas)", "tipo": "repeticiones", "reps": "AMRAP", "registro": "repeticiones", "nota": "Se harán menos que en la primera serie; es lo esperado" },
         { "orden": 6,  "nombre": "Plancha", "tipo": "tiempo", "duracion_seg": 20, "registro": "tiempo" },
         { "orden": 7,  "nombre": "Zancadas caminando", "tipo": "repeticiones", "reps": "10 pasos por pierna", "registro": "repeticiones" },
         { "orden": 8,  "nombre": "Mountain climbers", "tipo": "tiempo", "duracion_seg": 30, "registro": "tiempo" },
         { "orden": 9,  "nombre": "Descanso activo caminando", "tipo": "tiempo", "duracion_seg": 60, "registro": "tiempo", "nota": "Seguir en movimiento, nada de sentarse" },
         { "orden": 10, "nombre": "Burpees", "tipo": "repeticiones", "reps": 5, "registro": "repeticiones", "alternativa": { "nombre": "Jumping jacks", "tipo": "tiempo", "duracion_seg": 45, "condicion": "si los burpees son demasiado avanzados" } },
-        { "orden": 11, "nombre": "Bear crawl (oso)", "tipo": "repeticiones", "reps": "10 pasos adelante y 10 atras", "registro": "repeticiones" },
-        { "orden": 12, "nombre": "Sentadilla isometrica contra la pared", "tipo": "tiempo", "duracion_seg_min": 30, "duracion_seg_max": 45, "registro": "tiempo" },
+        { "orden": 11, "nombre": "Bear crawl (oso)", "tipo": "repeticiones", "reps": "10 pasos adelante y 10 atrás", "registro": "repeticiones" },
+        { "orden": 12, "nombre": "Sentadilla isométrica contra la pared", "tipo": "tiempo", "duracion_seg_min": 30, "duracion_seg_max": 45, "registro": "tiempo" },
         { "orden": 13, "nombre": "Vuelta a la calma caminando", "tipo": "tiempo", "duracion_seg": 180, "registro": "tiempo" }
       ]
     },
@@ -37,7 +37,7 @@
       "id": "quema_grasa",
       "nombre": "Rutina Quema Grasa",
       "tipo": "catalogo_ejercicios",
-      "descripcion": "Ejercicios de alta demanda metabolica sin necesidad de gimnasio (salvo peso muerto, kettlebell y comba). El usuario elige que ejercicio hacer en cada sesion; el aviso de frecuencia se controla ejercicio a ejercicio.",
+      "descripcion": "Ejercicios de alta demanda metabólica sin necesidad de gimnasio (salvo peso muerto, kettlebell y comba). El usuario elige qué ejercicio hacer en cada sesión; el aviso de frecuencia se controla ejercicio a ejercicio.",
       "ejercicios": [
         {
           "id": "burpees_hiit",
@@ -45,24 +45,24 @@
           "frecuencia_semanal": { "min": 1, "max": 2, "fuente": "transcripcion" },
           "protocolos": [
             { "nombre": "Tabata", "trabajo_seg": 20, "descanso_seg": 10, "rondas": 8, "duracion_total_min": 4 },
-            { "nombre": "Intervalos largos", "trabajo_seg_min": 30, "trabajo_seg_max": 60, "descanso_seg_min": 15, "descanso_seg_max": 30, "duracion_total_min": "10-15" }
+            { "nombre": "Intervalos largos", "trabajo_seg_min": 30, "trabajo_seg_max": 60, "descanso_seg_min": 15, "descanso_seg_max": 30, "rondas": 15, "duracion_total_min": "10-15" }
           ],
           "registro": "repeticiones",
           "notas_forma": "No hundir las caderas, no hacer medias flexiones, no saltarse el salto.",
-          "aviso_frecuencia": "Los burpees en protocolo HIIT estan recomendados 1-2 veces por semana y ya has cumplido la recomendacion. Puedes hacerlos igualmente, pero la intensidad es muy alta."
+          "aviso_frecuencia": "Los burpees en protocolo HIIT están recomendados 1-2 veces por semana y ya has cumplido la recomendación. Puedes hacerlos igualmente, pero la intensidad es muy alta."
         },
         {
           "id": "saltar_cuerda",
           "nombre": "Saltar a la cuerda",
           "frecuencia_semanal": { "min": 2, "max": 3, "fuente": "transcripcion" },
           "protocolos": [
-            { "nombre": "Principiante", "trabajo_seg": 30, "descanso_seg": 10, "rondas": 3, "nota": "Repetir con salto basico y estilo corriendo, unos 15 min en total" },
+            { "nombre": "Principiante", "trabajo_seg": 30, "descanso_seg": 10, "rondas": 3, "nota": "Repetir con salto básico y estilo corriendo, unos 15 min en total" },
             { "nombre": "Intermedio", "trabajo_seg": 45, "descanso_seg": 15, "rondas": 10 },
-            { "nombre": "Avanzado", "trabajo_seg": 20, "descanso_seg": 10, "rondas": 8, "nota": "Esfuerzo maximo, 4 minutos" }
+            { "nombre": "Avanzado", "trabajo_seg": 20, "descanso_seg": 10, "rondas": 8, "nota": "Esfuerzo máximo, 4 minutos" }
           ],
           "registro": "tiempo",
-          "notas_forma": "Rebotes bajos de 2-5 cm, la cuerda gira desde las munecas, codos pegados a las costillas, cuerpo erguido, buscar ritmo constante.",
-          "aviso_frecuencia": "Saltar a la cuerda esta recomendado 2-3 veces por semana y ya has cumplido la recomendacion esta semana."
+          "notas_forma": "Rebotes bajos de 2-5 cm, la cuerda gira desde las muñecas, codos pegados a las costillas, cuerpo erguido, buscar ritmo constante.",
+          "aviso_frecuencia": "Saltar a la cuerda está recomendado 2-3 veces por semana y ya has cumplido la recomendación esta semana."
         },
         {
           "id": "peso_muerto",
@@ -70,12 +70,12 @@
           "frecuencia_semanal": { "min": 1, "max": 2, "fuente": "transcripcion" },
           "recuperacion_entre_sesiones_dias": { "min": 2, "max": 3 },
           "protocolos": [
-            { "nombre": "Principiante", "series_min": 3, "series_max": 4, "reps_min": 6, "reps_max": 8, "nota": "Empezar solo con la barra vacia (20 kg) hasta dominar el movimiento" },
-            { "nombre": "Intermedio", "series_min": 3, "series_max": 4, "reps_min": 4, "reps_max": 6, "nota": "Mas peso" }
+            { "nombre": "Principiante", "series_min": 3, "series_max": 4, "reps_min": 6, "reps_max": 8, "nota": "Empezar solo con la barra vacía (20 kg) hasta dominar el movimiento" },
+            { "nombre": "Intermedio", "series_min": 3, "series_max": 4, "reps_min": 4, "reps_max": 6, "nota": "Más peso" }
           ],
           "registro": "repeticiones",
-          "notas_forma": "Barra sobre el medio del pie, bisagra de cadera (caderas atras), espalda plana, core apretado, caderas y pecho suben a la vez, barra pegada a las piernas.",
-          "aviso_frecuencia": "El peso muerto esta recomendado 1-2 veces por semana con 2-3 dias de recuperacion, y ya has cumplido la recomendacion esta semana."
+          "notas_forma": "Barra sobre el medio del pie, bisagra de cadera (caderas atrás), espalda plana, core apretado, caderas y pecho suben a la vez, barra pegada a las piernas.",
+          "aviso_frecuencia": "El peso muerto está recomendado 1-2 veces por semana con 2-3 días de recuperación, y ya has cumplido la recomendación esta semana."
         },
         {
           "id": "sprints",
@@ -85,34 +85,34 @@
           "protocolos": [
             { "nombre": "Principiante", "trabajo_seg_min": 10, "trabajo_seg_max": 15, "esfuerzo_pct": "80-85", "descanso_seg_min": 60, "descanso_seg_max": 90, "rondas_min": 4, "rondas_max": 6 },
             { "nombre": "Intermedio", "trabajo_seg_min": 20, "trabajo_seg_max": 30, "esfuerzo_pct": "90-95", "descanso_seg_min": 90, "descanso_seg_max": 120, "rondas_min": 6, "rondas_max": 8, "nota": "Tras 2-4 semanas del protocolo principiante" },
-            { "nombre": "Wingate (avanzado)", "trabajo_seg": 30, "esfuerzo_pct": "100", "descanso_seg": 240, "rondas_min": 4, "rondas_max": 6, "nota": "Recuperacion activa caminando" }
+            { "nombre": "Wingate (avanzado)", "trabajo_seg": 30, "esfuerzo_pct": "100", "descanso_seg": 240, "rondas_min": 4, "rondas_max": 6, "nota": "Recuperación activa caminando" }
           ],
           "registro": "tiempo",
-          "notas_forma": "Calentar 10 minutos minimo: balanceos dinamicos de piernas, circulos de brazos, trote ligero.",
-          "aviso_frecuencia": "Los sprints estan recomendados 1-2 veces por semana por su alta intensidad, y ya has cumplido la recomendacion esta semana."
+          "notas_forma": "Calentar 10 minutos mínimo: balanceos dinámicos de piernas, círculos de brazos, trote ligero.",
+          "aviso_frecuencia": "Los sprints están recomendados 1-2 veces por semana por su alta intensidad, y ya has cumplido la recomendación esta semana."
         },
         {
           "id": "kettlebell_swings",
           "nombre": "Swings con kettlebell",
           "frecuencia_semanal": { "min": 2, "max": 3, "fuente": "estimada" },
           "protocolos": [
-            { "nombre": "Intervalos", "trabajo_seg": 30, "descanso_seg": 30, "rondas": 12, "nota": "Basado en el protocolo de 12 series de 30 segundos citado en la transcripcion" }
+            { "nombre": "Intervalos", "trabajo_seg": 30, "descanso_seg": 30, "rondas": 12, "nota": "Basado en el protocolo de 12 series de 30 segundos citado en la transcripción" }
           ],
           "peso_inicial_kg": { "min": 12, "max": 16 },
           "registro": "repeticiones",
           "notas_forma": "Es bisagra de cadera, no sentadilla. Espalda plana, dorsales activados, la potencia sale de las caderas; los brazos son cuerdas. Si la espalda se redondea, bajar el peso.",
-          "aviso_frecuencia": "Los swings con kettlebell estan recomendados 2-3 veces por semana y ya has cumplido la recomendacion esta semana."
+          "aviso_frecuencia": "Los swings con kettlebell están recomendados 2-3 veces por semana y ya has cumplido la recomendación esta semana."
         },
         {
           "id": "plancha",
           "nombre": "Plancha",
           "frecuencia_semanal": { "min": 3, "max": 4, "fuente": "estimada" },
           "protocolos": [
-            { "nombre": "Progresion", "duracion_inicial_seg": 30, "progresion": "Anadir tiempo cada semana: 30 seg, 1 min, 2 min..." }
+            { "nombre": "Progresión", "duracion_inicial_seg": 30, "progresion": "Añadir tiempo cada semana: 30 seg, 1 min, 2 min..." }
           ],
           "registro": "tiempo",
-          "notas_forma": "Core apretado, cadera ni caida ni arqueada, inmovil como una estatua.",
-          "aviso_frecuencia": "La plancha esta recomendada 3-4 veces por semana y ya has cumplido la recomendacion esta semana."
+          "notas_forma": "Core apretado, cadera ni caída ni arqueada, inmóvil como una estatua.",
+          "aviso_frecuencia": "La plancha está recomendada 3-4 veces por semana y ya has cumplido la recomendación esta semana."
         },
         {
           "id": "sentadilla_salto",
@@ -122,8 +122,8 @@
             { "nombre": "Base", "series": 3, "reps": 10 }
           ],
           "registro": "repeticiones",
-          "notas_forma": "Bajada controlada y profunda, explosion maxima hacia arriba, aterrizar con rodillas blandas.",
-          "aviso_frecuencia": "La sentadilla con salto esta recomendada 2-3 veces por semana y ya has cumplido la recomendacion esta semana."
+          "notas_forma": "Bajada controlada y profunda, explosión máxima hacia arriba, aterrizar con rodillas blandas.",
+          "aviso_frecuencia": "La sentadilla con salto está recomendada 2-3 veces por semana y ya has cumplido la recomendación esta semana."
         },
         {
           "id": "flexiones",
@@ -132,18 +132,18 @@
           "progresiones": [
             "Flexiones contra la pared",
             "Flexiones con rodillas apoyadas",
-            "Flexion completa",
-            "Flexion arquero",
-            "Flexion con palmada",
-            "Flexion declinada (pies elevados)",
-            "Flexion en pino contra la pared"
+            "Flexión completa",
+            "Flexión arquero",
+            "Flexión con palmada",
+            "Flexión declinada (pies elevados)",
+            "Flexión en pino contra la pared"
           ],
           "protocolos": [
             { "nombre": "Base", "series": 3, "reps": "AMRAP con buena forma" }
           ],
           "registro": "repeticiones",
-          "notas_forma": "Bajada controlada, pecho toca el suelo, subir con tension, sin rebotes ni medias repeticiones, sin bloquear codos arriba.",
-          "aviso_frecuencia": "Las flexiones estan recomendadas 2-3 veces por semana y ya has cumplido la recomendacion esta semana."
+          "notas_forma": "Bajada controlada, pecho toca el suelo, subir con tensión, sin rebotes ni medias repeticiones, sin bloquear codos arriba.",
+          "aviso_frecuencia": "Las flexiones están recomendadas 2-3 veces por semana y ya has cumplido la recomendación esta semana."
         },
         {
           "id": "dominadas",
@@ -159,8 +159,8 @@
             { "nombre": "Base", "series": 3, "reps": "AMRAP con buena forma" }
           ],
           "registro": "repeticiones",
-          "notas_forma": "No saltarse el trabajo de espalda; es el grupo muscular mas grande del tren superior.",
-          "aviso_frecuencia": "Las dominadas estan recomendadas 2-3 veces por semana y ya has cumplido la recomendacion esta semana."
+          "notas_forma": "No saltarse el trabajo de espalda; es el grupo muscular más grande del tren superior.",
+          "aviso_frecuencia": "Las dominadas están recomendadas 2-3 veces por semana y ya has cumplido la recomendación esta semana."
         }
       ]
     },
@@ -168,18 +168,18 @@
       "id": "altura_postura",
       "nombre": "Rutina Altura y Postura",
       "tipo": "secuencia_fija",
-      "descripcion": "Cinco ejercicios de postura, movilidad y descompresion de columna: corregir la postura y descomprimir los discos para recuperar altura visible. Baja intensidad, apta a diario.",
+      "descripcion": "Cinco ejercicios de postura, movilidad y descompresión de columna: corregir la postura y descomprimir los discos para recuperar altura visible. Baja intensidad, apta a diario.",
       "duracion_estimada_min": 15,
       "frecuencia_semanal": { "min": 5, "max": 7, "fuente": "transcripcion" },
       "periodicidad_aviso": "diaria",
       "frecuencia_diaria": { "max": 1 },
       "descanso_entre_ejercicios_seg": { "min": 30, "max": 60 },
-      "aviso_frecuencia": "Esta rutina esta pensada para hacerse a diario, asi que hoy ya has cumplido la sesion recomendada. Puedes repetirla sin problema: es de baja intensidad.",
+      "aviso_frecuencia": "Esta rutina está pensada para hacerse a diario, así que hoy ya has cumplido la sesión recomendada. Puedes repetirla sin problema: es de baja intensidad.",
       "pasos": [
-        { "orden": 1, "nombre": "Wall angels (angeles de pared)", "tipo": "repeticiones", "reps": 10, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Espalda, gluteos y cabeza pegados a la pared; codos a la altura de los hombros; manos, codos y espalda tocando la pared todo el recorrido; repeticiones lentas y controladas." },
-        { "orden": 2, "nombre": "Puente de gluteos", "tipo": "repeticiones", "reps_min": 10, "reps_max": 15, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Tumbado boca arriba, rodillas dobladas, pies planos; empujar con los talones, subir caderas y apretar fuerte los gluteos arriba; bajar lento." },
-        { "orden": 3, "nombre": "Estiramiento de cobra", "tipo": "repeticiones", "reps_min": 8, "reps_max": 10, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Boca abajo, manos bajo los hombros; subir el pecho con los brazos manteniendo caderas y piernas en el suelo; mantener 1-2 segundos arriba respirando profundo; cuanto mas lento, mejor." },
-        { "orden": 4, "nombre": "Dead hang (colgarse de una barra)", "tipo": "tiempo", "duracion_seg_min": 20, "duracion_seg_max": 30, "series_min": 2, "series_max": 3, "descanso_entre_series_seg_min": 30, "descanso_entre_series_seg_max": 60, "registro": "tiempo", "notas_forma": "Cuerpo suelto, sin balancearse ni contraer musculos; dejar que la gravedad estire la columna. Principiantes: puntas de los pies rozando el suelo." },
+        { "orden": 1, "nombre": "Wall angels (ángeles de pared)", "tipo": "repeticiones", "reps": 10, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Espalda, glúteos y cabeza pegados a la pared; codos a la altura de los hombros; manos, codos y espalda tocando la pared todo el recorrido; repeticiones lentas y controladas." },
+        { "orden": 2, "nombre": "Puente de glúteos", "tipo": "repeticiones", "reps_min": 10, "reps_max": 15, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Tumbado boca arriba, rodillas dobladas, pies planos; empujar con los talones, subir caderas y apretar fuerte los glúteos arriba; bajar lento." },
+        { "orden": 3, "nombre": "Estiramiento de cobra", "tipo": "repeticiones", "reps_min": 8, "reps_max": 10, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 10, "registro": "repeticiones", "notas_forma": "Boca abajo, manos bajo los hombros; subir el pecho con los brazos manteniendo caderas y piernas en el suelo; mantener 1-2 segundos arriba respirando profundo; cuanto más lento, mejor." },
+        { "orden": 4, "nombre": "Dead hang (colgarse de una barra)", "tipo": "tiempo", "duracion_seg_min": 20, "duracion_seg_max": 30, "series_min": 2, "series_max": 3, "descanso_entre_series_seg_min": 30, "descanso_entre_series_seg_max": 60, "registro": "tiempo", "notas_forma": "Cuerpo suelto, sin balancearse ni contraer músculos; dejar que la gravedad estire la columna. Principiantes: puntas de los pies rozando el suelo." },
         { "orden": 5, "nombre": "Gato-vaca (cat-cow)", "tipo": "repeticiones", "reps_min": 10, "reps_max": 15, "series_min": 2, "series_max": 3, "descanso_entre_series_seg": 30, "registro": "repeticiones", "notas_forma": "En cuatro patas, manos bajo hombros y rodillas bajo caderas; alternar espalda redondeada (barbilla al pecho) y espalda arqueada (pecho arriba, mirada al frente); inhalar al levantar el pecho, exhalar al redondear." }
       ]
     }
