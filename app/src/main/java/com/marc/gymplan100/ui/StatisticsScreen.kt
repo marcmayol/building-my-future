@@ -30,8 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -119,9 +119,13 @@ fun StatisticsScreen(
             }
 
             item {
-                TabRow(
+                // Desplazable a propósito: repartidas a tercios, "Constancia" se partía en dos
+                // líneas con el texto del sistema grande. Así cada pestaña ocupa lo que necesita
+                // y a tamaños grandes se arrastra en vez de romperse.
+                ScrollableTabRow(
                     selectedTabIndex = tab,
                     containerColor = MaterialTheme.colorScheme.background,
+                    edgePadding = 0.dp,
                     divider = {}
                 ) {
                     listOf("Resumen", "Pesos", "Constancia").forEachIndexed { i, label ->
@@ -131,6 +135,7 @@ fun StatisticsScreen(
                             text = {
                                 Text(
                                     label,
+                                    maxLines = 1,
                                     style = if (tab == i) MaterialTheme.typography.titleMedium
                                     else MaterialTheme.typography.bodyLarge
                                 )

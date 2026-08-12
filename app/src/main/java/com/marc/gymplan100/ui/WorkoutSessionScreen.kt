@@ -930,7 +930,11 @@ private fun StartPrompt(
                 .heightIn(min = Touch.primary)
         ) {
             Icon(Icons.Filled.Star, contentDescription = null)
-            Text("  Entrenamiento especial (con guía)")
+            Spacer(Modifier.width(Space.x2))
+            // Sin el "(con guía)": cabía en una sola línea solo a tamaño de texto normal, y
+            // partida dejaba la estrella descolgada. Lo que es ya lo cuenta el diálogo, y así
+            // se llama igual que en el reloj.
+            Text("Entrenamiento especial")
         }
         Spacer(Modifier.height(Space.x2))
         TextButton(onClick = onExit) { Text("Volver") }
