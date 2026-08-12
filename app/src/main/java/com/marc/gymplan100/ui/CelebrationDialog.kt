@@ -1,28 +1,36 @@
 package com.marc.gymplan100.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.marc.gymplan100.data.Achievement
 import com.marc.gymplan100.data.Celebration
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.ui.theme.LocalAppColors
+import com.marc.gymplan100.ui.theme.Space
+import com.marc.gymplan100.ui.theme.Touch
+
+/** Texto sobre el degradado de marca, el mismo que usa el héroe de Inicio. */
+private val OnHero = Color(0xFF3D0B02)
 
 @Composable
 fun CelebrationDialog(
@@ -30,82 +38,80 @@ fun CelebrationDialog(
     onDismiss: () -> Unit,
     onPlayAnthem: () -> Unit = {}
 ) {
+    val app = LocalAppColors.current
+
     Dialog(onDismissRequest = onDismiss) {
-        Card(shape = RoundedCornerShape(28.dp), modifier = Modifier.fillMaxWidth()) {
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.large)
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(Space.block),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("🎉", style = MaterialTheme.typography.displayMedium)
+            Spacer(Modifier.height(Space.x2))
+            Text(
+                "¡Día ${celebration.dayNumber} completado!",
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(Space.x2))
+            Text(
+                celebration.message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(Space.x4))
+            // El marcador va con el degradado de marca: es el momento de celebrar, no un dato más.
+            // En cifra grande, además, para que no se lea como un segundo botón encima de "¡Seguir!".
+            Text(
+                "${celebration.totalCompleted} de ${PlanData.TOTAL_DAYS} días",
+                style = MaterialTheme.typography.headlineMedium,
+                color = OnHero,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("🎉", style = MaterialTheme.typography.displayMedium)
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    "¡Día ${celebration.dayNumber} completado!",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    celebration.message,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(14.dp))
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        "${celebration.totalCompleted} de ${PlanData.TOTAL_DAYS} días",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                    )
-                }
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(app.brandGradient)
+                    .padding(vertical = Space.x4)
+            )
 
-                if (celebration.newAchievements.isNotEmpty()) {
-                    Spacer(Modifier.height(16.dp))
-                    Text(
-                        if (celebration.newAchievements.size == 1) "¡Logro desbloqueado!" else "¡Logros desbloqueados!",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    celebration.newAchievements.forEach { AchievementRow(it) }
-                }
+            if (celebration.newAchievements.isNotEmpty()) {
+                Spacer(Modifier.height(Space.x4))
+                Text(
+                    if (celebration.newAchievements.size == 1) "LOGRO DESBLOQUEADO"
+                    else "LOGROS DESBLOQUEADOS",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = app.work
+                )
+                Spacer(Modifier.height(Space.x2))
+                celebration.newAchievements.forEach { AchievementRow(it) }
+            }
 
-                if (celebration.isFinalVictory) {
-                    Spacer(Modifier.height(16.dp))
-                    Button(
-                        onClick = onPlayAnthem,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("▶  We Are The Champions")
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    androidx.compose.material3.TextButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Cerrar")
-                    }
-                } else {
-                    Spacer(Modifier.height(20.dp))
-                    Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
-                        Text("¡Seguir!")
-                    }
+            if (celebration.isFinalVictory) {
+                Spacer(Modifier.height(Space.x4))
+                Button(
+                    onClick = onPlayAnthem,
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = Touch.primary)
+                ) { Text("We Are The Champions") }
+                Spacer(Modifier.height(Space.x2))
+                TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                    Text("Cerrar")
                 }
+            } else {
+                Spacer(Modifier.height(Space.block))
+                Button(
+                    onClick = onDismiss,
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = Touch.primary)
+                ) { Text("¡Seguir!") }
             }
         }
     }
@@ -113,34 +119,25 @@ fun CelebrationDialog(
 
 @Composable
 private fun AchievementRow(achievement: Achievement) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        ),
-        shape = RoundedCornerShape(14.dp),
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = Space.x1)
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Space.x3)
     ) {
-        Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(achievement.emoji, style = MaterialTheme.typography.headlineMedium)
-            Column {
-                Text(
-                    achievement.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Text(
-                    achievement.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
+        Text(achievement.emoji, style = MaterialTheme.typography.headlineSmall)
+        Column {
+            Text(achievement.title, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(2.dp))
+            Text(
+                achievement.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
