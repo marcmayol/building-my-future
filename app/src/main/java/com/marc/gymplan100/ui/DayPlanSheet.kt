@@ -43,6 +43,7 @@ import com.marc.gymplan100.data.Exercise
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.data.setCountFromScheme
+import com.marc.gymplan100.ui.theme.LocalAppColors
 
 /**
  * Panel deslizable con el plan completo del día, pensado para consultarlo durante
@@ -69,15 +70,11 @@ fun DayPlanSheet(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                "Plan de hoy · Día ${day.number}",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                "DÍA ${day.number} · ${day.template.title.uppercase()}",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Text(
-                day.template.title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Text("Plan de hoy", style = MaterialTheme.typography.headlineMedium)
 
             if (day.template.warmup.isNotBlank()) {
                 Text(
@@ -132,15 +129,16 @@ private fun PlanRow(
     isDone: Boolean,
     onClick: () -> Unit
 ) {
-    val accent = MaterialTheme.colorScheme.primary
+    // Mismo código de color que la sesión: naranja = lo que estás haciendo ahora.
+    val app = LocalAppColors.current
+    val accent = app.work
     val bubbleColor = when {
         isCurrent -> accent
-        isDone -> MaterialTheme.colorScheme.secondaryContainer
+        isDone -> MaterialTheme.colorScheme.surfaceVariant
         else -> MaterialTheme.colorScheme.surfaceVariant
     }
     val bubbleContent = when {
-        isCurrent -> MaterialTheme.colorScheme.onPrimary
-        isDone -> MaterialTheme.colorScheme.onSecondaryContainer
+        isCurrent -> Color.White
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
@@ -149,8 +147,7 @@ private fun PlanRow(
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(
-                if (isCurrent) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surface
+                if (isCurrent) accent.copy(alpha = 0.12f) else Color.Transparent
             )
             .clickable(onClick = onClick)
             .padding(vertical = 10.dp, horizontal = 10.dp),

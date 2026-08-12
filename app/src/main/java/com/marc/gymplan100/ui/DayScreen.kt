@@ -1,10 +1,11 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.marc.gymplan100.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,18 +18,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +33,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,16 +49,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.Exercise
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.repsFromScheme
+import com.marc.gymplan100.ui.theme.LocalAppColors
+import com.marc.gymplan100.ui.theme.LocalAppTextStyles
+import com.marc.gymplan100.ui.theme.Space
+import com.marc.gymplan100.ui.theme.Touch
 
+/**
+ * El día del plan: lo que toca hoy, para consultarlo o para lanzar el entrenamiento.
+ *
+ * Sigue los patrones del rediseño: versalitas para las secciones, una tarjeta ligera por
+ * ejercicio (la ilustración manda, el resto acompaña) y el enlace de la ficha como texto en
+ * vez de un botón a todo lo ancho, que con seis ejercicios llenaba la pantalla de botones.
+ */
 @Composable
 fun DayScreen(
     dayNumber: Int,
@@ -72,96 +80,77 @@ fun DayScreen(
     val template = day.template
     val progress by viewModel.progress.collectAsState()
     val completed = day.number in progress.completedDays
-    // Ejercicio cuya ficha ("¿Cómo se hace?" + mapa muscular) se está mostrando, o null.
+    // Ejercicio cuya ficha se está mostrando, o null.
     var guideFor by remember { mutableStateOf<Exercise?>(null) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Día ${day.number}") },
+                title = { Text("Día ${day.number}", style = MaterialTheme.typography.headlineSmall) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { inner ->
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = inner.calculateTopPadding() + 8.dp,
+                start = Space.screen,
+                end = Space.screen,
+                top = inner.calculateTopPadding() + Space.x2,
                 bottom = 36.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Space.x3)
         ) {
             item {
                 Text(
-                    text = template.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    "FASE ${day.phase.number} · ${day.phase.name.uppercase()}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Spacer(Modifier.height(Space.x1))
+                Text(template.title, style = MaterialTheme.typography.headlineLarge)
+                Spacer(Modifier.height(Space.x1))
                 Text(
-                    text = "Fase ${day.phase.number}: ${day.phase.name}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    "${template.exercises.size} ejercicios",
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             item {
-                // Altura mínima en vez de fija: con el texto del sistema grande, una altura
-                // clavada recorta la etiqueta a media palabra.
                 Button(
                     onClick = { onStartSession(day.number) },
+                    shape = CircleShape,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 52.dp)
+                        .heightIn(min = Touch.primary)
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                    Text("  Empezar entrenamiento guiado")
+                    Spacer(Modifier.width(Space.x2))
+                    Text("Empezar entrenamiento")
                 }
             }
 
             item {
                 // Alternativa al guiado: cronómetro libre (sin series ni pesos) que SÍ cuenta
-                // como el día del plan. Para cuando entrenas a tu aire pero quieres registrar el día.
+                // como el día del plan. Para cuando entrenas a tu aire pero quieres el registro.
                 OutlinedButton(
                     onClick = { onStartFreeSession(day.number) },
+                    shape = CircleShape,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 52.dp)
-                ) {
-                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                    Text("  Entrenar libre · cuenta como día")
-                }
+                        .heightIn(min = Touch.primary)
+                ) { Text("Entrenar libre · cuenta como día") }
             }
 
-            item {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
-                        Text(
-                            "Calentamiento",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                        Spacer(Modifier.height(2.dp))
-                        Text(
-                            template.warmup,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
-            }
+            item { SectionBlock("CALENTAMIENTO", template.warmup) }
 
             itemsIndexed(template.exercises) { index, exercise ->
                 val log = progress.logs["${day.number}-$index"]
@@ -179,43 +168,35 @@ fun DayScreen(
                 )
             }
 
-            item {
-                Card(
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
-                        Text(
-                            "Vuelta a la calma",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(Modifier.height(2.dp))
-                        Text(template.cooldown, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
+            item { SectionBlock("VUELTA A LA CALMA", template.cooldown) }
 
             item {
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(Space.x1))
                 if (completed) {
                     OutlinedButton(
                         onClick = { viewModel.toggleDay(day.number) },
-                        modifier = Modifier.fillMaxWidth()
+                        shape = CircleShape,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = Touch.primary)
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = null)
-                        Text("  Día completado (toca para deshacer)")
+                        Spacer(Modifier.width(Space.x2))
+                        Text("Día hecho · deshacer")
                     }
                 } else {
                     Button(
                         onClick = { viewModel.toggleDay(day.number) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
+                        shape = CircleShape,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = Touch.primary)
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = null)
-                        Text("  Marcar día como completado")
+                        Spacer(Modifier.width(Space.x2))
+                        // Etiqueta corta a propósito: con el texto del sistema al 130 % la
+                        // frase larga se partía en dos líneas y el ✓ quedaba descolgado.
+                        Text("Marcar día hecho")
                     }
                 }
             }
@@ -231,6 +212,21 @@ fun DayScreen(
     }
 }
 
+/** Calentamiento y vuelta a la calma: versalitas y texto, sin tarjeta de color. */
+@Composable
+private fun SectionBlock(label: String, text: String) {
+    if (text.isBlank()) return
+    Column(modifier = Modifier.padding(top = Space.x2)) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(Space.x1))
+        Text(text, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
 @Composable
 private fun ExerciseCard(
     exercise: Exercise,
@@ -242,85 +238,72 @@ private fun ExerciseCard(
     onDone: (Boolean) -> Unit,
     onShowGuide: () -> Unit
 ) {
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        modifier = Modifier.fillMaxWidth()
+    val app = LocalAppColors.current
+    val styles = LocalAppTextStyles.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            val imageRes = ExerciseImages.forName(LocalContext.current, exercise.name, LocalIsFemale.current)
-            if (imageRes != null) {
-                Image(
-                    painter = painterResource(imageRes),
-                    contentDescription = exercise.name,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color.White)
-                )
-                Spacer(Modifier.height(10.dp))
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
+        val imageRes = ExerciseImages.forName(LocalContext.current, exercise.name, LocalIsFemale.current)
+        if (imageRes != null) {
+            Image(
+                painter = painterResource(imageRes),
+                contentDescription = exercise.name,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(140.dp)
+                    .clip(MaterialTheme.shapes.extraSmall)
+                    .background(Color.White)
+            )
+            Spacer(Modifier.height(Space.x3))
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(exercise.name, style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(2.dp))
+                Text(exercise.scheme, style = styles.tabular, color = app.warmup)
+                if (exercise.note.isNotEmpty()) {
                     Text(
-                        exercise.name,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
+                        exercise.note,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
-                        exercise.scheme,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    if (exercise.note.isNotEmpty()) {
-                        Text(
-                            exercise.note,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
-                Checkbox(checked = done, onCheckedChange = onDone)
             }
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    value = weight,
-                    onValueChange = onWeight,
-                    label = { Text("Peso (kg)") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = reps,
-                    onValueChange = onReps,
-                    label = { Text("Reps") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-            // Etiqueta corta: con el texto largo el botón se partía en dos líneas y el icono
-            // quedaba descolgado. Lo que hay dentro (músculos y técnica) ya lo cuenta la ficha.
-            OutlinedButton(
-                onClick = onShowGuide,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    Icons.Filled.Info,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text("Cómo se hace")
-            }
+            Checkbox(checked = done, onCheckedChange = onDone)
+        }
+        Spacer(Modifier.height(Space.x2))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Space.x2)
+        ) {
+            OutlinedTextField(
+                value = weight,
+                onValueChange = onWeight,
+                label = { Text("Peso (kg)") },
+                singleLine = true,
+                shape = MaterialTheme.shapes.extraSmall,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedTextField(
+                value = reps,
+                onValueChange = onReps,
+                label = { Text("Reps") },
+                singleLine = true,
+                shape = MaterialTheme.shapes.extraSmall,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+        }
+        // La ficha, como enlace: con seis ejercicios, seis botones anchos eran una pared.
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+            TextButton(onClick = onShowGuide) { Text("Cómo se hace") }
         }
     }
 }
