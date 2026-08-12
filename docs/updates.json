@@ -1,8 +1,8 @@
 {
-  "versionCode": 13,
-  "versionName": "2.1",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.1/building-my-future-v2.1.apk",
-  "sha256": "7e95aca78d7a059052f751bdb7840e5e99ed9b5ff160ece34505af0b90b74ec6",
-  "notas": "El rediseño llega a toda la app. Ajustes ya se puede desplazar: las ruedas de peso y altura se comían el arrastre y te cambiaban los datos sin querer. Las rutinas especiales van con sus tildes y el protocolo «Intervalos largos» de los burpees por fin arranca como intervalos.",
+  "versionCode": 14,
+  "versionName": "2.2",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.2/building-my-future-v2.2.apk",
+  "sha256": "ffce6fee80069519d1e7bc955593ee09b8a8c65cb5a1a125ce774a2910d17310",
+  "notas": "Se va la altura del perfil: se pedía «para las calorías» pero no entraba en ningún cálculo, así que la app tampoco te pide ya ese permiso de Google Health. El peso y el género explican ahora para qué sirve cada uno: el peso estima las calorías del entreno y el género elige si las ilustraciones son de hombre o de mujer.",
   "check_horas": 24
 }
