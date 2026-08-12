@@ -2,20 +2,25 @@
 
 package com.marc.gymplan100.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +28,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,10 +36,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.Protocolo
+import com.marc.gymplan100.ui.theme.LocalAppColors
+import com.marc.gymplan100.ui.theme.Space
+import com.marc.gymplan100.ui.theme.Touch
 
 /**
  * Ficha de un ejercicio de quema grasa: elegir protocolo, ver notas de forma y empezar.
@@ -55,40 +64,54 @@ fun FatburnExerciseScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(exercise.nombre) },
+                title = {
+                    Text(exercise.nombre, style = MaterialTheme.typography.headlineSmall)
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(
+                start = Space.screen,
+                end = Space.screen,
+                top = Space.x2,
+                bottom = 36.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(Space.x2)
         ) {
             if (exercise.calentamiento_obligatorio_min > 0) {
                 item {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                        ),
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            "⚠️ Calienta al menos ${exercise.calentamiento_obligatorio_min} min antes.",
-                            modifier = Modifier.padding(14.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    // El aviso de calentar usa el amarillo del calentamiento de la sesión.
+                    val app = LocalAppColors.current
+                    Text(
+                        "Calienta al menos ${exercise.calentamiento_obligatorio_min} min antes.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = app.warmup,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(app.warmup.copy(alpha = 0.12f))
+                            .padding(Space.x4)
+                    )
                 }
             }
 
             item {
-                Text("Elige protocolo", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    "ELIGE PROTOCOLO",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = Space.x2)
+                )
             }
             items(exercise.protocolos.size) { i ->
                 val p = exercise.protocolos[i]
@@ -101,10 +124,15 @@ fun FatburnExerciseScreen(
 
             if (exercise.progresiones.isNotEmpty()) {
                 item {
-                    Column {
-                        Text("Progresiones", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    Column(modifier = Modifier.padding(top = Space.x2)) {
+                        Text(
+                            "PROGRESIONES",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(Space.x1))
                         exercise.progresiones.forEach {
-                            Text("• $it", style = MaterialTheme.typography.bodyMedium)
+                            Text("· $it", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
@@ -112,16 +140,20 @@ fun FatburnExerciseScreen(
 
             if (exercise.notas_forma.isNotBlank()) {
                 item {
-                    Card(shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(14.dp)) {
-                            Text("Técnica", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                            Text(exercise.notas_forma, style = MaterialTheme.typography.bodyMedium)
-                        }
+                    Column(modifier = Modifier.padding(top = Space.x2)) {
+                        Text(
+                            "TÉCNICA",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(Space.x1))
+                        Text(exercise.notas_forma, style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }
 
             item {
+                Spacer(Modifier.height(Space.x2))
                 Button(
                     onClick = {
                         val status = viewModel.exerciseFrequency(exercise)
@@ -131,10 +163,14 @@ fun FatburnExerciseScreen(
                         }
                     },
                     enabled = selected != null,
-                    modifier = Modifier.fillMaxWidth()
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = Touch.primary)
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                    Text("  Empezar")
+                    Spacer(Modifier.width(Space.x2))
+                    Text("Empezar")
                 }
             }
         }
@@ -158,35 +194,41 @@ private fun ProtocolRow(
     selected: Boolean,
     onSelect: () -> Unit
 ) {
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.surfaceVariant
-        ),
+    // El elegido se tiñe de naranja, como todo lo que está activo en la app.
+    val app = LocalAppColors.current
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .selectable(selected = selected, onClick = onSelect)
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = selected, onClick = onSelect)
-                Text(protocol.nombre, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-            }
-            Text(
-                protocolSummary(protocol),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 8.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(
+                if (selected) app.work.copy(alpha = 0.12f)
+                else MaterialTheme.colorScheme.surfaceVariant
             )
-            if (protocol.nota.isNotBlank()) {
-                Text(
-                    protocol.nota,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
+            .then(
+                if (selected) Modifier.border(1.dp, app.work, MaterialTheme.shapes.medium)
+                else Modifier
+            )
+            .selectable(selected = selected, onClick = onSelect)
+            .padding(Space.x4)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(selected = selected, onClick = onSelect)
+            Spacer(Modifier.width(Space.x2))
+            Text(protocol.nombre, style = MaterialTheme.typography.titleMedium)
+        }
+        Spacer(Modifier.height(Space.x1))
+        Text(
+            protocolSummary(protocol),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (protocol.nota.isNotBlank()) {
+            Spacer(Modifier.height(2.dp))
+            Text(
+                protocol.nota,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
