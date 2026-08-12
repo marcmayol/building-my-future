@@ -1,8 +1,9 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.marc.gymplan100.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,25 +11,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,20 +32,31 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.PermissionController
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.SessionRecord
+import com.marc.gymplan100.ui.theme.LocalAppColors
+import com.marc.gymplan100.ui.theme.LocalAppTextStyles
+import com.marc.gymplan100.ui.theme.Space
+import com.marc.gymplan100.ui.theme.Touch
 
+/**
+ * Lo que ya has hecho: un bloque por día completado con sus pesos, y los extras aparte.
+ *
+ * Las duraciones y los pesos van en cifras tabulares en vez de en chips: los chips parecían
+ * botones y no llevaban a ninguna parte.
+ */
 @Composable
 fun ResultsScreen(
     viewModel: PlanViewModel,
@@ -76,7 +83,9 @@ fun ResultsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Resultados") },
+                title = {
+                    Text("Resultados", style = MaterialTheme.typography.headlineSmall)
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -90,26 +99,29 @@ fun ResultsScreen(
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )
-                        Spacer(Modifier.width(2.dp))
+                        Spacer(Modifier.width(Space.x1))
                         Text(if (newestFirst) "Recientes" else "Antiguos")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { inner ->
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = inner.calculateTopPadding() + 8.dp,
-                bottom = 28.dp
+                start = Space.screen,
+                end = Space.screen,
+                top = inner.calculateTopPadding() + Space.x2,
+                bottom = 36.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Space.x3)
         ) {
             if (viewModel.healthAvailable) {
                 item {
-                    HealthConnectCard(
+                    HealthConnectBlock(
                         connected = healthGranted,
                         onConnect = { permissionLauncher.launch(viewModel.healthPermissions) }
                     )
@@ -119,9 +131,10 @@ fun ResultsScreen(
             if (completed.isEmpty() && extras.isEmpty()) {
                 item {
                     Text(
-                        "Aún no has completado ningún día. Cuando termines tu primer entrenamiento, " +
-                            "aquí verás cuánto tardaste y con qué peso hiciste cada ejercicio.",
-                        style = MaterialTheme.typography.bodyMedium,
+                        "Aún no has completado ningún día. Cuando termines tu primer " +
+                            "entrenamiento, aquí verás cuánto tardaste y con qué peso hiciste " +
+                            "cada ejercicio.",
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -131,20 +144,20 @@ fun ResultsScreen(
                 val record = history
                     .filter { it.dayNumber == dayNumber && !it.extra }
                     .maxByOrNull { it.endMillis }
-                ResultCard(dayNumber, record, progress)
+                ResultBlock(dayNumber, record, progress)
             }
 
             if (extras.isNotEmpty()) {
                 item {
                     Text(
-                        "Entrenamientos extra",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 8.dp)
+                        "ENTRENAMIENTOS EXTRA",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = Space.x2)
                     )
                 }
                 items(extras, key = { it.startMillis }) { rec ->
-                    ExtraCard(rec)
+                    ExtraBlock(rec)
                 }
             }
         }
@@ -152,87 +165,76 @@ fun ResultsScreen(
 }
 
 @Composable
-private fun HealthConnectCard(connected: Boolean, onConnect: () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+private fun HealthConnectBlock(connected: Boolean, onConnect: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    if (connected) Icons.Filled.CheckCircle else Icons.Filled.Favorite,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    if (connected) "Conectado con Google Health" else "Google Health",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-            }
-            Spacer(Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                if (connected) Icons.Filled.CheckCircle else Icons.Filled.Favorite,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.width(Space.x2))
             Text(
-                if (connected)
-                    "Cada entreno que termines se guardará automáticamente en Google Health, " +
-                        "con su duración y el detalle de ejercicios y pesos."
-                else
-                    "Conecta la app para que tus entrenamientos aparezcan en Google Health " +
-                        "automáticamente al terminarlos.",
-                style = MaterialTheme.typography.bodyMedium,
+                if (connected) "Conectado con Google Health" else "Google Health",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        Spacer(Modifier.height(Space.x2))
+        Text(
+            if (connected)
+                "Cada entreno que termines se guardará automáticamente en Google Health, " +
+                    "con su duración y el detalle de ejercicios y pesos."
+            else
+                "Conecta la app para que tus entrenamientos aparezcan en Google Health " +
+                    "automáticamente al terminarlos.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (!connected) {
+            Spacer(Modifier.height(Space.x3))
+            Button(
+                onClick = onConnect,
+                shape = CircleShape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = Touch.primary)
+            ) { Text("Conectar con Google Health") }
+        }
+    }
+}
+
+@Composable
+private fun ExtraBlock(record: SessionRecord) {
+    val styles = LocalAppTextStyles.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text("Entrenamiento extra", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(2.dp))
+            Text(
+                formatDate(record.endMillis),
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if (!connected) {
-                Spacer(Modifier.height(12.dp))
-                Button(onClick = onConnect) {
-                    Text("Conectar con Google Health")
-                }
-            }
         }
-    }
-}
-
-@Composable
-private fun ExtraCard(record: SessionRecord) {
-    Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Filled.Star,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(Modifier.height(0.dp))
-                Column(modifier = Modifier.padding(start = 10.dp)) {
-                    Text(
-                        "Entrenamiento extra",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        formatDate(record.endMillis),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            AssistChip(
-                onClick = {},
-                label = { Text(formatDuration(record.durationSeconds)) },
-                colors = AssistChipDefaults.assistChipColors(
-                    labelColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
+        Spacer(Modifier.width(Space.x2))
+        Text(
+            formatDuration(record.durationSeconds),
+            style = styles.tabular,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
@@ -242,94 +244,90 @@ private fun formatDate(millis: Long): String {
 }
 
 @Composable
-private fun ResultCard(dayNumber: Int, record: SessionRecord?, progress: ProgressState) {
+private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: ProgressState) {
     val day = PlanData.dayByNumber(dayNumber) ?: return
-    Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        "Día $dayNumber",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        day.template.title,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                if (record != null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (record.special) {
-                            AssistChip(
-                                onClick = {},
-                                leadingIcon = {
-                                    Icon(Icons.Filled.Star, contentDescription = null)
-                                },
-                                label = { Text("Especial") },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    labelColor = MaterialTheme.colorScheme.primary,
-                                    leadingIconContentColor = MaterialTheme.colorScheme.primary
-                                )
-                            )
-                        }
-                        AssistChip(
-                            onClick = {},
-                            label = { Text(formatDuration(record.durationSeconds)) },
-                            colors = AssistChipDefaults.assistChipColors(
-                                labelColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                    }
-                }
-            }
+    val app = LocalAppColors.current
+    val styles = LocalAppTextStyles.current
 
-            Spacer(Modifier.height(10.dp))
-
-            if (record?.special == true) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                if (record?.special == true) {
+                    Text(
+                        "ESPECIAL",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = app.work
+                    )
+                    Spacer(Modifier.height(2.dp))
+                }
+                Text("Día $dayNumber", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(2.dp))
                 Text(
-                    "Sesión libre guiada (p. ej. con tu tío). Solo se registró el tiempo total.",
+                    day.template.title,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            } else {
-                day.template.exercises.forEachIndexed { index, exercise ->
-                    val log = progress.logs["$dayNumber-$index"]
-                    val weight = log?.weight.orEmpty()
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 3.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            exercise.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            if (weight.isNotBlank()) "$weight kg" else "—",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = if (weight.isNotBlank()) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+            }
+            if (record != null) {
+                Spacer(Modifier.width(Space.x2))
+                Text(
+                    formatDuration(record.durationSeconds),
+                    style = styles.tabular,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
 
-                if (record != null) {
-                    Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.x3))
+
+        if (record?.special == true) {
+            Text(
+                "Sesión libre guiada (p. ej. con tu tío). Solo se registró el tiempo total.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            day.template.exercises.forEachIndexed { index, exercise ->
+                val log = progress.logs["$dayNumber-$index"]
+                val weight = log?.weight.orEmpty()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        "${record.totalSets} series · descanso total ${formatDuration(record.totalRestSeconds)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        exercise.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.width(Space.x2))
+                    Text(
+                        if (weight.isNotBlank()) "$weight kg" else "—",
+                        style = styles.tabular,
+                        color = if (weight.isNotBlank()) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+
+            if (record != null) {
+                Spacer(Modifier.height(Space.x2))
+                Text(
+                    "${record.totalSets} series · descanso total " +
+                        formatDuration(record.totalRestSeconds),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
