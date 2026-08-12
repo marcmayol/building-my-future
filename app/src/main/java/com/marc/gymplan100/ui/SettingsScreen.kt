@@ -1,23 +1,25 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.marc.gymplan100.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +31,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,9 +41,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.marc.gymplan100.ui.theme.Space
+import com.marc.gymplan100.ui.theme.Touch
 import androidx.health.connect.client.PermissionController
 import com.marc.gymplan100.BuildConfig
 import com.marc.gymplan100.GymApp
@@ -89,12 +94,15 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Configuración") },
+                title = { Text("Ajustes", style = MaterialTheme.typography.headlineSmall) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbar) }
@@ -102,41 +110,46 @@ fun SettingsScreen(
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = inner.calculateTopPadding() + 8.dp,
-                bottom = 28.dp
+                start = Space.screen,
+                end = Space.screen,
+                top = inner.calculateTopPadding() + Space.x2,
+                bottom = 36.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Space.x3)
         ) {
             item {
-                Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(
-                            "Plan de entrenamiento",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(Modifier.size(4.dp))
-                        Text(
-                            "Sigues «${activePlan.name}» · ${activePlan.totalDays} días. " +
-                                "Puedes traerte tu propio plan y alternar entre ellos sin " +
-                                "perder el progreso de ninguno.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.size(12.dp))
-                        Button(onClick = onOpenPlans, modifier = Modifier.fillMaxWidth()) {
-                            Text("Mis planes")
-                        }
-                    }
+                Bloque {
+                    Text("Plan de entrenamiento", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.size(Space.x1))
+                    Text(
+                        "Sigues «${activePlan.name}» · ${activePlan.totalDays} días. " +
+                            "Puedes traerte tu propio plan y alternar entre ellos sin " +
+                            "perder el progreso de ninguno.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.size(Space.x3))
+                    Button(
+                        onClick = onOpenPlans,
+                        shape = CircleShape,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = Touch.primary)
+                    ) { Text("Mis planes") }
                 }
             }
 
             item {
                 Text(
-                    "Tus datos personales. Sirven para estimar las calorías de cada entreno, " +
-                        "que es lo que Google Health necesita para contarlo en tus objetivos.",
+                    "TUS DATOS",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = Space.x2)
+                )
+                Spacer(Modifier.size(Space.x1))
+                Text(
+                    "Sirven para estimar las calorías de cada entreno, que es lo que Google " +
+                        "Health necesita para contarlo en tus objetivos.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -144,27 +157,31 @@ fun SettingsScreen(
 
             item {
                 WheelCard(title = "Peso") {
-                    WheelPicker(
-                        items = WEIGHTS.map { "$it kg" },
-                        selectedIndex = WEIGHTS.indexOf(weight).coerceAtLeast(0),
-                        onSelectedIndexChange = { i ->
-                            viewModel.updateProfile(profile.copy(weightKg = WEIGHTS[i]))
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    CarrilDeScroll {
+                        WheelPicker(
+                            items = WEIGHTS.map { "$it kg" },
+                            selectedIndex = WEIGHTS.indexOf(weight).coerceAtLeast(0),
+                            onSelectedIndexChange = { i ->
+                                viewModel.updateProfile(profile.copy(weightKg = WEIGHTS[i]))
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
 
             item {
                 WheelCard(title = "Altura") {
-                    WheelPicker(
-                        items = HEIGHTS.map { "$it cm" },
-                        selectedIndex = HEIGHTS.indexOf(height).coerceAtLeast(0),
-                        onSelectedIndexChange = { i ->
-                            viewModel.updateProfile(profile.copy(heightCm = HEIGHTS[i]))
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    CarrilDeScroll {
+                        WheelPicker(
+                            items = HEIGHTS.map { "$it cm" },
+                            selectedIndex = HEIGHTS.indexOf(height).coerceAtLeast(0),
+                            onSelectedIndexChange = { i ->
+                                viewModel.updateProfile(profile.copy(heightCm = HEIGHTS[i]))
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
 
@@ -187,71 +204,71 @@ fun SettingsScreen(
             }
 
             item {
-                Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
+                Bloque {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Uso reloj o pulsómetro",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Spacer(Modifier.size(4.dp))
-                            Text(
-                                "Si empiezas o controlas el entreno desde el reloj, esto se aplica " +
-                                    "solo: Google Health usa las calorías reales de tu pulso y la app " +
-                                    "no estima (evita el doble conteo). Actívalo aquí para forzarlo " +
-                                    "también en los entrenos que empieces desde el móvil.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Spacer(Modifier.size(12.dp))
+                        Text(
+                            "Uso reloj o pulsómetro",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(Modifier.size(Space.x3))
                         Switch(
                             checked = profile.usesWatch,
-                            onCheckedChange = { viewModel.updateProfile(profile.copy(usesWatch = it)) }
+                            onCheckedChange = {
+                                viewModel.updateProfile(profile.copy(usesWatch = it))
+                            }
                         )
                     }
+                    Spacer(Modifier.size(Space.x1))
+                    Text(
+                        "Si empiezas o controlas el entreno desde el reloj, esto se aplica " +
+                            "solo: Google Health usa las calorías reales de tu pulso y la app " +
+                            "no estima (evita el doble conteo). Actívalo aquí para forzarlo " +
+                            "también en los entrenos que empieces desde el móvil.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
             item { SeccionActualizaciones() }
 
             item {
-                Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
+                Bloque {
+                    Text(
+                        "Rellenar desde Google Health",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(Modifier.size(Space.x1))
+                    Text(
+                        "Trae tu peso y altura más recientes guardados en Google Health.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.size(Space.x3))
+                    if (viewModel.healthAvailable) {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    // Pide permisos de lectura si aún no los tenemos; el
+                                    // resultado dispara la importación en el launcher.
+                                    permissionLauncher.launch(viewModel.healthPermissions)
+                                }
+                            },
+                            shape = CircleShape,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = Touch.primary)
+                        ) { Text("Importar de Google Health") }
+                    } else {
                         Text(
-                            "Rellenar desde Google Health",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
+                            "Google Health no está disponible en este dispositivo.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
                         )
-                        Spacer(Modifier.size(4.dp))
-                        Text(
-                            "Trae tu peso y altura más recientes guardados en Google Health.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.size(12.dp))
-                        if (viewModel.healthAvailable) {
-                            Button(
-                                onClick = {
-                                    scope.launch {
-                                        // Pide permisos de lectura si aún no los tenemos; el
-                                        // resultado dispara la importación en el launcher.
-                                        permissionLauncher.launch(viewModel.healthPermissions)
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) { Text("Importar de Google Health") }
-                        } else {
-                            Text(
-                                "Google Health no está disponible en este dispositivo.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
                     }
                 }
             }
@@ -271,57 +288,63 @@ private fun SeccionActualizaciones() {
     var buscarAuto by remember { mutableStateOf(actualizador.buscarAutomaticamente) }
     val scope = rememberCoroutineScope()
 
-    Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp)) {
-            Text(
-                "Actualizaciones",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(Modifier.size(4.dp))
-            Text(
-                "La app se instala fuera de Play Store, así que se actualiza sola desde " +
-                    "su página de versiones.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.size(12.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Buscar actualizaciones", modifier = Modifier.weight(1f))
-                Switch(
-                    checked = buscarAuto,
-                    onCheckedChange = {
-                        buscarAuto = it
-                        actualizador.buscarAutomaticamente = it
-                    }
-                )
-            }
-            Spacer(Modifier.size(8.dp))
-            OutlinedButton(
-                onClick = { scope.launch { actualizador.comprobar(Modo.MANUAL) } },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Buscar ahora") }
-
-            if (estado is EstadoActualizacion.Disponible) {
-                Spacer(Modifier.size(8.dp))
-                Button(
-                    onClick = { actualizador.actualizarAhora() },
-                    modifier = Modifier.fillMaxWidth()
-                ) { Text("Actualizar a la ${(estado as EstadoActualizacion.Disponible).info.versionName}") }
-            }
-
-            EstadoComprobacionManual(estado)
-
-            Spacer(Modifier.size(12.dp))
-            Text(
-                "Versión ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+    Bloque {
+        Text("Actualizaciones", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.size(Space.x1))
+        Text(
+            "La app se instala fuera de Play Store, así que se actualiza sola desde " +
+                "su página de versiones.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.size(Space.x3))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Buscar actualizaciones", modifier = Modifier.weight(1f))
+            Spacer(Modifier.size(Space.x3))
+            Switch(
+                checked = buscarAuto,
+                onCheckedChange = {
+                    buscarAuto = it
+                    actualizador.buscarAutomaticamente = it
+                }
             )
         }
+        Spacer(Modifier.size(Space.x2))
+        OutlinedButton(
+            onClick = { scope.launch { actualizador.comprobar(Modo.MANUAL) } },
+            shape = CircleShape,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = Touch.primary)
+        ) { Text("Buscar ahora") }
+
+        if (estado is EstadoActualizacion.Disponible) {
+            Spacer(Modifier.size(Space.x2))
+            Button(
+                onClick = { actualizador.actualizarAhora() },
+                shape = CircleShape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = Touch.primary)
+            ) {
+                Text(
+                    "Actualizar a la " +
+                        (estado as EstadoActualizacion.Disponible).info.versionName
+                )
+            }
+        }
+
+        EstadoComprobacionManual(estado)
+
+        Spacer(Modifier.size(Space.x3))
+        Text(
+            "Versión ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -355,17 +378,40 @@ private fun EstadoComprobacionManual(estado: EstadoActualizacion) {
     }
 }
 
+/** Un ajuste = un bloque de color. Sustituye a las tarjetas del diseño anterior. */
+@Composable
+private fun Bloque(content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4)
+    ) { content() }
+}
+
 @Composable
 private fun WheelCard(title: String, content: @Composable () -> Unit) {
-    Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp)) {
-            Text(
-                title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(Modifier.size(4.dp))
-            content()
-        }
+    Bloque {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.size(Space.x1))
+        content()
+    }
+}
+
+/**
+ * Carril de scroll alrededor de una rueda.
+ *
+ * La rueda va estrecha y centrada a propósito: a todo el ancho se comía cualquier arrastre
+ * vertical, así que bajar por la pantalla te cambiaba el peso o la altura sin querer. Con los
+ * laterales libres queda sitio para desplazar la lista.
+ */
+@Composable
+private fun CarrilDeScroll(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(modifier = Modifier.width(200.dp)) { content() }
     }
 }
