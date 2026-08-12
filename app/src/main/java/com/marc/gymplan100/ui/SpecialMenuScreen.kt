@@ -2,18 +2,20 @@
 
 package com.marc.gymplan100.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,15 +23,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.ui.theme.Space
 
 /**
  * Sección de entrenamientos especiales: tres opciones seleccionables.
@@ -55,27 +59,45 @@ fun SpecialMenuScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Entrenamientos especiales") },
+                title = {
+                    Text("Especiales", style = MaterialTheme.typography.headlineSmall)
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            contentPadding = PaddingValues(
+                start = Space.screen,
+                end = Space.screen,
+                top = Space.x2,
+                bottom = 36.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(Space.x3)
         ) {
             item {
                 Text(
-                    "Elige qué entrenar hoy. Ninguno cuenta como día de tu plan: son " +
-                        "extras que se guardan aparte.",
-                    style = MaterialTheme.typography.bodyMedium,
+                    "NINGUNO CUENTA COMO DÍA DEL PLAN",
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Spacer(Modifier.height(Space.x1))
+                Text("Elige qué entrenar hoy", style = MaterialTheme.typography.headlineLarge)
+                Spacer(Modifier.height(Space.x1))
+                Text(
+                    "Son extras que se guardan aparte.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(Space.x2))
             }
             item {
                 OptionCard(
@@ -146,19 +168,25 @@ private fun OptionCard(
     subtitle: String,
     onClick: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(18.dp),
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(onClick = onClick)
+            .padding(Space.x4)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
-            Text("$emoji  $title", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(
-                subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        // El emoji en su propia línea: pegado al título le robaba el ancho a la primera línea
+        // en cuanto el texto del sistema crecía.
+        Text(emoji, style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(Space.x2))
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(2.dp))
+        Text(
+            subtitle,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
