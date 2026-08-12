@@ -257,7 +257,9 @@ private fun WorkingContent(
                 )
             }
             SessionSecondary("Cómo se hace", { showGuide = true })
-            SessionSecondary("Ejercicios", { showDayPlan = true })
+            // "Plan" y no "Ejercicios": con el texto del sistema grande la palabra larga no
+            // cabía en su tercio y se partía a media palabra ("Ejercicio/s").
+            SessionSecondary("Plan", { showDayPlan = true })
         },
         contextCard = {
             if (timedSecs == null && !bodyweight) {
@@ -595,7 +597,9 @@ private fun RestingContent(
         onExit = onExit,
         secondaries = {
             SessionSecondary("−30 s", { viewModel.adjustRest(-30) })
-            SessionSecondary("Ejercicios", { showDayPlan = true })
+            // "Plan" y no "Ejercicios": con el texto del sistema grande la palabra larga no
+            // cabía en su tercio y se partía a media palabra ("Ejercicio/s").
+            SessionSecondary("Plan", { showDayPlan = true })
             SessionSecondary("+30 s", { viewModel.adjustRest(30) })
         },
         contextCard = {
@@ -665,6 +669,32 @@ private fun RestingContent(
             )
         }
     ) {
+        // El hueco de arriba lo llena la ilustración de lo que viene: descansando es justo
+        // cuando da tiempo a mirar el movimiento. Va con weight para que se encoja sola —o
+        // desaparezca— antes que empujar la cuenta atrás fuera del alcance del pulgar.
+        val nextImageRes = nextExercise?.let {
+            ExerciseImages.forName(LocalContext.current, it.name, LocalIsFemale.current)
+        }
+        if (nextImageRes != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(bottom = Space.x4),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Image(
+                    painter = painterResource(nextImageRes),
+                    contentDescription = nextExercise.name,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 260.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                )
+            }
+        }
         Countdown(
             text = if (remaining >= 0) formatSecs(remaining) else "+${formatSecs(-remaining)}",
             caption = if (remaining >= 0) "restante de ${s.restTargetSeconds} s"
