@@ -1,0 +1,284 @@
+{
+ "id": "calistenia",
+ "nombre": "Calistenia",
+ "descripcion": "Fuerza con tu propio cuerpo · Cualquiera · 3 días/semana\nEn calistenia no se sube peso: se sube dificultad. Cada patrón tiene una escalera de 5 variantes y avanzas cuando dominas la actual. Material mínimo: una mesa o barandilla firme, una barra donde colgarse y una silla. Sirve de programa principal o de alternativa cuando no se puede ir al gimnasio.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Fundamentos",
+   "semanas": 4,
+   "descripcion": "Encontrar tu nivel en cada escalera y acumular repeticiones con técnica limpia. Descansos de 90 segundos, sin llegar al fallo. Si pesas mucho, la versión inclinada (pared o mesa) es exactamente igual de válida.",
+   "progresion": "Cuando completes todas las series en el tope del rango con técnica limpia, pasa al siguiente nivel de la escalera y vuelve a la parte baja del rango. Si no llegas al mínimo, baja un nivel sin drama.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo completo A",
+     "calentamiento": "5 min de saltos suaves o marcha + movilidad de hombros y cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Empuje (escalera)",
+       "esquema": "3 x 8-12"
+      },
+      {
+       "nombre": "Tirón (escalera)",
+       "esquema": "3 x 8-12"
+      },
+      {
+       "nombre": "Sentadilla (escalera)",
+       "esquema": "3 x 12-15"
+      },
+      {
+       "nombre": "Puente de glúteos",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Plancha (tu nivel)",
+       "esquema": "3 x 20-30 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Cuerpo completo B",
+     "calentamiento": "5 min + movilidad",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Tirón (escalera)",
+       "esquema": "3 x 8-12"
+      },
+      {
+       "nombre": "Empuje con manos elevadas",
+       "esquema": "3 x 10-12"
+      },
+      {
+       "nombre": "Zancadas estáticas",
+       "esquema": "3 x 10 por pierna"
+      },
+      {
+       "nombre": "Elevación de talones a una pierna",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Bird dog",
+       "esquema": "3 x 10 por lado"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo completo C",
+     "calentamiento": "5 min + movilidad",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Empuje (escalera)",
+       "esquema": "3 x 8-12"
+      },
+      {
+       "nombre": "Remo invertido",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Sentadilla (escalera)",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Puente de glúteos a una pierna",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Dead bug",
+       "esquema": "3 x 10 por lado"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Progresiones",
+   "semanas": 4,
+   "descripcion": "Se sube de nivel en las escaleras donde ya sobran repeticiones, se añade una serie y aparece el trabajo de suspensión.",
+   "progresion": "Misma regla de escaleras. En el trabajo colgado, el objetivo es acumular tiempo total: si el agarre falla antes que el resto, es normal.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Empuje dominante",
+     "calentamiento": "5 min + movilidad de hombros",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Empuje (nivel actual)",
+       "esquema": "4 x 8-12"
+      },
+      {
+       "nombre": "Fondos entre sillas o en banco",
+       "esquema": "3 x 8-10"
+      },
+      {
+       "nombre": "Empuje con manos juntas",
+       "esquema": "3 x 8-10"
+      },
+      {
+       "nombre": "Sentadilla búlgara",
+       "esquema": "3 x 10 por pierna"
+      },
+      {
+       "nombre": "Plancha lateral",
+       "esquema": "3 x 25 s por lado"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Tirón dominante",
+     "calentamiento": "5 min + movilidad",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Tirón (nivel actual)",
+       "esquema": "4 x 8-12"
+      },
+      {
+       "nombre": "Remo invertido agarre supino",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Colgarse de la barra",
+       "esquema": "3 x máximo tiempo"
+      },
+      {
+       "nombre": "Puente a una pierna",
+       "esquema": "3 x 12 por lado"
+      },
+      {
+       "nombre": "Hollow hold",
+       "esquema": "3 x 20 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Pierna y core",
+     "calentamiento": "5 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla (nivel actual)",
+       "esquema": "4 x 12-15"
+      },
+      {
+       "nombre": "Zancada caminando",
+       "esquema": "3 x 12 por pierna"
+      },
+      {
+       "nombre": "Peso muerto a una pierna",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Elevación de talones",
+       "esquema": "4 x 20"
+      },
+      {
+       "nombre": "Circuito de core (plancha, hollow, plancha lateral)",
+       "esquema": "3 vueltas"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Habilidades",
+   "semanas": 4,
+   "descripcion": "Se busca la dominada y la flexión completa si aún no salen, con series de dificultad alta y menos repeticiones. La semana 12 baja el volumen a la mitad para cerrar descansado.",
+   "progresion": "En dominadas, las negativas lentas (saltar arriba y bajar en 5 segundos) son el puente más corto hacia la primera completa.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Empuje avanzado",
+     "calentamiento": "5 min + movilidad de hombros y muñecas",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Flexión con pies elevados o pseudo planche",
+       "esquema": "4 x 6-10"
+      },
+      {
+       "nombre": "Fondos",
+       "esquema": "4 x 8"
+      },
+      {
+       "nombre": "Flexión en diamante",
+       "esquema": "3 x 8-10"
+      },
+      {
+       "nombre": "Pino contra la pared",
+       "esquema": "3 x 20-30 s"
+      },
+      {
+       "nombre": "Sentadilla búlgara",
+       "esquema": "3 x 12 por pierna"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Tirón avanzado",
+     "calentamiento": "5 min + movilidad y activación escapular",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Dominada (asistida o completa)",
+       "esquema": "5 x máximo posible"
+      },
+      {
+       "nombre": "Remo invertido con pies elevados",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Negativas de dominada (bajar en 5 s)",
+       "esquema": "3 x 4"
+      },
+      {
+       "nombre": "Colgarse de la barra",
+       "esquema": "3 x máximo tiempo"
+      },
+      {
+       "nombre": "Elevación de piernas colgado o tumbado",
+       "esquema": "3 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Pierna y control",
+     "calentamiento": "5 min + movilidad de cadera y tobillo",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla a una pierna asistida",
+       "esquema": "4 x 6 por pierna"
+      },
+      {
+       "nombre": "Zancada caminando",
+       "esquema": "4 x 12 por pierna"
+      },
+      {
+       "nombre": "Puente a una pierna",
+       "esquema": "4 x 12 por lado"
+      },
+      {
+       "nombre": "Elevación de talones a una pierna",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Circuito de core",
+       "esquema": "4 vueltas"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

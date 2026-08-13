@@ -1,0 +1,80 @@
+{
+ "id": "bloque-postura",
+ "nombre": "Bloque Postura",
+ "descripcion": "Bloque extra · Contrarrestar la silla · Cualquiera · 2 días extra/semana\nPara hombros enrollados hacia delante, cabeza adelantada y esa sensación de espalda cargada al final del día. Fortalece la cadena posterior del torso y estira pecho y flexores. No corrige la postura por arte de magia: la mejor postura es la siguiente, muévete a menudo.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Antídoto de escritorio",
+   "semanas": 6,
+   "descripcion": "Dos sesiones cortas (25 a 35 minutos) con una lógica simple: fortalecer lo que la silla debilita (espalda alta, deltoides posterior, glúteo) y devolver longitud a lo que acorta (pecho, flexores de cadera). Descansos de 60 a 90 segundos.",
+   "progresion": "En los ejercicios de fuerza, doble progresión normal. En los estiramientos, gana rango sin dolor: molestia suave sí, dolor no. La postura no se arregla solo aquí: levántate cada 45 minutos y el bloque hará el resto.",
+   "dias": [
+    {
+     "dia": "Sesión T1",
+     "titulo": "Espalda alta y hombro posterior",
+     "calentamiento": "5 min + gato-vaca y rotaciones torácicas",
+     "estiramientos": "Colgarse de la barra 2 x 20 s si hay barra disponible",
+     "ejercicios": [
+      {
+       "nombre": "Remo sentado con pausa de 2 s atrás",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Face pull",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Pájaros con mancuernas o pec deck invertido",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Y-T-W en banco inclinado (sin peso o muy ligero)",
+       "esquema": "2 x 8 de cada"
+      },
+      {
+       "nombre": "Estiramiento de pecho en marco de puerta",
+       "esquema": "3 x 30 s por lado"
+      },
+      {
+       "nombre": "Chin tuck (retracción de barbilla)",
+       "esquema": "2 x 10"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión T2",
+     "titulo": "Cadera y extensión torácica",
+     "calentamiento": "5 min + movilidad de cadera",
+     "estiramientos": "Respiración profunda tumbado: 2 min",
+     "ejercicios": [
+      {
+       "nombre": "Hip thrust o puente de glúteos con pausa",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Remo en polea a la cara con cuerda",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Extensión torácica sobre banco o foam roller",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Estiramiento de flexores de cadera (zancada baja)",
+       "esquema": "3 x 30 s por lado"
+      },
+      {
+       "nombre": "Apertura de pecho tumbado (libro abierto)",
+       "esquema": "2 x 8 por lado"
+      },
+      {
+       "nombre": "Bird dog",
+       "esquema": "3 x 8 por lado"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

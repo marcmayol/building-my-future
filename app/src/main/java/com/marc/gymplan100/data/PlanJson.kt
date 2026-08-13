@@ -137,6 +137,10 @@ object PlanCodec {
     fun decodeStored(text: String): PlanDto? =
         runCatching { json.decodeFromString<PlanDto>(text) }.getOrNull()
 
+    /** Lista de ids (el índice de los planes de serie en assets). */
+    fun decodeIdList(text: String): List<String> =
+        runCatching { json.decodeFromString<List<String>>(text) }.getOrElse { emptyList() }
+
     /**
      * Convierte y valida. Las fases son opcionales: si el plan trae días sueltos, se envuelven
      * en una fase única para que las pantallas de fases, estadísticas y logros sigan valiendo.

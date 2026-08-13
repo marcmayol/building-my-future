@@ -1,0 +1,199 @@
+{
+ "id": "fuerza-maxima",
+ "nombre": "Fuerza Máxima",
+ "descripcion": "Básicos pesados a pocas repeticiones · Intermedio · 3 días/semana\nAquí no se persigue el músculo sino el número: series de 3 a 5 repeticiones en sentadilla, press y bisagra de cadera, con descansos largos (la evidencia es clara: 3 a 5 minutos entre series pesadas rinde más que recortar). Tres días para recuperar bien entre sesiones.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Base de fuerza",
+   "semanas": 4,
+   "descripcion": "Cinco series de cinco en los básicos, con carga exigente pero limpia (RIR 2). Descansos de 3 minutos en los grandes y de 2 en los accesorios: aquí el descanso largo no es pereza, es parte del método.",
+   "progresion": "Cuando salgan las 5 x 5 con técnica limpia, sube 2,5 kg en los de torso y 5 kg en los de pierna. Si fallas dos sesiones seguidas, baja un 10% y vuelve a subir. Las máquinas (hack, multipower, prensa) valen igual si aún no dominas la barra.",
+   "dias": [
+    {
+     "dia": "Día A",
+     "titulo": "Sentadilla dominante",
+     "calentamiento": "8 min + movilidad de cadera y tobillo + series de aproximación",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla (barra, hack o multipower)",
+       "esquema": "5 x 5",
+       "nota": "3 min de descanso"
+      },
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "3 x 8"
+      },
+      {
+       "nombre": "Remo sentado",
+       "esquema": "3 x 8"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 40 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día B",
+     "titulo": "Empuje dominante",
+     "calentamiento": "8 min + movilidad de hombros + series de aproximación",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Press de banca (barra, mancuernas o máquina)",
+       "esquema": "5 x 5",
+       "nota": "3 min de descanso"
+      },
+      {
+       "nombre": "Press militar sentado",
+       "esquema": "3 x 6"
+      },
+      {
+       "nombre": "Jalón al pecho o dominada asistida",
+       "esquema": "3 x 8"
+      },
+      {
+       "nombre": "Extensión de tríceps en polea",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Face pull",
+       "esquema": "3 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Día C",
+     "titulo": "Bisagra dominante",
+     "calentamiento": "8 min + movilidad de cadera + series de aproximación",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Peso muerto rumano o hip thrust pesado",
+       "esquema": "5 x 5",
+       "nota": "3 min de descanso"
+      },
+      {
+       "nombre": "Prensa pies altos",
+       "esquema": "3 x 8"
+      },
+      {
+       "nombre": "Remo con mancuerna",
+       "esquema": "3 x 8 por lado"
+      },
+      {
+       "nombre": "Elevación de gemelos de pie",
+       "esquema": "4 x 12"
+      },
+      {
+       "nombre": "Elevación de rodillas colgado",
+       "esquema": "3 x 10"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Cargas altas",
+   "semanas": 4,
+   "descripcion": "Cuatro series de tres con más peso del que usabas en el 5 x 5, más trabajo de respaldo a 6-8 repeticiones. Descansos de 3 a 4 minutos en los triples. La semana 8 es de descarga: mitad de series y peso cómodo.",
+   "progresion": "En los triples, RIR 1-2: pesado de verdad, pero sin fallar ni sacrificar técnica. Apunta cada peso: la comparación con la semana 1 es la medida real del bloque.",
+   "dias": [
+    {
+     "dia": "Día A",
+     "titulo": "Sentadilla pesada",
+     "calentamiento": "10 min + movilidad + aproximación progresiva",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla (tu variante)",
+       "esquema": "4 x 3",
+       "nota": "3-4 min de descanso"
+      },
+      {
+       "nombre": "Sentadilla, series de respaldo",
+       "esquema": "2 x 6",
+       "nota": "Peso del 5x5 de la fase 1"
+      },
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "3 x 8"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Plancha con peso",
+       "esquema": "3 x 30 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día B",
+     "titulo": "Press pesado",
+     "calentamiento": "10 min + movilidad de hombros + aproximación",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Press de banca (tu variante)",
+       "esquema": "4 x 3",
+       "nota": "3-4 min de descanso"
+      },
+      {
+       "nombre": "Press de banca, respaldo",
+       "esquema": "2 x 6"
+      },
+      {
+       "nombre": "Press militar",
+       "esquema": "3 x 6"
+      },
+      {
+       "nombre": "Jalón al pecho o dominada",
+       "esquema": "4 x 6"
+      },
+      {
+       "nombre": "Face pull",
+       "esquema": "3 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Día C",
+     "titulo": "Bisagra pesada",
+     "calentamiento": "10 min + movilidad de cadera + aproximación",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Peso muerto rumano o hip thrust",
+       "esquema": "4 x 3",
+       "nota": "3-4 min de descanso"
+      },
+      {
+       "nombre": "Bisagra, respaldo",
+       "esquema": "2 x 6"
+      },
+      {
+       "nombre": "Remo con barra o en máquina",
+       "esquema": "4 x 6"
+      },
+      {
+       "nombre": "Elevación de gemelos",
+       "esquema": "4 x 12"
+      },
+      {
+       "nombre": "Elevación de rodillas colgado",
+       "esquema": "3 x 12"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

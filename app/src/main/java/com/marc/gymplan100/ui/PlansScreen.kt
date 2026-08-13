@@ -53,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanImport
@@ -340,10 +341,14 @@ private fun PlanCard(
         }
         if (plan.description.isNotBlank()) {
             Spacer(Modifier.height(Space.x1))
+            // Recortada a propósito: los planes de serie traen su descripción entera y, sin
+            // tope, cada tarjeta ocupaba una pantalla y la lista no había quien la bajara.
             Text(
                 plan.description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
         }
         Spacer(Modifier.height(Space.x2))

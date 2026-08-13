@@ -1,0 +1,102 @@
+{
+ "id": "movilidad",
+ "nombre": "Movilidad",
+ "descripcion": "Bloque extra · Rango de movimiento en 15 min · Cualquiera · 3 días extra/semana\nSesiones de 12 a 15 minutos para recuperar rango en cadera, tobillo, torácica, hombro y cadena posterior. La constancia gana a la duración: poco y a menudo. Se nota al agacharse, al hacer sentadilla profunda y al atarse los zapatos. Al acabar el bloque, reinícialo y sigue.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Bloque de movilidad",
+   "semanas": 4,
+   "descripcion": "Tres sesiones cortas por semana, cada una centrada en una zona. La dosis que funciona es sorprendentemente pequeña: unos 10 minutos semanales por zona bastan, y más no añade gran cosa. Lo que sí importa es no fallar semanas.",
+   "progresion": "Mantén cada posición 30 a 45 segundos respirando lento; con cada exhalación, busca un poco más de rango. Molestia de estiramiento sí, dolor punzante no. Cuanto peor sea tu punto de partida, más rápido vas a mejorar.",
+   "dias": [
+    {
+     "dia": "Sesión M1",
+     "titulo": "Cadera y tobillo",
+     "calentamiento": "2 min de marcha o círculos de cadera",
+     "estiramientos": "Sacudir piernas y caminar 1 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla profunda asistida (agarrado a algo)",
+       "esquema": "3 x 30 s"
+      },
+      {
+       "nombre": "Postura 90/90 con cambios",
+       "esquema": "2 x 45 s por lado"
+      },
+      {
+       "nombre": "Zancada baja con rotación hacia arriba",
+       "esquema": "2 x 8 por lado"
+      },
+      {
+       "nombre": "Dorsiflexión de tobillo contra pared",
+       "esquema": "2 x 10 por lado",
+       "nota": "Rodilla a la pared sin levantar talón"
+      },
+      {
+       "nombre": "Estiramiento de flexores (zancada baja, brazo arriba)",
+       "esquema": "2 x 30 s por lado"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión M2",
+     "titulo": "Torácica y hombro",
+     "calentamiento": "2 min de gato-vaca",
+     "estiramientos": "Respiración profunda: 1 min",
+     "ejercicios": [
+      {
+       "nombre": "Rotación torácica en cuadrupedia (mano a la nuca)",
+       "esquema": "2 x 8 por lado"
+      },
+      {
+       "nombre": "Extensión torácica sobre banco o silla",
+       "esquema": "3 x 30 s"
+      },
+      {
+       "nombre": "Deslizamientos de brazos en pared (wall slides)",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Estiramiento de pecho en marco de puerta",
+       "esquema": "3 x 30 s por lado"
+      },
+      {
+       "nombre": "Colgarse de la barra (activo o pasivo)",
+       "esquema": "3 x 20 s",
+       "nota": "Si no hay barra: alcance máximo en pared"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión M3",
+     "titulo": "Cadena posterior",
+     "calentamiento": "2 min de marcha suave",
+     "estiramientos": "Ponerse de pie despacio y caminar 1 min",
+     "ejercicios": [
+      {
+       "nombre": "Isquios con correa o toalla, tumbado",
+       "esquema": "3 x 40 s por pierna"
+      },
+      {
+       "nombre": "Bisagra de cadera con palo o escoba (espalda recta)",
+       "esquema": "2 x 10"
+      },
+      {
+       "nombre": "Estiramiento de gemelos en escalón o pared",
+       "esquema": "3 x 30 s por lado"
+      },
+      {
+       "nombre": "Glúteo y piriforme (figura 4 tumbado)",
+       "esquema": "2 x 40 s por lado"
+      },
+      {
+       "nombre": "Flexión adelante sentado, espalda larga",
+       "esquema": "2 x 40 s"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

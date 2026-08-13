@@ -1,0 +1,416 @@
+{
+ "id": "hipertrofia",
+ "nombre": "Hipertrofia",
+ "descripcion": "Torso / pierna, 2 veces por semana · Intermedio · 4 días/semana\nEl músculo crece con volumen suficiente (12 a 20 series semanales por grupo), cercanía al fallo y progresión sostenida. Rangos de 8 a 15 repeticiones, descansos de 2 minutos en básicos y de 60 a 90 segundos en aislamientos. Sesiones de 55 a 70 minutos.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Acumulación",
+   "semanas": 4,
+   "descripcion": "Construir volumen y tolerancia trabajando con RIR 3: cada serie termina con la sensación de que sobran unas tres repeticiones. Descansos de 2 minutos en los básicos y de 60 a 90 segundos en los aislamientos.",
+   "progresion": "Doble progresión: cuando completes el tope del rango en todas las series, sube el peso y vuelve a la parte baja del rango.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Torso A · Empuje dominante",
+     "calentamiento": "6 min + movilidad de hombros",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Press de pecho en máquina o mancuernas",
+       "esquema": "4 x 10-12"
+      },
+      {
+       "nombre": "Remo sentado en polea",
+       "esquema": "4 x 10-12"
+      },
+      {
+       "nombre": "Press inclinado con mancuernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Jalón al pecho",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Elevaciones laterales",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Extensión de tríceps en polea",
+       "esquema": "3 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Pierna A · Cuádriceps dominante",
+     "calentamiento": "6 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "4 x 12"
+      },
+      {
+       "nombre": "Sentadilla goblet o hack en máquina",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Curl de piernas tumbado",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Elevación de gemelos de pie",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 40 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Torso B · Tirón dominante",
+     "calentamiento": "6 min + movilidad de hombros",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Jalón al pecho agarre ancho",
+       "esquema": "4 x 10-12"
+      },
+      {
+       "nombre": "Remo con mancuerna a una mano",
+       "esquema": "4 x 10 por lado"
+      },
+      {
+       "nombre": "Press de hombros sentado",
+       "esquema": "3 x 10-12"
+      },
+      {
+       "nombre": "Pec deck o aperturas en polea",
+       "esquema": "3 x 12-15"
+      },
+      {
+       "nombre": "Face pull",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Curl de bíceps con mancuernas",
+       "esquema": "3 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Día 4",
+     "titulo": "Pierna B · Cadena posterior",
+     "calentamiento": "6 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Hip thrust",
+       "esquema": "4 x 10-12"
+      },
+      {
+       "nombre": "Peso muerto rumano con mancuernas",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Prensa de piernas pies altos",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl de piernas sentado",
+       "esquema": "3 x 12-15"
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Elevación de piernas colgado o en banco",
+       "esquema": "3 x 12"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Intensificación",
+   "semanas": 4,
+   "descripcion": "Las mismas sesiones acercándose más al fallo (RIR 1 a 2), con una serie más en los ejercicios principales y una serie descendente al cierre: bajar el peso a la mitad y seguir hasta el límite técnico.",
+   "progresion": "Mantén la doble progresión. Descansos de 2 minutos en básicos; en la serie descendente no se descansa al bajar el peso.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Torso A · Empuje (intensificado)",
+     "calentamiento": "6 min + movilidad de hombros",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Press de pecho",
+       "esquema": "5 x 8-10"
+      },
+      {
+       "nombre": "Remo sentado",
+       "esquema": "5 x 8-10"
+      },
+      {
+       "nombre": "Press inclinado con mancuernas",
+       "esquema": "3 x 10-12"
+      },
+      {
+       "nombre": "Jalón al pecho",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Elevaciones laterales",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Extensión de tríceps en polea",
+       "esquema": "3 x 12",
+       "nota": "Última serie: descendente"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Pierna A · Cuádriceps (intensificado)",
+     "calentamiento": "6 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "5 x 10-12"
+      },
+      {
+       "nombre": "Sentadilla hack o goblet",
+       "esquema": "4 x 8-10"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "3 x 15",
+       "nota": "Última serie: descendente"
+      },
+      {
+       "nombre": "Elevación de gemelos",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 50 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Torso B · Tirón (intensificado)",
+     "calentamiento": "6 min + movilidad de hombros",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Jalón al pecho",
+       "esquema": "5 x 8-10"
+      },
+      {
+       "nombre": "Remo con mancuerna",
+       "esquema": "5 x 8-10 por lado"
+      },
+      {
+       "nombre": "Press de hombros",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Pec deck",
+       "esquema": "3 x 12-15"
+      },
+      {
+       "nombre": "Face pull",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Curl de bíceps",
+       "esquema": "3 x 12",
+       "nota": "Última serie: descendente"
+      }
+     ]
+    },
+    {
+     "dia": "Día 4",
+     "titulo": "Pierna B · Cadena posterior (intensificado)",
+     "calentamiento": "6 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Hip thrust",
+       "esquema": "5 x 10"
+      },
+      {
+       "nombre": "Peso muerto rumano",
+       "esquema": "4 x 8-10"
+      },
+      {
+       "nombre": "Prensa pies altos",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "3 x 15",
+       "nota": "Última serie: descendente"
+      },
+      {
+       "nombre": "Elevación de gemelos",
+       "esquema": "4 x 20"
+      },
+      {
+       "nombre": "Core a elección",
+       "esquema": "3 x 12"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Especialización y cierre",
+   "semanas": 4,
+   "descripcion": "Se mantiene la intensidad y se añade trabajo dirigido. La última semana es de descarga: mismas sesiones con la mitad de series y peso algo inferior, para llegar descansado al siguiente bloque.",
+   "progresion": "Prioriza los ejercicios que abren cada sesión. En la semana de descarga no se busca progresar: se busca recuperar.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Torso A · Empuje + hombro",
+     "calentamiento": "6 min + movilidad de hombros",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Press de pecho",
+       "esquema": "4 x 8"
+      },
+      {
+       "nombre": "Press inclinado",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Press de hombros",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Elevaciones laterales",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Fondos en máquina asistida",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Extensión de tríceps sobre la cabeza",
+       "esquema": "3 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Pierna A · Cuádriceps + gemelo",
+     "calentamiento": "6 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "5 x 10"
+      },
+      {
+       "nombre": "Sentadilla hack",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Zancadas con mancuernas o en multipower",
+       "esquema": "3 x 10 por pierna"
+      },
+      {
+       "nombre": "Elevación de gemelos de pie",
+       "esquema": "5 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Torso B · Espalda + bíceps",
+     "calentamiento": "6 min + movilidad de hombros",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Jalón al pecho",
+       "esquema": "4 x 8"
+      },
+      {
+       "nombre": "Remo en máquina",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Remo con mancuerna",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Pullover en polea",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl con barra o mancuernas",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Curl martillo",
+       "esquema": "3 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Día 4",
+     "titulo": "Pierna B · Glúteo e isquios",
+     "calentamiento": "6 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Hip thrust",
+       "esquema": "5 x 10"
+      },
+      {
+       "nombre": "Peso muerto rumano",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Curl de piernas tumbado",
+       "esquema": "4 x 12"
+      },
+      {
+       "nombre": "Abducción de cadera en máquina",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "4 x 20"
+      },
+      {
+       "nombre": "Core a elección",
+       "esquema": "3 x 12"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

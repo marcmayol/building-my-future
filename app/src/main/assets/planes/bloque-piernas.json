@@ -1,0 +1,76 @@
+{
+ "id": "bloque-piernas",
+ "nombre": "Bloque Piernas",
+ "descripcion": "Bloque extra · Especialización de 6 semanas · Intermedio · 2 días extra/semana\nNo es un programa completo: son dos sesiones que se montan encima de tu rutina base durante 6 semanas para priorizar el tren inferior.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Especialización de pierna",
+   "semanas": 6,
+   "descripcion": "Dos sesiones semanales dedicadas. Si estás en Hipertrofia, sustituyen a Pierna A y Pierna B; si estás en Mantenimiento, se añaden reduciendo el trabajo de pierna de las sesiones normales.",
+   "progresion": "Semanas 1-2 con RIR 3, semanas 3-4 con RIR 2, semanas 5-6 con RIR 1 en el primer ejercicio de cada sesión. Descansos de 2 minutos en los grandes.",
+   "dias": [
+    {
+     "dia": "Sesión P1",
+     "titulo": "Cuádriceps y volumen general",
+     "calentamiento": "8 min bici + movilidad de cadera y tobillo",
+     "estiramientos": "Estiramiento de cuádriceps e isquios",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla en máquina hack o goblet",
+       "esquema": "4 x 8-10"
+      },
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "4 x 12"
+      },
+      {
+       "nombre": "Zancadas con mancuernas o en multipower",
+       "esquema": "3 x 10 por pierna"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Elevación de gemelos de pie",
+       "esquema": "4 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión P2",
+     "titulo": "Glúteo e isquiosurales",
+     "calentamiento": "8 min bici + activación de glúteo con banda",
+     "estiramientos": "Estiramiento de glúteo e isquios",
+     "ejercicios": [
+      {
+       "nombre": "Hip thrust",
+       "esquema": "4 x 8-10"
+      },
+      {
+       "nombre": "Peso muerto rumano con mancuernas o barra",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Prensa de piernas pies altos y anchos",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl de piernas tumbado",
+       "esquema": "4 x 12"
+      },
+      {
+       "nombre": "Abducción de cadera en máquina",
+       "esquema": "3 x 20"
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "4 x 20"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

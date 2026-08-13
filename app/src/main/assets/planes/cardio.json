@@ -1,0 +1,183 @@
+{
+ "id": "cardio",
+ "nombre": "Cardio",
+ "descripcion": "Resistencia en bajo impacto · Cualquiera · 4 días/semana\nLa mayor parte del trabajo va suave y sostenido, y solo una parte pequeña va intensa: es la distribución con mejor resultado y menor desgaste. Si se combina con fuerza el mismo día, la fuerza va primero; las sesiones suaves encajan en cualquier momento.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Base aeróbica",
+   "semanas": 3,
+   "descripcion": "Solo trabajo suave y continuo. El objetivo es acumular minutos y que el cuerpo tolere el volumen. Elige máquinas de bajo impacto: bici, elíptica, remo, natación o cinta con inclinación. Correr puede esperar.",
+   "progresion": "Cada semana alarga un poco la sesión larga. Nada más. La intensidad se mide por el test del habla: en esta fase, conversación entera siempre.",
+   "dias": [
+    {
+     "dia": "Sesión 1",
+     "titulo": "Continuo corto",
+     "calentamiento": "5 min muy suave",
+     "estiramientos": "5 min suave + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "Bloque continuo a ritmo suave",
+       "esquema": "20 min",
+       "nota": "Conversación entera posible"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 2",
+     "titulo": "Continuo con cambios",
+     "calentamiento": "5 min suave",
+     "estiramientos": "5 min suave + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "Alternar 4 min suave y 2 min moderado",
+       "esquema": "24 min",
+       "nota": "4 ciclos de 6 min"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 3",
+     "titulo": "Continuo corto (otra máquina)",
+     "calentamiento": "5 min suave",
+     "estiramientos": "5 min suave + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "Bloque continuo suave en máquina distinta",
+       "esquema": "20 min",
+       "nota": "Variar reparte el impacto"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 4",
+     "titulo": "Sesión larga",
+     "calentamiento": "5 min suave",
+     "estiramientos": "Estiramientos 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Continuo suave largo",
+       "esquema": "30-40 min",
+       "nota": "Puede ser caminar en exterior"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Mixto",
+   "semanas": 3,
+   "descripcion": "Entra el primer trabajo por intervalos, con recuperaciones largas. La sesión larga sigue creciendo.",
+   "progresion": "Cada semana añade una repetición a los intervalos o alarga la sesión larga: nunca las dos cosas a la vez.",
+   "dias": [
+    {
+     "dia": "Sesión 1",
+     "titulo": "Intervalos largos",
+     "calentamiento": "8 min progresivo",
+     "estiramientos": "5 min + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "5 x (3 min moderado + 2 min suave)",
+       "esquema": "25 min",
+       "nota": "Frases cortas en la parte moderada"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 2",
+     "titulo": "Continuo suave",
+     "calentamiento": "5 min suave",
+     "estiramientos": "5 min + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "Bloque continuo suave",
+       "esquema": "30 min"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 3",
+     "titulo": "Cuestas o resistencia",
+     "calentamiento": "8 min progresivo",
+     "estiramientos": "5 min + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "6 x (2 min inclinación o resistencia alta + 2 min suave)",
+       "esquema": "24 min",
+       "nota": "Ritmo moderado en el esfuerzo"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 4",
+     "titulo": "Sesión larga",
+     "calentamiento": "5 min suave",
+     "estiramientos": "Estiramientos 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Continuo suave largo",
+       "esquema": "40-50 min"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Intensidad",
+   "semanas": 2,
+   "descripcion": "Intervalos más cortos e intensos manteniendo la base suave intacta. La segunda semana reduce el volumen para asimilar.",
+   "progresion": "En los tramos intensos solo salen palabras sueltas. Si hay antecedentes cardiovasculares o mucho sobrepeso, revisión médica antes de esta fase.",
+   "dias": [
+    {
+     "dia": "Sesión 1",
+     "titulo": "Intervalos cortos",
+     "calentamiento": "10 min progresivo",
+     "estiramientos": "8 min + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "8 x (1 min intenso + 2 min suave)",
+       "esquema": "24 min"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 2",
+     "titulo": "Continuo suave",
+     "calentamiento": "5 min suave",
+     "estiramientos": "5 min + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "Bloque continuo suave",
+       "esquema": "30 min"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 3",
+     "titulo": "Pirámide",
+     "calentamiento": "10 min progresivo",
+     "estiramientos": "8 min + estiramientos",
+     "ejercicios": [
+      {
+       "nombre": "Pirámide 1-2-3-2-1 min intenso",
+       "esquema": "18 min",
+       "nota": "Recuperación suave igual al esfuerzo"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 4",
+     "titulo": "Sesión larga",
+     "calentamiento": "5 min suave",
+     "estiramientos": "Estiramientos 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Continuo suave largo",
+       "esquema": "45-55 min"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

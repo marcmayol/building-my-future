@@ -1,0 +1,112 @@
+{
+ "id": "mantenimiento",
+ "nombre": "Mantenimiento",
+ "descripcion": "Mantenerse fit sin exprimirse · Cualquiera · 3 días/semana\nEl destino natural al terminar el Plan 100 Días o Hipertrofia, y el refugio para épocas de mucho trabajo, viajes o desmotivación. El bloque de 4 semanas se repite indefinidamente: al acabarlo, reinícialo desde el programa.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Bloque de mantenimiento",
+   "semanas": 4,
+   "descripcion": "Tres sesiones de cuerpo completo por semana con el volumen justo. Para mantener músculo y fuerza hace falta bastante menos trabajo del que hizo falta para ganarlos. Sesiones de 40 a 50 minutos, con RIR 2 o 3.",
+   "progresion": "No hay obligación de subir peso: basta con repetir las mismas cargas con buena técnica. Si un día no da la vida, hacer los tres primeros ejercicios ya cuenta como sesión. Al terminar el bloque, reinícialo y sigue.",
+   "dias": [
+    {
+     "dia": "Sesión 1",
+     "titulo": "Cuerpo completo, énfasis empuje",
+     "calentamiento": "6 min + movilidad",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Press de pecho en máquina o mancuernas",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Remo sentado",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Press de hombros",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Elevación de gemelos",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 40 s"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 2",
+     "titulo": "Cuerpo completo, énfasis tirón",
+     "calentamiento": "6 min + movilidad",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Hip thrust o peso muerto rumano",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Jalón al pecho",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Press inclinado con mancuernas",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Face pull",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Curl de bíceps",
+       "esquema": "2 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión 3",
+     "titulo": "Cuerpo completo, énfasis pierna",
+     "calentamiento": "6 min + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla goblet o prensa",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Remo con mancuerna",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Press de pecho",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Elevaciones laterales",
+       "esquema": "3 x 15"
+      },
+      {
+       "nombre": "Core a elección",
+       "esquema": "3 x 12"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

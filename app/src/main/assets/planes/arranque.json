@@ -1,0 +1,192 @@
+{
+ "id": "arranque",
+ "nombre": "Arranque",
+ "descripcion": "Reacondicionamiento desde cero · Nivel cero · 3 días/semana\nNo se busca músculo todavía: se busca crear el hábito, aprender a moverse sin dolor y que el cuerpo tolere el estímulo. Todo con máquinas, ejercicios sentados o apoyados y sesiones de 25 a 40 minutos. Al terminar, el paso natural es el Plan 100 Días desde el día 1.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Familiarización",
+   "semanas": 2,
+   "descripcion": "Conocer las máquinas, ajustar asientos y agarres y aprender el rango de movimiento. Descansos amplios, de 90 a 120 segundos.",
+   "progresion": "En esta fase no se sube peso: solo se aprende el movimiento. Elige cargas que se sientan cómodas de principio a fin.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo completo suave",
+     "calentamiento": "5 min bici sin resistencia + movilidad de hombros y tobillos",
+     "estiramientos": "5 min de estiramientos suaves",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas (recorrido corto)",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Remo sentado en máquina",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "2 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Cuerpo completo suave",
+     "calentamiento": "5 min bici sin resistencia + movilidad de cadera",
+     "estiramientos": "5 min de estiramientos suaves",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Jalón al pecho en polea",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Press de hombros en máquina (peso mínimo)",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Curl de piernas en máquina",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Plancha apoyada en banco o pared",
+       "esquema": "2 x 15 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo completo suave",
+     "calentamiento": "5 min bici sin resistencia + movilidad general",
+     "estiramientos": "5 min de estiramientos suaves",
+     "ejercicios": [
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Remo sentado",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Elevación de gemelos",
+       "esquema": "2 x 15"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Consolidación",
+   "semanas": 2,
+   "descripcion": "Las mismas máquinas, una serie más y rango de movimiento completo.",
+   "progresion": "Sube un punto de la máquina solo si las repeticiones salen cómodas y sin molestias. Si un ejercicio duele, salta a la variante anterior.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo completo",
+     "calentamiento": "6 min bici suave + movilidad",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Remo sentado",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Elevación de gemelos",
+       "esquema": "3 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Cuerpo completo",
+     "calentamiento": "6 min bici suave + movilidad de cadera",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Jalón al pecho",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Press de hombros en máquina",
+       "esquema": "2 x 12"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Plancha (rodillas o banco)",
+       "esquema": "3 x 20 s"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo completo",
+     "calentamiento": "6 min bici suave + movilidad",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Prensa de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Press de pecho",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Remo sentado",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl de piernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl de bíceps con mancuernas ligeras",
+       "esquema": "2 x 12"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

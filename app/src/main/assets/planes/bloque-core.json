@@ -1,0 +1,270 @@
+{
+ "id": "bloque-core",
+ "nombre": "Bloque Core",
+ "descripcion": "Bloque extra · Anti movimiento en 4 familias · Cualquiera · 3 días extra/semana\nEl core no está para doblarse: está para resistir que te doblen. Por eso el grueso son ejercicios anti movimiento en 4 familias (anti extensión, anti rotación, anti flexión lateral y flexión de cadera). Sesiones de 15 a 25 minutos para pegar al final de cualquier entrenamiento. Que el abdomen se vea depende de la grasa que haya encima: eso se resuelve en la cocina, no aquí.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Estabilidad",
+   "semanas": 2,
+   "descripcion": "Aprender a mantener la zona lumbar neutra y respirar sin perder la tensión. Todo estático o muy controlado. Descansos de 45 segundos.",
+   "progresion": "En los ejercicios de tiempo, sube 5 segundos por serie cada semana. Si algo provoca dolor lumbar punzante, sáltalo: el dolor nunca es parte del ejercicio.",
+   "dias": [
+    {
+     "dia": "Sesión K1",
+     "titulo": "Estabilidad A",
+     "calentamiento": "Gato-vaca 10 repeticiones + puente de glúteos 10",
+     "estiramientos": "Estiramiento suave de flexores de cadera",
+     "ejercicios": [
+      {
+       "nombre": "Plancha (rodillas o completa)",
+       "esquema": "3 x 20-30 s"
+      },
+      {
+       "nombre": "Bird dog",
+       "esquema": "3 x 8 por lado"
+      },
+      {
+       "nombre": "Plancha lateral con rodillas",
+       "esquema": "3 x 15-20 s por lado"
+      },
+      {
+       "nombre": "Dead bug",
+       "esquema": "3 x 8 por lado"
+      },
+      {
+       "nombre": "Puente de glúteos",
+       "esquema": "3 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión K2",
+     "titulo": "Estabilidad B",
+     "calentamiento": "Gato-vaca 10 + rotación torácica tumbado 8 por lado",
+     "estiramientos": "Estiramiento suave",
+     "ejercicios": [
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 25-35 s"
+      },
+      {
+       "nombre": "Press Pallof con banda (o isométrico en pared)",
+       "esquema": "3 x 20 s por lado"
+      },
+      {
+       "nombre": "Plancha lateral con rodillas",
+       "esquema": "3 x 20 s por lado"
+      },
+      {
+       "nombre": "Dead bug con brazos",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Puente de glúteos a una pierna",
+       "esquema": "2 x 8 por lado"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión K3",
+     "titulo": "Estabilidad C",
+     "calentamiento": "Gato-vaca + movilidad de cadera",
+     "estiramientos": "Estiramiento suave",
+     "ejercicios": [
+      {
+       "nombre": "Bird dog lento (5 s por repetición)",
+       "esquema": "3 x 8 por lado"
+      },
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 30 s"
+      },
+      {
+       "nombre": "Hollow hold con rodillas flexionadas",
+       "esquema": "3 x 15 s"
+      },
+      {
+       "nombre": "Plancha lateral",
+       "esquema": "3 x 15 s por lado"
+      },
+      {
+       "nombre": "Elevación de piernas tumbado (rodillas flexionadas)",
+       "esquema": "3 x 10"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Fuerza",
+   "semanas": 2,
+   "descripcion": "Las mismas familias con variantes más duras y algo de dinámica. Aparece el trabajo colgado y con carga.",
+   "progresion": "Misma regla: 5 segundos más por serie y semana en los de tiempo, una repetición más en los de repeticiones. Al llegar al tope, variante siguiente y de vuelta al inicio.",
+   "dias": [
+    {
+     "dia": "Sesión K1",
+     "titulo": "Fuerza A",
+     "calentamiento": "Gato-vaca + puente de glúteos",
+     "estiramientos": "Estiramiento suave",
+     "ejercicios": [
+      {
+       "nombre": "Plancha con toque de hombro",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Press Pallof con banda",
+       "esquema": "3 x 12 por lado"
+      },
+      {
+       "nombre": "Plancha lateral completa",
+       "esquema": "3 x 25-30 s por lado"
+      },
+      {
+       "nombre": "Dead bug con banda",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Elevación de piernas tumbado",
+       "esquema": "3 x 12"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión K2",
+     "titulo": "Fuerza B",
+     "calentamiento": "Movilidad torácica y de cadera",
+     "estiramientos": "Estiramiento suave",
+     "ejercicios": [
+      {
+       "nombre": "Hollow hold",
+       "esquema": "3 x 20-25 s"
+      },
+      {
+       "nombre": "Rueda abdominal desde rodillas (o toalla)",
+       "esquema": "3 x 8"
+      },
+      {
+       "nombre": "Paseo del granjero a una mano",
+       "esquema": "3 x 20 m por lado",
+       "nota": "Peso pesado en una sola mano"
+      },
+      {
+       "nombre": "Plancha lateral con elevación de cadera",
+       "esquema": "3 x 10 por lado"
+      },
+      {
+       "nombre": "Dead bug lento",
+       "esquema": "3 x 10 por lado"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión K3",
+     "titulo": "Fuerza C",
+     "calentamiento": "Gato-vaca + activación de glúteo",
+     "estiramientos": "Estiramiento suave",
+     "ejercicios": [
+      {
+       "nombre": "Plancha con peso o pies elevados",
+       "esquema": "3 x 30 s"
+      },
+      {
+       "nombre": "Rotación con banda de pie",
+       "esquema": "3 x 12 por lado"
+      },
+      {
+       "nombre": "Elevación de rodillas colgado",
+       "esquema": "3 x 10"
+      },
+      {
+       "nombre": "Plancha lateral",
+       "esquema": "3 x 30 s por lado"
+      },
+      {
+       "nombre": "Puente de glúteos a una pierna",
+       "esquema": "3 x 12 por lado"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Potencia y control",
+   "semanas": 2,
+   "descripcion": "Variantes avanzadas, más tiempo bajo tensión y algo de trabajo explosivo. La semana 6 baja el volumen a la mitad para cerrar descansado.",
+   "progresion": "Mantén la calidad: en cuanto la cadera cae o la lumbar se arquea, la serie ha terminado aunque el cronómetro diga otra cosa.",
+   "dias": [
+    {
+     "dia": "Sesión K1",
+     "titulo": "Potencia A",
+     "calentamiento": "Calentamiento completo, 5 min",
+     "estiramientos": "Estiramiento de flexores de cadera y lumbar",
+     "ejercicios": [
+      {
+       "nombre": "Rueda abdominal desde rodillas",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Elevación de piernas colgado",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Press Pallof en rodillas",
+       "esquema": "3 x 12 por lado"
+      },
+      {
+       "nombre": "Plancha lateral con pies elevados",
+       "esquema": "3 x 25 s por lado"
+      },
+      {
+       "nombre": "Hollow rock",
+       "esquema": "3 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión K2",
+     "titulo": "Potencia B",
+     "calentamiento": "Calentamiento completo, 5 min",
+     "estiramientos": "Estiramiento de flexores de cadera y lumbar",
+     "ejercicios": [
+      {
+       "nombre": "Plancha con deslizamiento de brazos",
+       "esquema": "4 x 8"
+      },
+      {
+       "nombre": "Lanzamiento de balón medicinal (o rotación explosiva con banda)",
+       "esquema": "4 x 10 por lado"
+      },
+      {
+       "nombre": "Paseo del granjero a una mano",
+       "esquema": "4 x 25 m por lado",
+       "nota": "Peso pesado en una sola mano"
+      },
+      {
+       "nombre": "Elevación de rodillas colgado con giro",
+       "esquema": "3 x 8 por lado"
+      },
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 45 s"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión K3",
+     "titulo": "Circuito",
+     "calentamiento": "Calentamiento completo, 5 min",
+     "estiramientos": "Estiramiento de flexores de cadera y zona lumbar",
+     "ejercicios": [
+      {
+       "nombre": "Circuito: plancha, hollow hold, plancha lateral dcha, plancha lateral izq, dead bug",
+       "esquema": "4 vueltas · 40 s trabajo / 20 s descanso"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,72 @@
+{
+ "id": "bloque-brazos",
+ "nombre": "Bloque Brazos",
+ "descripcion": "Bloque extra · Especialización de 6 semanas · Intermedio · 2 días extra/semana\nSesiones cortas de brazo para montar encima de tu rutina base. Encajan bien al final de los días de pierna.",
+ "origen": "json",
+ "fases": [
+  {
+   "nombre": "Especialización de brazo",
+   "semanas": 6,
+   "descripcion": "Dos sesiones cortas (35 a 45 minutos) que se añaden al final de un día de pierna o como días extra si tu rutina base es de 3 días.",
+   "progresion": "Los brazos responden bien al volumen y a las repeticiones altas. Sube peso solo al llegar al tope del rango en todas las series con técnica limpia y sin balanceo. Descansos de 60 a 90 segundos.",
+   "dias": [
+    {
+     "dia": "Sesión B1",
+     "titulo": "Bíceps y hombro lateral",
+     "calentamiento": "5 min + movilidad de codo y hombro",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Curl con barra Z",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Curl inclinado con mancuernas",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Curl martillo",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Elevaciones laterales",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Elevaciones laterales en polea a una mano",
+       "esquema": "3 x 15"
+      }
+     ]
+    },
+    {
+     "dia": "Sesión B2",
+     "titulo": "Tríceps y hombro posterior",
+     "calentamiento": "5 min + movilidad de codo y hombro",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Fondos en máquina asistida o press cerrado",
+       "esquema": "4 x 10"
+      },
+      {
+       "nombre": "Extensión de tríceps en polea alta",
+       "esquema": "4 x 12"
+      },
+      {
+       "nombre": "Extensión sobre la cabeza con mancuerna",
+       "esquema": "3 x 12"
+      },
+      {
+       "nombre": "Face pull",
+       "esquema": "4 x 15"
+      },
+      {
+       "nombre": "Pájaros con mancuernas o pec deck invertido",
+       "esquema": "3 x 15"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

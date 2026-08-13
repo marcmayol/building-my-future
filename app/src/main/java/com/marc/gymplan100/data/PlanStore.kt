@@ -42,9 +42,12 @@ object PlanStore {
             .mapNotNull { (PlanCodec.fromDto(it) as? PlanImport.Ok)?.plan }
             .sortedByDescending { it.importedAt }
 
-    /** El plan que viene con la app siempre el primero, y detrás los del usuario. */
+    /**
+     * Todos los planes disponibles: el reto de 100 días primero, después el resto de los que
+     * vienen con la app (Arranque, Hipertrofia, los bloques extra…) y al final los del usuario.
+     */
     fun allPlans(context: Context): List<TrainingPlan> =
-        listOf(BuiltinPlan.plan) + customPlans(context)
+        listOf(BuiltinPlan.plan) + BuiltinPlans.all(context) + customPlans(context)
 
     /** El plan tal y como se guardó, para volver a editarlo sin perder nada por el camino. */
     fun storedDto(context: Context, id: String): PlanDto? =
@@ -57,7 +60,9 @@ object PlanStore {
     fun activePlan(context: Context): TrainingPlan {
         val id = activeId(context)
         if (id == BuiltinPlan.ID) return BuiltinPlan.plan
-        return customPlans(context).firstOrNull { it.id == id } ?: BuiltinPlan.plan
+        return BuiltinPlans.byId(context, id)
+            ?: customPlans(context).firstOrNull { it.id == id }
+            ?: BuiltinPlan.plan
     }
 
     /** Deja el plan activo cargado en [PlanData]. Se llama al arrancar el proceso. */
