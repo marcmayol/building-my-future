@@ -19,7 +19,8 @@
       {
        "nombre": "Bloque continuo a ritmo suave",
        "esquema": "20 min",
-       "nota": "Conversación entera posible"
+       "nota": "Conversación entera posible",
+       "tipo": "cardio"
       }
      ]
     },
@@ -32,7 +33,8 @@
       {
        "nombre": "Alternar 4 min suave y 2 min moderado",
        "esquema": "24 min",
-       "nota": "4 ciclos de 6 min"
+       "nota": "4 ciclos de 6 min",
+       "tipo": "cardio"
       }
      ]
     },
@@ -45,7 +47,8 @@
       {
        "nombre": "Bloque continuo suave en máquina distinta",
        "esquema": "20 min",
-       "nota": "Variar reparte el impacto"
+       "nota": "Variar reparte el impacto",
+       "tipo": "cardio"
       }
      ]
     },
@@ -58,7 +61,8 @@
       {
        "nombre": "Continuo suave largo",
        "esquema": "30-40 min",
-       "nota": "Puede ser caminar en exterior"
+       "nota": "Puede ser caminar en exterior",
+       "tipo": "cardio"
       }
      ]
     }
@@ -79,7 +83,8 @@
       {
        "nombre": "5 x (3 min moderado + 2 min suave)",
        "esquema": "25 min",
-       "nota": "Frases cortas en la parte moderada"
+       "nota": "Frases cortas en la parte moderada",
+       "tipo": "cardio"
       }
      ]
     },
@@ -91,7 +96,8 @@
      "ejercicios": [
       {
        "nombre": "Bloque continuo suave",
-       "esquema": "30 min"
+       "esquema": "30 min",
+       "tipo": "cardio"
       }
      ]
     },
@@ -104,7 +110,8 @@
       {
        "nombre": "6 x (2 min inclinación o resistencia alta + 2 min suave)",
        "esquema": "24 min",
-       "nota": "Ritmo moderado en el esfuerzo"
+       "nota": "Ritmo moderado en el esfuerzo",
+       "tipo": "cardio"
       }
      ]
     },
@@ -116,7 +123,8 @@
      "ejercicios": [
       {
        "nombre": "Continuo suave largo",
-       "esquema": "40-50 min"
+       "esquema": "40-50 min",
+       "tipo": "cardio"
       }
      ]
     }
@@ -136,7 +144,8 @@
      "ejercicios": [
       {
        "nombre": "8 x (1 min intenso + 2 min suave)",
-       "esquema": "24 min"
+       "esquema": "24 min",
+       "tipo": "cardio"
       }
      ]
     },
@@ -148,7 +157,8 @@
      "ejercicios": [
       {
        "nombre": "Bloque continuo suave",
-       "esquema": "30 min"
+       "esquema": "30 min",
+       "tipo": "cardio"
       }
      ]
     },
@@ -161,7 +171,8 @@
       {
        "nombre": "Pirámide 1-2-3-2-1 min intenso",
        "esquema": "18 min",
-       "nota": "Recuperación suave igual al esfuerzo"
+       "nota": "Recuperación suave igual al esfuerzo",
+       "tipo": "cardio"
       }
      ]
     },
@@ -173,7 +184,8 @@
      "ejercicios": [
       {
        "nombre": "Continuo suave largo",
-       "esquema": "45-55 min"
+       "esquema": "45-55 min",
+       "tipo": "cardio"
       }
      ]
     }

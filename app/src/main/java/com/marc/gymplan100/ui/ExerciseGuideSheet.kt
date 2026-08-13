@@ -66,7 +66,7 @@ fun ExerciseGuideSheet(
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val guide = ExerciseGuides.forName(exerciseName)
+    val guide = ExerciseGuides.forName(LocalContext.current, exerciseName)
     val imageRes = ExerciseImages.forName(LocalContext.current, exerciseName, LocalIsFemale.current)
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -241,15 +241,20 @@ fun ExerciseGuideSheet(
 
             // Estas dos se consultan de vez en cuando, no en cada serie: van plegadas para que
             // "Cómo se hace" no quede enterrado.
-            CollapsibleSection("Errores típicos") {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    guide.mistakes.forEach { Bullet(it) }
+            // Solo si hay algo que contar: una sección plegable vacía es una promesa rota.
+            if (guide.mistakes.isNotEmpty()) {
+                CollapsibleSection("Errores típicos") {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        guide.mistakes.forEach { Bullet(it) }
+                    }
                 }
             }
 
-            CollapsibleSection("Si está ocupada o no la tienes") {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    guide.alternatives.forEach { Bullet(it) }
+            if (guide.alternatives.isNotEmpty()) {
+                CollapsibleSection("Si está ocupada o no la tienes") {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        guide.alternatives.forEach { Bullet(it) }
+                    }
                 }
             }
 

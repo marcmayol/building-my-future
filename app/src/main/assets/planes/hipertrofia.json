@@ -70,7 +70,8 @@
       },
       {
        "nombre": "Plancha",
-       "esquema": "3 x 40 s"
+       "esquema": "3 x 40 s",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -208,7 +209,8 @@
       },
       {
        "nombre": "Plancha",
-       "esquema": "3 x 50 s"
+       "esquema": "3 x 50 s",
+       "tipo": "tiempo"
       }
      ]
     },

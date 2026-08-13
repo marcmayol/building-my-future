@@ -62,7 +62,8 @@
       },
       {
        "nombre": "Plancha apoyada en banco o pared",
-       "esquema": "2 x 15 s"
+       "esquema": "2 x 15 s",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -154,7 +155,8 @@
       },
       {
        "nombre": "Plancha (rodillas o banco)",
-       "esquema": "3 x 20 s"
+       "esquema": "3 x 20 s",
+       "tipo": "tiempo"
       }
      ]
     },

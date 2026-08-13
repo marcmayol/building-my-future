@@ -229,7 +229,9 @@ private fun WorkingContent(
     val hasNext = pos < order.lastIndex
 
     val timedSecs = secondsPerSetFromScheme(exercise.scheme)
-    val bodyweight = isBodyweightScheme(exercise.scheme)
+    // El propio ejercicio dice si lleva kilos: una dominada y un press de banca se escriben
+    // igual ("3 x 8-12") y solo en uno tiene sentido preguntarlos.
+    val bodyweight = exercise.withoutWeight
 
     var weight by remember(s.exerciseIndex, s.setNumber) {
         mutableStateOf(viewModel.suggestedWeight(s))
@@ -580,7 +582,7 @@ private fun RestingContent(
     val nextTotalSets = nextExercise?.let { setCountFromScheme(it.scheme) } ?: 0
 
     val nextIsTimed = nextExercise != null && secondsPerSetFromScheme(nextExercise.scheme) != null
-    val nextIsBodyweight = nextExercise != null && isBodyweightScheme(nextExercise.scheme)
+    val nextIsBodyweight = nextExercise != null && nextExercise.withoutWeight
     var plannedWeight by remember(s.restStartMillis) {
         mutableStateOf(s.plannedWeight.ifBlank { viewModel.plannedWeightSuggestion(s) })
     }

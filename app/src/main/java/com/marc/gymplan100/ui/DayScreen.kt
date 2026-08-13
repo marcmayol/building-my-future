@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.Exercise
 import com.marc.gymplan100.data.ExerciseImages
+import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.repsFromScheme
 import com.marc.gymplan100.ui.theme.LocalAppColors
@@ -277,29 +278,40 @@ private fun ExerciseCard(
             }
             Checkbox(checked = done, onCheckedChange = onDone)
         }
+        // Sin kilos en lo que no los lleva (dominadas, planchas, cardio) y sin repeticiones en
+        // el cardio: el campo vacío solo invitaba a preguntarse qué poner. Un bloque de cardio
+        // no tiene ninguno de los dos, así que la fila entera desaparece.
+        val pidePeso = !exercise.withoutWeight
+        val pideReps = exercise.kind != ExerciseKind.CARDIO
+        if (pidePeso || pideReps) {
         Spacer(Modifier.height(Space.x2))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Space.x2)
         ) {
-            OutlinedTextField(
-                value = weight,
-                onValueChange = onWeight,
-                label = { Text("Peso (kg)") },
-                singleLine = true,
-                shape = MaterialTheme.shapes.extraSmall,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
-            )
-            OutlinedTextField(
-                value = reps,
-                onValueChange = onReps,
-                label = { Text("Reps") },
-                singleLine = true,
-                shape = MaterialTheme.shapes.extraSmall,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
-            )
+            if (pidePeso) {
+                OutlinedTextField(
+                    value = weight,
+                    onValueChange = onWeight,
+                    label = { Text("Peso (kg)") },
+                    singleLine = true,
+                    shape = MaterialTheme.shapes.extraSmall,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            if (pideReps) {
+                OutlinedTextField(
+                    value = reps,
+                    onValueChange = onReps,
+                    label = { Text(if (exercise.kind == ExerciseKind.TIME) "Segundos" else "Reps") },
+                    singleLine = true,
+                    shape = MaterialTheme.shapes.extraSmall,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
         }
         // La ficha, como enlace: con seis ejercicios, seis botones anchos eran una pared.
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {

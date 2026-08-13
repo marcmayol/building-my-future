@@ -18,23 +18,28 @@
      "ejercicios": [
       {
        "nombre": "Empuje (escalera)",
-       "esquema": "3 x 8-12"
+       "esquema": "3 x 8-12",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Tirón (escalera)",
-       "esquema": "3 x 8-12"
+       "esquema": "3 x 8-12",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Sentadilla (escalera)",
-       "esquema": "3 x 12-15"
+       "esquema": "3 x 12-15",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Puente de glúteos",
-       "esquema": "3 x 15"
+       "esquema": "3 x 15",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha (tu nivel)",
-       "esquema": "3 x 20-30 s"
+       "esquema": "3 x 20-30 s",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -46,23 +51,28 @@
      "ejercicios": [
       {
        "nombre": "Tirón (escalera)",
-       "esquema": "3 x 8-12"
+       "esquema": "3 x 8-12",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Empuje con manos elevadas",
-       "esquema": "3 x 10-12"
+       "esquema": "3 x 10-12",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Zancadas estáticas",
-       "esquema": "3 x 10 por pierna"
+       "esquema": "3 x 10 por pierna",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Elevación de talones a una pierna",
-       "esquema": "3 x 15"
+       "esquema": "3 x 15",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Bird dog",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -74,23 +84,28 @@
      "ejercicios": [
       {
        "nombre": "Empuje (escalera)",
-       "esquema": "3 x 8-12"
+       "esquema": "3 x 8-12",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Remo invertido",
-       "esquema": "3 x 10"
+       "esquema": "3 x 10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Sentadilla (escalera)",
-       "esquema": "3 x 15"
+       "esquema": "3 x 15",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Puente de glúteos a una pierna",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Dead bug",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       }
      ]
     }
@@ -110,23 +125,28 @@
      "ejercicios": [
       {
        "nombre": "Empuje (nivel actual)",
-       "esquema": "4 x 8-12"
+       "esquema": "4 x 8-12",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Fondos entre sillas o en banco",
-       "esquema": "3 x 8-10"
+       "esquema": "3 x 8-10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Empuje con manos juntas",
-       "esquema": "3 x 8-10"
+       "esquema": "3 x 8-10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Sentadilla búlgara",
-       "esquema": "3 x 10 por pierna"
+       "esquema": "3 x 10 por pierna",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha lateral",
-       "esquema": "3 x 25 s por lado"
+       "esquema": "3 x 25 s por lado",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -138,23 +158,28 @@
      "ejercicios": [
       {
        "nombre": "Tirón (nivel actual)",
-       "esquema": "4 x 8-12"
+       "esquema": "4 x 8-12",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Remo invertido agarre supino",
-       "esquema": "3 x 10"
+       "esquema": "3 x 10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Colgarse de la barra",
-       "esquema": "3 x máximo tiempo"
+       "esquema": "3 x máximo tiempo",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Puente a una pierna",
-       "esquema": "3 x 12 por lado"
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Hollow hold",
-       "esquema": "3 x 20 s"
+       "esquema": "3 x 20 s",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -166,23 +191,28 @@
      "ejercicios": [
       {
        "nombre": "Sentadilla (nivel actual)",
-       "esquema": "4 x 12-15"
+       "esquema": "4 x 12-15",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Zancada caminando",
-       "esquema": "3 x 12 por pierna"
+       "esquema": "3 x 12 por pierna",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Peso muerto a una pierna",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Elevación de talones",
-       "esquema": "4 x 20"
+       "esquema": "4 x 20",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Circuito de core (plancha, hollow, plancha lateral)",
-       "esquema": "3 vueltas"
+       "esquema": "3 vueltas",
+       "tipo": "tiempo"
       }
      ]
     }
@@ -202,23 +232,28 @@
      "ejercicios": [
       {
        "nombre": "Flexión con pies elevados o pseudo planche",
-       "esquema": "4 x 6-10"
+       "esquema": "4 x 6-10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Fondos",
-       "esquema": "4 x 8"
+       "esquema": "4 x 8",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Flexión en diamante",
-       "esquema": "3 x 8-10"
+       "esquema": "3 x 8-10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Pino contra la pared",
-       "esquema": "3 x 20-30 s"
+       "esquema": "3 x 20-30 s",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Sentadilla búlgara",
-       "esquema": "3 x 12 por pierna"
+       "esquema": "3 x 12 por pierna",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -230,23 +265,28 @@
      "ejercicios": [
       {
        "nombre": "Dominada (asistida o completa)",
-       "esquema": "5 x máximo posible"
+       "esquema": "5 x máximo posible",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Remo invertido con pies elevados",
-       "esquema": "4 x 10"
+       "esquema": "4 x 10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Negativas de dominada (bajar en 5 s)",
-       "esquema": "3 x 4"
+       "esquema": "3 x 4",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Colgarse de la barra",
-       "esquema": "3 x máximo tiempo"
+       "esquema": "3 x máximo tiempo",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Elevación de piernas colgado o tumbado",
-       "esquema": "3 x 12"
+       "esquema": "3 x 12",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -258,23 +298,28 @@
      "ejercicios": [
       {
        "nombre": "Sentadilla a una pierna asistida",
-       "esquema": "4 x 6 por pierna"
+       "esquema": "4 x 6 por pierna",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Zancada caminando",
-       "esquema": "4 x 12 por pierna"
+       "esquema": "4 x 12 por pierna",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Puente a una pierna",
-       "esquema": "4 x 12 por lado"
+       "esquema": "4 x 12 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Elevación de talones a una pierna",
-       "esquema": "4 x 15"
+       "esquema": "4 x 15",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Circuito de core",
-       "esquema": "4 vueltas"
+       "esquema": "4 vueltas",
+       "tipo": "tiempo"
       }
      ]
     }

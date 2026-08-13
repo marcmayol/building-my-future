@@ -78,7 +78,14 @@ data class EjercicioDto(
     @JsonNames("scheme", "series")
     val esquema: String = "",
     @JsonNames("note")
-    val nota: String = ""
+    val nota: String = "",
+    /**
+     * Qué se registra: "fuerza" (por defecto), "peso corporal", "tiempo" o "cardio". Sirve para
+     * no pedir kilos en una dominada, que por esquema es idéntica a un press de banca.
+     * Se aceptan también los nombres en inglés porque estos JSON se escriben a mano.
+     */
+    @JsonNames("kind", "type")
+    val tipo: String = ""
 )
 
 /** Resultado de leer un plan: o sale un plan usable, o un motivo concreto por el que no. */
@@ -142,6 +149,17 @@ object PlanCodec {
         runCatching { json.decodeFromString<List<String>>(text) }.getOrElse { emptyList() }
 
     /**
+     * Traduce el tipo escrito en el archivo. Tolerante a propósito (español o inglés, con o
+     * sin acentos): si no se reconoce, se asume fuerza, que es el caso de siempre.
+     */
+    private fun kindFrom(raw: String): ExerciseKind = when (raw.trim().lowercase()) {
+        "peso corporal", "corporal", "bodyweight", "calistenia" -> ExerciseKind.BODYWEIGHT
+        "tiempo", "time", "isometrico", "isométrico" -> ExerciseKind.TIME
+        "cardio" -> ExerciseKind.CARDIO
+        else -> ExerciseKind.STRENGTH
+    }
+
+    /**
      * Convierte y valida. Las fases son opcionales: si el plan trae días sueltos, se envuelven
      * en una fase única para que las pantallas de fases, estadísticas y logros sigan valiendo.
      */
@@ -189,7 +207,12 @@ object PlanCodec {
                                 "\"3 x 30 s\" o \"3 vueltas\"."
                         )
                     }
-                    Exercise(name = exName, scheme = scheme, note = ex.nota.trim())
+                    Exercise(
+                        name = exName,
+                        scheme = scheme,
+                        note = ex.nota.trim(),
+                        kind = kindFrom(ex.tipo)
+                    )
                 }
                 templates.add(
                     WorkoutTemplate(

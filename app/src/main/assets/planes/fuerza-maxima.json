@@ -35,7 +35,8 @@
       },
       {
        "nombre": "Plancha",
-       "esquema": "3 x 40 s"
+       "esquema": "3 x 40 s",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -93,7 +94,8 @@
       },
       {
        "nombre": "Elevación de rodillas colgado",
-       "esquema": "3 x 10"
+       "esquema": "3 x 10",
+       "tipo": "peso corporal"
       }
      ]
     }
@@ -131,7 +133,8 @@
       },
       {
        "nombre": "Plancha con peso",
-       "esquema": "3 x 30 s"
+       "esquema": "3 x 30 s",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -189,7 +192,8 @@
       },
       {
        "nombre": "Elevación de rodillas colgado",
-       "esquema": "3 x 12"
+       "esquema": "3 x 12",
+       "tipo": "peso corporal"
       }
      ]
     }

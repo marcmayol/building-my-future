@@ -30,15 +30,18 @@
       },
       {
        "nombre": "Y-T-W en banco inclinado (sin peso o muy ligero)",
-       "esquema": "2 x 8 de cada"
+       "esquema": "2 x 8 de cada",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Estiramiento de pecho en marco de puerta",
-       "esquema": "3 x 30 s por lado"
+       "esquema": "3 x 30 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Chin tuck (retracción de barbilla)",
-       "esquema": "2 x 10"
+       "esquema": "2 x 10",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -58,19 +61,23 @@
       },
       {
        "nombre": "Extensión torácica sobre banco o foam roller",
-       "esquema": "3 x 10"
+       "esquema": "3 x 10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Estiramiento de flexores de cadera (zancada baja)",
-       "esquema": "3 x 30 s por lado"
+       "esquema": "3 x 30 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Apertura de pecho tumbado (libro abierto)",
-       "esquema": "2 x 8 por lado"
+       "esquema": "2 x 8 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Bird dog",
-       "esquema": "3 x 8 por lado"
+       "esquema": "3 x 8 por lado",
+       "tipo": "peso corporal"
       }
      ]
     }

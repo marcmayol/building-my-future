@@ -288,4 +288,11 @@ object ExerciseImages {
     /** ¿Sabemos con qué ilustrar este ejercicio? Slug propio o movimientos de un compuesto. */
     fun hasVisual(name: String): Boolean =
         nameToSlug.containsKey(name) || nameToCompoundMoves.containsKey(name)
+
+    /**
+     * Slug del catálogo al que corresponde este nombre, o el del primer movimiento si es un
+     * compuesto. Lo usa [ExerciseGuides] para encontrar la ficha del ejercicio.
+     */
+    fun slugFor(name: String): String? =
+        nameToSlug[name] ?: nameToCompoundMoves[name]?.firstOrNull()?.second
 }

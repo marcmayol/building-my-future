@@ -1,10 +1,15 @@
 package com.marc.gymplan100.data
 
+import android.content.Context
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
 /**
  * Ficha de ayuda de un ejercicio: cómo se hace, errores típicos y alternativas
  * cuando la máquina está ocupada o no existe en tu gimnasio.
  * Pensada para consultarse en mitad del entreno sin salir de la app.
  */
+@Serializable
 data class ExerciseGuide(
     /** Músculos principales que trabaja. */
     val muscles: String,
@@ -604,5 +609,39 @@ object ExerciseGuides {
         "Finisher: press de pecho ligero al fallo" to finisher,
     )
 
+    /**
+     * Fichas del catálogo (`assets/fichas.json`), una por slug de ilustración: músculos y
+     * técnica salen de <https://marcmayol.com/exercise-api>, y los errores y alternativas
+     * están escritos por familia de movimiento (los de un estiramiento valen para el resto).
+     *
+     * Son la red de seguridad: cubren los ejercicios de los planes nuevos, que son demasiados
+     * para escribirlos uno a uno. Las de arriba, redactadas a mano, siempre mandan.
+     */
+    @Volatile
+    private var catalogo: Map<String, ExerciseGuide>? = null
+
+    private fun catalogo(context: Context): Map<String, ExerciseGuide> {
+        catalogo?.let { return it }
+        synchronized(this) {
+            catalogo?.let { return it }
+            val leido = runCatching {
+                val raw = context.applicationContext.assets.open("fichas.json")
+                    .bufferedReader().use { it.readText() }
+                Json { ignoreUnknownKeys = true }
+                    .decodeFromString<Map<String, ExerciseGuide>>(raw)
+            }.getOrElse { emptyMap() }
+            catalogo = leido
+            return leido
+        }
+    }
+
+    /**
+     * Ficha del ejercicio: primero la escrita a mano, y si no hay, la del catálogo a través
+     * del slug de su ilustración. Null si no sabemos nada de ese ejercicio.
+     */
+    fun forName(context: Context, name: String): ExerciseGuide? =
+        map[name] ?: ExerciseImages.slugFor(name)?.let { catalogo(context)[it] }
+
+    /** Solo la escrita a mano, para donde no hay contexto a mano. */
     fun forName(name: String): ExerciseGuide? = map[name]
 }

@@ -1,11 +1,38 @@
 package com.marc.gymplan100.data
 
+/**
+ * Qué se registra de un ejercicio, que es lo que decide qué campos pide la sesión.
+ *
+ * Hasta ahora se adivinaba leyendo el esquema ("3 x 30 s" es por tiempo, "3 vueltas" es sin
+ * peso), y con los planes nuevos eso ya no basta: una dominada y un press de banca se escriben
+ * igual ("3 x 8-12") y solo en uno tiene sentido preguntar kilos.
+ */
+enum class ExerciseKind {
+    /** Peso y repeticiones: el gimnasio de siempre. */
+    STRENGTH,
+
+    /** El peso es tu cuerpo: repeticiones sí, kilos no. */
+    BODYWEIGHT,
+
+    /** Segundos: planchas, holds, colgarse, estiramientos. */
+    TIME,
+
+    /** Minutos en una máquina o corriendo: ni series ni kilos. */
+    CARDIO
+}
+
 /** Un ejercicio dentro de una sesión. */
 data class Exercise(
     val name: String,
     val scheme: String,
-    val note: String = ""
-)
+    val note: String = "",
+    val kind: ExerciseKind = ExerciseKind.STRENGTH
+) {
+    /** No tiene sentido pedirle kilos: es tu cuerpo, o es tiempo en una máquina. */
+    val withoutWeight: Boolean
+        get() = kind == ExerciseKind.BODYWEIGHT || kind == ExerciseKind.CARDIO ||
+            isBodyweightScheme(scheme)
+}
 
 /** Plantilla de un día de entrenamiento (lunes a viernes). */
 data class WorkoutTemplate(

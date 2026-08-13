@@ -18,23 +18,28 @@
      "ejercicios": [
       {
        "nombre": "Plancha (rodillas o completa)",
-       "esquema": "3 x 20-30 s"
+       "esquema": "3 x 20-30 s",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Bird dog",
-       "esquema": "3 x 8 por lado"
+       "esquema": "3 x 8 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha lateral con rodillas",
-       "esquema": "3 x 15-20 s por lado"
+       "esquema": "3 x 15-20 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Dead bug",
-       "esquema": "3 x 8 por lado"
+       "esquema": "3 x 8 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Puente de glúteos",
-       "esquema": "3 x 12"
+       "esquema": "3 x 12",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -46,23 +51,28 @@
      "ejercicios": [
       {
        "nombre": "Plancha",
-       "esquema": "3 x 25-35 s"
+       "esquema": "3 x 25-35 s",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Press Pallof con banda (o isométrico en pared)",
-       "esquema": "3 x 20 s por lado"
+       "esquema": "3 x 20 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Plancha lateral con rodillas",
-       "esquema": "3 x 20 s por lado"
+       "esquema": "3 x 20 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Dead bug con brazos",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Puente de glúteos a una pierna",
-       "esquema": "2 x 8 por lado"
+       "esquema": "2 x 8 por lado",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -74,23 +84,28 @@
      "ejercicios": [
       {
        "nombre": "Bird dog lento (5 s por repetición)",
-       "esquema": "3 x 8 por lado"
+       "esquema": "3 x 8 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha",
-       "esquema": "3 x 30 s"
+       "esquema": "3 x 30 s",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Hollow hold con rodillas flexionadas",
-       "esquema": "3 x 15 s"
+       "esquema": "3 x 15 s",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Plancha lateral",
-       "esquema": "3 x 15 s por lado"
+       "esquema": "3 x 15 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Elevación de piernas tumbado (rodillas flexionadas)",
-       "esquema": "3 x 10"
+       "esquema": "3 x 10",
+       "tipo": "peso corporal"
       }
      ]
     }
@@ -110,23 +125,28 @@
      "ejercicios": [
       {
        "nombre": "Plancha con toque de hombro",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Press Pallof con banda",
-       "esquema": "3 x 12 por lado"
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha lateral completa",
-       "esquema": "3 x 25-30 s por lado"
+       "esquema": "3 x 25-30 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Dead bug con banda",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Elevación de piernas tumbado",
-       "esquema": "3 x 12"
+       "esquema": "3 x 12",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -138,11 +158,13 @@
      "ejercicios": [
       {
        "nombre": "Hollow hold",
-       "esquema": "3 x 20-25 s"
+       "esquema": "3 x 20-25 s",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Rueda abdominal desde rodillas (o toalla)",
-       "esquema": "3 x 8"
+       "esquema": "3 x 8",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Paseo del granjero a una mano",
@@ -151,11 +173,13 @@
       },
       {
        "nombre": "Plancha lateral con elevación de cadera",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Dead bug lento",
-       "esquema": "3 x 10 por lado"
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -167,23 +191,28 @@
      "ejercicios": [
       {
        "nombre": "Plancha con peso o pies elevados",
-       "esquema": "3 x 30 s"
+       "esquema": "3 x 30 s",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Rotación con banda de pie",
-       "esquema": "3 x 12 por lado"
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Elevación de rodillas colgado",
-       "esquema": "3 x 10"
+       "esquema": "3 x 10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha lateral",
-       "esquema": "3 x 30 s por lado"
+       "esquema": "3 x 30 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Puente de glúteos a una pierna",
-       "esquema": "3 x 12 por lado"
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
       }
      ]
     }
@@ -203,23 +232,28 @@
      "ejercicios": [
       {
        "nombre": "Rueda abdominal desde rodillas",
-       "esquema": "4 x 10"
+       "esquema": "4 x 10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Elevación de piernas colgado",
-       "esquema": "4 x 10"
+       "esquema": "4 x 10",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Press Pallof en rodillas",
-       "esquema": "3 x 12 por lado"
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha lateral con pies elevados",
-       "esquema": "3 x 25 s por lado"
+       "esquema": "3 x 25 s por lado",
+       "tipo": "tiempo"
       },
       {
        "nombre": "Hollow rock",
-       "esquema": "3 x 15"
+       "esquema": "3 x 15",
+       "tipo": "peso corporal"
       }
      ]
     },
@@ -231,11 +265,13 @@
      "ejercicios": [
       {
        "nombre": "Plancha con deslizamiento de brazos",
-       "esquema": "4 x 8"
+       "esquema": "4 x 8",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Lanzamiento de balón medicinal (o rotación explosiva con banda)",
-       "esquema": "4 x 10 por lado"
+       "esquema": "4 x 10 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Paseo del granjero a una mano",
@@ -244,11 +280,13 @@
       },
       {
        "nombre": "Elevación de rodillas colgado con giro",
-       "esquema": "3 x 8 por lado"
+       "esquema": "3 x 8 por lado",
+       "tipo": "peso corporal"
       },
       {
        "nombre": "Plancha",
-       "esquema": "3 x 45 s"
+       "esquema": "3 x 45 s",
+       "tipo": "tiempo"
       }
      ]
     },
@@ -260,7 +298,8 @@
      "ejercicios": [
       {
        "nombre": "Circuito: plancha, hollow hold, plancha lateral dcha, plancha lateral izq, dead bug",
-       "esquema": "4 vueltas · 40 s trabajo / 20 s descanso"
+       "esquema": "4 vueltas · 40 s trabajo / 20 s descanso",
+       "tipo": "tiempo"
       }
      ]
     }
