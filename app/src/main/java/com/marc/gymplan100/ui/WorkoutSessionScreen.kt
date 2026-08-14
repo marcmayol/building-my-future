@@ -82,6 +82,8 @@ fun WorkoutSessionScreen(
     val session by viewModel.activeSession.collectAsState()
     val day = PlanData.dayByNumber(dayNumber) ?: PlanData.days.first()
     var showQuitDialog by remember { mutableStateOf(false) }
+    // Apuntando lo hecho al terminar un entreno libre (el paso previo a guardarlo).
+    var apuntando by remember { mutableStateOf(false) }
     val dark = isSystemInDarkTheme()
 
     // Reloj que avanza cada medio segundo para refrescar cronómetros.
@@ -108,11 +110,21 @@ fun WorkoutSessionScreen(
         SessionPhase.WORKING -> WorkingContent(s, day, dark, dayContext, viewModel) { showQuitDialog = true }
         SessionPhase.TIMED_SET -> TimedSetContent(s, day, now, dark, dayContext, viewModel) { showQuitDialog = true }
         SessionPhase.RESTING -> RestingContent(s, day, now, dark, dayContext, viewModel) { showQuitDialog = true }
-        SessionPhase.FREE -> FreeContent(
-            s = s, day = day, now = now, dark = dark,
-            onFinish = { viewModel.finishSession(); onExit() },
-            onExit = { showQuitDialog = true }
-        )
+        SessionPhase.FREE -> if (apuntando) {
+            // Entrenando libre el cronómetro solo guardaba el tiempo: antes de cerrar, se
+            // ofrece apuntar qué se ha hecho, con los ejercicios del día ya puestos.
+            FreeSessionLog(
+                day = day,
+                onSave = { apuntado -> viewModel.finishFreeSession(apuntado); onExit() },
+                onSkip = { viewModel.finishSession(); onExit() }
+            )
+        } else {
+            FreeContent(
+                s = s, day = day, now = now, dark = dark,
+                onFinish = { apuntando = true },
+                onExit = { showQuitDialog = true }
+            )
+        }
         SessionPhase.FINISHED -> FinishedContent(
             s = s, day = day, now = now, dark = dark,
             onFinish = { viewModel.finishSession(); onExit() },

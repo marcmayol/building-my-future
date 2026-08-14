@@ -136,10 +136,27 @@ data class SessionRecord(
     /** Ejercicio del catálogo de quema grasa (null en militar o sesiones normales). */
     val exerciseId: String? = null,
     /** Solo militar: la sesión llegó hasta el último paso (cuenta para la frecuencia semanal). */
-    val routineCompleted: Boolean = false
+    val routineCompleted: Boolean = false,
+    /**
+     * Lo que se apuntó a mano al terminar un entrenamiento libre. En el guiado no hace falta
+     * (cada serie se registra sobre la marcha), pero entrenando a tu aire el cronómetro solo
+     * guardaba el tiempo y lo demás se perdía.
+     */
+    val logged: List<LoggedExercise> = emptyList()
 ) {
     val durationSeconds: Int get() = ((endMillis - startMillis) / 1000).toInt().coerceAtLeast(0)
 }
+
+/**
+ * Un ejercicio apuntado a mano al acabar un entreno libre: el nombre (del plan, del catálogo
+ * o escrito por ti) con el peso y las repeticiones que hayas hecho.
+ */
+@Serializable
+data class LoggedExercise(
+    val name: String,
+    val weight: String = "",
+    val reps: String = ""
+)
 
 /** Objetivos de descanso por defecto (segundos). */
 object RestDefaults {

@@ -8,6 +8,7 @@ import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.Celebration
 import com.marc.gymplan100.data.ExerciseLog
+import com.marc.gymplan100.data.LoggedExercise
 import com.marc.gymplan100.data.Motivation
 import com.marc.gymplan100.data.DiaDto
 import com.marc.gymplan100.data.EjercicioDto
@@ -907,7 +908,50 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Finaliza la sesión: guarda el histórico, marca el día y vuelca los pesos a los registros. */
-    fun finishSession() {
+    /**
+     * Termina un entreno libre apuntando lo que se ha hecho.
+     *
+     * Lo apuntado va a tres sitios, y por eso merece la pena: al historial (para verlo en
+     * Resultados), a los pesos por ejercicio (para que la próxima vez te lo sugiera, tanto
+     * aquí como en el entreno guiado) y, si el ejercicio es uno de los del día, también al
+     * registro de ese día del plan.
+     */
+    fun finishFreeSession(entries: List<LoggedExercise>) {
+        val limpias = entries
+            .map { it.copy(name = it.name.trim(), weight = it.weight.trim(), reps = it.reps.trim()) }
+            .filter { it.name.isNotEmpty() }
+
+        if (limpias.isNotEmpty()) {
+            val dia = PlanData.dayByNumber(_active.value?.dayNumber ?: 0)
+            var estado = _progress.value
+            limpias.forEach { entrada ->
+                if (entrada.weight.isNotEmpty()) {
+                    estado = estado.copy(
+                        exerciseWeights = estado.exerciseWeights + (entrada.name to entrada.weight)
+                    )
+                }
+                // Si coincide con un ejercicio del día, queda también en su ficha del plan.
+                val indice = dia?.template?.exercises?.indexOfFirst { it.name == entrada.name } ?: -1
+                if (indice >= 0) {
+                    val clave = "${dia!!.number}-$indice"
+                    val previo = estado.logs[clave] ?: ExerciseLog()
+                    estado = estado.copy(
+                        logs = estado.logs + (clave to previo.copy(
+                            weight = entrada.weight.ifEmpty { previo.weight },
+                            reps = entrada.reps.ifEmpty { previo.reps },
+                            done = true
+                        ))
+                    )
+                }
+            }
+            _progress.value = estado
+            viewModelScope.launch { repo.save(estado) }
+        }
+
+        finishSession(logged = limpias)
+    }
+
+    fun finishSession(logged: List<LoggedExercise> = emptyList()) {
         val s = _active.value ?: return
         val end = System.currentTimeMillis()
         val totalRest = s.completedSets.sumOf { it.restSeconds }
@@ -925,7 +969,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             // completaron (finalizar aparece al llegar al último paso). La quema grasa cuenta por
             // ejercicio (usa exerciseId, no este flag).
             routineCompleted = s.routineId != null &&
-                specialWorkouts.rutina(s.routineId)?.esSecuenciaFija == true
+                specialWorkouts.rutina(s.routineId)?.esSecuenciaFija == true,
+            logged = logged
         )
         viewModelScope.launch { repo.appendHistory(record) }
         _history.value = _history.value + record
