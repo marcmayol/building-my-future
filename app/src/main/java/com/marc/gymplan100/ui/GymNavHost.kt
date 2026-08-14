@@ -222,6 +222,18 @@ fun GymNavHost(
     }
     }
 
+        // Encima de todo lo demás y la última en dibujarse: la primera vez no hay plan elegido,
+        // así que la portada que hay detrás no significa nada todavía. Después no vuelve a salir.
+        val needsWelcome by viewModel.needsWelcome.collectAsState()
+        if (needsWelcome) {
+            WelcomeScreen(
+                viewModel = viewModel,
+                onSeePlans = { viewModel.welcomeDone() },
+                onCreatePlan = { viewModel.welcomeDone() },
+                onDone = { viewModel.welcomeDone() }
+            )
+        }
+
         celebration?.let {
             CelebrationDialog(
                 celebration = it,

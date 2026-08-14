@@ -126,6 +126,24 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     /** Días completados de cada plan (por id), para enseñarlos en la lista sin activarlos. */
     val planProgress: StateFlow<Map<String, Int>> = _planProgress.asStateFlow()
 
+    private val _needsWelcome = MutableStateFlow(false)
+    /**
+     * Primera vez de verdad: no se ha elegido plan nunca y no hay nada entrenado. Quien ya
+     * venía usando la app no lo ve, aunque nunca haya tocado la pantalla de planes.
+     */
+    val needsWelcome: StateFlow<Boolean> = _needsWelcome.asStateFlow()
+
+    /** Ya ha elegido (o ha pasado del asistente): no volver a dar la bienvenida. */
+    fun welcomeDone() {
+        PlanStore.marcarPlanElegido(getApplication())
+        _needsWelcome.value = false
+    }
+
+    private fun refreshWelcome() {
+        val hayProgreso = _progress.value.completedDays.isNotEmpty() || _history.value.isNotEmpty()
+        _needsWelcome.value = PlanStore.necesitaBienvenida(getApplication(), hayProgreso)
+    }
+
     private fun refreshPlans() {
         _plans.value = PlanStore.allPlans(getApplication())
         _activePlan.value = PlanData.active
@@ -260,6 +278,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             _progress.value = repo.progress.first()
             _history.value = repo.history.first()
             _profile.value = repo.profile.first()
+            // Después de leer el progreso: es lo que distingue "primera vez" de "ya venías".
+            refreshWelcome()
         }
         refreshPlans()
         refreshHealthPermissions()

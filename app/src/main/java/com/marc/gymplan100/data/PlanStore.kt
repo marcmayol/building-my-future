@@ -21,6 +21,9 @@ object PlanStore {
     private const val KEY_PLANS = "planes"
     private const val KEY_ACTIVE = "plan_activo"
 
+    /** Ya se eligió plan alguna vez (a mano o con el asistente): no hay que dar la bienvenida. */
+    private const val KEY_ELEGIDO = "plan_elegido_alguna_vez"
+
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
     private fun prefs(context: Context) =
@@ -56,6 +59,28 @@ object PlanStore {
     fun activeId(context: Context): String =
         prefs(context).getString(KEY_ACTIVE, null) ?: BuiltinPlan.ID
 
+    /**
+     * ¿Hay que darle la bienvenida y ayudarle a elegir plan?
+     *
+     * Solo la primera vez de verdad. Quien ya venía usando la app **nunca** ve el asistente,
+     * aunque jamás haya tocado la pantalla de planes: se detecta por [tieneProgreso] (días
+     * completados o entrenos en el historial) y se marca como elegido sin molestar.
+     */
+    fun necesitaBienvenida(context: Context, tieneProgreso: Boolean): Boolean {
+        val p = prefs(context)
+        if (p.getBoolean(KEY_ELEGIDO, false)) return false
+        if (tieneProgreso || p.contains(KEY_ACTIVE)) {
+            marcarPlanElegido(context)
+            return false
+        }
+        return true
+    }
+
+    /** Deja de dar la bienvenida: ya eligió (con el asistente, de la lista o creando uno). */
+    fun marcarPlanElegido(context: Context) {
+        prefs(context).edit().putBoolean(KEY_ELEGIDO, true).apply()
+    }
+
     /** El plan activo; si el guardado ya no existe, se vuelve al de la app. */
     fun activePlan(context: Context): TrainingPlan {
         val id = activeId(context)
@@ -89,7 +114,10 @@ object PlanStore {
 
     /** Cambia el plan activo y lo deja cargado. Devuelve el plan que queda activo. */
     fun setActive(context: Context, id: String): TrainingPlan {
-        prefs(context).edit().putString(KEY_ACTIVE, id).apply()
+        prefs(context).edit()
+            .putString(KEY_ACTIVE, id)
+            .putBoolean(KEY_ELEGIDO, true)
+            .apply()
         val plan = activePlan(context)
         PlanData.setActive(plan)
         return plan
