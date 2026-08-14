@@ -89,12 +89,20 @@ sola vez.
   14 de agosto"
 - Bloque de datos: Tiempo entrenado · Series hechas · Mejor racha
 - `LO QUE HA SUBIDO`: hasta cuatro ejercicios con "Prensa de piernas 60 → 85 kg"
-- `¿Y AHORA QUÉ?` con tres salidas:
+- `¿Y AHORA QUÉ?` con **cinco** salidas, que hoy son cinco botones apilados y ahí es donde
+  más falta haces:
   - Tarjeta destacada: **el plan que viene después**, con su motivo ("ya entrenas con
     constancia, 3 días por semana, sin material: el volumen está repartido para crecer") y
     botón **Seguir con este**
-  - **Otra vuelta a Movilidad** (para los planes que están pensados para repetirse)
+  - **Empezarlo de cero** — repetir el plan entero
+  - **Repetir solo «Consolidación»** — solo la última fase, con la explicación debajo: "La
+    última fase son 20 días: repetirla mantiene el nivel al que has llegado sin volver al
+    principio". Solo aparece si el plan tiene más de una fase.
+  - **Empezar otro · ayúdame a elegir** — relanza el asistente de la pantalla 1
   - **Ver todos los planes** · **Ahora no, déjalo así**
+
+  Las tres primeras son variantes de "sigo entrenando" y las dos últimas son salidas. Hoy
+  pesan todas igual y la pantalla parece un menú de opciones. Ese es el problema a resolver.
 
 **Estado vacío importante:** si alguien completó el plan marcando los días a mano, sin usar el
 entrenamiento guiado, no hay tiempo, ni series, ni pesos. En ese caso sale este texto:
@@ -108,6 +116,30 @@ legítima de usar la app.
 3. Que **"¿y ahora qué?" no eclipse al resumen**, ni al revés. Son dos mitades: mirar atrás y
    mirar adelante.
 4. El caso de "sin datos" no puede quedar como un hueco triste.
+
+---
+
+---
+
+## Pantalla 3 · El plan terminado, fuera de su pantalla
+
+Terminar un plan no se acaba en la pantalla de cierre: deja rastro en dos sitios más, y los
+dos están sin resolver.
+
+**En la portada.** Mientras hay plan en marcha, el héroe dice "HOY TE TOCA · Día 9" y lleva a
+empezarlo. Con el plan acabado eso empujaba a repetir el último día sin querer, así que ahora
+sale un héroe distinto: versalita `PLAN TERMINADO`, el nombre del plan, "Los 12 días, hechos.
+Elige qué sigue cuando quieras" y un botón **Elegir el siguiente**. Lo he montado con el
+degradado de marca, igual que el héroe de "entreno en curso", y **ahora mismo compiten**: son
+dos estados muy distintos con el mismo tratamiento visual. Además, debajo sigue la barra de
+progreso al 100 %, que repite lo que ya dice el héroe.
+
+**En la lista de planes.** Cada plan es una tarjeta con nombre, descripción, "12 días · 1 fase
+· 12 completados" y "De serie en la app". Un plan **terminado** no se distingue de uno a
+medias: debería decir algo como "Terminado el 14 de agosto" y, si se ha repetido, "2ª vuelta
+en curso". Los datos existen (fecha de fin y número de vueltas), solo falta el diseño.
+
+Los tres estados que conviven en esa lista: **activo**, **terminado** y **sin empezar**.
 
 ---
 
@@ -126,8 +158,13 @@ legítima de usar la app.
 
 ## Qué te pido
 
-1. El diseño de las dos pantallas con sus estados (bienvenida A/B/C y cierre normal/sin datos).
-2. Si hace falta, **tokens o componentes nuevos** — por ejemplo un "chip de respuesta" para el
-   asistente, que ahora mismo me he inventado con un `Text` redondeado.
-3. Que me digas qué **NO** debería hacer: si ves que meto demasiada información en el cierre,
-   o que las cuatro preguntas sobran, prefiero saberlo.
+1. El diseño de las tres cosas con sus estados: la **bienvenida** (puerta / preguntas /
+   resultado), el **cierre de plan** (normal y sin datos) y **el plan terminado fuera de su
+   pantalla** (héroe de la portada y tarjeta en la lista de planes).
+2. Resolver el amontonamiento de las cinco salidas del cierre: qué jerarquía tienen "seguir
+   con otro plan", "empezar de cero" y "repetir la última fase".
+3. Si hace falta, **tokens o componentes nuevos** — por ejemplo un "chip de respuesta" para el
+   asistente, que ahora mismo me he inventado con un `Text` redondeado, o un distintivo de
+   "plan terminado" reutilizable en la portada y en la lista.
+4. Que me digas qué **NO** debería hacer: si ves que meto demasiada información en el cierre,
+   que las cinco salidas son tres, o que las cuatro preguntas sobran, prefiero saberlo.
