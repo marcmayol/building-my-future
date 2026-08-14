@@ -1,7 +1,7 @@
-# Prompt para Claude Design — Bienvenida y cierre de plan
+# Prompt para Claude Design — Las cuatro pantallas nuevas
 
 > Copia todo lo que hay debajo de la línea y pégalo en Claude Design, adjuntando además
-> `docs/handoff-diseno.md` (el sistema visual ya aplicado) y capturas de las dos pantallas
+> `docs/handoff-diseno.md` (el sistema visual ya aplicado) y capturas de las pantallas
 > nuevas si las tienes a mano.
 
 ---
@@ -118,8 +118,6 @@ legítima de usar la app.
 3. Que **"¿y ahora qué?" no eclipse al resumen**, ni al revés. Son dos mitades: mirar atrás y
    mirar adelante.
 4. El caso de "sin datos" no puede quedar como un hueco triste.
-
----
 
 ---
 
