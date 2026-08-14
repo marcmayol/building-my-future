@@ -3,6 +3,11 @@
  "nombre": "Bloque Core",
  "descripcion": "Bloque extra · Anti movimiento en 4 familias · Cualquiera · 3 días extra/semana\nEl core no está para doblarse: está para resistir que te doblen. Por eso el grueso son ejercicios anti movimiento en 4 familias (anti extensión, anti rotación, anti flexión lateral y flexión de cadera). Sesiones de 15 a 25 minutos para pegar al final de cualquier entrenamiento. Que el abdomen se vea depende de la grasa que haya encima: eso se resuelve en la cocina, no aquí.",
  "origen": "json",
+ "objetivo": "musculo",
+ "nivel": "cualquiera",
+ "diasSemana": 3,
+ "material": "nada",
+ "bloqueExtra": true,
  "fases": [
   {
    "nombre": "Estabilidad",

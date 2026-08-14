@@ -3,6 +3,11 @@
  "nombre": "Calistenia",
  "descripcion": "Fuerza con tu propio cuerpo · Cualquiera · 3 días/semana\nEn calistenia no se sube peso: se sube dificultad. Cada patrón tiene una escalera de 5 variantes y avanzas cuando dominas la actual. Material mínimo: una mesa o barandilla firme, una barra donde colgarse y una silla. Sirve de programa principal o de alternativa cuando no se puede ir al gimnasio.",
  "origen": "json",
+ "objetivo": "musculo",
+ "nivel": "cualquiera",
+ "diasSemana": 3,
+ "material": "barra",
+ "bloqueExtra": false,
  "fases": [
   {
    "nombre": "Fundamentos",

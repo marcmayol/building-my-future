@@ -37,7 +37,26 @@ data class PlanDto(
     val dias: List<DiaDto> = emptyList(),
     /** "json", "markdown" o "editor". Solo informativo. */
     val origen: String = "json",
-    val importadoEn: Long = 0L
+    val importadoEn: Long = 0L,
+
+    // --- Para qué sirve el plan. Lo usa el asistente que recomienda uno al empezar; ------
+    // --- todos son opcionales: un plan propio no tiene por qué rellenarlos. --------------
+
+    /** "perder grasa", "musculo", "fuerza", "mantener", "movilidad" o "empezar". */
+    @JsonNames("goal")
+    val objetivo: String = "",
+    /** "cero", "principiante", "intermedio" o "cualquiera". */
+    @JsonNames("level")
+    val nivel: String = "",
+    /** Días de entrenamiento por semana que pide el plan. */
+    @JsonNames("daysPerWeek")
+    val diasSemana: Int = 0,
+    /** Qué hace falta: "gimnasio", "barra" o "nada". */
+    @JsonNames("equipment")
+    val material: String = "",
+    /** Bloque que se monta sobre otro plan (piernas, brazos, core, postura, movilidad). */
+    @JsonNames("addOn")
+    val bloqueExtra: Boolean = false
 )
 
 @Serializable
@@ -152,6 +171,30 @@ object PlanCodec {
      * Traduce el tipo escrito en el archivo. Tolerante a propósito (español o inglés, con o
      * sin acentos): si no se reconoce, se asume fuerza, que es el caso de siempre.
      */
+    /** Objetivo del plan. Null si no lo dice: entonces el asistente no lo propone. */
+    private fun goalFrom(raw: String): PlanGoal? = when (raw.trim().lowercase()) {
+        "perder grasa", "grasa", "adelgazar", "lose fat" -> PlanGoal.LOSE_FAT
+        "musculo", "músculo", "hipertrofia", "muscle" -> PlanGoal.MUSCLE
+        "fuerza", "strength" -> PlanGoal.STRENGTH
+        "mantener", "mantenimiento", "maintain" -> PlanGoal.MAINTAIN
+        "movilidad", "postura", "mobility" -> PlanGoal.MOBILITY
+        "empezar", "arrancar", "start" -> PlanGoal.START
+        else -> null
+    }
+
+    private fun levelFrom(raw: String): PlanLevel = when (raw.trim().lowercase()) {
+        "cero", "zero" -> PlanLevel.ZERO
+        "principiante", "beginner" -> PlanLevel.BEGINNER
+        "intermedio", "intermediate" -> PlanLevel.INTERMEDIATE
+        else -> PlanLevel.ANY
+    }
+
+    private fun equipmentFrom(raw: String): PlanEquipment = when (raw.trim().lowercase()) {
+        "nada", "ninguno", "none", "casa" -> PlanEquipment.NONE
+        "barra", "bar" -> PlanEquipment.BAR
+        else -> PlanEquipment.GYM
+    }
+
     private fun kindFrom(raw: String): ExerciseKind = when (raw.trim().lowercase()) {
         "peso corporal", "corporal", "bodyweight", "calistenia" -> ExerciseKind.BODYWEIGHT
         "tiempo", "time", "isometrico", "isométrico" -> ExerciseKind.TIME
@@ -268,7 +311,12 @@ object PlanCodec {
                 phases = phases,
                 builtin = false,
                 source = source,
-                importedAt = importedAt
+                importedAt = importedAt,
+                goal = goalFrom(dto.objetivo),
+                level = levelFrom(dto.nivel),
+                daysPerWeek = dto.diasSemana,
+                equipment = equipmentFrom(dto.material),
+                addOn = dto.bloqueExtra
             )
         )
     }

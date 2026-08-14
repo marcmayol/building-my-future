@@ -3,6 +3,11 @@
  "nombre": "Arranque",
  "descripcion": "Reacondicionamiento desde cero · Nivel cero · 3 días/semana\nNo se busca músculo todavía: se busca crear el hábito, aprender a moverse sin dolor y que el cuerpo tolere el estímulo. Todo con máquinas, ejercicios sentados o apoyados y sesiones de 25 a 40 minutos. Al terminar, el paso natural es el Plan 100 Días desde el día 1.",
  "origen": "json",
+ "objetivo": "empezar",
+ "nivel": "cero",
+ "diasSemana": 3,
+ "material": "gimnasio",
+ "bloqueExtra": false,
  "fases": [
   {
    "nombre": "Familiarización",

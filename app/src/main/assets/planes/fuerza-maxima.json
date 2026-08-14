@@ -3,6 +3,11 @@
  "nombre": "Fuerza Máxima",
  "descripcion": "Básicos pesados a pocas repeticiones · Intermedio · 3 días/semana\nAquí no se persigue el músculo sino el número: series de 3 a 5 repeticiones en sentadilla, press y bisagra de cadera, con descansos largos (la evidencia es clara: 3 a 5 minutos entre series pesadas rinde más que recortar). Tres días para recuperar bien entre sesiones.",
  "origen": "json",
+ "objetivo": "fuerza",
+ "nivel": "intermedio",
+ "diasSemana": 3,
+ "material": "gimnasio",
+ "bloqueExtra": false,
  "fases": [
   {
    "nombre": "Base de fuerza",

@@ -3,6 +3,11 @@
  "nombre": "Movilidad",
  "descripcion": "Bloque extra · Rango de movimiento en 15 min · Cualquiera · 3 días extra/semana\nSesiones de 12 a 15 minutos para recuperar rango en cadera, tobillo, torácica, hombro y cadena posterior. La constancia gana a la duración: poco y a menudo. Se nota al agacharse, al hacer sentadilla profunda y al atarse los zapatos. Al acabar el bloque, reinícialo y sigue.",
  "origen": "json",
+ "objetivo": "movilidad",
+ "nivel": "cualquiera",
+ "diasSemana": 3,
+ "material": "nada",
+ "bloqueExtra": true,
  "fases": [
   {
    "nombre": "Bloque de movilidad",

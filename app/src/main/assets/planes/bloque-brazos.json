@@ -3,6 +3,11 @@
  "nombre": "Bloque Brazos",
  "descripcion": "Bloque extra · Especialización de 6 semanas · Intermedio · 2 días extra/semana\nSesiones cortas de brazo para montar encima de tu rutina base. Encajan bien al final de los días de pierna.",
  "origen": "json",
+ "objetivo": "musculo",
+ "nivel": "intermedio",
+ "diasSemana": 2,
+ "material": "gimnasio",
+ "bloqueExtra": true,
  "fases": [
   {
    "nombre": "Especialización de brazo",

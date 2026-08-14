@@ -3,6 +3,11 @@
  "nombre": "Mantenimiento",
  "descripcion": "Mantenerse fit sin exprimirse · Cualquiera · 3 días/semana\nEl destino natural al terminar el Plan 100 Días o Hipertrofia, y el refugio para épocas de mucho trabajo, viajes o desmotivación. El bloque de 4 semanas se repite indefinidamente: al acabarlo, reinícialo desde el programa.",
  "origen": "json",
+ "objetivo": "mantener",
+ "nivel": "cualquiera",
+ "diasSemana": 3,
+ "material": "gimnasio",
+ "bloqueExtra": false,
  "fases": [
   {
    "nombre": "Bloque de mantenimiento",

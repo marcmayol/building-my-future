@@ -330,7 +330,11 @@ object BuiltinPlan {
             name = "Building My Future",
             description = "El reto original de 100 días: de la adaptación a la consolidación.",
             phases = phases,
-            builtin = true
+            builtin = true,
+            goal = PlanGoal.LOSE_FAT,
+            level = PlanLevel.BEGINNER,
+            daysPerWeek = 5,
+            equipment = PlanEquipment.GYM
         )
     }
 }

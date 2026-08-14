@@ -3,6 +3,11 @@
  "nombre": "Bloque Piernas",
  "descripcion": "Bloque extra · Especialización de 6 semanas · Intermedio · 2 días extra/semana\nNo es un programa completo: son dos sesiones que se montan encima de tu rutina base durante 6 semanas para priorizar el tren inferior.",
  "origen": "json",
+ "objetivo": "musculo",
+ "nivel": "intermedio",
+ "diasSemana": 2,
+ "material": "gimnasio",
+ "bloqueExtra": true,
  "fases": [
   {
    "nombre": "Especialización de pierna",

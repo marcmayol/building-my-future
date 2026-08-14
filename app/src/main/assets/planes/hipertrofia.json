@@ -3,6 +3,11 @@
  "nombre": "Hipertrofia",
  "descripcion": "Torso / pierna, 2 veces por semana · Intermedio · 4 días/semana\nEl músculo crece con volumen suficiente (12 a 20 series semanales por grupo), cercanía al fallo y progresión sostenida. Rangos de 8 a 15 repeticiones, descansos de 2 minutos en básicos y de 60 a 90 segundos en aislamientos. Sesiones de 55 a 70 minutos.",
  "origen": "json",
+ "objetivo": "musculo",
+ "nivel": "intermedio",
+ "diasSemana": 4,
+ "material": "gimnasio",
+ "bloqueExtra": false,
  "fases": [
   {
    "nombre": "Acumulación",

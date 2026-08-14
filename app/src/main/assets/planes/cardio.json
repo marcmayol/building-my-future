@@ -3,6 +3,11 @@
  "nombre": "Cardio",
  "descripcion": "Resistencia en bajo impacto · Cualquiera · 4 días/semana\nLa mayor parte del trabajo va suave y sostenido, y solo una parte pequeña va intensa: es la distribución con mejor resultado y menor desgaste. Si se combina con fuerza el mismo día, la fuerza va primero; las sesiones suaves encajan en cualquier momento.",
  "origen": "json",
+ "objetivo": "perder grasa",
+ "nivel": "cualquiera",
+ "diasSemana": 4,
+ "material": "gimnasio",
+ "bloqueExtra": false,
  "fases": [
   {
    "nombre": "Base aeróbica",

@@ -1,5 +1,26 @@
 package com.marc.gymplan100.data
 
+/**
+ * Para qué entrena la gente. Es la primera pregunta del asistente y lo que más estrecha el
+ * catálogo: quien quiere levantar más y quien quiere moverse mejor no comparten plan.
+ */
+enum class PlanGoal { LOSE_FAT, MUSCLE, STRENGTH, MAINTAIN, MOBILITY, START }
+
+/** Punto de partida de quien lo va a hacer. `ANY` = le vale a cualquiera. */
+enum class PlanLevel { ZERO, BEGINNER, INTERMEDIATE, ANY }
+
+/** Qué hace falta para poder hacerlo. */
+enum class PlanEquipment {
+    /** Máquinas y peso libre. */
+    GYM,
+
+    /** Una barra de dominadas y suelo. */
+    BAR,
+
+    /** Nada: el propio cuerpo, una pared, una toalla. */
+    NONE
+}
+
 /** De dónde salió un plan. Se enseña en la lista de planes y decide si se puede borrar. */
 enum class PlanSource {
     /** Viene con la app (el reto de 100 días). */
@@ -29,7 +50,14 @@ data class TrainingPlan(
     val builtin: Boolean = false,
     val source: PlanSource = if (builtin) PlanSource.BUILTIN else PlanSource.JSON,
     /** Cuándo se importó, para ordenar la lista de planes. 0 en el integrado. */
-    val importedAt: Long = 0L
+    val importedAt: Long = 0L,
+    /** Para qué sirve, para poder recomendarlo. Vacío en un plan propio que no lo diga. */
+    val goal: PlanGoal? = null,
+    val level: PlanLevel = PlanLevel.ANY,
+    val daysPerWeek: Int = 0,
+    val equipment: PlanEquipment = PlanEquipment.GYM,
+    /** Se monta sobre otro plan en vez de sustituirlo (los bloques de 2-3 días extra). */
+    val addOn: Boolean = false
 ) {
     /** Los días numerados, repitiendo las plantillas de cada fase por cada una de sus semanas. */
     val days: List<TrainingDay> by lazy {

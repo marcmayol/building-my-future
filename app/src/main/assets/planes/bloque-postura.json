@@ -3,6 +3,11 @@
  "nombre": "Bloque Postura",
  "descripcion": "Bloque extra · Contrarrestar la silla · Cualquiera · 2 días extra/semana\nPara hombros enrollados hacia delante, cabeza adelantada y esa sensación de espalda cargada al final del día. Fortalece la cadena posterior del torso y estira pecho y flexores. No corrige la postura por arte de magia: la mejor postura es la siguiente, muévete a menudo.",
  "origen": "json",
+ "objetivo": "movilidad",
+ "nivel": "cualquiera",
+ "diasSemana": 2,
+ "material": "nada",
+ "bloqueExtra": true,
  "fases": [
   {
    "nombre": "Antídoto de escritorio",
