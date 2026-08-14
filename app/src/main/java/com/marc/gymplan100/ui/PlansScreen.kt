@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -306,9 +309,20 @@ private fun PlanCard(
     val app = LocalAppColors.current
     val styles = LocalAppTextStyles.current
 
-    Column(
+    // Estado del plan: es lo primero que se lee, y va en el raíl y en el distintivo.
+    val terminado = plan.totalDays > 0 && completedDays >= plan.totalDays
+    val estado = when {
+        isActive -> PlanBadge.Activo
+        terminado -> PlanBadge.Terminado
+        completedDays == 0 -> PlanBadge.SinEmpezar
+        else -> PlanBadge.Activo
+    }
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
+            // Altura intrínseca: sin esto el raíl no sabe cuánto mide la tarjeta y no se pinta.
+            .height(IntrinsicSize.Min)
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .then(
@@ -319,25 +333,29 @@ private fun PlanCard(
                     MaterialTheme.shapes.medium
                 ) else Modifier
             )
-            .padding(Space.x4)
     ) {
+        Box(
+            modifier = Modifier
+                .width(5.dp)
+                .fillMaxHeight()
+                .background(planRailColor(estado))
+        )
+    Column(modifier = Modifier.padding(Space.x4)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 plan.name,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
-            if (isActive) {
-                Text(
-                    "ACTIVO",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(horizontal = Space.x3, vertical = Space.x1)
-                )
-            }
+            DoneBadge(
+                kind = estado,
+                label = when (estado) {
+                    PlanBadge.Activo -> "Activo"
+                    PlanBadge.Terminado -> "Terminado"
+                    PlanBadge.VueltaEnCurso -> "Otra vuelta"
+                    PlanBadge.SinEmpezar -> "Sin empezar"
+                }
+            )
         }
         if (plan.description.isNotBlank()) {
             Spacer(Modifier.height(Space.x1))
@@ -427,6 +445,7 @@ private fun PlanCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
     }
 }
 

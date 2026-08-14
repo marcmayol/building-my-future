@@ -399,6 +399,15 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         _needsWelcome.value = true
     }
 
+    /** Vuelve a abrir el resumen del plan terminado (desde la portada o la lista). */
+    fun showPlanSummaryAgain() {
+        val actual = _progress.value
+        if (actual.finishedAt > 0L) return
+        val visto = actual.copy(finishedAt = System.currentTimeMillis())
+        _progress.value = visto
+        viewModelScope.launch { repo.save(visto) }
+    }
+
     /** Cierra la pantalla de fin de plan sin repetirlo: el plan se queda terminado. */
     fun dismissPlanFinished() {
         val actual = _progress.value

@@ -1,23 +1,29 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(
+    androidx.compose.material3.ExperimentalMaterial3Api::class,
+    androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
 
 package com.marc.gymplan100.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,25 +34,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.Statistics
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
-import com.marc.gymplan100.ui.theme.Touch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**
- * Cierre de un plan terminado: qué has hecho y qué puedes hacer ahora.
+ * Cierre de un plan terminado, según el rediseño de agosto de 2026.
  *
- * Sale una sola vez, al completar el último día. Los números salen del historial de sesiones
- * de ese plan (que no se borra nunca), así que son reales: no hay ningún dato guardado a
- * propósito para esta pantalla. La fecha de inicio se deduce del primer entreno registrado.
+ * **Dos mitades con un separador explícito**: mirar atrás (qué has hecho) y mirar adelante
+ * (qué sigue). Sin el separador, una mitad se come a la otra.
+ *
+ * Los números salen del historial de sesiones de ese plan, así que son reales. Si el plan se
+ * completó marcando los días a mano no hay ninguno, y entonces **se dice con palabras y en
+ * tono de constatación**, nunca de error: marcar a mano es una forma legítima de usar la app.
  */
 @Composable
 fun PlanFinishedScreen(
@@ -60,19 +70,16 @@ fun PlanFinishedScreen(
     val app = LocalAppColors.current
     val styles = LocalAppTextStyles.current
 
-    // La fecha guardada al empezar manda; el primer entreno es el respaldo para los planes
-    // que ya estaban en marcha antes de que se guardara.
-    val primera = remember(progress.startedAt, history) {
+    val inicio = remember(progress.startedAt, history) {
         progress.startedAt.takeIf { it > 0L } ?: history.minByOrNull { it.startMillis }?.startMillis
     }
     val minutos = remember(history) { history.sumOf { it.durationSeconds } / 60 }
     val series = remember(history) { history.sumOf { it.totalSets } }
-    val semanas = remember(primera, progress.finishedAt) {
+    val semanas = remember(inicio, progress.finishedAt) {
         val fin = progress.finishedAt.takeIf { it > 0 } ?: System.currentTimeMillis()
-        primera?.let { ((fin - it) / TimeUnit.DAYS.toMillis(7)).toInt() + 1 }
+        inicio?.let { ((fin - it) / TimeUnit.DAYS.toMillis(7)).toInt() + 1 }
     }
-    val mejorRacha = remember(progress.completedDays) { Statistics.bestStreak(progress.completedDays) }
-    // Pesos que subieron: solo los que tienen dos puntos o más, y solo los que mejoraron.
+    val racha = remember(progress.completedDays) { Statistics.bestStreak(progress.completedDays) }
     val subidas = remember(progress) {
         Statistics.weightProgression(progress)
             .mapNotNull { (nombre, puntos) ->
@@ -82,213 +89,262 @@ fun PlanFinishedScreen(
                 if (fin > ini) Triple(nombre, ini, fin) else null
             }
             .sortedByDescending { (_, ini, fin) -> fin - ini }
-            .take(4)
+            .take(4)          // el techo son cuatro: Estadísticas está a dos toques
     }
     val siguiente = remember(plan.id) { viewModel.nextPlanSuggestion() }
+    val ultimaFase = plan.phases.lastOrNull()?.takeIf { plan.phases.size > 1 }
+    val sinDatos = history.isEmpty()
 
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentPadding = PaddingValues(
-            start = Space.screen, end = Space.screen, top = 56.dp, bottom = 40.dp
-        ),
-        verticalArrangement = Arrangement.spacedBy(Space.x3)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        item {
-            Text(
-                if (progress.rounds > 0) "VUELTA ${progress.rounds + 1} TERMINADA" else "PLAN TERMINADO",
-                style = MaterialTheme.typography.labelMedium,
-                color = app.work
-            )
-            Spacer(Modifier.height(Space.x2))
-            Text(plan.name, style = MaterialTheme.typography.displaySmall)
-        }
+        // Cinta de degradado: el único sitio donde aparece la marca en esta pantalla, junto
+        // al bloque de días. Terminado no es "en marcha", así que el degradado no se reparte.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .background(app.brandGradient)
+        )
 
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(app.brandGradient)
-                    .padding(Space.x4)
-            ) {
-                val onHero = Color(0xFF3D0B02)
-                Text(
-                    "${plan.totalDays} de ${plan.totalDays} días",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = onHero
+        LazyColumn(
+            contentPadding = PaddingValues(
+                start = Space.screen, end = Space.screen, top = Space.block, bottom = 40.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(Space.x3)
+        ) {
+            // ─── Mirar atrás ────────────────────────────────────────────────────────
+            item {
+                DoneBadge(
+                    kind = if (progress.rounds > 0) PlanBadge.VueltaEnCurso else PlanBadge.Terminado,
+                    label = if (progress.rounds > 0) "Vuelta ${progress.rounds + 1} terminada"
+                    else "Plan terminado"
                 )
-                if (semanas != null && primera != null) {
-                    Spacer(Modifier.height(Space.x1))
-                    Text(
-                        "en $semanas semanas · empezaste el ${fecha(primera)}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = onHero
-                    )
-                }
+                Spacer(Modifier.height(Space.x3))
+                Text(
+                    plan.name,
+                    style = MaterialTheme.typography.displaySmall.copy(fontSize = 40.sp)
+                )
             }
-        }
 
-        if (minutos > 0 || series > 0 || mejorRacha > 1) {
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(Space.x4)
+                        .clip(MaterialTheme.shapes.large)
+                        .background(app.brandGradient)
+                        .padding(Space.screen)
                 ) {
-                    if (minutos > 0) Dato("Tiempo entrenado", tiempo(minutos), styles.tabular)
-                    if (series > 0) Dato("Series hechas", "$series", styles.tabular)
-                    if (mejorRacha > 1) Dato("Mejor racha", "$mejorRacha días", styles.tabular)
+                    val onHero = Color(0xFF3D0B02)
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            "${plan.totalDays}",
+                            style = styles.tabular.copy(fontSize = 60.sp),
+                            color = onHero
+                        )
+                        Spacer(Modifier.size(Space.x2))
+                        Text(
+                            "de ${plan.totalDays} días",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = onHero,
+                            modifier = Modifier.padding(bottom = 10.dp)
+                        )
+                    }
+                    if (semanas != null && inicio != null) {
+                        Spacer(Modifier.height(Space.x1))
+                        Text(
+                            "en $semanas semanas · empezaste el ${fecha(inicio)}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = onHero
+                        )
+                    }
                 }
             }
-        }
 
-        // Sin sesiones guardadas no hay tiempo, ni series, ni pesos que enseñar. Se dice, en
-        // vez de dejar el hueco: marcar los días a mano es una forma legítima de usar la app,
-        // pero entonces no hay nada que resumir.
-        if (history.isEmpty()) {
-            item {
-                Text(
-                    "Marcaste los días a mano, sin usar el entrenamiento guiado, así que de " +
-                        "este plan no queda registro de tiempo, series ni pesos.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        if (subidas.isNotEmpty()) {
-            item {
-                Text(
-                    "LO QUE HA SUBIDO",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = Space.x2)
-                )
-            }
-            items(subidas.size) { i ->
-                val (nombre, ini, fin) = subidas[i]
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        nombre,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        "${kg(ini)} → ${kg(fin)} kg",
-                        style = styles.tabular,
-                        color = app.work
-                    )
+            if (sinDatos) {
+                item { SinRegistro() }
+            } else {
+                // Tres cifras en fila: apiladas competían entre ellas. Al 150 % el FlowRow
+                // las baja de línea solo.
+                item {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                        verticalArrangement = Arrangement.spacedBy(Space.x2)
+                    ) {
+                        Cifra("Entrenado", tiempo(minutos), Modifier.weight(1f))
+                        Cifra("Series", "$series", Modifier.weight(1f))
+                        Cifra("Mejor racha", "$racha d", Modifier.weight(1f), app.streak)
+                    }
                 }
             }
-        }
 
-        item {
-            Text(
-                "¿Y AHORA QUÉ?",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = Space.block)
-            )
-        }
-
-        if (siguiente != null) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(app.work.copy(alpha = 0.12f))
-                        .padding(Space.x4)
-                ) {
-                    Text(siguiente.plan.name, style = MaterialTheme.typography.titleLarge)
-                    Spacer(Modifier.height(Space.x1))
+            if (subidas.isNotEmpty()) {
+                item {
                     Text(
-                        "${siguiente.plan.totalDays} días · ${siguiente.plan.daysPerWeek} por semana",
-                        style = MaterialTheme.typography.bodyMedium,
+                        "LO QUE HA SUBIDO",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = Space.x2)
+                    )
+                }
+                items(subidas.size) { i ->
+                    val (nombre, ini, fin) = subidas[i]
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            nombre,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text("${kg(ini)} → ${kg(fin)} kg", style = styles.tabular, color = app.streak)
+                    }
+                }
+            }
+
+            // ─── El separador: aquí se cambia de mirar atrás a mirar adelante ───────
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Space.x3),
+                    modifier = Modifier.padding(top = Space.block, bottom = Space.x1)
+                ) {
+                    HorizontalDivider(modifier = Modifier.weight(1f))
+                    Text(
+                        "¿Y AHORA QUÉ?",
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(Modifier.height(Space.x2))
-                    Text(siguiente.reason, style = MaterialTheme.typography.bodyLarge)
-                    Spacer(Modifier.height(Space.x3))
-                    Button(
-                        onClick = {
+                    HorizontalDivider(modifier = Modifier.weight(1f))
+                }
+            }
+
+            // ─── Mirar adelante: cuatro salidas en tres pesos ───────────────────────
+            if (siguiente != null) {
+                item {
+                    MotiveCard(
+                        name = siguiente.plan.name,
+                        meta = "${siguiente.plan.totalDays} días · " +
+                            "${siguiente.plan.daysPerWeek} por semana",
+                        motive = siguiente.reason,
+                        actionLabel = "Seguir con este",
+                        onAction = {
                             viewModel.dismissPlanFinished()
                             viewModel.activatePlan(siguiente.plan.id)
                         },
-                        shape = CircleShape,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                    ) { Text("Seguir con este") }
+                        featured = true,
+                        overline = "El que viene después"
+                    )
                 }
             }
-        }
 
-        // Repetir el plan entero, o solo su última fase. Lo segundo solo tiene sentido si hay
-        // más de una: después de 100 días, volver al día 1 es retroceder, pero repetir la fase
-        // final mantiene el nivel al que has llegado.
-        item {
-            OutlinedButton(
-                onClick = { viewModel.startNewRound() },
-                shape = CircleShape,
-                modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-            ) { Text("Empezarlo de cero") }
-        }
-        if (plan.phases.size > 1) {
-            val ultima = plan.phases.last()
-            item {
-                OutlinedButton(
-                    onClick = { viewModel.repeatLastPhase() },
-                    shape = CircleShape,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                ) { Text("Repetir solo «${ultima.name}»") }
+            // La de la fase va primera de las filas porque es la que necesita explicación.
+            if (ultimaFase != null) {
+                item {
+                    DecisionRow(
+                        title = "Repetir solo «${ultimaFase.name}»",
+                        explanation = "La última fase son " +
+                            "${PlanData.daysOfPhase(ultimaFase.number).size} días: repetirla " +
+                            "mantiene el nivel al que has llegado sin volver al principio.",
+                        onClick = { viewModel.repeatLastPhase() }
+                    )
+                }
             }
             item {
-                Text(
-                    "La última fase son ${PlanData.daysOfPhase(ultima.number).size} días: " +
-                        "repetirla mantiene el nivel al que has llegado sin volver al principio.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                DecisionRow(
+                    title = "Empezarlo de cero",
+                    explanation = "Los ${plan.totalDays} días otra vez, como " +
+                        "${progress.rounds + 2}ª vuelta.",
+                    onClick = { viewModel.startNewRound() }
                 )
             }
-        }
-        item {
-            OutlinedButton(
-                onClick = { viewModel.dismissPlanFinished(); viewModel.askAdvisorAgain() },
-                shape = CircleShape,
-                modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-            ) { Text("Empezar otro · ayúdame a elegir") }
-        }
-        item {
-            TextButton(
-                onClick = { viewModel.dismissPlanFinished(); onSeePlans() },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Ver todos los planes") }
-        }
-        item {
-            TextButton(
-                onClick = { viewModel.dismissPlanFinished(); onDismiss() },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("Ahora no, déjalo así") }
+            item {
+                DecisionRow(
+                    title = "Elegir otro plan",
+                    explanation = "Los doce, con el asistente si quieres que te ayude.",
+                    onClick = { viewModel.dismissPlanFinished(); onSeePlans() }
+                )
+            }
+
+            item {
+                Spacer(Modifier.height(Space.x2))
+                TextButton(
+                    onClick = { viewModel.dismissPlanFinished(); onDismiss() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "Ahora no, déjalo así",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            textDecoration = TextDecoration.Underline
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }
 
+/** Una de las tres cifras del resumen. */
 @Composable
-private fun Dato(etiqueta: String, valor: String, estilo: androidx.compose.ui.text.TextStyle) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = Space.x1),
-        verticalAlignment = Alignment.CenterVertically
+private fun Cifra(
+    etiqueta: String,
+    valor: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface
+) {
+    Column(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4)
     ) {
+        Text(valor, style = LocalAppTextStyles.current.tabular.copy(fontSize = 22.sp), color = color)
+        Spacer(Modifier.height(Space.x1))
         Text(
             etiqueta,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Text(valor, style = estilo, color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+/**
+ * Días marcados a mano: no hay tiempo, ni series, ni pesos. Ocupa el sitio de las tres cifras
+ * en vez de dejar el hueco, y lo cuenta sin dramatismo: sin color de error ni icono de alerta.
+ */
+@Composable
+private fun SinRegistro() {
+    val app = LocalAppColors.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4),
+        horizontalArrangement = Arrangement.spacedBy(Space.x3)
+    ) {
+        Icon(
+            Icons.Filled.Check,
+            contentDescription = null,
+            tint = app.positive,
+            modifier = Modifier.size(22.dp)
+        )
+        Column {
+            Text(
+                "Marcaste los días a mano, sin usar el entrenamiento guiado, así que de este " +
+                    "plan no queda registro de tiempo, series ni pesos.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(Space.x2))
+            Text(
+                "Los días están hechos, y eso es lo que cuenta. Si quieres que el próximo deje " +
+                    "datos, entrena con el guiado o con el libre.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -298,7 +354,7 @@ private fun fecha(millis: Long): String =
 private fun tiempo(minutos: Int): String {
     val h = minutos / 60
     val m = minutos % 60
-    return if (h > 0) "$h h $m min" else "$m min"
+    return if (h > 0) "$h h $m" else "$m min"
 }
 
 private fun kg(v: Float): String =

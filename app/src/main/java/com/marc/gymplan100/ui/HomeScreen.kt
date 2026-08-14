@@ -57,6 +57,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.material3.TextButton
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
@@ -231,7 +235,13 @@ fun HomeScreen(
                 HeroTerminado(
                     planName = activePlan.name,
                     total = total,
-                    onSeePlans = onOpenPlans
+                    finishedAt = progress.finishedAt.coerceAtLeast(0L),
+                    weeks = progress.startedAt.takeIf { it > 0L }?.let { ini ->
+                        val fin = progress.finishedAt.takeIf { it > 0 } ?: System.currentTimeMillis()
+                        ((fin - ini) / (7L * 24 * 60 * 60 * 1000)).toInt() + 1
+                    },
+                    onSeePlans = onOpenPlans,
+                    onSeeSummary = { viewModel.showPlanSummaryAgain() }
                 )
             } else {
                 HeroHoy(
@@ -246,7 +256,11 @@ fun HomeScreen(
             }
         }
 
-        item { ProgresoDelPlan(done = done, total = total) }
+        // Con el plan terminado la barra marcaría 100 % y repetiría lo que ya dice el héroe,
+        // que además lleva la fecha de fin. Se calla.
+        if (done < total || total == 0) {
+            item { ProgresoDelPlan(done = done, total = total) }
+        }
 
         item { FilaEspeciales(onClick = onOpenSpecial) }
 
@@ -335,43 +349,70 @@ private fun HeroEnCurso(
 /**
  * Héroe de un plan acabado. Sustituye al de "hoy te toca": con todos los días hechos, seguir
  * ofreciendo el último era empujar a repetirlo sin querer.
+ *
+ * **Sin el degradado de marca**: el degradado significa *en marcha*, y terminado es reposo.
+ * Lleva solo una cinta de 5 dp arriba, para no competir con el héroe de "entreno en curso".
  */
 @Composable
-private fun HeroTerminado(planName: String, total: Int, onSeePlans: () -> Unit) {
+private fun HeroTerminado(
+    planName: String,
+    total: Int,
+    finishedAt: Long,
+    weeks: Int?,
+    onSeePlans: () -> Unit,
+    onSeeSummary: () -> Unit
+) {
     val app = LocalAppColors.current
-    val onHero = Color(0xFF3D0B02)
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
-            .background(app.brandGradient)
-            .padding(Space.screen)
+            .background(app.surface1)
     ) {
-        Text(
-            "PLAN TERMINADO",
-            style = MaterialTheme.typography.labelMedium,
-            color = onHero
-        )
-        Spacer(Modifier.height(Space.x2))
-        Text(planName, style = LocalAppTextStyles.current.displayCard, color = onHero)
-        Spacer(Modifier.height(Space.x1))
-        Text(
-            "Los $total días, hechos. Elige qué sigue cuando quieras.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = onHero
-        )
-        Spacer(Modifier.height(Space.x4))
-        Button(
-            onClick = onSeePlans,
-            shape = CircleShape,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF1C0410),
-                contentColor = Color.White
-            ),
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = Touch.primary)
-        ) { Text("Elegir el siguiente") }
+                .height(5.dp)
+                .background(app.brandGradient)
+        )
+        Column(modifier = Modifier.padding(Space.screen)) {
+            DoneBadge(kind = PlanBadge.Terminado, label = "Plan terminado")
+            Spacer(Modifier.height(Space.x3))
+            Text(planName, style = MaterialTheme.typography.headlineLarge)
+            Spacer(Modifier.height(Space.x1))
+            Text(
+                "Los $total días, hechos. Elige qué sigue cuando quieras.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(Space.x4))
+            Button(
+                onClick = onSeePlans,
+                shape = CircleShape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = Touch.primary)
+            ) { Text("Elegir el siguiente") }
+            TextButton(onClick = onSeeSummary, modifier = Modifier.fillMaxWidth()) {
+                Text("Ver el resumen del plan")
+            }
+            if (finishedAt > 0L) {
+                Spacer(Modifier.height(Space.x1))
+                Text(
+                    buildString {
+                        append("Terminado el ")
+                        append(
+                            SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
+                                .format(Date(finishedAt))
+                        )
+                        if (weeks != null) append(", en $weeks semanas")
+                        append(".")
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 
