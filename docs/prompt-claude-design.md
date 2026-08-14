@@ -11,7 +11,7 @@ tiene tu rediseño aplicado (el paquete que enviaste con la tipografía Archivo,
 ámbar→naranja→magenta, los tokens de estado y las 23 pantallas). Adjunto `handoff-diseno.md`
 con el sistema tal y como quedó implementado.
 
-La app ha crecido y necesito que diseñes **dos pantallas nuevas** que ahora mismo existen pero
+La app ha crecido y necesito que diseñes **cuatro pantallas nuevas** que ahora mismo existen pero
 están sin vestir: las he montado con los tokens del sistema para que funcionen, pero les falta
 tu criterio.
 
@@ -23,7 +23,9 @@ Cardio y cinco bloques extra: piernas, brazos, core, postura y movilidad), más 
 usuario se importe o se cree. Cada plan guarda su progreso por separado.
 
 Eso abre dos momentos que antes no existían: **el principio** (¿qué plan hago?) y **el final**
-(he terminado el plan, ¿y ahora qué?).
+(he terminado el plan, ¿y ahora qué?). Y hay un tercero que ya existía y estaba cojo: al acabar
+un **entrenamiento libre** solo se guardaba el tiempo, así que ahora se puede apuntar qué se ha
+hecho.
 
 ---
 
@@ -143,6 +145,51 @@ Los tres estados que conviven en esa lista: **activo**, **terminado** y **sin em
 
 ---
 
+## Pantalla 4 · Apuntar lo hecho al terminar un entreno libre
+
+**Contexto:** además del entrenamiento guiado (serie a serie, con su cronómetro), la app tiene
+un **entrenamiento libre**: un cronómetro que corre mientras entrenas a tu aire y que cuenta
+como día del plan. Hasta ahora solo guardaba el tiempo y lo demás se perdía. Al pulsar
+**Finalizar** aparece ahora esta pantalla para apuntarlo.
+
+**Cuándo sale:** justo al terminar, antes de guardar. Es el último paso de un entreno, con la
+persona cansada y con el móvil en la mano.
+
+**Contenido real:**
+- Versalita: `ENTRENO TERMINADO`
+- Titular: **¿Qué has hecho?**
+- Cuerpo: "Apunta lo que quieras y déjate el resto: el tiempo se guarda igual. Los pesos que
+  pongas se quedan como los últimos de cada ejercicio."
+- **Una fila por ejercicio**, precargadas con las del día del plan. Cada fila tiene:
+  - un campo **Ejercicio** que es a la vez desplegable y escribible: se elige de la lista
+    (primero los del día, luego el resto del plan) **o se escribe uno que no esté**, porque
+    entrenando libre es normal salirse del guion
+  - una **X** para quitar la fila
+  - **Peso (kg)** y **Reps**
+- Botón **Añadir otro ejercicio**
+- Fijos abajo: **Guardar y terminar** y **Terminar sin apuntar nada**
+
+**Estados a resolver:**
+- Con los ejercicios del día precargados (el normal, hoy salen cinco).
+- Sin plan detrás o día sin ejercicios: una sola fila en blanco.
+- Desplegable abierto con las sugerencias.
+- **Con el teclado abierto**: es el caso peliagudo. Hoy los botones van fijos abajo con
+  `imePadding` porque, con ocho filas y el teclado, buscarlos al final de la lista era un
+  scroll a ciegas.
+
+**Lo que me importa:**
+1. Que **no se sienta como un formulario de aduana** después de entrenar. Si a alguien le pesa,
+   dejará de usar el entreno libre, y ese es el que usa quien va a su bola.
+2. Que **"Terminar sin apuntar nada" no parezca un castigo ni una trampa**. Es una salida
+   legítima y tiene que verse tranquila.
+3. La fila es densa: nombre + peso + reps + borrar, en un ancho de móvil. Hoy la he resuelto en
+   dos alturas (nombre arriba, peso y reps debajo) y ocupa bastante; con cinco ejercicios la
+   pantalla es larga.
+4. Si crees que esto debería ser una hoja inferior en vez de una pantalla, o que las
+   repeticiones sobran y basta el peso, dímelo.
+
+---
+
 ## Restricciones técnicas (importantes)
 
 - **Jetpack Compose + Material 3**, tema propio ya montado: `Space` (base 4), `Touch`
@@ -158,9 +205,10 @@ Los tres estados que conviven en esa lista: **activo**, **terminado** y **sin em
 
 ## Qué te pido
 
-1. El diseño de las tres cosas con sus estados: la **bienvenida** (puerta / preguntas /
-   resultado), el **cierre de plan** (normal y sin datos) y **el plan terminado fuera de su
-   pantalla** (héroe de la portada y tarjeta en la lista de planes).
+1. El diseño de las cuatro cosas con sus estados: la **bienvenida** (puerta / preguntas /
+   resultado), el **cierre de plan** (normal y sin datos), **el plan terminado fuera de su
+   pantalla** (héroe de la portada y tarjeta en la lista de planes) y **apuntar lo hecho al
+   terminar un entreno libre** (precargado / en blanco / desplegable / con teclado).
 2. Resolver el amontonamiento de las cinco salidas del cierre: qué jerarquía tienen "seguir
    con otro plan", "empezar de cero" y "repetir la última fase".
 3. Si hace falta, **tokens o componentes nuevos** — por ejemplo un "chip de respuesta" para el
