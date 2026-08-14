@@ -226,18 +226,45 @@ fun PlanFinishedScreen(
             }
         }
 
+        // Repetir el plan entero, o solo su última fase. Lo segundo solo tiene sentido si hay
+        // más de una: después de 100 días, volver al día 1 es retroceder, pero repetir la fase
+        // final mantiene el nivel al que has llegado.
         item {
             OutlinedButton(
                 onClick = { viewModel.startNewRound() },
                 shape = CircleShape,
                 modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-            ) { Text("Otra vuelta a ${plan.name}") }
+            ) { Text("Empezarlo de cero") }
+        }
+        if (plan.phases.size > 1) {
+            val ultima = plan.phases.last()
+            item {
+                OutlinedButton(
+                    onClick = { viewModel.repeatLastPhase() },
+                    shape = CircleShape,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
+                ) { Text("Repetir solo «${ultima.name}»") }
+            }
+            item {
+                Text(
+                    "La última fase son ${PlanData.daysOfPhase(ultima.number).size} días: " +
+                        "repetirla mantiene el nivel al que has llegado sin volver al principio.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
         item {
             OutlinedButton(
-                onClick = { viewModel.dismissPlanFinished(); onSeePlans() },
+                onClick = { viewModel.dismissPlanFinished(); viewModel.askAdvisorAgain() },
                 shape = CircleShape,
                 modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
+            ) { Text("Empezar otro · ayúdame a elegir") }
+        }
+        item {
+            TextButton(
+                onClick = { viewModel.dismissPlanFinished(); onSeePlans() },
+                modifier = Modifier.fillMaxWidth()
             ) { Text("Ver todos los planes") }
         }
         item {

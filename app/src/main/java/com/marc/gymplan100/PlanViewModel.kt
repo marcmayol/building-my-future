@@ -366,19 +366,36 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * historial de entrenos no se toca**: el tiempo entrenado sigue sumando.
      */
     fun startNewRound() {
-        val actual = _progress.value
-        val nueva = actual.copy(
-            completedDays = emptySet(),
-            logs = emptyMap(),
-            startedAt = System.currentTimeMillis(),   // la vuelta nueva empieza hoy
-            finishedAt = 0L,
-            rounds = actual.rounds + 1
-        )
+        val nueva = _progress.value.restartedFromScratch(System.currentTimeMillis())
         _progress.value = nueva
         viewModelScope.launch {
             repo.save(nueva)
             WearBridge.publishState(getApplication(), null, nextDay = nextDay())
         }
+    }
+
+    /**
+     * Repetir solo la última fase, en vez del plan entero.
+     *
+     * Es lo que pide un plan largo: después de 100 días, volver al día 1 es retroceder, pero
+     * repetir la fase final mantiene el nivel al que has llegado. Los días de esa fase se
+     * borran y el resto del progreso se queda como está.
+     */
+    fun repeatLastPhase() {
+        val fase = PlanData.active.phases.lastOrNull() ?: return
+        val dias = PlanData.daysOfPhase(fase.number).map { it.number }.toSet()
+        if (dias.isEmpty()) return
+        val nueva = _progress.value.restartedDays(dias, System.currentTimeMillis())
+        _progress.value = nueva
+        viewModelScope.launch {
+            repo.save(nueva)
+            WearBridge.publishState(getApplication(), null, nextDay = nextDay())
+        }
+    }
+
+    /** Vuelve a preguntar las cuatro cosas para elegir otro plan (el mismo asistente del inicio). */
+    fun askAdvisorAgain() {
+        _needsWelcome.value = true
     }
 
     /** Cierra la pantalla de fin de plan sin repetirlo: el plan se queda terminado. */

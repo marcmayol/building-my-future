@@ -86,7 +86,8 @@ fun HomeScreen(
     onOpenWeights: () -> Unit,
     onOpenResults: () -> Unit,
     onOpenStats: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onOpenPlans: () -> Unit = {}
 ) {
     val progress by viewModel.progress.collectAsState()
     val activeSession by viewModel.activeSession.collectAsState()
@@ -224,6 +225,14 @@ fun HomeScreen(
                     },
                     onResume = { onResumeSession(session.dayNumber) }
                 )
+            } else if (done >= total && total > 0) {
+                // Plan acabado: seguir diciendo "hoy te toca" el último día sería empujar a
+                // repetir sin querer. Aquí se enseña el final y se manda a elegir qué sigue.
+                HeroTerminado(
+                    planName = activePlan.name,
+                    total = total,
+                    onSeePlans = onOpenPlans
+                )
             } else {
                 HeroHoy(
                     dayNumber = nextDay,
@@ -320,6 +329,49 @@ private fun HeroEnCurso(
                 .fillMaxWidth()
                 .heightIn(min = Touch.primary)
         ) { Text("Reanudar") }
+    }
+}
+
+/**
+ * Héroe de un plan acabado. Sustituye al de "hoy te toca": con todos los días hechos, seguir
+ * ofreciendo el último era empujar a repetirlo sin querer.
+ */
+@Composable
+private fun HeroTerminado(planName: String, total: Int, onSeePlans: () -> Unit) {
+    val app = LocalAppColors.current
+    val onHero = Color(0xFF3D0B02)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(app.brandGradient)
+            .padding(Space.screen)
+    ) {
+        Text(
+            "PLAN TERMINADO",
+            style = MaterialTheme.typography.labelMedium,
+            color = onHero
+        )
+        Spacer(Modifier.height(Space.x2))
+        Text(planName, style = LocalAppTextStyles.current.displayCard, color = onHero)
+        Spacer(Modifier.height(Space.x1))
+        Text(
+            "Los $total días, hechos. Elige qué sigue cuando quieras.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = onHero
+        )
+        Spacer(Modifier.height(Space.x4))
+        Button(
+            onClick = onSeePlans,
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1C0410),
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = Touch.primary)
+        ) { Text("Elegir el siguiente") }
     }
 }
 

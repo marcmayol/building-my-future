@@ -47,6 +47,32 @@ data class ProgressState(
 
     /** El plan está acabado y todavía no se ha decidido qué hacer después. */
     val isFinished: Boolean get() = finishedAt > 0L
+
+    /**
+     * Otra vuelta al plan entero: los días vuelven a cero y la vuelta queda contada.
+     *
+     * Lo que **no** se toca: el historial de entrenos (vive aparte) ni los pesos por ejercicio,
+     * que son lo que has aprendido a levantar y no se pierde por repetir el plan.
+     */
+    fun restartedFromScratch(now: Long): ProgressState = copy(
+        completedDays = emptySet(),
+        logs = emptyMap(),
+        startedAt = now,
+        finishedAt = 0L,
+        rounds = rounds + 1
+    )
+
+    /**
+     * Repetir solo unos días concretos (la última fase). El resto del progreso se queda: es
+     * la diferencia entre volver al día 1 de 100 y repetir los 20 últimos.
+     */
+    fun restartedDays(days: Set<Int>, now: Long): ProgressState = copy(
+        completedDays = completedDays - days,
+        logs = logs.filterKeys { it.substringBefore("-").toIntOrNull() !in days },
+        startedAt = now,
+        finishedAt = 0L,
+        rounds = rounds + 1
+    )
 }
 
 /**

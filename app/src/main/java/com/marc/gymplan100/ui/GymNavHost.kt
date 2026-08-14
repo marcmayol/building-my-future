@@ -89,7 +89,8 @@ fun GymNavHost(
                 onOpenWeights = { navController.navigate(Routes.WEIGHTS) },
                 onOpenResults = { navController.navigate(Routes.RESULTS) },
                 onOpenStats = { navController.navigate(Routes.STATS) },
-                onOpenSettings = { navController.navigate(Routes.SETTINGS) }
+                onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onOpenPlans = { navController.navigate(Routes.PLANS) }
             )
         }
         composable(Routes.SETTINGS) {
