@@ -12,6 +12,10 @@ import com.marc.gymplan100.data.Motivation
 import com.marc.gymplan100.data.DiaDto
 import com.marc.gymplan100.data.EjercicioDto
 import com.marc.gymplan100.data.FaseDto
+import com.marc.gymplan100.data.BuiltinPlan
+import com.marc.gymplan100.data.PlanAdvisor
+import com.marc.gymplan100.data.PlanEquipment
+import com.marc.gymplan100.data.PlanGoal
 import com.marc.gymplan100.data.PlanCodec
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.PlanDto
@@ -192,7 +196,13 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         if (!canSwitchPlan) return
         _activePlan.value = PlanStore.setActive(getApplication(), id)
         viewModelScope.launch {
-            _progress.value = repo.progress.first()
+            val cargado = repo.progress.first()
+            // Un plan sin empezar arranca hoy: es la fecha que se enseña al terminarlo.
+            _progress.value = if (cargado.startedAt == 0L && cargado.completedDays.isEmpty()) {
+                cargado.copy(startedAt = System.currentTimeMillis()).also { repo.save(it) }
+            } else {
+                cargado
+            }
             _history.value = repo.history.first()
             refreshPlans()
             // El reloj enseña el siguiente día pendiente: ahora es otro.
@@ -313,7 +323,14 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val set = before.completedDays.toMutableSet().apply {
             if (!add(day)) remove(day)
         }
-        val after = before.copy(completedDays = set)
+        // Si el plan venía sin fecha de arranque (o se marcó el primer día antes de tenerla),
+        // el primer día completado la fija: así el resumen final siempre puede decir desde cuándo.
+        val conInicio = if (before.startedAt == 0L && set.isNotEmpty()) {
+            before.copy(startedAt = System.currentTimeMillis())
+        } else {
+            before
+        }
+        val after = conInicio.copy(completedDays = set)
         _progress.value = after
         viewModelScope.launch { repo.save(after) }
         if (!wasCompleted && day in after.completedDays) {
@@ -324,14 +341,79 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     private fun triggerCelebration(before: ProgressState, after: ProgressState, day: Int) {
         val total = after.completedDays.count { it in 1..PlanData.TOTAL_DAYS }
         val finalVictory = total >= PlanData.TOTAL_DAYS
+        val esElReto = PlanData.active.id == BuiltinPlan.ID
         _celebration.value = Celebration(
             dayNumber = day,
             totalCompleted = total,
             message = pickMessage(total),
             newAchievements = Achievements.newlyUnlocked(before, after),
-            isFinalVictory = finalVictory
+            isFinalVictory = finalVictory,
+            offerAnthem = finalVictory && esElReto
         )
-        if (finalVictory) playChampionsVideo()
+        if (finalVictory) {
+            // Queda apuntado para poder enseñar el cierre del plan al salir del diálogo.
+            val terminado = after.copy(finishedAt = System.currentTimeMillis())
+            _progress.value = terminado
+            viewModelScope.launch { repo.save(terminado) }
+            // El himno es del reto de 100 días: en un bloque de 12 sesiones no pega.
+            if (esElReto) playChampionsVideo()
+        }
+    }
+
+    /**
+     * Otra vuelta al mismo plan (Mantenimiento y Movilidad se hacen así, en bloques que se
+     * repiten). Los días se vacían para empezar de cero, pero la vuelta queda contada y **el
+     * historial de entrenos no se toca**: el tiempo entrenado sigue sumando.
+     */
+    fun startNewRound() {
+        val actual = _progress.value
+        val nueva = actual.copy(
+            completedDays = emptySet(),
+            logs = emptyMap(),
+            startedAt = System.currentTimeMillis(),   // la vuelta nueva empieza hoy
+            finishedAt = 0L,
+            rounds = actual.rounds + 1
+        )
+        _progress.value = nueva
+        viewModelScope.launch {
+            repo.save(nueva)
+            WearBridge.publishState(getApplication(), null, nextDay = nextDay())
+        }
+    }
+
+    /** Cierra la pantalla de fin de plan sin repetirlo: el plan se queda terminado. */
+    fun dismissPlanFinished() {
+        val actual = _progress.value
+        if (!actual.isFinished) return
+        val cerrado = actual.copy(finishedAt = -1L)   // -1: terminado y ya visto
+        _progress.value = cerrado
+        viewModelScope.launch { repo.save(cerrado) }
+    }
+
+    /**
+     * Qué plan pega después del que se acaba de terminar. Se apoya en el mismo recomendador
+     * de la bienvenida, dándole por hecho el objetivo del plan terminado y que quien acaba un
+     * plan entero ya entrena con constancia.
+     */
+    fun nextPlanSuggestion(): PlanAdvisor.Suggestion? {
+        val terminado = PlanData.active
+        val objetivo = when (terminado.goal) {
+            // Quien acaba el plan de empezar ya no está empezando.
+            PlanGoal.START -> PlanGoal.LOSE_FAT
+            // Tras un plan duro, lo natural es sostener lo ganado.
+            PlanGoal.MUSCLE, PlanGoal.STRENGTH -> PlanGoal.MAINTAIN
+            null -> return null
+            else -> terminado.goal
+        }
+        val dias = terminado.daysPerWeek.takeIf { it > 0 } ?: 3
+        val respuestas = PlanAdvisor.Answers(
+            goal = objetivo,
+            shape = PlanAdvisor.Shape.REGULAR,
+            days = PlanAdvisor.Days.entries.firstOrNull { it.n == dias } ?: PlanAdvisor.Days.THREE,
+            place = if (terminado.equipment == PlanEquipment.NONE) PlanAdvisor.Place.HOME
+            else PlanAdvisor.Place.GYM
+        )
+        return PlanAdvisor.recommend(_plans.value.filter { it.id != terminado.id }, respuestas).best
     }
 
     /** Abre en YouTube el videoclip de "We Are the Champions" de Queen. */

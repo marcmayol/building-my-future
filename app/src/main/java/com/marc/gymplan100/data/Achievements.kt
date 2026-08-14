@@ -149,6 +149,11 @@ data class Celebration(
     val totalCompleted: Int,
     val message: String,
     val newAchievements: List<Achievement>,
-    /** Cierto al completar el día 100: el reto está terminado. */
-    val isFinalVictory: Boolean = false
+    /** Cierto al completar el último día: el plan está terminado. */
+    val isFinalVictory: Boolean = false,
+    /**
+     * Ofrecer el himno de Queen. Solo en el reto de 100 días, que es de lo que venía: al
+     * acabar un bloque de movilidad de 12 sesiones, "We Are The Champions" sobra.
+     */
+    val offerAnthem: Boolean = false
 )

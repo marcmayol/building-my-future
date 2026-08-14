@@ -220,6 +220,18 @@ fun GymNavHost(
             )
         }
     }
+
+    // Cierre del plan: encima de la navegación, al marcar el último día y una vez cerrada la
+    // celebración de ese día. Vive aquí dentro porque necesita el navController para llevar
+    // al catálogo si se quiere cambiar de plan.
+    val progress by viewModel.progress.collectAsState()
+    if (progress.isFinished && celebration == null) {
+        PlanFinishedScreen(
+            viewModel = viewModel,
+            onSeePlans = { navController.navigate(Routes.PLANS) },
+            onDismiss = {}
+        )
+    }
     }
 
         // Encima de todo lo demás y la última en dibujarse: la primera vez no hay plan elegido,

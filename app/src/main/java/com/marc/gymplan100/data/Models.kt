@@ -28,10 +28,12 @@ data class Exercise(
     val note: String = "",
     val kind: ExerciseKind = ExerciseKind.STRENGTH
 ) {
-    /** No tiene sentido pedirle kilos: es tu cuerpo, o es tiempo en una máquina. */
+    /**
+     * No tiene sentido pedirle kilos: es tu cuerpo, es un estiramiento o una plancha, o son
+     * minutos en una máquina. Solo los ejercicios de fuerza llevan carga.
+     */
     val withoutWeight: Boolean
-        get() = kind == ExerciseKind.BODYWEIGHT || kind == ExerciseKind.CARDIO ||
-            isBodyweightScheme(scheme)
+        get() = kind != ExerciseKind.STRENGTH || isBodyweightScheme(scheme)
 }
 
 /** Plantilla de un día de entrenamiento (lunes a viernes). */

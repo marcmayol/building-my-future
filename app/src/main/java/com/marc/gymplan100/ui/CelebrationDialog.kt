@@ -90,7 +90,7 @@ fun CelebrationDialog(
                 celebration.newAchievements.forEach { AchievementRow(it) }
             }
 
-            if (celebration.isFinalVictory) {
+            if (celebration.offerAnthem) {
                 Spacer(Modifier.height(Space.x4))
                 Button(
                     onClick = onPlayAnthem,

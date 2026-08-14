@@ -22,10 +22,31 @@ data class ProgressState(
     val exerciseWeights: Map<String, String> = emptyMap(),
     // En Resultados, el día más reciente arriba (con 30+ días completados, bajar hasta
     // el último era un scroll interminable).
-    val resultsNewestFirst: Boolean = true
+    val resultsNewestFirst: Boolean = true,
+    /**
+     * Cuándo se empezó este plan (0 = no se sabe, planes de antes de guardarlo).
+     *
+     * Se guarda al activarlo y, por si acaso, al marcar el primer día. Antes se deducía del
+     * primer entreno del historial, pero eso solo funciona si se usa el entrenamiento guiado:
+     * quien marca los días a mano se quedaba sin fecha.
+     */
+    val startedAt: Long = 0L,
+    /**
+     * Cuándo se completó el último día del plan (0 = sin terminar). Lo que dispara la
+     * pantalla de cierre; se pone a 0 al empezar otra vuelta.
+     */
+    val finishedAt: Long = 0L,
+    /**
+     * Vueltas ya terminadas. Mantenimiento y Movilidad están pensados para darlas: al
+     * empezar otra, los días se vacían pero esto sube y el historial de entrenos se queda.
+     */
+    val rounds: Int = 0
 ) {
     fun completedInPhase(phaseNumber: Int): Int =
         PlanData.daysOfPhase(phaseNumber).count { it.number in completedDays }
+
+    /** El plan está acabado y todavía no se ha decidido qué hacer después. */
+    val isFinished: Boolean get() = finishedAt > 0L
 }
 
 /**
