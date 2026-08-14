@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.ExerciseGuides
 import com.marc.gymplan100.data.ExerciseImages
+import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.MuscleTargets
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import java.net.URLEncoder
@@ -63,7 +64,10 @@ import java.net.URLEncoder
 fun ExerciseGuideSheet(
     exerciseName: String,
     scheme: String,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    /** Para que el consejo de cuando no hay ficha encaje: a un bloque de cardio no se le
+     *  dice que controle el peso y no arquee la espalda. */
+    kind: ExerciseKind = ExerciseKind.STRENGTH
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val guide = ExerciseGuides.forName(LocalContext.current, exerciseName)
@@ -163,13 +167,20 @@ fun ExerciseGuideSheet(
                 Text(
                     // Con planes propios este caso es habitual (el ejercicio no está en el
                     // catálogo de la app), y entonces tampoco hay ilustración a la que mirar.
-                    if (imageRes != null) {
-                        "Todavía no hay ficha para este ejercicio. Fíjate en la imagen y haz el " +
-                            "movimiento controlando el peso, con la espalda neutra y sin impulso."
-                    } else {
-                        "Este ejercicio no está en el catálogo de la app, así que no hay ficha " +
-                            "ni ilustración. El vídeo de aquí arriba te lo busca en YouTube; " +
-                            "hazlo controlando el peso, con la espalda neutra y sin impulso."
+                    when {
+                        kind == ExerciseKind.CARDIO ->
+                            "Un bloque de cardio no tiene técnica que mirar: elige la máquina " +
+                                "que quieras (cinta, bici, elíptica o remo) y mantén el ritmo " +
+                                "que pide el plan de principio a fin."
+                        imageRes != null ->
+                            "Todavía no hay ficha para este ejercicio. Fíjate en la imagen y " +
+                                "haz el movimiento controlando el peso, con la espalda neutra " +
+                                "y sin impulso."
+                        else ->
+                            "Este ejercicio no está en el catálogo de la app, así que no hay " +
+                                "ficha ni ilustración. El vídeo de aquí arriba te lo busca en " +
+                                "YouTube; hazlo controlando el peso, con la espalda neutra y " +
+                                "sin impulso."
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

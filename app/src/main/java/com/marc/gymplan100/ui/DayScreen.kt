@@ -207,7 +207,8 @@ fun DayScreen(
             ExerciseGuideSheet(
                 exerciseName = ex.name,
                 scheme = ex.scheme,
-                onDismiss = { guideFor = null }
+                onDismiss = { guideFor = null },
+                kind = ex.kind
             )
         }
     }
