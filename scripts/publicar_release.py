@@ -322,13 +322,10 @@ def asegurar_arbol_limpio() -> None:
         ["git", "status", "--porcelain"], cwd=RAIZ, capture_output=True, text=True
     ).stdout.strip()
     if salida:
-        sucios = "
-".join("  " + l for l in salida.splitlines()[:12])
+        sucios = "\n".join("  " + linea for linea in salida.splitlines()[:12])
         raise SystemExit(
-            "Hay cambios sin commitear: la Release quedaría etiquetada sin ellos.
-"
-            f"{sucios}
-"
+            "Hay cambios sin commitear: la Release quedaría etiquetada sin ellos.\n"
+            f"{sucios}\n"
             "Commitea (o guarda en stash) y vuelve a lanzarlo."
         )
 
