@@ -1,8 +1,8 @@
 {
-  "versionCode": 14,
-  "versionName": "2.2",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.2/building-my-future-v2.2.apk",
-  "sha256": "ffce6fee80069519d1e7bc955593ee09b8a8c65cb5a1a125ce774a2910d17310",
-  "notas": "Se va la altura del perfil: se pedía «para las calorías» pero no entraba en ningún cálculo, así que la app tampoco te pide ya ese permiso de Google Health. El peso y el género explican ahora para qué sirve cada uno: el peso estima las calorías del entreno y el género elige si las ilustraciones son de hombre o de mujer.",
+  "versionCode": 15,
+  "versionName": "2.3",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.3/building-my-future-v2.3.apk",
+  "sha256": "394d46a573f24ce7a35ac40f7edea482abf4f0722b7bcaff21f224e233e42ba8",
+  "notas": "Tres pantallas nuevas y unos cuantos arreglos.\n\nLa primera vez que abres la app, un asistente de cuatro preguntas te propone uno de los doce planes y te dice por qué. Las respuestas no se guardan en ninguna parte: se calculan en el móvil y se descartan.\n\nAl terminar un plan, una pantalla de cierre con lo que has hecho y cuatro salidas: seguir con el siguiente, repetir solo la última fase, empezarlo de cero o elegir otro. Si marcaste los días a mano, lo dice con palabras en vez de enseñar ceros.\n\nAl acabar un entrenamiento libre puedes apuntar qué has hecho, con los ejercicios del día ya puestos. Es opcional: el tiempo se guarda igual.\n\nArreglos: la fecha de fin del plan ya no se borra al cerrar el aviso, la lista de planes se actualiza al terminar uno, el teclado ya no tapa el campo que estás rellenando, y al abrir la app ya no parpadea un \"plan nuevo\" falso.",
   "check_horas": 24
 }
