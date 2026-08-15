@@ -321,8 +321,14 @@ def asegurar_arbol_limpio() -> None:
     salida = subprocess.run(
         ["git", "status", "--porcelain"], cwd=RAIZ, capture_output=True, text=True
     ).stdout.strip()
-    if salida:
-        sucios = "\n".join("  " + linea for linea in salida.splitlines()[:12])
+    # El manifiesto no cuenta: lo escribe este mismo script (y un --dry-run previo lo deja
+    # tocado), y lo commitea él al publicar.
+    pendientes = [
+        linea for linea in salida.splitlines()
+        if MANIFIESTO.name not in linea.replace("\\", "/")
+    ]
+    if pendientes:
+        sucios = "\n".join("  " + linea for linea in pendientes[:12])
         raise SystemExit(
             "Hay cambios sin commitear: la Release quedaría etiquetada sin ellos.\n"
             f"{sucios}\n"
