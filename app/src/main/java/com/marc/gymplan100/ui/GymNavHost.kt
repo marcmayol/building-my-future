@@ -1,6 +1,10 @@
 package com.marc.gymplan100.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +54,16 @@ fun GymNavHost(
     val celebration by viewModel.celebration.collectAsState()
     val profile by viewModel.profile.collectAsState()
     val activePlan by viewModel.activePlan.collectAsState()
+
+    // Nada se dibuja hasta tener el progreso leído. Es cosa de un parpadeo, pero en ese
+    // parpadeo la portada decía "plan nuevo · empieza cuando quieras · día 1" a quien lleva
+    // cuarenta días hechos, y también sacaba la bienvenida a quien ya eligió plan hace meses.
+    // Mejor un instante de fondo vacío que un instante de mentira.
+    val loaded by viewModel.loaded.collectAsState()
+    if (!loaded) {
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+        return
+    }
 
     CompositionLocalProvider(LocalIsFemale provides (profile.gender == "Mujer")) {
     Box {

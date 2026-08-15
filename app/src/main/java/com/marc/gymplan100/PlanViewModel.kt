@@ -48,6 +48,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -57,6 +60,16 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _progress = MutableStateFlow(ProgressState())
     val progress: StateFlow<ProgressState> = _progress.asStateFlow()
+
+    private val _loaded = MutableStateFlow(false)
+    /**
+     * El progreso guardado ya está leído.
+     *
+     * Hasta que lo esté, [progress] es un estado vacío, y pintar la portada con él significa
+     * enseñar "PLAN NUEVO · empieza cuando quieras · día 1" a alguien que lleva cuarenta días
+     * hechos. Dura un parpadeo, pero es un parpadeo que dice justo lo contrario de la verdad.
+     */
+    val loaded: StateFlow<Boolean> = _loaded.asStateFlow()
 
     private val _active = MutableStateFlow<ActiveSession?>(null)
     val activeSession: StateFlow<ActiveSession?> = _active.asStateFlow()
@@ -132,8 +145,15 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Progreso de cada plan (por id), para enseñarlo en la lista sin activarlos: días hechos,
      * si está terminado y por qué vuelta va.
+     *
+     * Los de los planes que no sigues se leen de disco al cambiar de plan, pero **el activo
+     * sale del progreso en vivo**: si no, la lista enseñaba como "sin empezar" el plan que
+     * acabas de terminar, porque el mapa era de cuando lo activaste.
      */
-    val planProgress: StateFlow<Map<String, ProgressState>> = _planProgress.asStateFlow()
+    val planProgress: StateFlow<Map<String, ProgressState>> =
+        combine(_planProgress, _progress, _activePlan) { guardados, actual, plan ->
+            guardados + (plan.id to actual)
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     private val _needsWelcome = MutableStateFlow(false)
     /**
@@ -295,6 +315,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             _profile.value = repo.profile.first()
             // Después de leer el progreso: es lo que distingue "primera vez" de "ya venías".
             refreshWelcome()
+            _loaded.value = true
         }
         refreshPlans()
         refreshHealthPermissions()
