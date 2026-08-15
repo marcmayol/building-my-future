@@ -312,6 +312,27 @@ def verificar_url_publica(vc_esperado: int, intentos: int = 30, espera_s: int = 
     )
 
 
+def asegurar_arbol_limpio() -> None:
+    """La Release se etiqueta con el commit actual: lo que no esté commiteado no viaja.
+
+    Publicar con cambios sin commitear deja un tag que no contiene el código que se
+    acaba de compilar, y descubrirlo semanas después es imposible.
+    """
+    salida = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=RAIZ, capture_output=True, text=True
+    ).stdout.strip()
+    if salida:
+        sucios = "
+".join("  " + l for l in salida.splitlines()[:12])
+        raise SystemExit(
+            "Hay cambios sin commitear: la Release quedaría etiquetada sin ellos.
+"
+            f"{sucios}
+"
+            "Commitea (o guarda en stash) y vuelve a lanzarlo."
+        )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Publica una release de Building My Future.")
     parser.add_argument("--dry-run", action="store_true", help="prepara sin publicar")
@@ -319,6 +340,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if not args.dry_run:
+        asegurar_arbol_limpio()
         verificar_gh()
 
     manifiesto, apk, reloj = preparar(args.notas)
