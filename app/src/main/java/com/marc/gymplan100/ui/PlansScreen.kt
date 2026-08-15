@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanImport
+import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.PlanSource
 import com.marc.gymplan100.data.TrainingPlan
 import com.marc.gymplan100.ui.theme.LocalAppColors
@@ -236,8 +237,9 @@ fun PlansScreen(
                 PlanCard(
                     plan = plan,
                     isActive = plan.id == activePlan.id,
-                    completedDays = planProgress[plan.id] ?: 0,
+                    progress = planProgress[plan.id] ?: ProgressState(),
                     canSwitch = activeSession == null,
+                    onSeeSummary = { viewModel.showPlanSummaryAgain(); onBack() },
                     onActivate = {
                         viewModel.activatePlan(plan.id)
                         scope.launch { snackbar.showSnackbar("Ahora sigues «${plan.name}»") }
@@ -300,22 +302,33 @@ fun PlansScreen(
 private fun PlanCard(
     plan: TrainingPlan,
     isActive: Boolean,
-    completedDays: Int,
+    progress: ProgressState,
     canSwitch: Boolean,
+    onSeeSummary: () -> Unit,
     onActivate: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     val app = LocalAppColors.current
-    val styles = LocalAppTextStyles.current
 
+    val completedDays = progress.completedDays.size
     // Estado del plan: es lo primero que se lee, y va en el raíl y en el distintivo.
-    val terminado = plan.totalDays > 0 && completedDays >= plan.totalDays
+    // Terminado y sin empezar mandan sobre "activo": lo que importa es en qué punto está.
+    val terminado = progress.everFinished ||
+        (plan.totalDays > 0 && completedDays >= plan.totalDays)
+    // Se terminó y ya se ha vuelto a empezar: la vuelta en curso se dice aparte, sin borrar
+    // el "terminado el…" (haber acabado el plan una vez no se deshace por repetirlo).
+    val enMarcha = completedDays in 1 until plan.totalDays
+    val repitiendo = terminado && progress.rounds > 0 && enMarcha
     val estado = when {
-        isActive -> PlanBadge.Activo
         terminado -> PlanBadge.Terminado
         completedDays == 0 -> PlanBadge.SinEmpezar
         else -> PlanBadge.Activo
+    }
+    val fechaFin = remember(progress.finishedAt) {
+        progress.finishedAt.takeIf { it > 0L }?.let {
+            SimpleDateFormat("d MMM", Locale.forLanguageTag("es-ES")).format(Date(it))
+        }
     }
 
     Row(
@@ -341,21 +354,33 @@ private fun PlanCard(
                 .background(planRailColor(estado))
         )
     Column(modifier = Modifier.padding(Space.x4)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                plan.name,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
-            )
+        Text(plan.name, style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(Space.x2))
+        // Los distintivos en FlowRow: un plan terminado que se está repitiendo lleva dos, y
+        // con el texto del sistema grande el segundo baja de línea en vez de recortarse.
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(Space.x2),
+            verticalArrangement = Arrangement.spacedBy(Space.x1)
+        ) {
             DoneBadge(
                 kind = estado,
                 label = when (estado) {
                     PlanBadge.Activo -> "Activo"
-                    PlanBadge.Terminado -> "Terminado"
-                    PlanBadge.VueltaEnCurso -> "Otra vuelta"
+                    PlanBadge.Terminado ->
+                        if (fechaFin != null) "Terminado el $fechaFin" else "Terminado"
+                    PlanBadge.VueltaEnCurso -> "${progress.rounds + 1}ª vuelta en curso"
                     PlanBadge.SinEmpezar -> "Sin empezar"
                 }
             )
+            if (repitiendo) {
+                DoneBadge(
+                    kind = PlanBadge.VueltaEnCurso,
+                    label = "${progress.rounds + 1}ª vuelta en curso"
+                )
+            }
+            if (isActive && estado != PlanBadge.Activo) {
+                DoneBadge(kind = PlanBadge.Activo, label = "Activo")
+            }
         }
         if (plan.description.isNotBlank()) {
             Spacer(Modifier.height(Space.x1))
@@ -374,7 +399,11 @@ private fun PlanCard(
             buildString {
                 append("${plan.totalDays} días · ")
                 append(if (plan.phases.size == 1) "1 fase" else "${plan.phases.size} fases")
-                append(if (completedDays == 1) " · 1 completado" else " · $completedDays completados")
+                // Sin empezar no se cuentan ceros: un "0 completados" es ruido, no información.
+                if (completedDays > 0) {
+                    append(if (completedDays == 1) " · 1 completado" else " · $completedDays completados")
+                    if (repitiendo) append(" de la ${progress.rounds + 1}ª vuelta")
+                }
             },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -401,15 +430,17 @@ private fun PlanCard(
             )
         }
 
-        Spacer(Modifier.height(Space.x3))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f))
-        ) {
-            if (completedDays > 0 && plan.totalDays > 0) {
+        // La barra solo aparece si hay algo que enseñar: vacía no dice nada, y al 100 % repite
+        // lo que ya pone el distintivo de terminado.
+        if (enMarcha) {
+            Spacer(Modifier.height(Space.x3))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f))
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(
@@ -431,6 +462,12 @@ private fun PlanCard(
         ) {
             if (!isActive) {
                 Button(onClick = onActivate, enabled = canSwitch) { Text("Seguir este") }
+            }
+            // El resumen del cierre se puede volver a abrir, pero solo del plan que se está
+            // siguiendo: abrirlo de otro obligaría a cambiar de plan por detrás, y eso no es
+            // lo que pide quien pulsa "ver resumen".
+            if (isActive && terminado) {
+                OutlinedButton(onClick = onSeeSummary) { Text("Ver resumen") }
             }
             if (!plan.builtin) {
                 OutlinedButton(onClick = onEdit) { Text("Editar") }

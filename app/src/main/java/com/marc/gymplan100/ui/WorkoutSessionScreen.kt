@@ -84,6 +84,7 @@ fun WorkoutSessionScreen(
     var showQuitDialog by remember { mutableStateOf(false) }
     // Apuntando lo hecho al terminar un entreno libre (el paso previo a guardarlo).
     var apuntando by remember { mutableStateOf(false) }
+    var tiempoLibre by remember { mutableStateOf(0L) }
     val dark = isSystemInDarkTheme()
 
     // Reloj que avanza cada medio segundo para refrescar cronómetros.
@@ -115,13 +116,16 @@ fun WorkoutSessionScreen(
             // ofrece apuntar qué se ha hecho, con los ejercicios del día ya puestos.
             FreeSessionLog(
                 day = day,
+                elapsedMs = tiempoLibre,
                 onSave = { apuntado -> viewModel.finishFreeSession(apuntado); onExit() },
                 onSkip = { viewModel.finishSession(); onExit() }
             )
         } else {
             FreeContent(
                 s = s, day = day, now = now, dark = dark,
-                onFinish = { apuntando = true },
+                // El cronómetro se para al pulsar finalizar: lo que se enseña mientras se
+                // apunta es el tiempo entrenado, no el rato que se ha tardado en escribirlo.
+                onFinish = { tiempoLibre = now - s.startMillis; apuntando = true },
                 onExit = { showQuitDialog = true }
             )
         }

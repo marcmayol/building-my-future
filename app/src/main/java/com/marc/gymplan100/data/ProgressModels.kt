@@ -32,10 +32,16 @@ data class ProgressState(
      */
     val startedAt: Long = 0L,
     /**
-     * Cuándo se completó el último día del plan (0 = sin terminar). Lo que dispara la
-     * pantalla de cierre; se pone a 0 al empezar otra vuelta.
+     * Cuándo se terminó el plan por última vez (0 = nunca).
+     *
+     * La fecha **no se borra**: ni al cerrar el aviso ni al empezar otra vuelta. La portada y
+     * la lista dicen "Terminado el 14 de agosto", y esa frase no puede depender de si se cerró
+     * un aviso ni desaparecer por seguir entrenando. Lo que decide si el cierre sale solo es
+     * [finishedSeen], no esto.
      */
     val finishedAt: Long = 0L,
+    /** El cierre del plan ya se ha enseñado: no vuelve a salir solo. */
+    val finishedSeen: Boolean = false,
     /**
      * Vueltas ya terminadas. Mantenimiento y Movilidad están pensados para darlas: al
      * empezar otra, los días se vacían pero esto sube y el historial de entrenos se queda.
@@ -46,7 +52,10 @@ data class ProgressState(
         PlanData.daysOfPhase(phaseNumber).count { it.number in completedDays }
 
     /** El plan está acabado y todavía no se ha decidido qué hacer después. */
-    val isFinished: Boolean get() = finishedAt > 0L
+    val isFinished: Boolean get() = finishedAt > 0L && !finishedSeen
+
+    /** Acabado alguna vez, se haya visto el cierre o no. */
+    val everFinished: Boolean get() = finishedAt > 0L
 
     /**
      * Otra vuelta al plan entero: los días vuelven a cero y la vuelta queda contada.
@@ -58,7 +67,7 @@ data class ProgressState(
         completedDays = emptySet(),
         logs = emptyMap(),
         startedAt = now,
-        finishedAt = 0L,
+        finishedSeen = true,
         rounds = rounds + 1
     )
 
@@ -70,7 +79,7 @@ data class ProgressState(
         completedDays = completedDays - days,
         logs = logs.filterKeys { it.substringBefore("-").toIntOrNull() !in days },
         startedAt = now,
-        finishedAt = 0L,
+        finishedSeen = true,
         rounds = rounds + 1
     )
 }

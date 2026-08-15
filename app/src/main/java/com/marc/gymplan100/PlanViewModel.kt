@@ -127,9 +127,12 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     /** El plan que viene con la app más los que haya importado el usuario. */
     val plans: StateFlow<List<TrainingPlan>> = _plans.asStateFlow()
 
-    private val _planProgress = MutableStateFlow<Map<String, Int>>(emptyMap())
-    /** Días completados de cada plan (por id), para enseñarlos en la lista sin activarlos. */
-    val planProgress: StateFlow<Map<String, Int>> = _planProgress.asStateFlow()
+    private val _planProgress = MutableStateFlow<Map<String, ProgressState>>(emptyMap())
+    /**
+     * Progreso de cada plan (por id), para enseñarlo en la lista sin activarlos: días hechos,
+     * si está terminado y por qué vuelta va.
+     */
+    val planProgress: StateFlow<Map<String, ProgressState>> = _planProgress.asStateFlow()
 
     private val _needsWelcome = MutableStateFlow(false)
     /**
@@ -153,7 +156,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         _plans.value = PlanStore.allPlans(getApplication())
         _activePlan.value = PlanData.active
         viewModelScope.launch {
-            _planProgress.value = _plans.value.associate { it.id to repo.completedDaysOf(it.id) }
+            _planProgress.value = _plans.value.associate { it.id to repo.progressOf(it.id) }
         }
     }
 
@@ -353,7 +356,10 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         )
         if (finalVictory) {
             // Queda apuntado para poder enseñar el cierre del plan al salir del diálogo.
-            val terminado = after.copy(finishedAt = System.currentTimeMillis())
+            val terminado = after.copy(
+                finishedAt = System.currentTimeMillis(),
+                finishedSeen = false
+            )
             _progress.value = terminado
             viewModelScope.launch { repo.save(terminado) }
             // El himno es del reto de 100 días: en un bloque de 12 sesiones no pega.
@@ -399,11 +405,16 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         _needsWelcome.value = true
     }
 
-    /** Vuelve a abrir el resumen del plan terminado (desde la portada o la lista). */
+    /**
+     * Vuelve a abrir el resumen del plan terminado (desde la portada o la lista).
+     *
+     * Solo levanta la marca de "ya visto": la fecha de fin no se toca, porque es la del día
+     * que se terminó el plan y no la de la última vez que se miró el resumen.
+     */
     fun showPlanSummaryAgain() {
         val actual = _progress.value
-        if (actual.finishedAt > 0L) return
-        val visto = actual.copy(finishedAt = System.currentTimeMillis())
+        if (!actual.everFinished || actual.isFinished) return
+        val visto = actual.copy(finishedSeen = false)
         _progress.value = visto
         viewModelScope.launch { repo.save(visto) }
     }
@@ -412,7 +423,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     fun dismissPlanFinished() {
         val actual = _progress.value
         if (!actual.isFinished) return
-        val cerrado = actual.copy(finishedAt = -1L)   // -1: terminado y ya visto
+        val cerrado = actual.copy(finishedSeen = true)
         _progress.value = cerrado
         viewModelScope.launch { repo.save(cerrado) }
     }

@@ -235,7 +235,7 @@ fun HomeScreen(
                 HeroTerminado(
                     planName = activePlan.name,
                     total = total,
-                    finishedAt = progress.finishedAt.coerceAtLeast(0L),
+                    finishedAt = progress.finishedAt,
                     weeks = progress.startedAt.takeIf { it > 0L }?.let { ini ->
                         val fin = progress.finishedAt.takeIf { it > 0 } ?: System.currentTimeMillis()
                         ((fin - ini) / (7L * 24 * 60 * 60 * 1000)).toInt() + 1
@@ -405,7 +405,10 @@ private fun HeroTerminado(
                             SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
                                 .format(Date(finishedAt))
                         )
-                        if (weeks != null) append(", en $weeks semanas")
+                        if (weeks != null) {
+                            append(", en $weeks ")
+                            append(if (weeks == 1) "semana" else "semanas")
+                        }
                         append(".")
                     },
                     style = MaterialTheme.typography.bodySmall,

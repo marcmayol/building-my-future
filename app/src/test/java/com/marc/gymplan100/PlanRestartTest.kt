@@ -69,4 +69,22 @@ class PlanRestartTest {
         val aMedias = ProgressState(completedDays = setOf(1, 2, 3))
         assertFalse(aMedias.isFinished)
     }
+
+    /**
+     * La portada y la lista dicen "Terminado el 14 de agosto": esa frase no puede depender de
+     * si se cerró un aviso ni desaparecer por volver a empezar el plan.
+     */
+    @Test fun `la fecha de fin sobrevive a la vuelta siguiente`() {
+        val nuevo = terminado.restartedFromScratch(now = 50_000L)
+        assertEquals(9_000L, nuevo.finishedAt)
+        assertTrue(nuevo.everFinished)
+        assertFalse("el cierre ya no debe volver a salir solo", nuevo.isFinished)
+    }
+
+    @Test fun `ver el cierre y cerrarlo no toca la fecha`() {
+        val visto = terminado.copy(finishedSeen = true)
+        assertEquals(9_000L, visto.finishedAt)
+        assertFalse(visto.isFinished)
+        assertTrue(visto.everFinished)
+    }
 }

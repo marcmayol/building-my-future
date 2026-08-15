@@ -6,6 +6,7 @@
 package com.marc.gymplan100.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
@@ -220,6 +223,9 @@ fun DecisionRow(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = Touch.min)
+            // Toda la fila es el botón, no solo el chevrón: el título y su explicación son
+            // parte de lo que se está eligiendo, y con el pulgar se apunta al texto.
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(vertical = 15.dp, horizontal = 2.dp),
     ) {
         Column(Modifier.weight(1f)) {
@@ -230,4 +236,24 @@ fun DecisionRow(
         Text("›", style = MaterialTheme.typography.titleLarge, color = cs.outline)
     }
     HorizontalDivider(color = cs.outlineVariant)
+}
+
+/**
+ * Salida de tercer peso: texto subrayado en `onSurfaceVariant`.
+ *
+ * Es la que dice "déjalo así" o "no me apuntes nada": tiene que estar a la vista y no pedir
+ * el turno. Un botón con borde la haría competir con la acción de verdad; un gris sin subrayar
+ * la escondería.
+ */
+@Composable
+fun Subrayado(texto: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    TextButton(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        Text(
+            texto,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                textDecoration = TextDecoration.Underline
+            ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }

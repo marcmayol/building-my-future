@@ -86,9 +86,14 @@ class ProgressRepository(private val context: Context) {
         }
     }
 
-    /** Días completados de un plan cualquiera, para enseñarlos en la lista de planes. */
-    suspend fun completedDaysOf(planId: String): Int =
-        readProgress(context.dataStore.data.first(), planId).completedDays.size
+    /**
+     * Progreso de un plan cualquiera, para pintarlo en la lista sin tener que activarlo.
+     *
+     * Se lee entero y no solo los días hechos porque la tarjeta también dice si el plan está
+     * terminado, cuándo, y por qué vuelta va.
+     */
+    suspend fun progressOf(planId: String): ProgressState =
+        readProgress(context.dataStore.data.first(), planId)
 
     /** Borra el progreso y el historial de un plan (al borrar el plan). */
     suspend fun clearPlanData(planId: String) {

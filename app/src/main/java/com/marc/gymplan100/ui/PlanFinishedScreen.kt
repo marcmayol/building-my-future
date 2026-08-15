@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -110,8 +112,11 @@ fun PlanFinishedScreen(
         )
 
         LazyColumn(
+            // La cinta sí toca el borde de la pantalla, pero el contenido no: sin esto el
+            // distintivo de "plan terminado" se cuela debajo del reloj.
+            modifier = Modifier.statusBarsPadding().navigationBarsPadding(),
             contentPadding = PaddingValues(
-                start = Space.screen, end = Space.screen, top = Space.block, bottom = 40.dp
+                start = Space.screen, end = Space.screen, top = Space.x3, bottom = 40.dp
             ),
             verticalArrangement = Arrangement.spacedBy(Space.x3)
         ) {
@@ -155,7 +160,8 @@ fun PlanFinishedScreen(
                     if (semanas != null && inicio != null) {
                         Spacer(Modifier.height(Space.x1))
                         Text(
-                            "en $semanas semanas · empezaste el ${fecha(inicio)}",
+                            "en $semanas ${if (semanas == 1) "semana" else "semanas"} · " +
+                                "empezaste el ${fecha(inicio)}",
                             style = MaterialTheme.typography.bodyLarge,
                             color = onHero
                         )
@@ -175,7 +181,9 @@ fun PlanFinishedScreen(
                         verticalArrangement = Arrangement.spacedBy(Space.x2)
                     ) {
                         Cifra("Entrenado", tiempo(minutos), Modifier.weight(1f))
-                        Cifra("Series", "$series", Modifier.weight(1f))
+                        // Un cero rotundo suena a suspenso; el guion dice "de esto no hay
+                        // registro", que es lo que pasa cuando los días se marcan a mano.
+                        Cifra("Series", if (series > 0) "$series" else "—", Modifier.weight(1f))
                         Cifra("Mejor racha", "$racha d", Modifier.weight(1f), app.streak)
                     }
                 }

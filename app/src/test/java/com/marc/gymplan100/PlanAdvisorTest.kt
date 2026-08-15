@@ -121,6 +121,23 @@ class PlanAdvisorTest {
         assertTrue(r.best!!.reason.endsWith("."))
     }
 
+    /**
+     * Escuchar la respuesta: si alguien pide moverse mejor, un plan de músculo no vale como
+     * propuesta aunque quepa en su semana. Se dice que no hay, y se le enseña lo más cercano.
+     */
+    @Test fun `no se propone un plan de otro objetivo`() {
+        val r = recomienda(PlanGoal.MOBILITY, Shape.REGULAR, Days.TWO, Place.HOME)
+        assertNull(r.best)
+        assertTrue(r.whyNothing.contains("movilidad"))
+        assertTrue("y sí se ofrece el bloque de movilidad", r.addOns.any { it.id == "movilidad" })
+    }
+
+    @Test fun `cuando nada encaja se explica que le falta a lo mas cercano`() {
+        val r = recomienda(PlanGoal.MOBILITY, Shape.REGULAR, Days.TWO, Place.HOME)
+        assertNotNull(r.closest)
+        assertTrue(r.closest!!.reason.isNotBlank())
+    }
+
     @Test fun `sin planes que encajen no se inventa una recomendacion`() {
         val soloGimnasio = catalogo.filter { it.equipment == PlanEquipment.GYM && !it.addOn }
         val r = PlanAdvisor.recommend(
