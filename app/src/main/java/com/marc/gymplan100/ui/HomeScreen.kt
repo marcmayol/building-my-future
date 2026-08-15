@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -67,6 +70,8 @@ import com.marc.gymplan100.R
 import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.Phase
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
@@ -121,13 +126,18 @@ fun HomeScreen(
     val actualizador = remember(context) { (context.applicationContext as GymApp).actualizador }
     val estadoActualizacion by actualizador.estado.collectAsState()
 
+    // La portada no vive dentro de un Scaffold, así que los márgenes del sistema se piden
+    // aquí. Iban a ojo (44 dp) y la barra de estado de este móvil mide 48,8: el logo estaba
+    // ya medio metido debajo, y con una isla o un notch más alto sería peor. Van en el
+    // contentPadding y no en la pantalla para que la lista siga pasando por debajo al bajar.
+    val sistema = WindowInsets.systemBars.asPaddingValues()
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(
             start = Space.screen,
             end = Space.screen,
-            top = 44.dp,
-            bottom = 32.dp
+            top = sistema.calculateTopPadding() + Space.x3,
+            bottom = sistema.calculateBottomPadding() + 32.dp
         ),
         verticalArrangement = Arrangement.spacedBy(Space.x3)
     ) {
@@ -247,7 +257,7 @@ fun HomeScreen(
                 HeroHoy(
                     dayNumber = nextDay,
                     subtitle = nextTemplate?.let {
-                        "${it.title} · ${it.exercises.size} ejercicios"
+                        "${it.title} · " + contar(it.exercises.size, "ejercicio", "ejercicios")
                     }.orEmpty(),
                     everStarted = done > 0,
                     onStart = { onOpenDay(nextDay) },

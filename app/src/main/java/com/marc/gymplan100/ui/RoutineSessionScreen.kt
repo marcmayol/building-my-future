@@ -34,6 +34,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -156,7 +158,9 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
     // Se puede terminar el ejercicio antes (elegir 2 de 3) una vez hechas las series mínimas.
     val canEndEarly = hasSeries && s.setNumber >= paso.minSeries && s.setNumber < paso.numSeries
 
-    AssistChip(onClick = {}, label = { Text("Paso ${s.stepIndex + 1} de ${s.totalUnits}") })
+    // Etiqueta, no botón: un AssistChip con onClick vacío se ilumina al tocarlo y promete
+    // algo que no pasa. Aquí solo dice por dónde vas.
+    Etiqueta("Paso ${s.stepIndex + 1} de ${s.totalUnits}")
     if (hasSeries) {
         Text(
             "Serie ${s.setNumber} de ${paso.numSeries}",
@@ -238,7 +242,7 @@ private fun FatburnContent(s: ActiveSession, now: Long, viewModel: PlanViewModel
         s.totalUnits > 1 -> "Ronda ${s.stepIndex + 1} de ${s.totalUnits}"
         else -> protocol.nombre
     }
-    AssistChip(onClick = {}, label = { Text(unitLabel) })
+    Etiqueta(unitLabel)
 
     when (s.phase) {
         SessionPhase.TIMED_SET -> {
@@ -378,4 +382,20 @@ private fun formatClock(millis: Long): String {
     val m = total / 60
     val sec = total % 60
     return "%02d:%02d".format(m, sec)
+}
+
+/** Píldora informativa: la forma de un chip sin fingir que se puede pulsar. */
+@Composable
+private fun Etiqueta(texto: String) {
+    Surface(
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    ) {
+        Text(
+            texto,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+    }
 }

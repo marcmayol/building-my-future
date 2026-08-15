@@ -53,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Canvas
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.SessionRecord
 import com.marc.gymplan100.data.Statistics
 import com.marc.gymplan100.ui.theme.BrandMagenta
@@ -663,7 +665,7 @@ private fun RecordsSection(
                 productive?.let {
                     RecordTile(
                         emoji = "💪",
-                        value = "${it.totalSets} series",
+                        value = contar(it.totalSets, "serie", "series"),
                         label = "sesión más productiva · día ${it.dayNumber}",
                         modifier = Modifier.weight(1f)
                     )

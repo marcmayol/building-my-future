@@ -54,6 +54,7 @@ import androidx.health.connect.client.PermissionController
 import com.marc.gymplan100.BuildConfig
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.UserProfile
 import com.marcm.actualizador.EstadoActualizacion
 import com.marcm.actualizador.Modo
@@ -124,7 +125,8 @@ fun SettingsScreen(
                     Text("Plan de entrenamiento", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        "Sigues «${activePlan.name}» · ${activePlan.totalDays} días. " +
+                        "Sigues «${activePlan.name}» · " +
+                            contar(activePlan.totalDays, "día", "días") + ". " +
                             "Puedes traerte tu propio plan y alternar entre ellos sin " +
                             "perder el progreso de ninguno.",
                         style = MaterialTheme.typography.bodyMedium,

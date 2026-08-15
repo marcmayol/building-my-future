@@ -62,6 +62,8 @@ import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.data.isBodyweightScheme
@@ -199,7 +201,8 @@ private fun WarmupContent(
                 )
                 Spacer(Modifier.height(Space.x1))
                 Text(
-                    "${day.template.exercises.size} ejercicios · $totalSets series",
+                    contar(day.template.exercises.size, "ejercicio", "ejercicios") + " · " +
+                        contar(totalSets, "serie", "series"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

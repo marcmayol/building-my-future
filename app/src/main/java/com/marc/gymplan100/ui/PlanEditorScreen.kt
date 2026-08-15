@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -321,7 +322,9 @@ private fun PlanLevel(
     val totalDays = plan.fases.sumOf { it.dias.size * it.semanas.coerceAtLeast(1) }
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        // Con el teclado abierto la lista se encoge en vez de quedar tapada: si no, el campo
+        // que estás escribiendo se queda debajo de las teclas.
+        modifier = Modifier.fillMaxWidth().imePadding(),
         contentPadding = padding,
         verticalArrangement = Arrangement.spacedBy(Space.x3)
     ) {
@@ -439,7 +442,9 @@ private fun PhaseLevel(
         onEdit { it.copy(fases = it.fases.replacedAt(phaseIndex, transform(it.fases[phaseIndex]))) }
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        // Con el teclado abierto la lista se encoge en vez de quedar tapada: si no, el campo
+        // que estás escribiendo se queda debajo de las teclas.
+        modifier = Modifier.fillMaxWidth().imePadding(),
         contentPadding = padding,
         verticalArrangement = Arrangement.spacedBy(Space.x3)
     ) {
@@ -586,7 +591,9 @@ private fun DayLevel(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
+        // Con el teclado abierto la lista se encoge en vez de quedar tapada: si no, el campo
+        // que estás escribiendo se queda debajo de las teclas.
+        modifier = Modifier.fillMaxWidth().imePadding(),
         contentPadding = padding,
         verticalArrangement = Arrangement.spacedBy(Space.x3)
     ) {

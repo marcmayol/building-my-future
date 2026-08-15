@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.PermissionController
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.SessionRecord
 import com.marc.gymplan100.ui.theme.LocalAppColors
@@ -323,7 +325,7 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
             if (record != null) {
                 Spacer(Modifier.height(Space.x2))
                 Text(
-                    "${record.totalSets} series · descanso total " +
+                    contar(record.totalSets, "serie", "series") + " · descanso total " +
                         formatDuration(record.totalRestSeconds),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

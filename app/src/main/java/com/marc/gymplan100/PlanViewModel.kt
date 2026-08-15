@@ -23,6 +23,7 @@ import com.marc.gymplan100.data.PlanDto
 import com.marc.gymplan100.data.PlanImport
 import com.marc.gymplan100.data.PlanMarkdownParser
 import com.marc.gymplan100.data.PlanStore
+import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.EjercicioCatalogo
@@ -1104,7 +1105,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
         val mins = record.durationSeconds / 60
-        sb.append("Duración: $mins min · ${record.totalSets} series")
+        sb.append("Duración: $mins min · " + contar(record.totalSets, "serie", "series"))
         return sb.toString().trim()
     }
 

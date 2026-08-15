@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.Statistics
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -253,7 +255,7 @@ fun PlanFinishedScreen(
                     DecisionRow(
                         title = "Repetir solo «${ultimaFase.name}»",
                         explanation = "La última fase son " +
-                            "${PlanData.daysOfPhase(ultimaFase.number).size} días: repetirla " +
+                            contar(PlanData.daysOfPhase(ultimaFase.number).size, "día", "días") + ": repetirla " +
                             "mantiene el nivel al que has llegado sin volver al principio.",
                         onClick = { viewModel.repeatLastPhase() }
                     )

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -56,6 +57,8 @@ import com.marc.gymplan100.data.Exercise
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.repsFromScheme
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -100,7 +103,9 @@ fun DayScreen(
         }
     ) { inner ->
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            // Con el teclado abierto la lista se encoge en vez de quedar tapada: si no, el
+            // campo que estás escribiendo se queda debajo de las teclas.
+            modifier = Modifier.fillMaxWidth().imePadding(),
             contentPadding = PaddingValues(
                 start = Space.screen,
                 end = Space.screen,
@@ -119,7 +124,7 @@ fun DayScreen(
                 Text(template.title, style = MaterialTheme.typography.headlineLarge)
                 Spacer(Modifier.height(Space.x1))
                 Text(
-                    "${template.exercises.size} ejercicios",
+                    contar(template.exercises.size, "ejercicio", "ejercicios"),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

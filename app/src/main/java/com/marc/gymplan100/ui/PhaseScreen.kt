@@ -38,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -102,7 +104,7 @@ fun PhaseScreen(
                 Spacer(Modifier.height(Space.x3))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "$hechos de ${days.size} días",
+                        "$hechos de ${days.size} " + palabra(days.size, "día", "días"),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f)
