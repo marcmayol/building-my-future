@@ -335,6 +335,22 @@ def asegurar_arbol_limpio() -> None:
             "Commitea (o guarda en stash) y vuelve a lanzarlo."
         )
 
+    # Y commiteado no basta: `gh release create` pone el tag sobre lo que hay en GitHub, así
+    # que lo que no esté pusheado tampoco viaja. Pasó en la 2.3: el tag nació apuntando al
+    # commit de la 2.2 y hubo que moverlo a mano.
+    subprocess.run(["git", "fetch", "origin", "main", "-q"], cwd=RAIZ, check=False)
+    sin_pushear = subprocess.run(
+        ["git", "log", "--oneline", "origin/main..HEAD"],
+        cwd=RAIZ, capture_output=True, text=True
+    ).stdout.strip()
+    if sin_pushear:
+        cuantos = len(sin_pushear.splitlines())
+        raise SystemExit(
+            f"Hay {cuantos} commit(s) sin subir: el tag apuntaría a código viejo.\n"
+            + "\n".join("  " + l for l in sin_pushear.splitlines()[:12])
+            + "\nHaz `git push` y vuelve a lanzarlo."
+        )
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Publica una release de Building My Future.")
