@@ -1,8 +1,8 @@
 {
-  "versionCode": 15,
-  "versionName": "2.3",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.3/building-my-future-v2.3.apk",
-  "sha256": "394d46a573f24ce7a35ac40f7edea482abf4f0722b7bcaff21f224e233e42ba8",
-  "notas": "Tres pantallas nuevas y unos cuantos arreglos.\n\nLa primera vez que abres la app, un asistente de cuatro preguntas te propone uno de los doce planes y te dice por qué. Las respuestas no se guardan en ninguna parte: se calculan en el móvil y se descartan.\n\nAl terminar un plan, una pantalla de cierre con lo que has hecho y cuatro salidas: seguir con el siguiente, repetir solo la última fase, empezarlo de cero o elegir otro. Si marcaste los días a mano, lo dice con palabras en vez de enseñar ceros.\n\nAl acabar un entrenamiento libre puedes apuntar qué has hecho, con los ejercicios del día ya puestos. Es opcional: el tiempo se guarda igual.\n\nArreglos: la fecha de fin del plan ya no se borra al cerrar el aviso, la lista de planes se actualiza al terminar uno, el teclado ya no tapa el campo que estás rellenando, y al abrir la app ya no parpadea un \"plan nuevo\" falso.",
+  "versionCode": 16,
+  "versionName": "2.3.1",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.3.1/building-my-future-v2.3.1.apk",
+  "sha256": "1d3358088f609e3e37e9a7d43458602e2a09fccc8755cdda305ef76b98015333",
+  "notas": "Cinco arreglos de lo que molestaba entrenando.\n\nLos circuitos de core ya enseñan sus tres ejercicios, en orden y con cuánto dura cada uno. Antes solo salía el dibujo de la plancha y no había manera de saber qué tocaba hacer; la ficha \"Cómo se hace\" también los enseña todos ahora.\n\nEl peso sube y baja de medio kilo en medio kilo, porque en el gimnasio no todo son discos de 2,5. Si mantienes pulsado el botón, acelera.\n\nEl peso que le ponías a una serie ya no se pierde. Si el móvil se quedaba en el bolsillo un rato largo y Android cerraba la app, al volver te pedía otra vez el peso: ahora se guarda como el resto del entreno.\n\nLa app ya no se tumba. Con el botón de girar del móvil se quedaba en horizontal, sin el nombre del ejercicio ni la ilustración, y costaba volver a ponerla derecha.\n\nLos cronómetros ya no son una cifra en mitad de la nada: el de las planchas lleva el dibujo de lo que estás aguantando, y el del calentamiento dice con qué ejercicio se empieza.",
   "check_horas": 24
 }
