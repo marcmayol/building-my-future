@@ -25,14 +25,20 @@ import kotlinx.coroutines.delay
 /**
  * Botón redondo de un stepper (± peso, ± semanas, ± series).
  *
- * Mantener pulsado repite: subir de 20 a 60 kg de 2,5 en 2,5 son 16 toques, y en el gimnasio
- * eso no lo hace nadie.
+ * Mantener pulsado repite: subir de 20 a 60 kg a toques sueltos no lo hace nadie en el
+ * gimnasio.
+ *
+ * Con [fastRepeat] la repetición además acelera cuanto más rato se aguanta. Lo usan los
+ * steppers de peso, que van de medio kilo en medio kilo ([WEIGHT_STEP]): a ritmo fijo, pasar
+ * de 20 a 60 kg serían ochenta pasos y una eternidad con el dedo puesto. Los de semanas y
+ * series no lo quieren: su rango es corto y acelerar solo hace pasarse.
  */
 @Composable
 fun StepperButton(
     symbol: String,
     onStep: () -> Unit,
     enabled: Boolean = true,
+    fastRepeat: Boolean = false,
     size: Dp = Touch.stepper,
 ) {
     val interaction = remember { MutableInteractionSource() }
@@ -43,9 +49,13 @@ fun StepperButton(
     LaunchedEffect(pressed, enabled) {
         if (pressed && enabled) {
             delay(400)
+            var espera = 120L
             while (true) {
                 step()
-                delay(120)
+                delay(espera)
+                // Cada repetición recorta un poco la espera, hasta un suelo que todavía se
+                // puede soltar a tiempo: al principio se ve pasar el número, al rato vuela.
+                if (fastRepeat) espera = (espera - 6L).coerceAtLeast(35L)
             }
         }
     }

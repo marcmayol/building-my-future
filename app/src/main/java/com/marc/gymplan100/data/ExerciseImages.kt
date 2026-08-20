@@ -213,44 +213,54 @@ object ExerciseImages {
     )
 
     /**
-     * Movimientos ilustrables de cada ejercicio **compuesto** (circuitos y superseries), en
-     * orden (etiqueta -> slug de imagen). No tienen una sola imagen: mostramos la de cada
-     * sub-ejercicio, y como miniatura la del primero.
+     * Un movimiento dentro de un ejercicio compuesto: cómo se llama, con qué se ilustra y
+     * cuánto toca hacer. La dosis es la del propio circuito (la que cuenta la ficha), no la
+     * del esquema del ejercicio: el esquema dice cuántas *vueltas*, no cuánto dura cada cosa.
      */
-    private val nameToCompoundMoves: Map<String, List<Pair<String, String>>> = mapOf(
+    data class CompoundMove(val label: String, val slug: String, val dose: String? = null)
+
+    /** Un movimiento ya resuelto a drawable, listo para pintar. */
+    data class ResolvedMove(val label: String, val dose: String?, val drawable: Int)
+
+    /**
+     * Movimientos ilustrables de cada ejercicio **compuesto** (circuitos y superseries), en
+     * orden. No tienen una sola imagen: se muestran todos, porque enseñar solo el primero
+     * hacía pasar un circuito de tres cosas por una plancha a secas.
+     */
+    private val nameToCompoundMoves: Map<String, List<CompoundMove>> = mapOf(
         "Circuito core (plancha, plancha lateral, dead bug)" to listOf(
-            "Plancha" to "plank",
-            "Plancha lateral" to "side-plank",
-            "Dead bug" to "dead-bug",
+            CompoundMove("Plancha", "plank", "~30 s"),
+            CompoundMove("Plancha lateral", "side-plank", "~20 s por lado"),
+            CompoundMove("Dead bug", "dead-bug", "~10 reps alternando"),
         ),
         "Circuito core (plancha, rodillas, plancha lateral)" to listOf(
-            "Plancha" to "plank",
-            "Escaladores" to "mountain-climbers",
-            "Plancha lateral" to "side-plank",
+            CompoundMove("Plancha", "plank", "~30 s"),
+            CompoundMove("Rodillas al pecho", "mountain-climbers", "~20-30 s"),
+            CompoundMove("Plancha lateral", "side-plank", "~20 s por lado"),
         ),
         "Circuito core (plancha, rueda, elevación piernas)" to listOf(
-            "Plancha" to "plank",
-            "Rueda abdominal" to "ab-wheel-rollout",
-            "Elevación de piernas tumbado" to "lying-leg-raise",
+            CompoundMove("Plancha", "plank", "~30 s"),
+            CompoundMove("Rueda abdominal", "ab-wheel-rollout", "~8-10 reps"),
+            CompoundMove("Elevación de piernas", "lying-leg-raise", "~10-12 reps"),
         ),
         "Circuito de core (plancha, hollow, plancha lateral)" to listOf(
-            "Plancha" to "plank",
-            "Hollow hold" to "hollow-hold",
-            "Plancha lateral" to "side-plank",
+            CompoundMove("Plancha", "plank", "~30 s"),
+            CompoundMove("Hollow hold", "hollow-hold", "~20-30 s"),
+            CompoundMove("Plancha lateral", "side-plank", "~20 s por lado"),
         ),
         "Circuito: plancha, hollow hold, plancha lateral dcha, plancha lateral izq, dead bug" to listOf(
-            "Plancha" to "plank",
-            "Hollow hold" to "hollow-hold",
-            "Plancha lateral" to "side-plank",
-            "Dead bug" to "dead-bug",
+            CompoundMove("Plancha", "plank", "~30 s"),
+            CompoundMove("Hollow hold", "hollow-hold", "~20-30 s"),
+            CompoundMove("Plancha lateral", "side-plank", "~20 s por lado"),
+            CompoundMove("Dead bug", "dead-bug", "~10 reps alternando"),
         ),
         "Superserie curl + extensión" to listOf(
-            "Curl de bíceps alterno con mancuernas" to "alternating-dumbbell-biceps-curl",
-            "Extensión de tríceps en polea" to "triceps-pushdown",
+            CompoundMove("Curl de bíceps alterno con mancuernas", "alternating-dumbbell-biceps-curl"),
+            CompoundMove("Extensión de tríceps en polea", "triceps-pushdown"),
         ),
         "Superserie curl + extensión de tríceps" to listOf(
-            "Curl de bíceps alterno con mancuernas" to "alternating-dumbbell-biceps-curl",
-            "Extensión de tríceps en polea" to "triceps-pushdown",
+            CompoundMove("Curl de bíceps alterno con mancuernas", "alternating-dumbbell-biceps-curl"),
+            CompoundMove("Extensión de tríceps en polea", "triceps-pushdown"),
         ),
     )
 
@@ -268,22 +278,35 @@ object ExerciseImages {
             val id = drawableFor(context, slug, female)
             if (id != 0) return id
         }
-        // Un compuesto (circuito o superserie) no tiene imagen propia: vale la del primer
-        // movimiento, que es lo que se ve en la miniatura de la lista.
-        return circuitMoves(context, name, female).firstOrNull()?.second
+        // Un compuesto no tiene imagen propia. Vale la del primer movimiento para las
+        // miniaturas de 64 dp (la lista del día), donde no cabe nada más; donde hay sitio se
+        // pintan todos con [circuitMoves], que para eso el circuito son tres cosas.
+        return circuitMoves(context, name, female).firstOrNull()?.drawable
     }
 
     /**
-     * Ilustraciones de los movimientos de un ejercicio compuesto (etiqueta -> drawable), solo
-     * las que existen. Vacío si el nombre no es un compuesto conocido.
+     * Movimientos de un ejercicio compuesto ya resueltos a drawable, en orden y solo los que
+     * tienen ilustración. Vacío si el nombre no es un compuesto conocido.
      */
-    fun circuitMoves(context: Context, name: String, female: Boolean): List<Pair<String, Int>> {
+    fun circuitMoves(context: Context, name: String, female: Boolean): List<ResolvedMove> {
         val moves = nameToCompoundMoves[name] ?: return emptyList()
-        return moves.mapNotNull { (label, slug) ->
-            val id = drawableFor(context, slug, female)
-            if (id != 0) label to id else null
+        return moves.mapNotNull { move ->
+            val id = drawableFor(context, move.slug, female)
+            if (id != 0) ResolvedMove(move.label, move.dose, id) else null
         }
     }
+
+    /** ¿Es un circuito o una superserie, es decir, varios movimientos en un solo ejercicio? */
+    fun isCompound(name: String): Boolean = nameToCompoundMoves.containsKey(name)
+
+    /**
+     * El nombre para un titular grande. A un compuesto se le quita el paréntesis con la lista
+     * de movimientos ("Circuito core (plancha, rodillas, plancha lateral)" -> "Circuito core"):
+     * en la pantalla de la serie no cabía y se cortaba a media enumeración, y además ahora los
+     * movimientos van escritos debajo, uno por uno y con su dibujo.
+     */
+    fun headlineName(name: String): String =
+        if (isCompound(name)) name.substringBefore(" (").trim() else name
 
     /** ¿Sabemos con qué ilustrar este ejercicio? Slug propio o movimientos de un compuesto. */
     fun hasVisual(name: String): Boolean =
@@ -294,5 +317,5 @@ object ExerciseImages {
      * compuesto. Lo usa [ExerciseGuides] para encontrar la ficha del ejercicio.
      */
     fun slugFor(name: String): String? =
-        nameToSlug[name] ?: nameToCompoundMoves[name]?.firstOrNull()?.second
+        nameToSlug[name] ?: nameToCompoundMoves[name]?.firstOrNull()?.slug
 }

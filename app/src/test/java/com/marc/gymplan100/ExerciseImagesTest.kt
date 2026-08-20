@@ -37,4 +37,18 @@ class ExerciseImagesTest {
         assertTrue(ExerciseImages.hasVisual("Superserie curl + extensión"))
         assertTrue(ExerciseImages.hasVisual("Superserie curl + extensión de tríceps"))
     }
+
+    @Test
+    fun `los circuitos y superseries del plan son compuestos, no una imagen suelta`() {
+        // El circuito de core enseñaba solo la plancha y parecía un ejercicio a secas. Si
+        // alguien añade un circuito y se olvida de desglosarlo, salta aquí y no entrenando.
+        val sinDesglosar = nombresDelPlan()
+            .filter { it.startsWith("Circuito") || it.startsWith("Superserie") }
+            .filterNot { ExerciseImages.isCompound(it) }
+
+        assertTrue(
+            "Estos circuitos no tienen sus movimientos desglosados: $sinDesglosar",
+            sinDesglosar.isEmpty(),
+        )
+    }
 }

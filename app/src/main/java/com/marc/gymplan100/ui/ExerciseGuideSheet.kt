@@ -94,7 +94,12 @@ fun ExerciseGuideSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (imageRes != null) {
+            // Los circuitos primero: forName devuelve la imagen del primer movimiento, así
+            // que preguntar "¿hay imagen?" daba siempre que sí y la lista de movimientos no
+            // llegaba a pintarse nunca. Un circuito se enseña entero o no se enseña.
+            if (ExerciseImages.isCompound(exerciseName)) {
+                CompoundMoveList(exerciseName)
+            } else if (imageRes != null) {
                 Image(
                     painter = painterResource(imageRes),
                     contentDescription = exerciseName,
@@ -105,41 +110,6 @@ fun ExerciseGuideSheet(
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White)
                 )
-            } else {
-                // Circuitos: no hay una sola imagen, mostramos la de cada movimiento.
-                val moves = ExerciseImages.circuitMoves(
-                    LocalContext.current, exerciseName, LocalIsFemale.current
-                )
-                if (moves.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        moves.forEach { (label, res) ->
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(res),
-                                    contentDescription = label,
-                                    contentScale = ContentScale.Fit,
-                                    modifier = Modifier
-                                        .size(150.dp)
-                                        .clip(RoundedCornerShape(14.dp))
-                                        .background(Color.White)
-                                )
-                                Text(
-                                    label,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
             }
 
             // Vídeo: abre una búsqueda en YouTube del movimiento (devuelve shorts y tutoriales).

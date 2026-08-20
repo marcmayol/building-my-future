@@ -839,6 +839,23 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         saveActive(s.copy(plannedWeight = weight))
     }
 
+    /**
+     * Guarda el peso que se está poniendo a la serie EN CURSO, antes de darla por hecha.
+     *
+     * Hasta ahora ese peso vivía solo en la pantalla: si Android se llevaba la app por delante
+     * mientras el móvil estaba en el bolsillo entre serie y serie, al volver el peso escrito
+     * había desaparecido y la app pedía otra vez "pon el peso que uses hoy". Todo lo demás de
+     * la sesión (la fase, las series hechas, el peso preparado en el descanso) sí se guardaba,
+     * y esto no; ahora usa el mismo campo, que [SessionEngine] ya limpia al terminar la serie.
+     */
+    fun setSetWeight(weight: String) {
+        val s = _active.value ?: return
+        if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return
+        val clean = weight.trim()
+        if (s.plannedWeight == clean) return
+        saveActive(s.copy(plannedWeight = clean))
+    }
+
     // --- Serie por tiempo (planchas, isométricos) -------------------------
 
     /** Arranca la cuenta atrás de una serie por tiempo y programa su aviso sonoro. */

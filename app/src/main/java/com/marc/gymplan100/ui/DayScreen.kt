@@ -255,18 +255,8 @@ private fun ExerciseCard(
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(Space.x4)
     ) {
-        val imageRes = ExerciseImages.forName(LocalContext.current, exercise.name, LocalIsFemale.current)
-        if (imageRes != null) {
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = exercise.name,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(MaterialTheme.shapes.extraSmall)
-                    .background(Color.White)
-            )
+        if (ExerciseImages.hasVisual(exercise.name)) {
+            ExerciseVisual(exercise.name, imageHeight = 140.dp)
             Spacer(Modifier.height(Space.x3))
         }
         Row(verticalAlignment = Alignment.CenterVertically) {

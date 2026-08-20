@@ -9,6 +9,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -218,6 +220,11 @@ private fun WarmupContent(
             )
         }
     ) {
+        // El calentamiento no tiene dibujo propio (es "6 min de lo que quieras"), así que el
+        // hueco lo llena con qué se empieza: da tiempo a ir buscando la máquina.
+        day.template.exercises.firstOrNull()?.let {
+            SessionIllustration(it.name, label = "Empezamos con ${it.name.lowercase()}")
+        }
         Countdown(
             text = if (!done) formatSecs(remaining) else "+${formatSecs(-remaining)}",
             caption = when {
@@ -227,6 +234,36 @@ private fun WarmupContent(
             },
             captionColor = tintAccent(SessionTint.WARMUP)
         )
+    }
+}
+
+/**
+ * La ilustración de un ejercicio ocupando el aire que sobra en una pantalla de cronómetro.
+ *
+ * Va con `weight`, como la del descanso: se encoge sola —o desaparece— antes que empujar la
+ * cuenta atrás y los botones fuera del alcance del pulgar. Con [label], una línea encima que
+ * dice qué se está mirando.
+ */
+@Composable
+private fun ColumnScope.SessionIllustration(exerciseName: String, label: String? = null) {
+    if (!ExerciseImages.hasVisual(exerciseName)) return
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .padding(bottom = Space.x4),
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        if (label != null) {
+            Text(
+                label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                modifier = Modifier.padding(bottom = Space.x2)
+            )
+        }
+        ExerciseVisual(exerciseName, imageHeight = 150.dp)
     }
 }
 
@@ -252,8 +289,20 @@ private fun WorkingContent(
     // igual ("3 x 8-12") y solo en uno tiene sentido preguntarlos.
     val bodyweight = exercise.withoutWeight
 
-    var weight by remember(s.exerciseIndex, s.setNumber) {
+    var weight by rememberSaveable(s.exerciseIndex, s.setNumber) {
         mutableStateOf(viewModel.suggestedWeight(s))
+    }
+    // Solo se persiste lo que el usuario toca: si no, cada serie reescribiría en disco el
+    // peso que la propia app acaba de sugerir.
+    var weightTouched by rememberSaveable(s.exerciseIndex, s.setNumber) { mutableStateOf(false) }
+
+    // El peso baja a disco medio segundo después del último toque. Con pasos de medio kilo y
+    // el botón acelerando, guardar en cada toque serían decenas de escrituras por segundo;
+    // así una ráfaga entera es una sola. Lo que se ve en pantalla cambia al instante igual.
+    LaunchedEffect(weight, weightTouched, s.exerciseIndex, s.setNumber) {
+        if (!weightTouched) return@LaunchedEffect
+        delay(500)
+        viewModel.setSetWeight(weight)
     }
     var showGuide by remember { mutableStateOf(false) }
     var showDayPlan by remember { mutableStateOf(false) }
@@ -286,7 +335,7 @@ private fun WorkingContent(
             if (timedSecs == null && !bodyweight) {
                 WeightBlock(
                     value = weight,
-                    onValue = { weight = it },
+                    onValue = { weight = it; weightTouched = true },
                     dark = dark,
                     exerciseInCatalog = imageRes != null
                 )
@@ -313,7 +362,7 @@ private fun WorkingContent(
         }
     ) {
         Text(
-            exercise.name,
+            ExerciseImages.headlineName(exercise.name),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2
@@ -329,16 +378,9 @@ private fun WorkingContent(
         )
         if (imageRes != null) {
             Spacer(Modifier.height(Space.x4))
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = exercise.name,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White)
-            )
+            // Un circuito son varios movimientos: en mitad de la serie es justo cuando hace
+            // falta ver los tres y en qué orden, no solo la plancha del principio.
+            ExerciseVisual(exercise.name, imageHeight = 150.dp)
         } else {
             // Un plan propio puede traer ejercicios que no están en el catálogo: se dice con
             // palabras en vez de dejar un hueco.
@@ -399,7 +441,12 @@ private fun WeightBlock(
 
     SessionCard(label = "Peso de esta serie", dark = dark) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            StepperButton("−", { onValue(formatKg((kg ?: 0.0) - 2.5)) }, enabled = (kg ?: 0.0) >= 2.5)
+            StepperButton(
+                "−",
+                { onValue(formatKg((kg ?: 0.0) - WEIGHT_STEP)) },
+                enabled = (kg ?: 0.0) >= WEIGHT_STEP,
+                fastRepeat = true,
+            )
             // El valor va en un Text con weight: dentro de un Box se salía de su hueco y se
             // comía el círculo de la izquierda.
             Text(
@@ -425,12 +472,16 @@ private fun WeightBlock(
                     .padding(horizontal = Space.x2)
                     .clickable { typing = true }
             )
-            StepperButton("+", { onValue(formatKg((kg ?: 0.0) + 2.5)) })
+            StepperButton(
+                "+",
+                { onValue(formatKg((kg ?: 0.0) + WEIGHT_STEP)) },
+                fastRepeat = true,
+            )
         }
         Spacer(Modifier.height(Space.x2))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                if (kg != null) "Pasos de 2,5 kg · el mismo que la serie anterior"
+                if (kg != null) "Pasos de 0,5 kg · el mismo que la serie anterior"
                 else if (exerciseInCatalog) "Primera vez con este: pon el peso que uses hoy"
                 else "Primera vez con este ejercicio: pon el peso que uses hoy",
                 style = MaterialTheme.typography.bodySmall,
@@ -442,7 +493,7 @@ private fun WeightBlock(
     }
 
     if (showWheel) {
-        val steps = remember { (0..120).map { it * 2.5 } }
+        val steps = remember { (0..600).map { it * WEIGHT_STEP } }
         val current = steps.indexOfFirst { it >= (kg ?: 0.0) }.coerceAtLeast(0)
         ModalBottomSheet(onDismissRequest = { showWheel = false }) {
             Column(
@@ -534,6 +585,9 @@ private fun TimedSetContent(
             )
         }
     ) {
+        // Aguantando una plancha, mirar la postura del dibujo es justo lo que hace falta; y
+        // sin él la pantalla del cronómetro era una cifra en mitad de la nada.
+        SessionIllustration(exercise.name)
         Countdown(
             text = if (!done) formatSecs(remaining) else "+${formatSecs(-remaining)}",
             caption = when {
@@ -653,10 +707,11 @@ private fun RestingContent(
                             StepperButton(
                                 "−",
                                 {
-                                    plannedWeight = formatKg((kg ?: 0.0) - 2.5)
+                                    plannedWeight = formatKg((kg ?: 0.0) - WEIGHT_STEP)
                                     viewModel.setPlannedWeight(plannedWeight)
                                 },
-                                enabled = (kg ?: 0.0) >= 2.5,
+                                enabled = (kg ?: 0.0) >= WEIGHT_STEP,
+                                fastRepeat = true,
                                 size = Touch.min
                             )
                             Text(
@@ -670,9 +725,10 @@ private fun RestingContent(
                             StepperButton(
                                 "+",
                                 {
-                                    plannedWeight = formatKg((kg ?: 0.0) + 2.5)
+                                    plannedWeight = formatKg((kg ?: 0.0) + WEIGHT_STEP)
                                     viewModel.setPlannedWeight(plannedWeight)
                                 },
+                                fastRepeat = true,
                                 size = Touch.min
                             )
                         }
@@ -1027,6 +1083,16 @@ private fun LaunchedEffectTick(onTick: (Long) -> Unit) {
         }
     }
 }
+
+/**
+ * Lo que sube o baja el peso con un toque del stepper.
+ *
+ * 0,5 kg y no 2,5: en un gimnasio no todo son discos de 2,5. Hay mancuernas de 1 en 1, discos
+ * de medio kilo y máquinas con placas que no van de dos en dos, y con el paso grande no había
+ * manera de escribir el peso real de la serie. Para los saltos gordos están la rueda, escribir
+ * el número a mano y mantener pulsado el botón, que acelera.
+ */
+const val WEIGHT_STEP = 0.5
 
 /** "12,5" o "12.5" -> 12.5. Null si no hay número. */
 fun parseKg(raw: String): Double? =
