@@ -54,10 +54,17 @@ class WearCommandListenerService : WearableListenerService() {
 
             val next = when (command) {
                 WearBridge.CMD_PRIMARY -> when (session.phase) {
-                    // Peso vacío: desde el reloj solo se marca "serie hecha"; el peso se anota
-                    // en el móvil. El móvil conserva igualmente los pesos de referencia.
                     SessionPhase.WARMUP -> SessionEngine.endWarmup(session)
-                    SessionPhase.WORKING -> SessionEngine.completeSet(session, "", now)
+                    // La serie se apunta con el peso que el móvil tenía preparado para ella
+                    // (el mismo que enseña su pantalla). Antes iba vacío, y marcar desde la
+                    // muñeca borraba los kilos recién escritos: la serie quedaba sin peso, el
+                    // día salía con un guion en Resultados y "Mis pesos" seguía con el de antes.
+                    SessionPhase.WORKING -> SessionEngine.completeSet(
+                        session,
+                        SessionEngine.weightForSet(session, repo.progress.first().exerciseWeights),
+                        now
+                    )
+                    // Una serie por tiempo (planchas) no lleva kilos.
                     SessionPhase.TIMED_SET -> SessionEngine.completeSet(session, "", now)
                     SessionPhase.RESTING -> SessionEngine.endRest(session, now)
                     else -> session

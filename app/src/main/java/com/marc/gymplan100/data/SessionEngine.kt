@@ -49,6 +49,27 @@ object SessionEngine {
     }
 
     /**
+     * Peso que le toca a la serie en curso, con la misma cuenta que hace la pantalla del móvil:
+     * lo que se dejó preparado, si no el de la serie anterior de esa misma máquina, y si no el
+     * último peso conocido del ejercicio.
+     *
+     * Vive aquí, y no en la pantalla, porque la serie también se marca desde el reloj: allí no
+     * hay campo de peso que leer, y darla por hecha con el peso vacío tiraba los kilos que se
+     * acababan de escribir en el móvil (ni la serie, ni el registro del día, ni "Mis pesos").
+     */
+    fun weightForSet(s: ActiveSession, knownWeights: Map<String, String>): String {
+        val exercise = PlanData.dayByNumber(s.dayNumber)
+            ?.template?.exercises?.getOrNull(s.exerciseIndex) ?: return ""
+        // Ni una plancha ni el cardio llevan kilos, y una serie por tiempo tampoco los pregunta.
+        if (exercise.withoutWeight || secondsPerSetFromScheme(exercise.scheme) != null) return ""
+        if (s.plannedWeight.isNotBlank()) return s.plannedWeight.trim()
+        s.completedSets
+            .lastOrNull { it.exerciseIndex == s.exerciseIndex && it.weight.isNotBlank() }
+            ?.let { return it.weight }
+        return knownWeights[exercise.name].orEmpty()
+    }
+
+    /**
      * Marca la serie actual como hecha y devuelve la sesión resultante: descanso (entre series
      * o entre ejercicios) con [now] como inicio, o FINISHED si era la última serie de todo.
      */

@@ -791,20 +791,16 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         if (next !== s) saveActive(next)
     }
 
-    /** Peso sugerido para la serie actual: el de la serie anterior del mismo ejercicio. */
+    /**
+     * Peso sugerido para la serie actual: el preparado en el descanso, si no el de la serie
+     * anterior de la misma máquina, y si no el último peso conocido del ejercicio.
+     *
+     * La cuenta la hace [SessionEngine.weightForSet], que es la misma que usa el reloj para
+     * saber con qué peso apuntar una serie marcada desde la muñeca.
+     */
     fun suggestedWeight(session: ActiveSession): String {
-        // Si durante el descanso previo se preparó un peso para esta serie, se usa ese.
-        if (session.plannedWeight.isNotBlank()) return session.plannedWeight.trim()
-        session.completedSets
-            .lastOrNull { it.exerciseIndex == session.exerciseIndex && it.weight.isNotBlank() }
-            ?.let { return it.weight }
-        // Primera serie del ejercicio: usa el último peso conocido de esa máquina/ejercicio.
-        val name = PlanData.dayByNumber(session.dayNumber)
-            ?.template?.exercises?.getOrNull(session.exerciseIndex)?.name
-        if (name != null) {
-            val known = _progress.value.exerciseWeights[name]
-            if (!known.isNullOrBlank()) return known
-        }
+        val fromSession = SessionEngine.weightForSet(session, _progress.value.exerciseWeights)
+        if (fromSession.isNotBlank()) return fromSession
         return logFor(session.dayNumber, session.exerciseIndex).weight
     }
 
@@ -1055,14 +1051,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
         val before = _progress.value
         val wasCompleted = s.dayNumber in before.completedDays
-        val logs = before.logs.toMutableMap()
-        s.completedSets.groupBy { it.exerciseIndex }.forEach { (idx, setsForExercise) ->
-            val lastWeight = setsForExercise.lastOrNull { it.weight.isNotBlank() }?.weight
-            val key = "${s.dayNumber}-$idx"
-            val current = logs[key] ?: ExerciseLog()
-            logs[key] = current.copy(weight = lastWeight ?: current.weight, done = true)
-        }
-        val after = before.copy(completedDays = before.completedDays + s.dayNumber, logs = logs)
+        val after = before.withFinishedDay(s.dayNumber, s.completedSets)
         _progress.value = after
         viewModelScope.launch { repo.save(after) }
 

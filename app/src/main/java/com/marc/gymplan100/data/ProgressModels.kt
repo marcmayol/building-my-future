@@ -58,6 +58,32 @@ data class ProgressState(
     val everFinished: Boolean get() = finishedAt > 0L
 
     /**
+     * Cierra un día del entrenamiento guiado: apunta en cada ejercicio el peso con el que se
+     * quedó y lo deja también como peso de referencia en "Mis pesos".
+     *
+     * Los pesos se rehacen aquí, y no solo serie a serie, porque las series marcadas desde el
+     * reloj no pasan por el ViewModel: al cerrar el día es donde se sabe de verdad qué se
+     * levantó. Un ejercicio sin ninguna serie con peso (una plancha) no toca nada.
+     */
+    fun withFinishedDay(dayNumber: Int, completedSets: List<CompletedSet>): ProgressState {
+        val nuevosLogs = logs.toMutableMap()
+        val nuevosPesos = exerciseWeights.toMutableMap()
+        completedSets.groupBy { it.exerciseIndex }.forEach { (idx, seriesDelEjercicio) ->
+            val ultimoPeso = seriesDelEjercicio.lastOrNull { it.weight.isNotBlank() }?.weight
+            val clave = "$dayNumber-$idx"
+            val previo = nuevosLogs[clave] ?: ExerciseLog()
+            nuevosLogs[clave] = previo.copy(weight = ultimoPeso ?: previo.weight, done = true)
+            val nombre = PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(idx)?.name
+            if (ultimoPeso != null && !nombre.isNullOrBlank()) nuevosPesos[nombre] = ultimoPeso
+        }
+        return copy(
+            completedDays = completedDays + dayNumber,
+            logs = nuevosLogs,
+            exerciseWeights = nuevosPesos
+        )
+    }
+
+    /**
      * Otra vuelta al plan entero: los días vuelven a cero y la vuelta queda contada.
      *
      * Lo que **no** se toca: el historial de entrenos (vive aparte) ni los pesos por ejercicio,
