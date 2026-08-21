@@ -1,8 +1,8 @@
 {
-  "versionCode": 16,
-  "versionName": "2.3.1",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.3.1/building-my-future-v2.3.1.apk",
-  "sha256": "1d3358088f609e3e37e9a7d43458602e2a09fccc8755cdda305ef76b98015333",
-  "notas": "Cinco arreglos de lo que molestaba entrenando.\n\nLos circuitos de core ya enseñan sus tres ejercicios, en orden y con cuánto dura cada uno. Antes solo salía el dibujo de la plancha y no había manera de saber qué tocaba hacer; la ficha \"Cómo se hace\" también los enseña todos ahora.\n\nEl peso sube y baja de medio kilo en medio kilo, porque en el gimnasio no todo son discos de 2,5. Si mantienes pulsado el botón, acelera.\n\nEl peso que le ponías a una serie ya no se pierde. Si el móvil se quedaba en el bolsillo un rato largo y Android cerraba la app, al volver te pedía otra vez el peso: ahora se guarda como el resto del entreno.\n\nLa app ya no se tumba. Con el botón de girar del móvil se quedaba en horizontal, sin el nombre del ejercicio ni la ilustración, y costaba volver a ponerla derecha.\n\nLos cronómetros ya no son una cifra en mitad de la nada: el de las planchas lleva el dibujo de lo que estás aguantando, y el del calentamiento dice con qué ejercicio se empieza.",
+  "versionCode": 17,
+  "versionName": "2.3.2",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.3.2/building-my-future-v2.3.2.apk",
+  "sha256": "3fc1ac1067d052404b37fce79965a33e5c591817b351353e6bb424e22e922414",
+  "notas": "El peso ya no se pierde al marcar la serie desde el reloj.",
   "check_horas": 24
 }
