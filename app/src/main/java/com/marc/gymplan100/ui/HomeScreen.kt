@@ -212,15 +212,18 @@ fun HomeScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(Space.x3))
+                        // Etiquetas cortas a proposito: los dos botones se reparten el ancho
+                        // a medias, y con el texto del sistema al 150 % "Entendido" no cabia
+                        // en su mitad y se partia a media palabra ("Entendid / o").
                         Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                             Button(
                                 onClick = { openBatterySettings(context) },
                                 modifier = Modifier.weight(1f)
-                            ) { Text("Ajustar") }
+                            ) { Text("Ajustar", maxLines = 1) }
                             OutlinedButton(
                                 onClick = { viewModel.dismissBatteryHint() },
                                 modifier = Modifier.weight(1f)
-                            ) { Text("Entendido") }
+                            ) { Text("Vale", maxLines = 1) }
                         }
                     }
                 }
