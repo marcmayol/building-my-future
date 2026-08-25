@@ -59,11 +59,17 @@ class WearCommandListenerService : WearableListenerService() {
                     // (el mismo que enseña su pantalla). Antes iba vacío, y marcar desde la
                     // muñeca borraba los kilos recién escritos: la serie quedaba sin peso, el
                     // día salía con un guion en Resultados y "Mis pesos" seguía con el de antes.
-                    SessionPhase.WORKING -> SessionEngine.completeSet(
-                        session,
-                        SessionEngine.weightForSet(session, repo.progress.first().exerciseWeights),
-                        now
-                    )
+                    // Las repeticiones se resuelven igual: desde la muñeca no se pueden
+                    // escribir, así que se apunta lo que el móvil tenía preparado para la serie.
+                    SessionPhase.WORKING -> {
+                        val progreso = repo.progress.first()
+                        SessionEngine.completeSet(
+                            session,
+                            SessionEngine.weightForSet(session, progreso.exerciseWeights),
+                            now,
+                            SessionEngine.repsForSet(session, progreso.exerciseReps)
+                        )
+                    }
                     // Una serie por tiempo (planchas) no lleva kilos.
                     SessionPhase.TIMED_SET -> SessionEngine.completeSet(session, "", now)
                     SessionPhase.RESTING -> SessionEngine.endRest(session, now)

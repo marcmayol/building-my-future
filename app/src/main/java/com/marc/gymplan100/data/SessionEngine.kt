@@ -70,23 +70,53 @@ object SessionEngine {
     }
 
     /**
+     * Repeticiones que le tocan a la serie en curso, con la misma cuenta en cascada que el peso:
+     * lo que se haya tocado en esta serie, si no lo que se hizo en la anterior de esta misma
+     * máquina, si no lo de la última vez que se hizo el ejercicio, y si no lo que pide el plan.
+     *
+     * Vive aquí por el mismo motivo que [weightForSet]: la serie también se cierra desde el
+     * reloj y desde la notificación, donde no hay pantalla que leer, y dar la serie por hecha
+     * sin repeticiones dejaría el registro a medias.
+     */
+    fun repsForSet(s: ActiveSession, knownReps: Map<String, String>): String {
+        val exercise = PlanData.dayByNumber(s.dayNumber)
+            ?.template?.exercises?.getOrNull(s.exerciseIndex) ?: return ""
+        // Una plancha se mide en segundos y un circuito en vueltas: ahí no hay repeticiones.
+        if (repsRangeFromScheme(exercise.scheme) == null) return ""
+        if (s.currentReps.isNotBlank()) return s.currentReps.trim()
+        s.completedSets
+            .lastOrNull { it.exerciseIndex == s.exerciseIndex && it.reps.isNotBlank() }
+            ?.let { return it.reps }
+        knownReps[exercise.name]?.takeIf { it.isNotBlank() }?.let { return it }
+        return defaultRepsFromScheme(exercise.scheme)
+    }
+
+    /**
      * Marca la serie actual como hecha y devuelve la sesión resultante: descanso (entre series
      * o entre ejercicios) con [now] como inicio, o FINISHED si era la última serie de todo.
+     *
+     * [reps] son las repeticiones que se hicieron de verdad; va al final y con valor por defecto
+     * para que quien no las tenga (una serie por tiempo) siga llamando igual que siempre.
      */
-    fun completeSet(s: ActiveSession, weight: String, now: Long): ActiveSession {
+    fun completeSet(s: ActiveSession, weight: String, now: Long, reps: String = ""): ActiveSession {
         if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return s
         val day = PlanData.dayByNumber(s.dayNumber) ?: return s
         val exercise = day.template.exercises.getOrNull(s.exerciseIndex) ?: return s
         val totalSets = setCountFromScheme(exercise.scheme)
 
         val cleanWeight = weight.trim()
-        val newSet = CompletedSet(s.exerciseIndex, s.setNumber, cleanWeight)
+        val newSet = CompletedSet(s.exerciseIndex, s.setNumber, cleanWeight, reps = reps.trim())
         val order = s.orderOrDefault()
         val isLastSet = s.setNumber >= totalSets
         val isLastExercise = order.indexOf(s.exerciseIndex) >= order.lastIndex
 
         return if (isLastSet && isLastExercise) {
-            s.copy(phase = SessionPhase.FINISHED, completedSets = s.completedSets + newSet, occupiedSkips = 0)
+            s.copy(
+                phase = SessionPhase.FINISHED,
+                completedSets = s.completedSets + newSet,
+                occupiedSkips = 0,
+                currentReps = ""
+            )
         } else {
             val betweenExercises = isLastSet
             val target = if (betweenExercises) RestDefaults.BETWEEN_EXERCISES else RestDefaults.BETWEEN_SETS
@@ -98,7 +128,8 @@ object SessionEngine {
                 completedSets = s.completedSets + newSet,
                 occupiedSkips = 0,
                 // Nuevo descanso: se recalcula la sugerencia de peso desde cero.
-                plannedWeight = ""
+                plannedWeight = "",
+                currentReps = ""
             )
         }
     }
@@ -124,7 +155,8 @@ object SessionEngine {
             phase = SessionPhase.WORKING,
             occupiedSkips = s.occupiedSkips + 1,
             // El peso preparado era para la máquina que dejamos: ya no aplica.
-            plannedWeight = ""
+            plannedWeight = "",
+            currentReps = ""
         )
     }
 

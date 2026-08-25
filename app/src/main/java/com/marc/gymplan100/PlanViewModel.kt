@@ -24,6 +24,7 @@ import com.marc.gymplan100.data.PlanImport
 import com.marc.gymplan100.data.PlanMarkdownParser
 import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.Progression
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.EjercicioCatalogo
@@ -563,6 +564,36 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         state.copy(logs = state.logs + (key to updated), exerciseWeights = weights)
     }
 
+    /**
+     * Repeticiones de UNA serie suelta, apuntadas a mano en la ficha del día.
+     *
+     * Mismo criterio que [setDaySetWeight]: la lista se rellena con series en blanco para que
+     * la tercera pueda llevar algo aunque la segunda esté vacía. El resumen del ejercicio se
+     * queda con las de la primera serie, que es por donde se arranca la próxima vez.
+     */
+    fun setDaySetReps(
+        day: Int,
+        exerciseIndex: Int,
+        setIndex: Int,
+        totalSets: Int,
+        reps: String
+    ) = update { state ->
+        val key = "$day-$exerciseIndex"
+        val current = state.logs[key] ?: ExerciseLog()
+        val size = maxOf(totalSets, setIndex + 1, current.sets.size)
+        val sets = List(size) { i ->
+            val previo = current.sets.getOrNull(i) ?: SetLog()
+            if (i == setIndex) previo.copy(reps = reps.trim()) else previo
+        }
+        val arranque = sets.firstOrNull { it.reps.isNotBlank() }?.reps.orEmpty()
+        val updated = current.copy(sets = sets, reps = arranque)
+        val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(exerciseIndex)?.name
+        val repsPorEjercicio = if (arranque.isNotBlank() && !name.isNullOrBlank()) {
+            state.exerciseReps + (name to arranque)
+        } else state.exerciseReps
+        state.copy(logs = state.logs + (key to updated), exerciseReps = repsPorEjercicio)
+    }
+
     /** Peso actual guardado para un ejercicio por su nombre. */
     fun exerciseWeight(name: String): String = _progress.value.exerciseWeights[name] ?: ""
 
@@ -834,10 +865,42 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * La cuenta la hace [SessionEngine.weightForSet], que es la misma que usa el reloj para
      * saber con qué peso apuntar una serie marcada desde la muñeca.
      */
+    /**
+     * Qué toca hoy en el ejercicio en curso, y por qué, según lo que se hizo las veces anteriores.
+     *
+     * Solo en la PRIMERA serie del ejercicio: a partir de la segunda manda lo que se está
+     * levantando hoy, no lo que dice el historial. Null cuando no hay nada que proponer.
+     */
+    fun progressionFor(session: ActiveSession): Progression.Suggestion? {
+        val exercise = PlanData.dayByNumber(session.dayNumber)
+            ?.template?.exercises?.getOrNull(session.exerciseIndex) ?: return null
+        if (session.completedSets.any { it.exerciseIndex == session.exerciseIndex }) return null
+        return Progression.suggest(
+            exercise.scheme,
+            Progression.historyOf(_progress.value, exercise.name, excludeDay = session.dayNumber),
+            hasWeight = !exercise.withoutWeight
+        )
+    }
+
     fun suggestedWeight(session: ActiveSession): String {
+        // Lo que se dejó preparado en el descanso manda sobre cualquier propuesta.
+        if (session.plannedWeight.isBlank()) {
+            progressionFor(session)?.weight?.takeIf { it.isNotBlank() }?.let { return it }
+        }
         val fromSession = SessionEngine.weightForSet(session, _progress.value.exerciseWeights)
         if (fromSession.isNotBlank()) return fromSession
         return logFor(session.dayNumber, session.exerciseIndex).weight
+    }
+
+    /**
+     * Repeticiones precargadas para la serie en curso. Es la misma cuenta que hace el reloj,
+     * así que la pantalla y la muñeca apuntan siempre lo mismo.
+     */
+    fun suggestedReps(session: ActiveSession): String {
+        if (session.currentReps.isBlank()) {
+            progressionFor(session)?.reps?.takeIf { it.isNotBlank() }?.let { return it }
+        }
+        return SessionEngine.repsForSet(session, _progress.value.exerciseReps)
     }
 
     /**
@@ -886,6 +949,18 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val clean = weight.trim()
         if (s.plannedWeight == clean) return
         saveActive(s.copy(plannedWeight = clean))
+    }
+
+    /**
+     * Guarda las repeticiones de la serie en curso, por el mismo motivo que el peso: si Android
+     * mata la app entre serie y serie, lo apuntado sigue ahí al volver.
+     */
+    fun setSetReps(reps: String) {
+        val s = _active.value ?: return
+        if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return
+        val clean = reps.trim()
+        if (s.currentReps == clean) return
+        saveActive(s.copy(currentReps = clean))
     }
 
     // --- Serie por tiempo (planchas, isométricos) -------------------------
@@ -950,8 +1025,13 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         saveActive(s.copy(timedTargetSeconds = newTarget))
     }
 
-    /** Marca la serie actual como hecha y arranca el descanso (o finaliza el día). */
-    fun completeSet(weight: String) {
+    /**
+     * Marca la serie actual como hecha y arranca el descanso (o finaliza el día).
+     *
+     * [reps] llega en blanco desde donde no se preguntan (una serie por tiempo, una vuelta de
+     * circuito); ahí se resuelve con la misma cascada que usa el reloj para el peso.
+     */
+    fun completeSet(weight: String, reps: String = "") {
         val s = _active.value ?: return
         if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return
         val day = PlanData.dayByNumber(s.dayNumber) ?: return
@@ -970,7 +1050,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         if (tope.isNotBlank()) {
             update { it.copy(exerciseWeights = it.exerciseWeights + (exercise.name to tope)) }
         }
-        val next = SessionEngine.completeSet(s, weight, System.currentTimeMillis())
+        val repsFinales = reps.trim().ifBlank { SessionEngine.repsForSet(s, _progress.value.exerciseReps) }
+        val next = SessionEngine.completeSet(s, weight, System.currentTimeMillis(), repsFinales)
         if (next.phase == SessionPhase.FINISHED) {
             RestReminder.cancel(getApplication())
         } else {

@@ -174,16 +174,18 @@ fun DayScreen(
                     // Lo apuntado serie a serie. Si el día viene de antes del desglose, el
                     // peso que hubiera se enseña como el de la primera serie.
                     sets = log?.sets?.ifEmpty { null }
-                        ?: listOf(SetLog(weight = log?.weight.orEmpty())),
+                        ?: listOf(SetLog(weight = log?.weight.orEmpty(), reps = log?.reps.orEmpty())),
                     // Lo último conocido de esa máquina, de pista en los campos vacíos.
                     hint = viewModel.exerciseWeight(exercise.name),
-                    // Reps: las guardadas o, si no, las indicadas en el plan.
-                    reps = log?.reps.orEmpty().ifEmpty { repsFromScheme(exercise.scheme) },
+                    // De pista en los campos vacios: lo que pide el plan para hoy.
+                    reps = repsFromScheme(exercise.scheme),
                     done = log?.done ?: false,
                     onSetWeight = { serie, kilos ->
                         viewModel.setDaySetWeight(day.number, index, serie, totalSets, kilos)
                     },
-                    onReps = { viewModel.setLog(day.number, index, reps = it) },
+                    onSetReps = { serie, r ->
+                        viewModel.setDaySetReps(day.number, index, serie, totalSets, r)
+                    },
                     onDone = { viewModel.setLog(day.number, index, done = it) },
                     onShowGuide = { guideFor = exercise }
                 )
@@ -265,7 +267,7 @@ private fun ExerciseCard(
     reps: String,
     done: Boolean,
     onSetWeight: (Int, String) -> Unit,
-    onReps: (String) -> Unit,
+    onSetReps: (Int, String) -> Unit,
     onDone: (Boolean) -> Unit,
     onShowGuide: () -> Unit
 ) {
@@ -299,68 +301,91 @@ private fun ExerciseCard(
             Checkbox(checked = done, onCheckedChange = onDone)
         }
         // Sin kilos en lo que no los lleva (dominadas, planchas, cardio) y sin repeticiones en
-        // el cardio: el campo vacío solo invitaba a preguntarse qué poner. Un bloque de cardio
-        // no tiene ninguno de los dos, así que la fila entera desaparece.
+        // el cardio: el campo vac\u00edo solo invitaba a preguntarse qu\u00e9 poner. Un bloque de cardio
+        // no tiene ninguno de los dos, as\u00ed que la fila entera desaparece.
         val pidePeso = !exercise.withoutWeight
         val pideReps = exercise.kind != ExerciseKind.CARDIO
         if (pidePeso || pideReps) {
-        Spacer(Modifier.height(Space.x2))
-        if (pidePeso) {
-            // Un campo por serie: las tres casi nunca llevan lo mismo (10, 12 y 11 es lo
-            // normal), y con un solo campo había que elegir cuál de los tres pesos mentía.
-            // A 150 % de texto los campos bajan de línea solos en vez de estrujarse.
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(Space.x2),
-                verticalArrangement = Arrangement.spacedBy(Space.x2)
-            ) {
-                repeat(maxOf(totalSets, sets.size)) { i ->
-                    OutlinedTextField(
-                        value = sets.getOrNull(i)?.weight.orEmpty(),
-                        onValueChange = { onSetWeight(i, it) },
-                        label = { Text("${i + 1}ª") },
-                        // La pista es el último peso conocido de esa máquina: orienta sin
-                        // dar por hecho que hoy vas a mover lo mismo.
-                        placeholder = if (hint.isBlank()) null else {
-                            {
+            Spacer(Modifier.height(Space.x2))
+            // Una L\u00cdNEA por serie, con lo suyo junto. Antes los kilos iban serie a serie y las
+            // repeticiones eran un \u00fanico campo suelto al final: adem\u00e1s de dejar cajas hu\u00e9rfanas
+            // cuando las series no llenaban la fila, contaba que cada serie llev\u00f3 un peso distinto
+            // y todas las mismas repeticiones, que es justo lo que no pasa.
+            val etiquetaReps = if (exercise.kind == ExerciseKind.TIME) "seg" else "reps"
+            repeat(maxOf(totalSets, sets.size)) { i ->
+                if (i > 0) Spacer(Modifier.height(Space.x2))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Space.x2)
+                ) {
+                    if (pidePeso) {
+                        OutlinedTextField(
+                            value = sets.getOrNull(i)?.weight.orEmpty(),
+                            onValueChange = { onSetWeight(i, it) },
+                            label = { Text("${i + 1}\u00aa") },
+                            // La pista es el \u00faltimo peso conocido de esa m\u00e1quina: orienta sin
+                            // dar por hecho que hoy vas a mover lo mismo.
+                            placeholder = if (hint.isBlank()) null else {
+                                {
+                                    Text(
+                                        hint,
+                                        style = LocalAppTextStyles.current.tabular,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            },
+                            // La unidad va de icono final y no de `suffix`: el sufijo de M3 solo
+                            // aparece al enfocar el campo, y aqu\u00ed tiene que verse tambi\u00e9n vac\u00edo.
+                            trailingIcon = {
                                 Text(
-                                    hint,
-                                    style = LocalAppTextStyles.current.tabular,
+                                    "kg",
+                                    style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                            }
-                        },
-                        // La unidad va de icono final y no de `suffix`: el sufijo de M3 solo
-                        // aparece al enfocar el campo, y aquí tiene que verse también vacío.
-                        trailingIcon = {
-                            Text(
-                                "kg",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        singleLine = true,
-                        shape = MaterialTheme.shapes.extraSmall,
-                        textStyle = LocalAppTextStyles.current.tabular,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        // Tres series tienen que caber en una línea de un móvil normal; con el
-                        // texto del sistema más grande bajan solas en vez de estrujarse.
-                        modifier = Modifier.width(100.dp * fontScale())
-                    )
+                            },
+                            singleLine = true,
+                            shape = MaterialTheme.shapes.extraSmall,
+                            textStyle = LocalAppTextStyles.current.tabular,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    if (pidePeso && pideReps) {
+                        Text(
+                            "\u00d7",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (pideReps) {
+                        OutlinedTextField(
+                            value = sets.getOrNull(i)?.reps.orEmpty(),
+                            onValueChange = { onSetReps(i, it) },
+                            // Sin kilos delante, el n\u00famero de serie tiene que ir aqu\u00ed.
+                            label = {
+                                Text(
+                                    if (pidePeso) etiquetaReps
+                                    else "${i + 1}\u00aa \u00b7 $etiquetaReps"
+                                )
+                            },
+                            placeholder = if (reps.isBlank()) null else {
+                                {
+                                    Text(
+                                        reps,
+                                        style = LocalAppTextStyles.current.tabular,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            },
+                            singleLine = true,
+                            shape = MaterialTheme.shapes.extraSmall,
+                            textStyle = LocalAppTextStyles.current.tabular,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.weight(if (pidePeso) 0.8f else 1f)
+                        )
+                    }
                 }
             }
-        }
-        if (pideReps) {
-            Spacer(Modifier.height(Space.x2))
-            OutlinedTextField(
-                value = reps,
-                onValueChange = onReps,
-                label = { Text(if (exercise.kind == ExerciseKind.TIME) "Segundos" else "Reps") },
-                singleLine = true,
-                shape = MaterialTheme.shapes.extraSmall,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.width(100.dp * fontScale())
-            )
-        }
         }
         // La ficha, como enlace: con seis ejercicios, seis botones anchos eran una pared.
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {

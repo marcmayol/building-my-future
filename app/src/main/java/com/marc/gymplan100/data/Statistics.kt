@@ -101,6 +101,94 @@ object Statistics {
         return out.mapValues { (_, v) -> v.sortedBy { it.day } }
     }
 
+    // --------------------------------------------------- Fuerza estimada (1RM) y volumen
+
+    /**
+     * Tope de repeticiones con el que la estimación de 1RM todavía vale algo.
+     *
+     * Por encima de doce, una serie deja de medir fuerza y empieza a medir aguante: la fórmula
+     * sigue dando un número, pero ese número ya no dice lo que parece.
+     */
+    const val MAX_REPS_FOR_ONE_RM = 12
+
+    /**
+     * Fuerza estimada a una repetición (fórmula de Epley: peso x (1 + reps/30)).
+     *
+     * Es lo único que permite comparar días con esquemas distintos: 40 kg x 12 y 50 kg x 5
+     * dibujan un salto enorme en la gráfica de kilos y son casi el mismo esfuerzo (56 y 58 kg
+     * estimados). Nadie prueba su máximo cada semana, así que se deduce de una serie normal.
+     *
+     * Null si las repeticiones se salen del rango en el que la fórmula es honesta.
+     */
+    fun estimatedOneRm(weightKg: Float, reps: Int): Float? {
+        if (weightKg <= 0f || reps < 1 || reps > MAX_REPS_FOR_ONE_RM) return null
+        // Con una sola repetición no hay nada que estimar: ese peso ES el máximo. La fórmula
+        // por sí sola devolvería un 3 % de más y apuntaría un récord que no ha pasado.
+        if (reps == 1) return weightKg
+        return weightKg * (1f + reps / 30f)
+    }
+
+    /** La mejor fuerza estimada de una lista de series (la serie que más dice, no la última). */
+    fun bestOneRm(sets: List<SetLog>): Float? =
+        sets.mapNotNull { serie ->
+            val kg = parseWeight(serie.weight) ?: return@mapNotNull null
+            val reps = serie.reps.trim().toIntOrNull() ?: return@mapNotNull null
+            estimatedOneRm(kg, reps)
+        }.maxOrNull()
+
+    /**
+     * Fuerza estimada por ejercicio y día, con la misma forma que [weightProgression] para que
+     * la gráfica pueda pintar una u otra sin enterarse.
+     *
+     * Solo aparecen los días con series apuntadas CON repeticiones: sin ellas no hay fórmula
+     * que valga, y rellenar el hueco con una suposición sería dibujar un progreso inventado.
+     */
+    fun oneRmProgression(progress: ProgressState): Map<String, List<WeightPoint>> {
+        val out = sortedMapOf<String, MutableList<WeightPoint>>()
+        for ((key, log) in progress.logs) {
+            val best = bestOneRm(log.filledSets) ?: continue
+            val dash = key.indexOf('-')
+            if (dash <= 0) continue
+            val day = key.substring(0, dash).toIntOrNull() ?: continue
+            val idx = key.substring(dash + 1).toIntOrNull() ?: continue
+            val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx)?.name ?: continue
+            out.getOrPut(name) { mutableListOf() }.add(WeightPoint(day, best))
+        }
+        return out.mapValues { (_, v) -> v.sortedBy { it.day } }
+    }
+
+    /**
+     * Kilos movidos en una lista de series: la suma de peso x repeticiones.
+     *
+     * Es la medida del trabajo hecho, y la que explica por qué un día de 40 kg puede cansar
+     * mas que uno de 60: tres series de doce mueven mas que tres de cinco.
+     */
+    fun volume(sets: List<SetLog>): Float =
+        sets.sumOf { serie ->
+            val kg = parseWeight(serie.weight)?.toDouble() ?: return@sumOf 0.0
+            val reps = serie.reps.trim().toIntOrNull() ?: return@sumOf 0.0
+            kg * reps
+        }.toFloat()
+
+    /**
+     * Kilos movidos por día del plan. Solo cuenta lo apuntado serie a serie: los días de antes
+     * de que la app guardara las repeticiones no tienen con qué calcularse y se quedan fuera,
+     * que es preferible a inventarles un número.
+     */
+    fun volumeByDay(progress: ProgressState): Map<Int, Float> {
+        val out = sortedMapOf<Int, Float>()
+        for ((key, log) in progress.logs) {
+            val v = volume(log.filledSets)
+            if (v <= 0f) continue
+            val day = key.substringBefore('-').toIntOrNull() ?: continue
+            out[day] = (out[day] ?: 0f) + v
+        }
+        return out
+    }
+
+    /** Kilos movidos en total, sumando todos los días con desglose. */
+    fun totalVolume(progress: ProgressState): Float = volumeByDay(progress).values.sum()
+
     // ------------------------------------------------------------------- Constancia
 
     private fun millisToDate(millis: Long, zone: ZoneId): LocalDate =

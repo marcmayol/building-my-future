@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -74,6 +75,8 @@ fun StatisticsScreen(
 
     val summary = remember(progress, history) { Statistics.summary(progress, history) }
     val progression = remember(progress) { Statistics.weightProgression(progress) }
+    val oneRm = remember(progress) { Statistics.oneRmProgression(progress) }
+    val volume = remember(progress) { Statistics.totalVolume(progress) }
     val weeks = remember(history) { Statistics.workoutsPerWeek(history, weeks = 10) }
     val trained = remember(history) { Statistics.trainedDays(history) }
     val records = remember(progress) { Statistics.personalRecords(progress) }
@@ -149,11 +152,11 @@ fun StatisticsScreen(
 
             when (tab) {
                 0 -> {
-                    item { SummarySection(summary) }
+                    item { SummarySection(summary, volume) }
                     item { WeeklySection(weeks) }
                     item { RecordsSection(records, longest, productive) }
                 }
-                1 -> item { ProgressionSection(progression) }
+                1 -> item { ProgressionSection(progression, oneRm) }
                 else -> item { ConsistencySection(trained, history) }
             }
         }
@@ -238,7 +241,7 @@ private fun WeeklySection(weeks: List<Statistics.WeekCount>) {
 // ------------------------------------------------------------------ Resumen global
 
 @Composable
-private fun SummarySection(s: Statistics.Summary) {
+private fun SummarySection(s: Statistics.Summary, volume: Float) {
     Column {
         // La racha y la mejor racha ya viven en el héroe: repetirlas aquí era decir lo mismo
         // dos veces en la misma pantalla.
@@ -265,6 +268,17 @@ private fun SummarySection(s: Statistics.Summary) {
                 value = "${s.totalSets}",
                 label = "series totales",
                 modifier = Modifier.weight(1f)
+            )
+        }
+        // Los kilos movidos solo aparecen cuando hay con qué contarlos: se suman peso por
+        // repeticiones, y los entrenos de antes de que la app guardara las repeticiones no
+        // tienen ese dato. Un "0 kg" ahí sería mentira, no un cero.
+        if (volume > 0f) {
+            Spacer(Modifier.height(12.dp))
+            StatTile(
+                value = fmtVolume(volume),
+                label = "kilos movidos · peso × repeticiones de cada serie",
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -305,9 +319,12 @@ private fun StatTile(value: String, label: String, modifier: Modifier = Modifier
 // ----------------------------------------------------------- Progresión de peso
 
 @Composable
-private fun ProgressionSection(progression: Map<String, List<Statistics.WeightPoint>>) {
+private fun ProgressionSection(
+    progression: Map<String, List<Statistics.WeightPoint>>,
+    oneRm: Map<String, List<Statistics.WeightPoint>>
+) {
     Column {
-        SectionTitle("Progresión de peso")
+        SectionTitle("Progresión")
         Spacer(Modifier.height(4.dp))
         if (progression.isEmpty()) {
             Text(
@@ -323,7 +340,16 @@ private fun ProgressionSection(progression: Map<String, List<Statistics.WeightPo
             names.maxByOrNull { progression[it]?.size ?: 0 } ?: names.first()
         }
         var selected by remember(progression) { mutableStateOf(default) }
-        val points = progression[selected].orEmpty()
+        // Kilos o fuerza estimada: la misma gráfica con otra vara de medir. Empieza en kilos,
+        // que es lo que se toca en la máquina.
+        var quiereFuerza by remember(progression) { mutableStateOf(false) }
+        val pesos = progression[selected].orEmpty()
+        val fuerzas = oneRm[selected].orEmpty()
+        // Con un solo punto no hay curva que enseñar: el conmutador aparece cuando la hay.
+        // Al cambiar a un ejercicio sin repeticiones apuntadas se vuelve solo a los kilos.
+        val hayFuerza = fuerzas.size >= 2
+        val verFuerza = quiereFuerza && hayFuerza
+        val points = if (verFuerza) fuerzas else pesos
 
         Spacer(Modifier.height(8.dp))
         Row(
@@ -364,7 +390,7 @@ private fun ProgressionSection(progression: Map<String, List<Statistics.WeightPo
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            "peso actual",
+                            if (verFuerza) "fuerza estimada" else "peso actual",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -392,6 +418,20 @@ private fun ProgressionSection(progression: Map<String, List<Statistics.WeightPo
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                if (hayFuerza) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        if (verFuerza)
+                            "La fuerza estimada compara días con esquemas distintos: 40 kg × 12 " +
+                                "y 50 kg × 5 son casi el mismo esfuerzo aunque los kilos digan otra cosa."
+                        else "Los kilos solos engañan cuando cambian las repeticiones.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    TextButton(onClick = { quiereFuerza = !verFuerza }) {
+                        Text(if (verFuerza) "Ver los kilos" else "Ver la fuerza estimada")
+                    }
+                }
             }
         }
     }
@@ -712,6 +752,15 @@ private fun SectionTitle(text: String) {
 }
 
 /** Formatea un peso: entero si es redondo (50), con un decimal si no (52.5). */
+/** 12480,0 -> "12.480 kg"; por debajo del millar, sin separador. */
+private fun fmtVolume(kg: Float): String {
+    val entero = kg.toLong()
+    val texto = if (entero >= 1000) {
+        entero.toString().reversed().chunked(3).joinToString(".").reversed()
+    } else entero.toString()
+    return "$texto kg"
+}
+
 private fun fmtWeight(w: Float): String =
     if (w == w.toLong().toFloat()) w.toLong().toString()
     else "%.1f".format(w)

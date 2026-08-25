@@ -31,7 +31,13 @@ data class CompletedSet(
     val weight: String = "",
     /** Descanso real (segundos) tomado tras esta serie. 0 si fue la última. */
     val restSeconds: Int = 0,
-    /** Repeticiones registradas (número, texto o AMRAP). Solo en rutinas especiales por reps. */
+    /**
+     * Repeticiones que se hicieron de verdad en esta serie (número, texto o AMRAP).
+     *
+     * En el entreno guiado se rellenan solas con lo que pide el plan y solo se tocan cuando el
+     * día no sale: marcar "serie hecha" es decir "he hecho lo que ponía". Sin esto, tres semanas
+     * subiendo de 8 a 12 repeticiones con los mismos kilos eran tres semanas de línea plana.
+     */
     val reps: String = ""
 )
 
@@ -62,6 +68,12 @@ data class ActiveSession(
      * serie. Se limpia al iniciar cada descanso para recalcular la sugerencia.
      */
     val plannedWeight: String = "",
+    /**
+     * Repeticiones apuntadas para la serie EN CURSO, persistidas por el mismo motivo que el
+     * peso: si Android mata la app a mitad de la serie, lo escrito no se pierde. Se limpia al
+     * cerrar cada serie y al cambiar de máquina, porque la siguiente vuelve a partir del plan.
+     */
+    val currentReps: String = "",
     val completedSets: List<CompletedSet> = emptyList(),
     /** Orden en que se realizan los ejercicios (puede reordenarse al saltar uno). */
     val order: List<Int> = emptyList(),
@@ -260,3 +272,35 @@ fun repsFromScheme(scheme: String): String {
     val m = Regex("""x\s*(\d+\s*-?\s*\d*)""").find(scheme.lowercase()) ?: return ""
     return m.groupValues[1].replace(" ", "").trimEnd('-')
 }
+
+/** Lo que sube o baja el contador de repeticiones con un toque. */
+const val REPS_STEP = 1
+
+/** "12" -> 12. Null si no hay un número de repeticiones utilizable. */
+fun parseReps(raw: String): Int? =
+    Regex("""\d+""").find(raw.trim())?.value?.toIntOrNull()?.takeIf { it in 1..999 }
+
+/**
+ * Rango de repeticiones que pide el esquema: "3 x 8-12" -> 8..12, "3 x 12" -> 12..12.
+ *
+ * Null cuando el ejercicio no se cuenta por repeticiones —una plancha va por segundos y un
+ * circuito por vueltas—, que es la señal para no preguntarlas siquiera.
+ */
+fun repsRangeFromScheme(scheme: String): IntRange? {
+    if (secondsPerSetFromScheme(scheme) != null) return null
+    if (isBodyweightScheme(scheme)) return null
+    val texto = repsFromScheme(scheme)
+    if (texto.isBlank()) return null
+    val partes = texto.split('-').mapNotNull { it.trim().toIntOrNull() }.filter { it in 1..999 }
+    if (partes.isEmpty()) return null
+    return partes.min()..partes.max()
+}
+
+/**
+ * Repeticiones con las que se llega a una serie por primera vez: el suelo del rango.
+ *
+ * En un "3 x 8-12" se entra por 8 y se sube desde ahí; dar por hecho el 12 sería apuntarse un
+ * resultado que aún no ha pasado. Con un número fijo ("3 x 12") el suelo y el techo coinciden.
+ */
+fun defaultRepsFromScheme(scheme: String): String =
+    repsRangeFromScheme(scheme)?.first?.toString().orEmpty()

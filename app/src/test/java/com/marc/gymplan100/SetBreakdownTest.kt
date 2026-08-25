@@ -142,6 +142,14 @@ class SetBreakdownTest {
         assertEquals("10 · 12 kg", setsSummary(listOf(SetLog("10"), SetLog("12"))))
     }
 
+    @Test fun `un ejercicio sin kilos se lee en repeticiones, sin aspas sueltas`() {
+        // Unas dominadas o un ejercicio de peso corporal: "x 12 · x 12" no dice nada.
+        assertEquals(
+            "12 · 10 reps",
+            setsSummary(listOf(SetLog(reps = "12"), SetLog(reps = "10")))
+        )
+    }
+
     // --- Entrenos apuntados antes de que existieran las series ------------
 
     @Test fun `un entreno libre viejo hace de serie unica`() {

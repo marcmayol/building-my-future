@@ -64,6 +64,11 @@ fun setsSummary(sets: List<SetLog>): String {
     val llenas = sets.filter { !it.isEmpty }
     if (llenas.isEmpty()) return ""
     if (llenas.none { it.reps.isNotBlank() }) return weightsSummary(llenas)
+    // Sin kilos por ningún lado (unas dominadas, un ejercicio de peso corporal) las
+    // repeticiones se leen solas: "× 12 · × 12" son dos aspas que no significan nada.
+    if (llenas.none { it.weight.isNotBlank() }) {
+        return llenas.joinToString(" · ") { it.reps.trim().ifBlank { "—" } } + " reps"
+    }
     return llenas.joinToString(" · ") { serie ->
         val kg = serie.weight.trim()
         val reps = serie.reps.trim()
@@ -85,6 +90,14 @@ data class ProgressState(
     val batteryHintDismissed: Boolean = false,
     // Último peso usado por ejercicio (clave: nombre del ejercicio).
     val exerciseWeights: Map<String, String> = emptyMap(),
+    /**
+     * Repeticiones con las que se ARRANCÓ el ejercicio la última vez (clave: nombre).
+     *
+     * Se guarda la primera serie y no la última a propósito: dentro de una sesión las
+     * repeticiones bajan con el cansancio —12, 11, 10—, y precargar el 10 del final haría
+     * empezar la próxima vez por debajo de donde de verdad se está.
+     */
+    val exerciseReps: Map<String, String> = emptyMap(),
     // En Resultados, el día más reciente arriba (con 30+ días completados, bajar hasta
     // el último era un scroll interminable).
     val resultsNewestFirst: Boolean = true,
@@ -137,6 +150,7 @@ data class ProgressState(
     fun withFinishedDay(dayNumber: Int, completedSets: List<CompletedSet>): ProgressState {
         val nuevosLogs = logs.toMutableMap()
         val nuevosPesos = exerciseWeights.toMutableMap()
+        val nuevasReps = exerciseReps.toMutableMap()
         completedSets.groupBy { it.exerciseIndex }.forEach { (idx, seriesDelEjercicio) ->
             // El peso del ejercicio es el MÁS ALTO de sus series, no el de la última: si hoy
             // fueron 10, 12 y 11, lo que levantas son 12. El detalle vive en `sets`.
@@ -155,11 +169,14 @@ data class ProgressState(
             )
             val nombre = PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(idx)?.name
             if (pesoTope != null && !nombre.isNullOrBlank()) nuevosPesos[nombre] = pesoTope
+            val repsDeArranque = desglose.firstOrNull { it.reps.isNotBlank() }?.reps
+            if (repsDeArranque != null && !nombre.isNullOrBlank()) nuevasReps[nombre] = repsDeArranque
         }
         return copy(
             completedDays = completedDays + dayNumber,
             logs = nuevosLogs,
-            exerciseWeights = nuevosPesos
+            exerciseWeights = nuevosPesos,
+            exerciseReps = nuevasReps
         )
     }
 

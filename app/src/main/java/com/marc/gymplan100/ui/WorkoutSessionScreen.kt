@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +32,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -65,15 +67,18 @@ import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SetLog
-import com.marc.gymplan100.data.weightsSummary
+import com.marc.gymplan100.data.setsSummary
 import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.data.TrainingDay
+import com.marc.gymplan100.data.REPS_STEP
 import com.marc.gymplan100.data.WEIGHT_STEP
 import com.marc.gymplan100.data.formatKg
 import com.marc.gymplan100.data.isBodyweightScheme
 import com.marc.gymplan100.data.parseKg
+import com.marc.gymplan100.data.parseReps
+import com.marc.gymplan100.data.repsRangeFromScheme
 import com.marc.gymplan100.data.secondsPerSetFromScheme
 import com.marc.gymplan100.data.setCountFromScheme
 import com.marc.gymplan100.ui.theme.LocalAppColors
@@ -301,6 +306,44 @@ private fun WorkingContent(
     // peso que la propia app acaba de sugerir.
     var weightTouched by rememberSaveable(s.exerciseIndex, s.setNumber) { mutableStateOf(false) }
 
+    // Repeticiones: se preguntan cuando el ejercicio se cuenta por ellas. Una plancha va por
+    // segundos y un circuito por vueltas, y ahí el contador solo estorbaría.
+    val repsRange = repsRangeFromScheme(exercise.scheme)
+    var reps by rememberSaveable(s.exerciseIndex, s.setNumber) {
+        mutableStateOf(viewModel.suggestedReps(s))
+    }
+    var repsTouched by rememberSaveable(s.exerciseIndex, s.setNumber) { mutableStateOf(false) }
+    LaunchedEffect(reps, repsTouched, s.exerciseIndex, s.setNumber) {
+        if (!repsTouched) return@LaunchedEffect
+        delay(500)
+        viewModel.setSetReps(reps)
+    }
+
+    // Qué toca hoy y por qué. Un número que sube solo sin explicación se lee como un fallo de
+    // la app, así que el motivo va escrito debajo del peso.
+    val progression = remember(s.exerciseIndex, s.setNumber, s.completedSets.size) {
+        viewModel.progressionFor(s)
+    }
+
+    // De dónde sale el número que se está viendo. Antes ponía "Pasos de 0,5 kg · el mismo que
+    // la serie anterior": media frase explicaba un botón y la otra media un dato, y juntas no
+    // se entendía ninguna de las dos.
+    val yaHayoSerieHecha = s.completedSets.any { it.exerciseIndex == s.exerciseIndex }
+    val pesoHint = when {
+        progression != null -> progression.reason
+        yaHayoSerieHecha -> "El mismo peso que la serie anterior."
+        parseKg(weight) != null -> "El peso con el que lo dejaste la última vez."
+        else -> "Primera vez con este ejercicio: pon el peso que uses hoy."
+    }
+
+    // La propuesta se guarda en cuanto se ve, no solo si se toca: el reloj y la notificación
+    // cierran la serie leyendo lo persistido, y si la propuesta viviera solo en la pantalla,
+    // marcar desde la muñeca apuntaría un peso distinto del que se está mirando.
+    LaunchedEffect(s.exerciseIndex, s.setNumber) {
+        viewModel.setSetWeight(weight)
+        viewModel.setSetReps(reps)
+    }
+
     // El peso baja a disco medio segundo después del último toque. Con pasos de medio kilo y
     // el botón acelerando, guardar en cada toque serían decenas de escrituras por segundo;
     // así una ráfaga entera es una sola. Lo que se ve en pantalla cambia al instante igual.
@@ -337,13 +380,28 @@ private fun WorkingContent(
             SessionSecondary("Plan", { showDayPlan = true })
         },
         contextCard = {
-            if (timedSecs == null && !bodyweight) {
-                WeightBlock(
-                    value = weight,
-                    onValue = { weight = it; weightTouched = true },
-                    dark = dark,
-                    exerciseInCatalog = imageRes != null
-                )
+            if (timedSecs == null) {
+                if (!bodyweight) {
+                    WeightBlock(
+                        value = weight,
+                        onValue = { weight = it; weightTouched = true },
+                        dark = dark,
+                        reps = if (repsRange != null) reps else null,
+                        onReps = { reps = it; repsTouched = true },
+                        hint = pesoHint
+                    )
+                } else if (repsRange != null) {
+                    // Una dominada no lleva kilos pero sí repeticiones, y son justo las que
+                    // marcan si se progresa.
+                    SessionCard(label = "Repeticiones de esta serie", dark = dark) {
+                        RepsRow(
+                            value = reps,
+                            onValue = { reps = it; repsTouched = true },
+                            hint = progression?.reason.orEmpty()
+                                .ifBlank { "El plan pide ${exercise.scheme}" }
+                        )
+                    }
+                }
             }
         },
         primary = {
@@ -353,14 +411,20 @@ private fun WorkingContent(
                     onClick = { viewModel.startTimedSet() },
                     dark = dark, tint = SessionTint.WORK
                 )
-                bodyweight -> SessionPrimary(
+                // Un circuito se cuenta por vueltas; unas dominadas, por series.
+                bodyweight && repsRange == null -> SessionPrimary(
                     text = "Vuelta hecha",
                     onClick = { viewModel.completeSet("") },
                     dark = dark, tint = SessionTint.WORK
                 )
+                bodyweight -> SessionPrimary(
+                    text = "Serie hecha",
+                    onClick = { viewModel.completeSet("", reps) },
+                    dark = dark, tint = SessionTint.WORK
+                )
                 else -> SessionPrimary(
                     text = "Serie hecha",
-                    onClick = { viewModel.completeSet(weight) },
+                    onClick = { viewModel.completeSet(weight, reps) },
                     dark = dark, tint = SessionTint.WORK
                 )
             }
@@ -426,6 +490,58 @@ private fun WorkingContent(
 }
 
 /**
+ * Las repeticiones de la serie, con el mismo par de botones que el peso.
+ *
+ * Vienen puestas de fábrica: el plan dice cuántas tocan y marcar "serie hecha" es decir que se
+ * han hecho. Solo hay que tocarlas el día que no salen —ocho en vez de doce—, que es justo el
+ * día que interesa apuntar bien para saber si se avanza o se está atascado.
+ */
+@Composable
+private fun RepsRow(value: String, onValue: (String) -> Unit, hint: String) {
+    val n = parseReps(value)
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                "Repeticiones",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (hint.isNotBlank()) {
+                Text(
+                    hint,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        StepperButton(
+            "−",
+            { onValue(((n ?: 1) - REPS_STEP).coerceAtLeast(1).toString()) },
+            enabled = (n ?: 0) > 1,
+            fastRepeat = true,
+            size = Touch.min,
+        )
+        Text(
+            text = n?.toString() ?: "—",
+            style = MaterialTheme.typography.headlineMedium,
+            color = if (n != null) MaterialTheme.colorScheme.onSurface
+            else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier
+                .widthIn(min = 52.dp)
+                .padding(horizontal = Space.x2)
+        )
+        StepperButton(
+            "+",
+            { onValue(((n ?: 0) + REPS_STEP).coerceAtMost(999).toString()) },
+            fastRepeat = true,
+            size = Touch.min,
+        )
+    }
+}
+
+/**
  * El peso de la serie, con botones en vez de teclado.
  *
  * De pie, con una mano y a veces con la máquina esperando, el teclado numérico era lo peor de
@@ -437,14 +553,22 @@ private fun WeightBlock(
     value: String,
     onValue: (String) -> Unit,
     dark: Boolean,
-    exerciseInCatalog: Boolean,
+    reps: String? = null,
+    onReps: (String) -> Unit = {},
+    /**
+     * De dónde sale el número que se ve: el mismo de la serie anterior, el de la última vez o
+     * la propuesta de hoy con su motivo. Es una frase, no una instrucción de uso: cómo van los
+     * botones ya lo enseñan los propios botones.
+     */
+    hint: String,
 ) {
     val styles = LocalAppTextStyles.current
     var showWheel by remember { mutableStateOf(false) }
     var typing by remember { mutableStateOf(false) }
     val kg = parseKg(value)
 
-    SessionCard(label = "Peso de esta serie", dark = dark) {
+    // Con repeticiones dentro, la tarjeta ya no habla solo de kilos.
+    SessionCard(label = if (reps != null) "Esta serie" else "Peso de esta serie", dark = dark) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             StepperButton(
                 "−",
@@ -486,14 +610,18 @@ private fun WeightBlock(
         Spacer(Modifier.height(Space.x2))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                if (kg != null) "Pasos de 0,5 kg · el mismo que la serie anterior"
-                else if (exerciseInCatalog) "Primera vez con este: pon el peso que uses hoy"
-                else "Primera vez con este ejercicio: pon el peso que uses hoy",
+                hint,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)
             )
             TextButton(onClick = { showWheel = true }) { Text("Rueda") }
+        }
+        if (reps != null) {
+            Spacer(Modifier.height(Space.x3))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f))
+            Spacer(Modifier.height(Space.x2))
+            RepsRow(value = reps, onValue = onReps, hint = "")
         }
     }
 
@@ -875,14 +1003,15 @@ private fun FinishedContent(
     val totalRest = s.completedSets.sumOf { it.restSeconds }
     val minutes = ((now - s.startMillis) / 60000).toInt().coerceAtLeast(0)
 
-    // Los pesos de cada ejercicio, serie a serie y en el orden en que se hicieron: hoy la
-    // primera de bíceps fueron 10, la segunda 12 y la tercera 11, y las tres se leen.
+    // Lo que ha dado de sí cada ejercicio, serie a serie y en el orden en que se hizo: hoy la
+    // primera de bíceps fueron 10 kg x 12, la segunda 12 x 12 y la tercera 11 x 10, y las tres
+    // se leen. Entran también las series sin kilos: unas dominadas se cuentan por repeticiones.
     val weights = s.completedSets
-        .filter { it.weight.isNotBlank() }
+        .filter { it.weight.isNotBlank() || it.reps.isNotBlank() }
         .groupBy { it.exerciseIndex }
         .map { (idx, seriesDelEjercicio) ->
             val nombre = day.template.exercises.getOrNull(idx)?.name ?: "Ejercicio"
-            nombre to weightsSummary(
+            nombre to setsSummary(
                 seriesDelEjercicio.sortedBy { it.setNumber }.map { SetLog(it.weight, it.reps) }
             )
         }
@@ -933,7 +1062,8 @@ private fun FinishedContent(
             }
             if (weights.isNotEmpty()) {
                 Spacer(Modifier.height(Space.x3))
-                SessionCard(label = "Pesos de hoy", dark = dark) {
+                // Ya no son solo los pesos: cada ejercicio trae sus series con repeticiones.
+                SessionCard(label = "Series de hoy", dark = dark) {
                     // El nombre arriba y el desglose debajo, no en la misma línea: "10 · 12 ·
                     // 11 kg" al lado de "Curl de bíceps con mancuernas" no cabe, y menos con
                     // el texto del sistema al 150 %.

@@ -25,7 +25,8 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 
 **Entrenamiento guiado en vivo**
 - Calentamiento con cuenta atrás ajustable (pausa/reanuda).
-- **Cada serie con su peso**: la primera con 10, la segunda con 12 y la tercera con 11 se apuntan tal cual, y el desglose se guarda con el día. También **series por tiempo** (planchas, isométricos) con su propia cuenta atrás.
+- **Cada serie con su peso y sus repeticiones**: la primera con 10 kg x 12, la segunda con 12 x 12 y la tercera con 11 x 10 se apuntan tal cual, y el desglose se guarda con el día. Las repeticiones vienen puestas desde el plan: solo se tocan el día que no salen. También **series por tiempo** (planchas, isométricos) con su propia cuenta atrás.
+- **El peso sugerido sube solo**: cuando cierras todas las series en el tope del rango, la app propone más carga —con el salto que de verdad existe en la máquina— y escribe el motivo debajo. Si llevas tres sesiones atascado, propone bajar un 10 % para volver a subir desde ahí.
 - **Descanso con temporizador** entre series y entre ejercicios, con avisos que **suenan aunque tengas la pantalla apagada** o la app en segundo plano.
 - **Peso ajustable durante el descanso**: deja preparado el peso de la siguiente serie para tener la máquina lista.
 - Botón **"máquina ocupada"**: reordena el ejercicio al final y pasa al siguiente pendiente.
@@ -38,7 +39,7 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 - **Cada plan guarda su progreso por separado**: puedes alternar entre planes y al volver tus días, pesos y entrenos siguen ahí. Los hitos y las estadísticas se recalculan sobre el plan activo.
 
 **Seguimiento y motivación**
-- **Estadísticas**: resumen (racha actual y máxima, días completados, tiempo total, series), **gráfica de progresión de peso** por ejercicio, **constancia** (entrenos por semana + mapa de calor tipo calendario) y **records personales**.
+- **Estadísticas**: resumen (racha actual y máxima, días completados, tiempo total, series y **kilos movidos**), **gráfica de progresión de peso** por ejercicio con vista de **fuerza estimada (1RM)** —que es la única forma de comparar días con esquemas distintos—, **constancia** (entrenos por semana + mapa de calor tipo calendario) y **records personales**.
 - **Logros / hitos** del reto con celebración al desbloquearlos (y sorpresa al completar los 100 días 🏆).
 - **Mis pesos**: el peso de referencia de cada máquina —el **más alto** que has movido en ella—, siempre a mano.
 - **Resultados**: histórico de cada día con su duración y los pesos de cada ejercicio, **serie a serie** ("10 · 12 · 11 kg"), incluido lo que apuntes al acabar un entreno libre.
