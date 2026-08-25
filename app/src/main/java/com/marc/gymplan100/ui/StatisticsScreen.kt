@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +60,7 @@ import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.SessionRecord
+import com.marc.gymplan100.data.MuscleLoad
 import com.marc.gymplan100.data.Statistics
 import com.marc.gymplan100.ui.theme.BrandMagenta
 import com.marc.gymplan100.ui.theme.BrandOrange
@@ -76,6 +80,10 @@ fun StatisticsScreen(
     val summary = remember(progress, history) { Statistics.summary(progress, history) }
     val progression = remember(progress) { Statistics.weightProgression(progress) }
     val oneRm = remember(progress) { Statistics.oneRmProgression(progress) }
+    // La carga por musculo sale de los dias ENTRENADOS esta semana, no de los marcados: un
+    // plan se puede retomar tres semanas despues y aquellos dias no son carga de ahora.
+    val diasRecientes = remember(history) { MuscleLoad.recentDays(history, days = 7) }
+    val cargaMuscular = remember(progress, diasRecientes) { MuscleLoad.byGroup(progress, diasRecientes) }
     val volume = remember(progress) { Statistics.totalVolume(progress) }
     val weeks = remember(history) { Statistics.workoutsPerWeek(history, weeks = 10) }
     val trained = remember(history) { Statistics.trainedDays(history) }
@@ -133,7 +141,7 @@ fun StatisticsScreen(
                     edgePadding = 0.dp,
                     divider = {}
                 ) {
-                    listOf("Resumen", "Pesos", "Constancia").forEachIndexed { i, label ->
+                    listOf("Resumen", "Pesos", "Músculos", "Constancia").forEachIndexed { i, label ->
                         Tab(
                             selected = tab == i,
                             onClick = { tab = i },
@@ -157,6 +165,7 @@ fun StatisticsScreen(
                     item { RecordsSection(records, longest, productive) }
                 }
                 1 -> item { ProgressionSection(progression, oneRm) }
+                2 -> item { MuscleLoadSection(cargaMuscular) }
                 else -> item { ConsistencySection(trained, history) }
             }
         }
@@ -632,6 +641,132 @@ private fun Heatmap(trained: Set<LocalDate>, weeks: Int = 13) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+// ------------------------------------------------------------- Carga por músculo
+
+/**
+ * Qué se ha llevado cada músculo en la última semana, en SERIES.
+ *
+ * Es lo único que ningún ejercicio suelto puede decir: la ficha de un press explica que
+ * trabaja el pecho, pero solo el acumulado cuenta si llevas tres semanas sin tocar pierna.
+ * Se mide en series porque es como se habla de volumen en el gimnasio y porque funciona
+ * igual con una prensa de 80 kg que con unas dominadas.
+ */
+@Composable
+private fun MuscleLoadSection(loads: List<MuscleLoad.GroupLoad>) {
+    Column {
+        SectionTitle("Lo que has trabajado")
+        Spacer(Modifier.height(4.dp))
+        if (loads.isEmpty()) {
+            Text(
+                "Aquí se pinta lo que se ha llevado cada músculo en los últimos siete días. " +
+                    "Con el primer entreno de la semana aparece.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            return
+        }
+        Text(
+            "Últimos 7 días · series por músculo",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(12.dp))
+
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val niveles = remember(loads) { MuscleLoad.levels(loads) }
+                val fuerte = MaterialTheme.colorScheme.primary
+                MuscleMap(
+                    levels = niveles,
+                    bodyColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.16f),
+                    // Tres tonos del mismo color: cuanto más intenso, más trabajo se ha llevado.
+                    levelColors = listOf(
+                        fuerte.copy(alpha = 0.30f),
+                        fuerte.copy(alpha = 0.60f),
+                        fuerte
+                    ),
+                    separatorColor = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.widthIn(max = 320.dp)
+                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        "Frente",
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "Espalda",
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+                val tope = loads.first().sets
+                loads.forEach { carga ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 3.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            MuscleLoad.label(carga.group),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(0.9f)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1.3f)
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(if (tope <= 0f) 0f else carga.sets / tope)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.primary)
+                            )
+                        }
+                        Text(
+                            MuscleLoad.formatSets(carga.sets),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.End,
+                            // Sin ancho fijo: con el texto del sistema al 150 % un "19,5" no
+                            // cabia en los 36 dp y se partia en dos lineas, y quien cede sitio
+                            // tiene que ser la barra, que para eso es elastica.
+                            maxLines = 1,
+                            softWrap = false,
+                            modifier = Modifier
+                                .widthIn(min = 36.dp)
+                                .padding(start = 6.dp)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Media serie cuando el músculo solo ayuda.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 

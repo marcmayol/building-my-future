@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ExerciseImages
+import com.marc.gymplan100.data.MuscleTargets
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.setsSummary
@@ -885,24 +886,49 @@ private fun RestingContent(
         val nextImageRes = nextExercise?.let {
             ExerciseImages.forName(LocalContext.current, it.name, LocalIsFemale.current)
         }
-        if (nextImageRes != null) {
-            Box(
+        // Y en ese mismo hueco cabe el mapa muscular, que aquí sí tiene sentido: en la serie
+        // no cambia nada de lo que vas a hacer en los próximos cuarenta segundos, pero
+        // descansando hay tiempo muerto y una pantalla con poco trabajo. Se alterna con la
+        // ilustración en vez de ponerse al lado: dos dibujos compiten por la misma mirada.
+        val nextTargets = nextExercise?.let { MuscleTargets.forName(it.name) }
+        var verMusculos by rememberSaveable(nextExercise?.name) { mutableStateOf(false) }
+        val mostrarMapa = nextTargets != null && (verMusculos || nextImageRes == null)
+        if (nextImageRes != null || nextTargets != null) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(bottom = Space.x4),
-                contentAlignment = Alignment.BottomCenter
+                    .padding(bottom = Space.x2),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
             ) {
-                Image(
-                    painter = painterResource(nextImageRes),
-                    contentDescription = nextExercise.name,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 260.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color.White)
-                )
+                if (mostrarMapa && nextTargets != null) {
+                    MuscleMap(
+                        primary = nextTargets.primary,
+                        secondary = nextTargets.secondary,
+                        bodyColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.18f),
+                        primaryColor = tintAccent(SessionTint.REST),
+                        secondaryColor = LocalAppColors.current.warmup,
+                        separatorColor = Color.Transparent,
+                        modifier = Modifier.widthIn(max = 230.dp)
+                    )
+                } else if (nextImageRes != null) {
+                    Image(
+                        painter = painterResource(nextImageRes),
+                        contentDescription = nextExercise?.name,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 230.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                    )
+                }
+                if (nextTargets != null && nextImageRes != null) {
+                    TextButton(onClick = { verMusculos = !verMusculos }) {
+                        Text(if (verMusculos) "Ver el ejercicio" else "Ver los músculos")
+                    }
+                }
             }
         }
         Countdown(

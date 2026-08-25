@@ -61,6 +61,9 @@ import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.Exercise
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.ExerciseKind
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextAlign
+import com.marc.gymplan100.data.MuscleLoad
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.setCountFromScheme
@@ -193,6 +196,8 @@ fun DayScreen(
 
             item { SectionBlock("VUELTA A LA CALMA", template.cooldown) }
 
+            item { DayMuscleCard(template.exercises) }
+
             item {
                 Spacer(Modifier.height(Space.x1))
                 if (completed) {
@@ -231,6 +236,72 @@ fun DayScreen(
                 scheme = ex.scheme,
                 onDismiss = { guideFor = null },
                 kind = ex.kind
+            )
+        }
+    }
+}
+
+/**
+ * Lo que el día va a trabajar, dibujado sobre el cuerpo.
+ *
+ * Va aquí y no en la pantalla de la serie porque es información de antes y de después: con la
+ * máquina delante y cuarenta segundos por delante da igual cómo se llame el músculo. En la
+ * ficha del día sirve para saber si hoy toca pierna sin leerse los seis ejercicios.
+ */
+@Composable
+private fun DayMuscleCard(exercises: List<Exercise>) {
+    val cargas = remember(exercises) { MuscleLoad.planned(exercises) }
+    if (cargas.isEmpty()) return
+    val niveles = remember(cargas) { MuscleLoad.levels(cargas) }
+    val fuerte = MaterialTheme.colorScheme.primary
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(Space.x4)
+    ) {
+        Text(
+            "HOY TRABAJAS",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(Space.x2))
+        // Los tres que más se llevan; el resto ya se ve en el dibujo.
+        Text(
+            cargas.take(3).joinToString(" · ") { MuscleLoad.label(it.group) },
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(Modifier.height(Space.x2))
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            MuscleMap(
+                levels = niveles,
+                bodyColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.16f),
+                levelColors = listOf(
+                    fuerte.copy(alpha = 0.30f),
+                    fuerte.copy(alpha = 0.60f),
+                    fuerte
+                ),
+                separatorColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.widthIn(max = 280.dp)
+            )
+        }
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                "Frente",
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                "Espalda",
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

@@ -42,13 +42,17 @@ private val NO_SEPARATOR = setOf("head", "hair", "neck")
 private val frontHead = Offset(303f, 97f) to Size(122f, 146f)
 private val backHead = Offset(1022f, 96f) to Size(124f, 138f)
 
+/**
+ * El mapa por niveles de intensidad (1 a 3), que es lo que hace falta para pintar el trabajo
+ * ACUMULADO: ahi no hay "principal y secundario", hay musculos que se han llevado mas y menos.
+ *
+ * [levelColors] va de menos a mas: tres tonos de la misma familia.
+ */
 @Composable
 fun MuscleMap(
-    primary: Set<String>,
-    secondary: Set<String>,
+    levels: Map<String, Int>,
     bodyColor: Color,
-    primaryColor: Color,
-    secondaryColor: Color,
+    levelColors: List<Color>,
     separatorColor: Color,
     modifier: Modifier = Modifier
 ) {
@@ -59,8 +63,8 @@ fun MuscleMap(
     ) {
         val scale = size.width / 1448f
         withTransform({ scale(scale, scale, pivot = Offset.Zero) }) {
-            drawBody(frontPaths, primary, secondary, bodyColor, primaryColor, secondaryColor, separatorColor)
-            drawBody(backPaths, primary, secondary, bodyColor, primaryColor, secondaryColor, separatorColor)
+            drawBody(frontPaths, levels, bodyColor, levelColors, separatorColor)
+            drawBody(backPaths, levels, bodyColor, levelColors, separatorColor)
             // Cabezas limpias por encima del cuello.
             drawOval(bodyColor, topLeft = frontHead.first, size = frontHead.second)
             drawOval(bodyColor, topLeft = backHead.first, size = backHead.second)
@@ -68,29 +72,48 @@ fun MuscleMap(
     }
 }
 
-private fun DrawScope.drawBody(
-    paths: Map<String, List<Path>>,
+/**
+ * El mapa de UN ejercicio: lo que trabaja y lo que solo ayuda. Se apoya en el de niveles,
+ * para que el dibujo sea exactamente el mismo en los dos sitios.
+ */
+@Composable
+fun MuscleMap(
     primary: Set<String>,
     secondary: Set<String>,
     bodyColor: Color,
     primaryColor: Color,
     secondaryColor: Color,
+    separatorColor: Color,
+    modifier: Modifier = Modifier
+) {
+    MuscleMap(
+        levels = secondary.associateWith { 1 } + primary.associateWith { 3 },
+        bodyColor = bodyColor,
+        levelColors = listOf(secondaryColor, secondaryColor, primaryColor),
+        separatorColor = separatorColor,
+        modifier = modifier
+    )
+}
+
+private fun DrawScope.drawBody(
+    paths: Map<String, List<Path>>,
+    levels: Map<String, Int>,
+    bodyColor: Color,
+    levelColors: List<Color>,
     separatorColor: Color
 ) {
-    // 1) Cuerpo (músculos no trabajados).
+    // 1) Cuerpo (músculos que no se han trabajado).
     paths.forEach { (slug, list) ->
-        if (slug in NO_DRAW || slug in primary || slug in secondary) return@forEach
+        if (slug in NO_DRAW || levels.containsKey(slug)) return@forEach
         list.forEach { drawPath(it, color = bodyColor) }
     }
-    // 2) Músculos secundarios (tono suave).
-    paths.forEach { (slug, list) ->
-        if (slug in NO_DRAW || slug in primary || slug !in secondary) return@forEach
-        list.forEach { drawPath(it, color = secondaryColor) }
-    }
-    // 3) Músculos principales (tono fuerte), por encima.
-    paths.forEach { (slug, list) ->
-        if (slug in NO_DRAW || slug !in primary) return@forEach
-        list.forEach { drawPath(it, color = primaryColor) }
+    // 2) Los trabajados, de menos a más: si dos trazados se pisan, manda el más cargado.
+    for (nivel in 1..3) {
+        val color = levelColors.getOrNull(nivel - 1) ?: continue
+        paths.forEach { (slug, list) ->
+            if (slug in NO_DRAW || levels[slug] != nivel) return@forEach
+            list.forEach { drawPath(it, color = color) }
+        }
     }
     // 4) Líneas de separación entre músculos (aspecto segmentado).
     paths.forEach { (slug, list) ->
