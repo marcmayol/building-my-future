@@ -1,8 +1,8 @@
 {
-  "versionCode": 19,
-  "versionName": "2.5",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.5/building-my-future-v2.5.apk",
-  "sha256": "0ac2390b741a9903c0c1992202d06f0e0347b1e9accb83f4bb9464ca2d2bb802",
-  "notas": "Cada serie con sus repeticiones, el peso que sube solo y el mapa de lo que trabajas.",
+  "versionCode": 20,
+  "versionName": "2.5.1",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.5.1/building-my-future-v2.5.1.apk",
+  "sha256": "e0fa90d4dc1156caefdf9ce94e8fc4af36dbc31ea5eda6254e9e2d818c55468f",
+  "notas": "El boton Entendido del aviso de bateria se partia a media palabra con el texto grande.",
   "check_horas": 24
 }
