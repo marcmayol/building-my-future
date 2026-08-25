@@ -64,11 +64,16 @@ import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.SetLog
+import com.marc.gymplan100.data.weightsSummary
 import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.data.TrainingDay
+import com.marc.gymplan100.data.WEIGHT_STEP
+import com.marc.gymplan100.data.formatKg
 import com.marc.gymplan100.data.isBodyweightScheme
+import com.marc.gymplan100.data.parseKg
 import com.marc.gymplan100.data.secondsPerSetFromScheme
 import com.marc.gymplan100.data.setCountFromScheme
 import com.marc.gymplan100.ui.theme.LocalAppColors
@@ -870,13 +875,18 @@ private fun FinishedContent(
     val totalRest = s.completedSets.sumOf { it.restSeconds }
     val minutes = ((now - s.startMillis) / 60000).toInt().coerceAtLeast(0)
 
-    // Peso final por ejercicio, en el orden en que se hicieron.
+    // Los pesos de cada ejercicio, serie a serie y en el orden en que se hicieron: hoy la
+    // primera de bíceps fueron 10, la segunda 12 y la tercera 11, y las tres se leen.
     val weights = s.completedSets
         .filter { it.weight.isNotBlank() }
         .groupBy { it.exerciseIndex }
-        .map { (idx, sets) ->
-            (day.template.exercises.getOrNull(idx)?.name ?: "Ejercicio") to sets.last().weight
+        .map { (idx, seriesDelEjercicio) ->
+            val nombre = day.template.exercises.getOrNull(idx)?.name ?: "Ejercicio"
+            nombre to weightsSummary(
+                seriesDelEjercicio.sortedBy { it.setNumber }.map { SetLog(it.weight, it.reps) }
+            )
         }
+        .filter { it.second.isNotBlank() }
 
     SessionShell(
         tint = SessionTint.NEUTRAL,
@@ -924,22 +934,20 @@ private fun FinishedContent(
             if (weights.isNotEmpty()) {
                 Spacer(Modifier.height(Space.x3))
                 SessionCard(label = "Pesos de hoy", dark = dark) {
-                    weights.forEach { (name, kg) ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = Space.x1)
-                        ) {
+                    // El nombre arriba y el desglose debajo, no en la misma línea: "10 · 12 ·
+                    // 11 kg" al lado de "Curl de bíceps con mancuernas" no cabe, y menos con
+                    // el texto del sistema al 150 %.
+                    weights.forEach { (name, resumen) ->
+                        Column(modifier = Modifier.fillMaxWidth().padding(vertical = Space.x1)) {
                             Text(
                                 name,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.weight(1f)
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                "$kg kg",
+                                resumen,
                                 style = styles.tabular,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = appColors.work
                             )
                         }
                     }
@@ -1082,27 +1090,6 @@ private fun LaunchedEffectTick(onTick: (Long) -> Unit) {
             delay(500)
         }
     }
-}
-
-/**
- * Lo que sube o baja el peso con un toque del stepper.
- *
- * 0,5 kg y no 2,5: en un gimnasio no todo son discos de 2,5. Hay mancuernas de 1 en 1, discos
- * de medio kilo y máquinas con placas que no van de dos en dos, y con el paso grande no había
- * manera de escribir el peso real de la serie. Para los saltos gordos están la rueda, escribir
- * el número a mano y mantener pulsado el botón, que acelera.
- */
-const val WEIGHT_STEP = 0.5
-
-/** "12,5" o "12.5" -> 12.5. Null si no hay número. */
-fun parseKg(raw: String): Double? =
-    raw.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it > 0 }
-
-/** 12.5 -> "12,5"; 40.0 -> "40". Coma decimal, que es como se escribe aquí. */
-fun formatKg(value: Double): String {
-    val v = value.coerceIn(0.0, 500.0)
-    return if (v % 1.0 == 0.0) v.toInt().toString()
-    else "%.1f".format(v).replace('.', ',')
 }
 
 private fun formatClock(ms: Long): String {

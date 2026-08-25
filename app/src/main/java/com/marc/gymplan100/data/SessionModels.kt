@@ -150,13 +150,55 @@ data class SessionRecord(
 /**
  * Un ejercicio apuntado a mano al acabar un entreno libre: el nombre (del plan, del catálogo
  * o escrito por ti) con el peso y las repeticiones que hayas hecho.
+ *
+ * [sets] guarda serie a serie —10 kg × 12, 12 kg × 12, 11 kg × 10—, que es como se entrena de
+ * verdad. [weight] y [reps] siguen ahí como resumen del ejercicio (el peso más alto y las
+ * repeticiones de esa serie), y son lo único que traen los entrenos apuntados antes de la 2.4.
  */
 @Serializable
 data class LoggedExercise(
     val name: String,
     val weight: String = "",
-    val reps: String = ""
-)
+    val reps: String = "",
+    val sets: List<SetLog> = emptyList()
+) {
+    /** Las series apuntadas; si es un registro viejo (sin desglose), el resumen hace de serie única. */
+    val setsOrSingle: List<SetLog>
+        get() = sets.filter { !it.isEmpty }.ifEmpty {
+            if (weight.isBlank() && reps.isBlank()) emptyList() else listOf(SetLog(weight, reps))
+        }
+}
+
+/**
+ * Lo que sube o baja el peso con un toque del stepper.
+ *
+ * 0,5 kg y no 2,5: en un gimnasio no todo son discos de 2,5. Hay mancuernas de 1 en 1, discos
+ * de medio kilo y máquinas con placas que no van de dos en dos, y con el paso grande no había
+ * manera de escribir el peso real de la serie. Para los saltos gordos están la rueda, escribir
+ * el número a mano y mantener pulsado el botón, que acelera.
+ */
+const val WEIGHT_STEP = 0.5
+
+/** "12,5" o "12.5" -> 12.5. Null si no hay número. */
+fun parseKg(raw: String): Double? =
+    raw.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it > 0 }
+
+/** 12.5 -> "12,5"; 40.0 -> "40". Coma decimal, que es como se escribe aquí. */
+fun formatKg(value: Double): String {
+    val v = value.coerceIn(0.0, 500.0)
+    return if (v % 1.0 == 0.0) v.toInt().toString()
+    else "%.1f".format(v).replace('.', ',')
+}
+
+/**
+ * El más pesado de unos kilos escritos, comparando por número y no por texto ("9" pesa menos
+ * que "10", aunque alfabéticamente vaya después). Devuelve "" si ninguno trae un número.
+ *
+ * Es lo que se guarda como peso de referencia del ejercicio: de una serie a otra se sube y se
+ * baja —10, 12, 11— y lo que cuenta como "lo que levantas" es el tope, no lo último que tocó.
+ */
+fun heaviestWeight(weights: List<String>): String =
+    weights.filter { parseKg(it) != null }.maxByOrNull { parseKg(it)!! }?.trim().orEmpty()
 
 /** Objetivos de descanso por defecto (segundos). */
 object RestDefaults {

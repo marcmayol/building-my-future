@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.LoggedExercise
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -96,8 +97,9 @@ fun FreeSessionLog(
     val filas = remember {
         mutableStateListOf<LoggedExercise>().apply {
             val delDia = day?.template?.exercises.orEmpty()
-            if (delDia.isEmpty()) add(LoggedExercise(""))
-            else delDia.forEach { add(LoggedExercise(name = it.name)) }
+            val unaSerie = listOf(SetLog())
+            if (delDia.isEmpty()) add(LoggedExercise("", sets = unaSerie))
+            else delDia.forEach { add(LoggedExercise(name = it.name, sets = unaSerie)) }
         }
     }
 
@@ -121,9 +123,7 @@ fun FreeSessionLog(
             }
     }
 
-    val apuntados = filas.count {
-        it.name.isNotBlank() && (it.weight.isNotBlank() || it.reps.isNotBlank())
-    }
+    val apuntados = filas.count { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
     val tecladoAbierto = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     // Qué fila se está escribiendo: la de al lado se atenúa para que el pulgar sepa dónde está.
     var enfocada by remember { mutableStateOf(-1) }
@@ -167,8 +167,9 @@ fun FreeSessionLog(
                             "Hoy no había ejercicios apuntados en el plan, así que empiezas en " +
                                 "blanco: escribe los que hayas hecho, o guarda solo el tiempo."
                         } else {
-                            "Apunta lo que quieras y déjate el resto. Los pesos que pongas se " +
-                                "quedan como los últimos de cada ejercicio."
+                            "Apunta lo que quieras y déjate el resto. Cada serie lleva sus " +
+                                "kilos y sus repeticiones, y el más alto se queda como tu " +
+                                "peso de ese ejercicio."
                         },
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -189,7 +190,7 @@ fun FreeSessionLog(
                 )
             }
 
-            item { AñadirEjercicio { filas.add(LoggedExercise("")) } }
+            item { AñadirEjercicio { filas.add(LoggedExercise("", sets = listOf(SetLog()))) } }
         }
 
         // Las acciones, fijas abajo: con el teclado abierto y ocho filas, buscarlas al final
@@ -351,28 +352,63 @@ private fun FilaEjercicio(
             }
         }
         Spacer(Modifier.height(Space.x3))
+        // Una línea por serie: entrenando a tu aire la primera sale con 10, la segunda con 12
+        // y la tercera con 11, y hasta ahora solo cabía un número por ejercicio.
         // Dos campos cortos, no dos campos anchos: nadie escribe "ciento veinte kilos".
         // A 150 % de texto el segundo baja solo en vez de estrujarse.
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(Space.x2),
-            verticalArrangement = Arrangement.spacedBy(Space.x2)
-        ) {
-            if (kind == ExerciseKind.STRENGTH) {
-                CampoCorto(
-                    value = fila.weight,
-                    onValueChange = { onChange(fila.copy(weight = it)) },
-                    label = "Peso",
-                    unidad = "kg",
-                    decimal = true
+        val series = fila.sets.ifEmpty { listOf(SetLog()) }
+        series.forEachIndexed { i, serie ->
+            fun cambiar(nueva: SetLog) =
+                onChange(fila.copy(sets = series.toMutableList().also { it[i] = nueva }))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "${i + 1}ª",
+                    style = LocalAppTextStyles.current.tabular,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.width(30.dp)
                 )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                    verticalArrangement = Arrangement.spacedBy(Space.x2),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    if (kind == ExerciseKind.STRENGTH) {
+                        CampoCorto(
+                            value = serie.weight,
+                            onValueChange = { cambiar(serie.copy(weight = it)) },
+                            label = "Peso de la serie ${i + 1}",
+                            unidad = "kg",
+                            decimal = true
+                        )
+                    }
+                    CampoCorto(
+                        value = serie.reps,
+                        onValueChange = { cambiar(serie.copy(reps = it)) },
+                        label = if (kind == ExerciseKind.TIME) "Tiempo de la serie ${i + 1}"
+                        else "Repeticiones de la serie ${i + 1}",
+                        unidad = if (kind == ExerciseKind.TIME) "s" else "reps",
+                        decimal = false
+                    )
+                }
+                // La primera serie no se puede quitar: es la fila del ejercicio.
+                if (series.size > 1) {
+                    IconButton(
+                        onClick = { onChange(fila.copy(sets = series.filterIndexed { j, _ -> j != i })) },
+                        modifier = Modifier.size(38.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "Quitar la serie ${i + 1}",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
             }
-            CampoCorto(
-                value = fila.reps,
-                onValueChange = { onChange(fila.copy(reps = it)) },
-                label = if (kind == ExerciseKind.TIME) "Tiempo" else "Reps",
-                unidad = if (kind == ExerciseKind.TIME) "s" else "reps",
-                decimal = false
-            )
+            Spacer(Modifier.height(Space.x2))
+        }
+        TextButton(onClick = { onChange(fila.copy(sets = series + SetLog())) }) {
+            Text("+ Añadir serie", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

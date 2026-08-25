@@ -25,7 +25,7 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 
 **Entrenamiento guiado en vivo**
 - Calentamiento con cuenta atrás ajustable (pausa/reanuda).
-- Series con registro de peso; **series por tiempo** (planchas, isométricos) con su propia cuenta atrás.
+- **Cada serie con su peso**: la primera con 10, la segunda con 12 y la tercera con 11 se apuntan tal cual, y el desglose se guarda con el día. También **series por tiempo** (planchas, isométricos) con su propia cuenta atrás.
 - **Descanso con temporizador** entre series y entre ejercicios, con avisos que **suenan aunque tengas la pantalla apagada** o la app en segundo plano.
 - **Peso ajustable durante el descanso**: deja preparado el peso de la siguiente serie para tener la máquina lista.
 - Botón **"máquina ocupada"**: reordena el ejercicio al final y pasa al siguiente pendiente.
@@ -40,9 +40,9 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 **Seguimiento y motivación**
 - **Estadísticas**: resumen (racha actual y máxima, días completados, tiempo total, series), **gráfica de progresión de peso** por ejercicio, **constancia** (entrenos por semana + mapa de calor tipo calendario) y **records personales**.
 - **Logros / hitos** del reto con celebración al desbloquearlos (y sorpresa al completar los 100 días 🏆).
-- **Mis pesos**: el peso de referencia de cada máquina, siempre a mano.
-- **Resultados**: histórico de cada día con su duración y los pesos de cada ejercicio.
-- Entrenamiento **especial** (sesión libre guiada) y **extra** (bonus que no cuenta como día del plan).
+- **Mis pesos**: el peso de referencia de cada máquina —el **más alto** que has movido en ella—, siempre a mano.
+- **Resultados**: histórico de cada día con su duración y los pesos de cada ejercicio, **serie a serie** ("10 · 12 · 11 kg"), incluido lo que apuntes al acabar un entreno libre.
+- Entrenamiento **especial** (sesión libre guiada) y **extra** (bonus que no cuenta como día del plan); al terminar se apunta lo hecho **con peso y repeticiones de cada serie**.
 
 **Integraciones**
 - **Wear OS**: controla la sesión desde el reloj (p. ej. Pixel Watch). Si el reloj mide el pulso, las calorías reales las aporta Google Health y la app evita el doble conteo.

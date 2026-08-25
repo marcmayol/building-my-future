@@ -1,4 +1,7 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(
+    androidx.compose.material3.ExperimentalMaterial3Api::class,
+    androidx.compose.foundation.layout.ExperimentalLayoutApi::class,
+)
 
 package com.marc.gymplan100.ui
 
@@ -7,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -57,6 +62,8 @@ import com.marc.gymplan100.data.Exercise
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.SetLog
+import com.marc.gymplan100.data.setCountFromScheme
 import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.repsFromScheme
@@ -160,14 +167,22 @@ fun DayScreen(
 
             itemsIndexed(template.exercises) { index, exercise ->
                 val log = progress.logs["${day.number}-$index"]
+                val totalSets = setCountFromScheme(exercise.scheme)
                 ExerciseCard(
                     exercise = exercise,
-                    // Peso: lo guardado o, si no, el último conocido de esa máquina.
-                    weight = log?.weight.orEmpty().ifEmpty { viewModel.exerciseWeight(exercise.name) },
+                    totalSets = totalSets,
+                    // Lo apuntado serie a serie. Si el día viene de antes del desglose, el
+                    // peso que hubiera se enseña como el de la primera serie.
+                    sets = log?.sets?.ifEmpty { null }
+                        ?: listOf(SetLog(weight = log?.weight.orEmpty())),
+                    // Lo último conocido de esa máquina, de pista en los campos vacíos.
+                    hint = viewModel.exerciseWeight(exercise.name),
                     // Reps: las guardadas o, si no, las indicadas en el plan.
                     reps = log?.reps.orEmpty().ifEmpty { repsFromScheme(exercise.scheme) },
                     done = log?.done ?: false,
-                    onWeight = { viewModel.setLog(day.number, index, weight = it) },
+                    onSetWeight = { serie, kilos ->
+                        viewModel.setDaySetWeight(day.number, index, serie, totalSets, kilos)
+                    },
                     onReps = { viewModel.setLog(day.number, index, reps = it) },
                     onDone = { viewModel.setLog(day.number, index, done = it) },
                     onShowGuide = { guideFor = exercise }
@@ -234,13 +249,22 @@ private fun SectionBlock(label: String, text: String) {
     }
 }
 
+/**
+ * Cuánto crece un campo con el tamaño de texto del sistema. A ancho fijo, con el texto al
+ * 150 % un "100" se sale del campo y solo se leen dos cifras.
+ */
+@Composable
+private fun fontScale(): Float = LocalDensity.current.fontScale.coerceIn(1f, 1.6f)
+
 @Composable
 private fun ExerciseCard(
     exercise: Exercise,
-    weight: String,
+    totalSets: Int,
+    sets: List<SetLog>,
+    hint: String,
     reps: String,
     done: Boolean,
-    onWeight: (String) -> Unit,
+    onSetWeight: (Int, String) -> Unit,
     onReps: (String) -> Unit,
     onDone: (Boolean) -> Unit,
     onShowGuide: () -> Unit
@@ -281,32 +305,61 @@ private fun ExerciseCard(
         val pideReps = exercise.kind != ExerciseKind.CARDIO
         if (pidePeso || pideReps) {
         Spacer(Modifier.height(Space.x2))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Space.x2)
-        ) {
-            if (pidePeso) {
-                OutlinedTextField(
-                    value = weight,
-                    onValueChange = onWeight,
-                    label = { Text("Peso (kg)") },
-                    singleLine = true,
-                    shape = MaterialTheme.shapes.extraSmall,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
+        if (pidePeso) {
+            // Un campo por serie: las tres casi nunca llevan lo mismo (10, 12 y 11 es lo
+            // normal), y con un solo campo había que elegir cuál de los tres pesos mentía.
+            // A 150 % de texto los campos bajan de línea solos en vez de estrujarse.
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                verticalArrangement = Arrangement.spacedBy(Space.x2)
+            ) {
+                repeat(maxOf(totalSets, sets.size)) { i ->
+                    OutlinedTextField(
+                        value = sets.getOrNull(i)?.weight.orEmpty(),
+                        onValueChange = { onSetWeight(i, it) },
+                        label = { Text("${i + 1}ª") },
+                        // La pista es el último peso conocido de esa máquina: orienta sin
+                        // dar por hecho que hoy vas a mover lo mismo.
+                        placeholder = if (hint.isBlank()) null else {
+                            {
+                                Text(
+                                    hint,
+                                    style = LocalAppTextStyles.current.tabular,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        },
+                        // La unidad va de icono final y no de `suffix`: el sufijo de M3 solo
+                        // aparece al enfocar el campo, y aquí tiene que verse también vacío.
+                        trailingIcon = {
+                            Text(
+                                "kg",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.extraSmall,
+                        textStyle = LocalAppTextStyles.current.tabular,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        // Tres series tienen que caber en una línea de un móvil normal; con el
+                        // texto del sistema más grande bajan solas en vez de estrujarse.
+                        modifier = Modifier.width(100.dp * fontScale())
+                    )
+                }
             }
-            if (pideReps) {
-                OutlinedTextField(
-                    value = reps,
-                    onValueChange = onReps,
-                    label = { Text(if (exercise.kind == ExerciseKind.TIME) "Segundos" else "Reps") },
-                    singleLine = true,
-                    shape = MaterialTheme.shapes.extraSmall,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-            }
+        }
+        if (pideReps) {
+            Spacer(Modifier.height(Space.x2))
+            OutlinedTextField(
+                value = reps,
+                onValueChange = onReps,
+                label = { Text(if (exercise.kind == ExerciseKind.TIME) "Segundos" else "Reps") },
+                singleLine = true,
+                shape = MaterialTheme.shapes.extraSmall,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.width(100.dp * fontScale())
+            )
         }
         }
         // La ficha, como enlace: con seis ejercicios, seis botones anchos eran una pared.

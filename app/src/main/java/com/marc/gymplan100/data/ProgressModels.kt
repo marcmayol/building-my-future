@@ -2,13 +2,78 @@ package com.marc.gymplan100.data
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Una serie tal y como quedó apuntada: los kilos que se movieron y, si se anotaron, las
+ * repeticiones que se hicieron de verdad.
+ *
+ * Existe porque las tres series de un ejercicio casi nunca son iguales —la primera con 10, la
+ * segunda con 12 y la tercera con 11 es lo normal—, y hasta la v2.3 la app se quedaba solo con
+ * la última y tiraba las otras dos al cerrar el día.
+ */
+@Serializable
+data class SetLog(
+    val weight: String = "",
+    val reps: String = ""
+) {
+    val isEmpty: Boolean get() = weight.isBlank() && reps.isBlank()
+}
+
 /** Registro del usuario para un ejercicio concreto de un día. */
 @Serializable
 data class ExerciseLog(
     val weight: String = "",
     val reps: String = "",
-    val done: Boolean = false
-)
+    val done: Boolean = false,
+    /**
+     * Desglose serie a serie. Vacío en los días de siempre (y en los que se apuntan de un
+     * plumazo): entonces [weight] y [reps] son todo lo que hay, y se leen igual que antes.
+     *
+     * [weight] no desaparece por esto: sigue siendo el peso de referencia del ejercicio ese
+     * día —el MÁS ALTO de sus series—, que es lo que mira "Mis pesos" y lo que se sugiere la
+     * próxima vez.
+     */
+    val sets: List<SetLog> = emptyList()
+) {
+    /** Series con algo apuntado; las de relleno (vacías del todo) no cuentan. */
+    val filledSets: List<SetLog> get() = sets.filter { !it.isEmpty }
+}
+
+/**
+ * El desglose de pesos en una línea: "10 · 12 · 11 kg" cuando cada serie llevó lo suyo, y
+ * "12 kg ×3" cuando las tres fueron iguales (repetir el mismo número tres veces no dice nada).
+ *
+ * Una serie sin peso en medio se marca con un guion ("10 · — · 11 kg") para no desplazar a las
+ * demás; las que se quedan sin apuntar al final se recortan. Devuelve "" si no hay ni un peso.
+ */
+fun weightsSummary(sets: List<SetLog>): String {
+    val weights = sets.map { it.weight.trim() }.dropLastWhile { it.isBlank() }
+    if (weights.none { it.isNotBlank() }) return ""
+    val distinct = weights.filter { it.isNotBlank() }.distinct()
+    if (distinct.size == 1 && weights.size > 1 && weights.all { it.isNotBlank() }) {
+        return "${distinct.first()} kg ×${weights.size}"
+    }
+    return weights.joinToString(" · ") { it.ifBlank { "—" } } + " kg"
+}
+
+/**
+ * Las series con kilos Y repeticiones, para lo que se apunta en el entreno libre:
+ * "10 kg × 12 · 12 kg × 12 · 11 kg × 10". Si ninguna trae repeticiones, se lee como el
+ * desglose de pesos de siempre.
+ */
+fun setsSummary(sets: List<SetLog>): String {
+    val llenas = sets.filter { !it.isEmpty }
+    if (llenas.isEmpty()) return ""
+    if (llenas.none { it.reps.isNotBlank() }) return weightsSummary(llenas)
+    return llenas.joinToString(" · ") { serie ->
+        val kg = serie.weight.trim()
+        val reps = serie.reps.trim()
+        when {
+            kg.isNotBlank() && reps.isNotBlank() -> "$kg kg × $reps"
+            kg.isNotBlank() -> "$kg kg"
+            else -> "× $reps"
+        }
+    }
+}
 
 /** Estado completo del progreso, persistido como JSON. */
 @Serializable
@@ -64,17 +129,32 @@ data class ProgressState(
      * Los pesos se rehacen aquí, y no solo serie a serie, porque las series marcadas desde el
      * reloj no pasan por el ViewModel: al cerrar el día es donde se sabe de verdad qué se
      * levantó. Un ejercicio sin ninguna serie con peso (una plancha) no toca nada.
+     *
+     * Aquí queda también el desglose entero (10 · 12 · 11), que antes se perdía: de las tres
+     * series solo sobrevivía la última, y con ella la idea falsa de que el ejercicio se hizo
+     * con un único peso.
      */
     fun withFinishedDay(dayNumber: Int, completedSets: List<CompletedSet>): ProgressState {
         val nuevosLogs = logs.toMutableMap()
         val nuevosPesos = exerciseWeights.toMutableMap()
         completedSets.groupBy { it.exerciseIndex }.forEach { (idx, seriesDelEjercicio) ->
-            val ultimoPeso = seriesDelEjercicio.lastOrNull { it.weight.isNotBlank() }?.weight
+            // El peso del ejercicio es el MÁS ALTO de sus series, no el de la última: si hoy
+            // fueron 10, 12 y 11, lo que levantas son 12. El detalle vive en `sets`.
+            val pesoTope = heaviestWeight(seriesDelEjercicio.map { it.weight })
+                .ifBlank { null }
             val clave = "$dayNumber-$idx"
             val previo = nuevosLogs[clave] ?: ExerciseLog()
-            nuevosLogs[clave] = previo.copy(weight = ultimoPeso ?: previo.weight, done = true)
+            // En el orden en que se hicieron, que es el que se lee luego en el resumen.
+            val desglose = seriesDelEjercicio
+                .sortedBy { it.setNumber }
+                .map { SetLog(weight = it.weight.trim(), reps = it.reps.trim()) }
+            nuevosLogs[clave] = previo.copy(
+                weight = pesoTope ?: previo.weight,
+                done = true,
+                sets = if (desglose.any { !it.isEmpty }) desglose else previo.sets
+            )
             val nombre = PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(idx)?.name
-            if (ultimoPeso != null && !nombre.isNullOrBlank()) nuevosPesos[nombre] = ultimoPeso
+            if (pesoTope != null && !nombre.isNullOrBlank()) nuevosPesos[nombre] = pesoTope
         }
         return copy(
             completedDays = completedDays + dayNumber,

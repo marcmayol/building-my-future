@@ -32,6 +32,8 @@ import com.marc.gymplan100.data.Rutina
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.data.SessionRecord
+import com.marc.gymplan100.data.SetLog
+import com.marc.gymplan100.data.heaviestWeight
 import com.marc.gymplan100.data.SpecialSessionEngine
 import com.marc.gymplan100.data.SpecialWorkoutsData
 import com.marc.gymplan100.data.SpecialWorkoutsLoader
@@ -527,6 +529,40 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         state.copy(logs = state.logs + (key to updated), exerciseWeights = weights)
     }
 
+    /**
+     * Peso de UNA serie suelta, apuntado a mano en la ficha del día.
+     *
+     * La lista se rellena hasta [totalSets] con series en blanco: una serie sin apuntar no es
+     * un cero, es un hueco, y la tercera tiene que poder llevar peso aunque la segunda no lo
+     * lleve. El peso del ejercicio pasa a ser el más alto de las series, igual que al terminar
+     * un entreno guiado.
+     */
+    fun setDaySetWeight(
+        day: Int,
+        exerciseIndex: Int,
+        setIndex: Int,
+        totalSets: Int,
+        weight: String
+    ) = update { state ->
+        val key = "$day-$exerciseIndex"
+        val current = state.logs[key] ?: ExerciseLog()
+        val size = maxOf(totalSets, setIndex + 1, current.sets.size)
+        val sets = List(size) { i ->
+            val previo = current.sets.getOrNull(i) ?: SetLog()
+            if (i == setIndex) previo.copy(weight = weight.trim()) else previo
+        }
+        val tope = heaviestWeight(sets.map { it.weight })
+        val updated = current.copy(
+            sets = sets,
+            weight = tope.ifBlank { "" }
+        )
+        val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(exerciseIndex)?.name
+        val weights = if (tope.isNotBlank() && !name.isNullOrBlank()) {
+            state.exerciseWeights + (name to tope)
+        } else state.exerciseWeights
+        state.copy(logs = state.logs + (key to updated), exerciseWeights = weights)
+    }
+
     /** Peso actual guardado para un ejercicio por su nombre. */
     fun exerciseWeight(name: String): String = _progress.value.exerciseWeights[name] ?: ""
 
@@ -923,9 +959,16 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
         // El peso de referencia es un efecto propio del ViewModel; la transición de fase la
         // calcula SessionEngine (compartida con la notificación) para no divergir.
+        //
+        // Se guarda el MÁS ALTO del ejercicio en esta sesión, no el de esta serie: bajando de
+        // 12 a 11 en la última, "Mis pesos" no debe olvidar que hoy has movido 12.
         val cleanWeight = weight.trim()
-        if (cleanWeight.isNotBlank()) {
-            update { it.copy(exerciseWeights = it.exerciseWeights + (exercise.name to cleanWeight)) }
+        val tope = heaviestWeight(
+            s.completedSets.filter { it.exerciseIndex == s.exerciseIndex }.map { it.weight } +
+                cleanWeight
+        )
+        if (tope.isNotBlank()) {
+            update { it.copy(exerciseWeights = it.exerciseWeights + (exercise.name to tope)) }
         }
         val next = SessionEngine.completeSet(s, weight, System.currentTimeMillis())
         if (next.phase == SessionPhase.FINISHED) {
@@ -973,7 +1016,23 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun finishFreeSession(entries: List<LoggedExercise>) {
         val limpias = entries
-            .map { it.copy(name = it.name.trim(), weight = it.weight.trim(), reps = it.reps.trim()) }
+            .map { entrada ->
+                val series = entrada.sets
+                    .map { SetLog(it.weight.trim(), it.reps.trim()) }
+                    .dropLastWhile { it.isEmpty }
+                // El resumen del ejercicio sale de sus series: el peso más alto y las
+                // repeticiones que se hicieron con él.
+                val tope = heaviestWeight(series.map { it.weight })
+                val repsDelTope = series.firstOrNull { it.weight == tope && it.reps.isNotBlank() }?.reps
+                entrada.copy(
+                    name = entrada.name.trim(),
+                    weight = tope.ifBlank { entrada.weight.trim() },
+                    reps = repsDelTope
+                        ?: series.firstOrNull { it.reps.isNotBlank() }?.reps
+                        ?: entrada.reps.trim(),
+                    sets = series
+                )
+            }
             .filter { it.name.isNotEmpty() }
 
         if (limpias.isNotEmpty()) {
@@ -994,7 +1053,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
                         logs = estado.logs + (clave to previo.copy(
                             weight = entrada.weight.ifEmpty { previo.weight },
                             reps = entrada.reps.ifEmpty { previo.reps },
-                            done = true
+                            done = true,
+                            sets = entrada.sets.ifEmpty { previo.sets }
                         ))
                     )
                 }

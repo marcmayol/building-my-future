@@ -48,6 +48,9 @@ import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.SessionRecord
+import com.marc.gymplan100.data.SetLog
+import com.marc.gymplan100.data.setsSummary
+import com.marc.gymplan100.data.weightsSummary
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
@@ -214,29 +217,44 @@ private fun HealthConnectBlock(connected: Boolean, onConnect: () -> Unit) {
 @Composable
 private fun ExtraBlock(record: SessionRecord) {
     val styles = LocalAppTextStyles.current
-    Row(
+    val apuntado = record.logged.filter { it.setsOrSingle.isNotEmpty() }
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(Space.x4),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(Space.x4)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text("Entrenamiento extra", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(2.dp))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Entrenamiento extra", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    formatDate(record.endMillis),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(Modifier.width(Space.x2))
             Text(
-                formatDate(record.endMillis),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                formatDuration(record.durationSeconds),
+                style = styles.tabular,
+                color = MaterialTheme.colorScheme.primary
             )
         }
-        Spacer(Modifier.width(Space.x2))
-        Text(
-            formatDuration(record.durationSeconds),
-            style = styles.tabular,
-            color = MaterialTheme.colorScheme.primary
-        )
+        // Un extra también se apunta al terminar: si escribiste los kilos de cada serie, aquí
+        // están, en vez de un bloque que solo dice cuánto duró.
+        if (apuntado.isNotEmpty()) {
+            Spacer(Modifier.height(Space.x3))
+            apuntado.forEach { ejercicio ->
+                ExerciseResultRow(
+                    name = ejercicio.name,
+                    weight = ejercicio.weight,
+                    sets = ejercicio.setsOrSingle,
+                    conReps = true
+                )
+            }
+        }
     }
 }
 
@@ -292,34 +310,41 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
         Spacer(Modifier.height(Space.x3))
 
         if (record?.special == true) {
-            Text(
-                "Sesión libre guiada (p. ej. con tu tío). Solo se registró el tiempo total.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            val apuntado = record.logged.filter { it.setsOrSingle.isNotEmpty() }
+            if (apuntado.isEmpty()) {
+                Text(
+                    "Sesión libre guiada (p. ej. con tu tío). Solo se registró el tiempo total.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                // Lo que se apuntó al terminar el entreno libre. Se guardaba desde la v2.3
+                // pero no se enseñaba en ningún sitio: el entreno salía como "solo el tiempo"
+                // aunque hubieras escrito los kilos de cada serie.
+                Text(
+                    "Entreno libre · lo que apuntaste",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(Space.x2))
+                apuntado.forEach { ejercicio ->
+                    ExerciseResultRow(
+                        name = ejercicio.name,
+                        weight = ejercicio.weight,
+                        sets = ejercicio.setsOrSingle,
+                        conReps = true
+                    )
+                }
+            }
         } else {
             day.template.exercises.forEachIndexed { index, exercise ->
                 val log = progress.logs["$dayNumber-$index"]
-                val weight = log?.weight.orEmpty()
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 3.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        exercise.name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(Modifier.width(Space.x2))
-                    Text(
-                        if (weight.isNotBlank()) "$weight kg" else "—",
-                        style = styles.tabular,
-                        color = if (weight.isNotBlank()) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                ExerciseResultRow(
+                    name = exercise.name,
+                    weight = log?.weight.orEmpty(),
+                    sets = log?.filledSets.orEmpty(),
+                    conReps = false
+                )
             }
 
             if (record != null) {
@@ -331,6 +356,52 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+        }
+    }
+}
+
+/**
+ * Un ejercicio dentro de la ficha de un día: el nombre con su peso a la derecha —el más alto
+ * que se movió— y, debajo, el desglose de las series.
+ *
+ * El desglose es la razón de ser de esta fila: tres series de bíceps con 10, 12 y 11 salían
+ * aquí como un escueto "11 kg", que es justo el dato que no habías hecho.
+ */
+@Composable
+private fun ExerciseResultRow(
+    name: String,
+    weight: String,
+    sets: List<SetLog>,
+    conReps: Boolean
+) {
+    val styles = LocalAppTextStyles.current
+    val desglose = if (conReps) setsSummary(sets) else weightsSummary(sets)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 3.dp)
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                name,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.width(Space.x2))
+            Text(
+                if (weight.isNotBlank()) "$weight kg" else "—",
+                style = styles.tabular,
+                color = if (weight.isNotBlank()) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        // Con una sola serie y sin repeticiones, el desglose repetiría el peso de al lado.
+        if (desglose.isNotBlank() && (sets.size > 1 || conReps)) {
+            Text(
+                desglose,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

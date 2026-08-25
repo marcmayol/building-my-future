@@ -82,6 +82,10 @@ object Statistics {
     /**
      * Para cada ejercicio con algún peso registrado, sus puntos (día del plan, peso) ordenados
      * por día. La clave del mapa es el nombre del ejercicio; se ordena alfabéticamente.
+     *
+     * El peso de cada día es el más alto que se movió ese día (lo que guarda [ExerciseLog.weight]),
+     * no el de la última serie: bajar en la tercera para llegar a las repeticiones no es una
+     * bajada de fuerza, y la gráfica dibujaba un diente de sierra que no había pasado.
      */
     fun weightProgression(progress: ProgressState): Map<String, List<WeightPoint>> {
         val out = sortedMapOf<String, MutableList<WeightPoint>>()
