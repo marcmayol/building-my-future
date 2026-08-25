@@ -1,8 +1,8 @@
 {
-  "versionCode": 17,
-  "versionName": "2.3.2",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.3.2/building-my-future-v2.3.2.apk",
-  "sha256": "3fc1ac1067d052404b37fce79965a33e5c591817b351353e6bb424e22e922414",
-  "notas": "El peso ya no se pierde al marcar la serie desde el reloj.",
+  "versionCode": 18,
+  "versionName": "2.4",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.4/building-my-future-v2.4.apk",
+  "sha256": "5d0193ca5cd0bc3475a1595a493df4765b86403cf540d11b93facf45717e6a00",
+  "notas": "Cada serie con su peso: el desglose (10 · 12 · 11) se guarda con el día y se lee en el resumen, en Resultados y en la ficha del día. Mis pesos guarda ahora el más alto. El entreno libre apunta peso y repeticiones de cada serie, y por fin se ve en Resultados.",
   "check_horas": 24
 }
