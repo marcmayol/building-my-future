@@ -64,6 +64,8 @@ import com.marc.gymplan100.data.ExerciseKind
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.text.style.TextAlign
 import com.marc.gymplan100.data.MuscleLoad
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.marc.gymplan100.data.setsSummary
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.setCountFromScheme
@@ -376,7 +378,25 @@ private fun ExerciseCard(
         // no tiene ninguno de los dos, as\u00ed que la fila entera desaparece.
         val pidePeso = !exercise.withoutWeight
         val pideReps = exercise.kind != ExerciseKind.CARDIO
-        if (pidePeso || pideReps) {
+
+        // Lo apuntado en este ejercicio, si hay algo.
+        val apuntado = sets.filter { !it.isEmpty }
+        var apuntandoAMano by rememberSaveable(exercise.name) { mutableStateOf(false) }
+        // Abrir la ficha del día enseñaba cuatro filas de campos vacíos por ejercicio: con seis
+        // ejercicios, veinticuatro huecos que nadie va a rellenar a mano, porque para eso está
+        // el entrenamiento guiado. Ahora solo salen si ya hay algo escrito o si se piden.
+        val mostrarCampos = (pidePeso || pideReps) && (apuntandoAMano || apuntado.isNotEmpty())
+
+        if (apuntado.isNotEmpty() && !apuntandoAMano) {
+            Spacer(Modifier.height(Space.x2))
+            Text(
+                setsSummary(apuntado),
+                style = styles.tabular,
+                color = app.work
+            )
+        }
+
+        if (mostrarCampos) {
             Spacer(Modifier.height(Space.x2))
             // Una L\u00cdNEA por serie, con lo suyo junto. Antes los kilos iban serie a serie y las
             // repeticiones eran un \u00fanico campo suelto al final: adem\u00e1s de dejar cajas hu\u00e9rfanas
@@ -459,8 +479,26 @@ private fun ExerciseCard(
             }
         }
         // La ficha, como enlace: con seis ejercicios, seis botones anchos eran una pared.
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-            TextButton(onClick = onShowGuide) { Text("Cómo se hace") }
+        // FlowRow y no Row: con el texto del sistema al 150 % los dos enlaces no caben en una
+        // linea y "Como se hace" se quedaba en "Como se". Asi el segundo baja entero.
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (pidePeso || pideReps) {
+                TextButton(onClick = { apuntandoAMano = !apuntandoAMano }) {
+                    Text(
+                        when {
+                            apuntandoAMano -> "Listo"
+                            apuntado.isNotEmpty() -> "Editar"
+                            else -> "Apuntar a mano"
+                        },
+                        maxLines = 1
+                    )
+                }
+            }
+            TextButton(onClick = onShowGuide) { Text("Cómo se hace", maxLines = 1) }
         }
     }
 }
