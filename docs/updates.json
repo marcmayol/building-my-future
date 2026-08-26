@@ -1,8 +1,8 @@
 {
-  "versionCode": 20,
-  "versionName": "2.5.1",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.5.1/building-my-future-v2.5.1.apk",
-  "sha256": "e0fa90d4dc1156caefdf9ce94e8fc4af36dbc31ea5eda6254e9e2d818c55468f",
-  "notas": "El boton Entendido del aviso de bateria se partia a media palabra con el texto grande.",
+  "versionCode": 21,
+  "versionName": "2.5.2",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.5.2/building-my-future-v2.5.2.apk",
+  "sha256": "fef10fe88ff61b3436b29333afb334deeebe883d4ccb2bf290390809713c879f",
+  "notas": "La ficha del dia ya no pide los kilos por adelantado: los campos salen solo si los pides o si ya hay algo apuntado.",
   "check_horas": 24
 }
