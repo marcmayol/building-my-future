@@ -1,8 +1,8 @@
 {
-  "versionCode": 21,
-  "versionName": "2.5.2",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.5.2/building-my-future-v2.5.2.apk",
-  "sha256": "fef10fe88ff61b3436b29333afb334deeebe883d4ccb2bf290390809713c879f",
-  "notas": "La ficha del dia ya no pide los kilos por adelantado: los campos salen solo si los pides o si ya hay algo apuntado.",
+  "versionCode": 22,
+  "versionName": "2.6",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.6/building-my-future-v2.6.apk",
+  "sha256": "536f218e5e3730db8f1ea8b7bb91ddc8e0f81d2b107990412012b21903dbaa37",
+  "notas": "Copia de seguridad de todo, superseries de verdad, series de calentamiento que no cuentan y el esfuerzo de cada serie.",
   "check_horas": 24
 }
