@@ -38,7 +38,11 @@ data class CompletedSet(
      * día no sale: marcar "serie hecha" es decir "he hecho lo que ponía". Sin esto, tres semanas
      * subiendo de 8 a 12 repeticiones con los mismos kilos eran tres semanas de línea plana.
      */
-    val reps: String = ""
+    val reps: String = "",
+    /** Serie de aproximación: se apunta, pero no cuenta como trabajo. */
+    val warmup: Boolean = false,
+    /** Repeticiones en reserva (RIR) apuntadas para esta serie; vacío si no se apuntó. */
+    val rir: String = ""
 )
 
 /** Sesión de entrenamiento en curso. Se persiste para poder reanudarla. */

@@ -70,6 +70,24 @@ object SessionEngine {
     }
 
     /**
+     * Los ejercicios encadenados en superserie con [index], en el orden del plan.
+     *
+     * Una superserie son dos o mas ejercicios CONSECUTIVOS del dia con la misma etiqueta: se
+     * hacen uno detras de otro sin descanso y se descansa al acabar el ultimo. Un ejercicio
+     * suelto es un grupo de uno, para que el resto del motor no tenga que distinguir casos.
+     */
+    fun supersetMembers(dayNumber: Int, index: Int): List<Int> {
+        val exercises = PlanData.dayByNumber(dayNumber)?.template?.exercises ?: return listOf(index)
+        val etiqueta = exercises.getOrNull(index)?.supersetGroup.orEmpty()
+        if (etiqueta.isBlank()) return listOf(index)
+        var desde = index
+        while (desde > 0 && exercises[desde - 1].supersetGroup == etiqueta) desde--
+        var hasta = index
+        while (hasta < exercises.lastIndex && exercises[hasta + 1].supersetGroup == etiqueta) hasta++
+        return (desde..hasta).toList()
+    }
+
+    /**
      * Repeticiones que le tocan a la serie en curso, con la misma cuenta en cascada que el peso:
      * lo que se haya tocado en esta serie, si no lo que se hizo en la anterior de esta misma
      * máquina, si no lo de la última vez que se hizo el ejercicio, y si no lo que pide el plan.
@@ -98,17 +116,46 @@ object SessionEngine {
      * [reps] son las repeticiones que se hicieron de verdad; va al final y con valor por defecto
      * para que quien no las tenga (una serie por tiempo) siga llamando igual que siempre.
      */
-    fun completeSet(s: ActiveSession, weight: String, now: Long, reps: String = ""): ActiveSession {
+    fun completeSet(
+        s: ActiveSession,
+        weight: String,
+        now: Long,
+        reps: String = "",
+        warmup: Boolean = false,
+        rir: String = ""
+    ): ActiveSession {
         if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return s
         val day = PlanData.dayByNumber(s.dayNumber) ?: return s
         val exercise = day.template.exercises.getOrNull(s.exerciseIndex) ?: return s
         val totalSets = setCountFromScheme(exercise.scheme)
 
         val cleanWeight = weight.trim()
-        val newSet = CompletedSet(s.exerciseIndex, s.setNumber, cleanWeight, reps = reps.trim())
+        val newSet = CompletedSet(
+            s.exerciseIndex, s.setNumber, cleanWeight,
+            reps = reps.trim(), warmup = warmup, rir = rir.trim()
+        )
         val order = s.orderOrDefault()
-        val isLastSet = s.setNumber >= totalSets
-        val isLastExercise = order.indexOf(s.exerciseIndex) >= order.lastIndex
+
+        // Superserie: si quedan ejercicios encadenados, se pasa al siguiente SIN descanso.
+        // El descanso de una superserie va al final del par, no en medio; ponerlo en medio es
+        // justo lo que la convierte en dos ejercicios normales.
+        val grupo = supersetMembers(s.dayNumber, s.exerciseIndex)
+        val posEnGrupo = grupo.indexOf(s.exerciseIndex)
+        if (posEnGrupo >= 0 && posEnGrupo < grupo.lastIndex) {
+            return s.copy(
+                exerciseIndex = grupo[posEnGrupo + 1],
+                completedSets = s.completedSets + newSet,
+                occupiedSkips = 0,
+                plannedWeight = "",
+                currentReps = ""
+            )
+        }
+
+        // Una serie de calentamiento no gasta serie del plan: se apunta y se repite la misma.
+        val isLastSet = !warmup && s.setNumber >= totalSets
+        // El grupo entero cuenta como una posicion: lo que importa es si el ULTIMO del grupo
+        // es el ultimo del dia.
+        val isLastExercise = order.indexOf(grupo.last()) >= order.lastIndex
 
         return if (isLastSet && isLastExercise) {
             s.copy(
@@ -143,15 +190,19 @@ object SessionEngine {
     fun skipExercise(s: ActiveSession): ActiveSession {
         if (s.phase != SessionPhase.WORKING) return s
         val order = s.orderOrDefault()
-        val pos = order.indexOf(s.exerciseIndex)
-        if (pos < 0 || pos >= order.lastIndex) return s // no hay otro ejercicio al que pasar
+        // Una superserie se mueve entera: dejar medio par colgando no tiene sentido.
+        val grupo = supersetMembers(s.dayNumber, s.exerciseIndex)
+        val pos = order.indexOf(grupo.first())
+        if (pos < 0 || order.indexOf(grupo.last()) >= order.lastIndex) return s
         val newOrder = order.toMutableList()
-        newOrder.add(newOrder.removeAt(pos))
+        newOrder.removeAll(grupo)
+        newOrder.addAll(grupo)
         val nextEx = newOrder[pos]
         return s.copy(
             order = newOrder,
             exerciseIndex = nextEx,
-            setNumber = s.completedSets.count { it.exerciseIndex == nextEx } + 1,
+            // Las de calentamiento no gastan serie del plan.
+            setNumber = s.completedSets.count { it.exerciseIndex == nextEx && !it.warmup } + 1,
             phase = SessionPhase.WORKING,
             occupiedSkips = s.occupiedSkips + 1,
             // El peso preparado era para la máquina que dejamos: ya no aplica.
@@ -174,12 +225,18 @@ object SessionEngine {
         val exercise = day.template.exercises[s.exerciseIndex]
         val totalSets = setCountFromScheme(exercise.scheme)
         val order = s.orderOrDefault()
-        val (nextEx, nextSet) = if (s.setNumber < totalSets) {
-            s.exerciseIndex to (s.setNumber + 1)
+        // En superserie se descansa al final del par y se vuelve al PRIMERO para la ronda
+        // siguiente; al acabar las series del grupo se sale del grupo entero.
+        val grupo = supersetMembers(s.dayNumber, s.exerciseIndex)
+        // Cual toca ahora se deduce del trabajo hecho, no de sumar uno al contador: una serie
+        // de aproximacion se apunta y descansa como las demas, pero no avanza el plan.
+        val trabajoHecho = sets.count { it.exerciseIndex == grupo.first() && !it.warmup }
+        val (nextEx, nextSet) = if (trabajoHecho < totalSets) {
+            grupo.first() to (trabajoHecho + 1)
         } else {
-            val pos = order.indexOf(s.exerciseIndex)
+            val pos = order.indexOf(grupo.last())
             val ne = order.getOrElse(pos + 1) { s.exerciseIndex }
-            ne to (s.completedSets.count { it.exerciseIndex == ne } + 1)
+            ne to (s.completedSets.count { it.exerciseIndex == ne && !it.warmup } + 1)
         }
 
         return s.copy(

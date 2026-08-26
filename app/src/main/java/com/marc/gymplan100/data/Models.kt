@@ -26,7 +26,15 @@ data class Exercise(
     val name: String,
     val scheme: String,
     val note: String = "",
-    val kind: ExerciseKind = ExerciseKind.STRENGTH
+    val kind: ExerciseKind = ExerciseKind.STRENGTH,
+    /**
+     * Etiqueta de superserie: los ejercicios CONSECUTIVOS que comparten etiqueta se encadenan
+     * sin descanso entre ellos, y el descanso cae al terminar el último del grupo.
+     *
+     * Vacío = ejercicio suelto, que es el caso normal. Es una etiqueta y no un booleano porque
+     * un día puede llevar dos superseries distintas ("A" y "B") una detrás de otra.
+     */
+    val supersetGroup: String = ""
 ) {
     /**
      * No tiene sentido pedirle kilos: es tu cuerpo, es un estiramiento o una plancha, o son

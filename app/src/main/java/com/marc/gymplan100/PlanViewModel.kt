@@ -25,6 +25,7 @@ import com.marc.gymplan100.data.PlanMarkdownParser
 import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.Progression
+import com.marc.gymplan100.data.ExerciseAliases
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.EjercicioCatalogo
@@ -238,6 +239,25 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Vuelve a leerlo todo despues de restaurar una copia.
+     *
+     * Restaurar cambia el almacen por debajo: el plan activo puede ser otro, los dias otros y
+     * el historial otro. Sin esto la pantalla seguiria ensenando lo de antes hasta reiniciar,
+     * que es la clase de duda que hace pensar que la copia no ha entrado.
+     */
+    fun reloadAfterRestore() {
+        _activePlan.value = PlanStore.activePlan(getApplication())
+        viewModelScope.launch {
+            _progress.value = repo.progress.first()
+            _history.value = repo.history.first()
+            _profile.value = repo.profile.first()
+            _active.value = repo.activeSession.first()
+            refreshPlans()
+            WearBridge.publishState(getApplication(), null, nextDay = nextDay())
+        }
+    }
+
     // --- Editor de planes -------------------------------------------------
 
     private val _draft = MutableStateFlow<PlanDto?>(null)
@@ -322,6 +342,12 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         }
         refreshPlans()
         refreshHealthPermissions()
+        // Los alias («este ejercicio mio es como este del catalogo») viven en el progreso pero
+        // los consultan el catalogo de imagenes, las fichas y los objetivos musculares, que son
+        // objetos puros. Se mantiene una ventana global al dia, igual que con el plan activo.
+        viewModelScope.launch {
+            _progress.collect { ExerciseAliases.set(it.exerciseAliases) }
+        }
         // Observa la sesión activa de forma continua: así los cambios hechos desde la
         // notificación persistente (SkipActionReceiver, en segundo plano) se reflejan al
         // volver a la app. saveActive() sigue fijando el valor al instante para respuesta
@@ -592,6 +618,17 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             state.exerciseReps + (name to arranque)
         } else state.exerciseReps
         state.copy(logs = state.logs + (key to updated), exerciseReps = repsPorEjercicio)
+    }
+
+    /**
+     * Dice a que ejercicio del catalogo se parece uno que la app no conoce, o lo desvincula
+     * con null. Con eso hereda ilustracion, ficha, musculos y sitio en el mapa.
+     */
+    fun setExerciseAlias(name: String, catalogName: String?) = update { state ->
+        val limpio = catalogName?.trim().orEmpty()
+        val nuevos = if (limpio.isBlank()) state.exerciseAliases - name
+        else state.exerciseAliases + (name to limpio)
+        state.copy(exerciseAliases = nuevos)
     }
 
     /** Peso actual guardado para un ejercicio por su nombre. */
@@ -1031,7 +1068,12 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * [reps] llega en blanco desde donde no se preguntan (una serie por tiempo, una vuelta de
      * circuito); ahí se resuelve con la misma cascada que usa el reloj para el peso.
      */
-    fun completeSet(weight: String, reps: String = "") {
+    fun completeSet(
+        weight: String,
+        reps: String = "",
+        warmup: Boolean = false,
+        rir: String = ""
+    ) {
         val s = _active.value ?: return
         if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return
         val day = PlanData.dayByNumber(s.dayNumber) ?: return
@@ -1043,15 +1085,20 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         // Se guarda el MÁS ALTO del ejercicio en esta sesión, no el de esta serie: bajando de
         // 12 a 11 en la última, "Mis pesos" no debe olvidar que hoy has movido 12.
         val cleanWeight = weight.trim()
+        // Las series de calentamiento no tocan el peso de referencia: aproximar con la mitad
+        // no puede hacer que "Mis pesos" olvide lo que de verdad mueves.
         val tope = heaviestWeight(
-            s.completedSets.filter { it.exerciseIndex == s.exerciseIndex }.map { it.weight } +
-                cleanWeight
+            s.completedSets
+                .filter { it.exerciseIndex == s.exerciseIndex && !it.warmup }
+                .map { it.weight } + (if (warmup) "" else cleanWeight)
         )
         if (tope.isNotBlank()) {
             update { it.copy(exerciseWeights = it.exerciseWeights + (exercise.name to tope)) }
         }
         val repsFinales = reps.trim().ifBlank { SessionEngine.repsForSet(s, _progress.value.exerciseReps) }
-        val next = SessionEngine.completeSet(s, weight, System.currentTimeMillis(), repsFinales)
+        val next = SessionEngine.completeSet(
+            s, weight, System.currentTimeMillis(), repsFinales, warmup, rir
+        )
         if (next.phase == SessionPhase.FINISHED) {
             RestReminder.cancel(getApplication())
         } else {
@@ -1065,6 +1112,22 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
         saveActive(next)
+    }
+
+    /**
+     * Apunta el esfuerzo (RIR) de la última serie cerrada.
+     *
+     * Se pregunta en el descanso y no en la serie: justo cuando acabas es cuando sabes si te
+     * has quedado corto, y la pantalla de la serie ya tiene bastante trabajo con el peso y las
+     * repeticiones.
+     */
+    fun setLastSetRir(rir: String) {
+        val s = _active.value ?: return
+        val sets = s.completedSets
+        if (sets.isEmpty()) return
+        val actualizada = sets.toMutableList()
+        actualizada[actualizada.lastIndex] = actualizada.last().copy(rir = rir.trim())
+        saveActive(s.copy(completedSets = actualizada))
     }
 
     /** Ajusta el objetivo de descanso (±segundos) durante un descanso. */

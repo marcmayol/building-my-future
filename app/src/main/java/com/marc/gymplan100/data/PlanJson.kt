@@ -104,7 +104,14 @@ data class EjercicioDto(
      * Se aceptan también los nombres en inglés porque estos JSON se escriben a mano.
      */
     @JsonNames("kind", "type")
-    val tipo: String = ""
+    val tipo: String = "",
+    /**
+     * Etiqueta de superserie: los ejercicios seguidos que la comparten se encadenan sin
+     * descanso y se descansa al acabar el ultimo. Cualquier texto vale ("A", "brazos"); lo
+     * unico que importa es que coincida entre ellos. Vacio = ejercicio suelto.
+     */
+    @JsonNames("superset", "supersetGroup")
+    val superserie: String = ""
 )
 
 /** Resultado de leer un plan: o sale un plan usable, o un motivo concreto por el que no. */
@@ -254,7 +261,8 @@ object PlanCodec {
                         name = exName,
                         scheme = scheme,
                         note = ex.nota.trim(),
-                        kind = kindFrom(ex.tipo)
+                        kind = kindFrom(ex.tipo),
+                        supersetGroup = ex.superserie.trim()
                     )
                 }
                 templates.add(

@@ -26,6 +26,9 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 **Entrenamiento guiado en vivo**
 - Calentamiento con cuenta atrás ajustable (pausa/reanuda).
 - **Cada serie con su peso y sus repeticiones**: la primera con 10 kg x 12, la segunda con 12 x 12 y la tercera con 11 x 10 se apuntan tal cual, y el desglose se guarda con el día. Las repeticiones vienen puestas desde el plan: solo se tocan el día que no salen. También **series por tiempo** (planchas, isométricos) con su propia cuenta atrás.
+- **Superseries de verdad**: los ejercicios encadenados se hacen uno detrás de otro y el descanso cae al acabar el par, cada uno con su peso y su progresión.
+- **Series de calentamiento**: se apuntan, pero no cuentan para los kilos movidos, la fuerza estimada ni la progresión.
+- **Qué tal ha ido**: al descansar puedes marcar si la serie fue fácil, justa o al fallo.
 - **El peso sugerido sube solo**: cuando cierras todas las series en el tope del rango, la app propone más carga —con el salto que de verdad existe en la máquina— y escribe el motivo debajo. Si llevas tres sesiones atascado, propone bajar un 10 % para volver a subir desde ahí.
 - **Descanso con temporizador** entre series y entre ejercicios, con avisos que **suenan aunque tengas la pantalla apagada** o la app en segundo plano.
 - **Peso ajustable durante el descanso**: deja preparado el peso de la siguiente serie para tener la máquina lista.
@@ -44,6 +47,10 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 - **Mis pesos**: el peso de referencia de cada máquina —el **más alto** que has movido en ella—, siempre a mano.
 - **Resultados**: histórico de cada día con su duración y los pesos de cada ejercicio, **serie a serie** ("10 · 12 · 11 kg"), incluido lo que apuntes al acabar un entreno libre.
 - Entrenamiento **especial** (sesión libre guiada) y **extra** (bonus que no cuenta como día del plan); al terminar se apunta lo hecho **con peso y repeticiones de cada serie**.
+
+**Tus datos son tuyos**
+- **Copia de seguridad**: guarda un archivo con todo (días, pesos, historial, planes y ajustes) donde quieras —Drive, el PC, la tarjeta— y restaurándolo recuperas el móvil tal y como estaba. Sin cuenta y sin nube: el archivo es tuyo y lo puedes abrir.
+- **Ejercicios que la app no conoce**: si tu plan trae uno con otro nombre, dile a cuál se parece y hereda ilustración, ficha, músculos y su sitio en el mapa.
 
 **Integraciones**
 - **Wear OS**: controla la sesión desde el reloj (p. ej. Pixel Watch). Si el reloj mide el pulso, las calorías reales las aporta Google Health y la app evita el doble conteo.

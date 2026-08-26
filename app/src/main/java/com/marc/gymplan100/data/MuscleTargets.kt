@@ -85,5 +85,5 @@ object MuscleTargets {
         "Finisher: press de pecho ligero al fallo" to chestPress,
     )
 
-    fun forName(name: String): MuscleTarget? = map[name]
+    fun forName(name: String): MuscleTarget? = map[ExerciseAliases.resolve(name)]
 }

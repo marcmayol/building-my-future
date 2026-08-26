@@ -13,7 +13,18 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SetLog(
     val weight: String = "",
-    val reps: String = ""
+    val reps: String = "",
+    /**
+     * Serie de aproximación, no de trabajo. Cuenta para saber qué hiciste, pero NO para los
+     * kilos movidos, ni para la fuerza estimada, ni para decidir si toca subir peso: dos series
+     * suaves antes de empezar no son entrenamiento, son ponerse a punto.
+     */
+    val warmup: Boolean = false,
+    /**
+     * Repeticiones que te habrías dejado en el depósito (RIR). "0" es fallo, "2" es «podría
+     * haber hecho dos más». Vacío cuando no se apunta, que es casi siempre.
+     */
+    val rir: String = ""
 ) {
     val isEmpty: Boolean get() = weight.isBlank() && reps.isBlank()
 }
@@ -36,6 +47,14 @@ data class ExerciseLog(
 ) {
     /** Series con algo apuntado; las de relleno (vacías del todo) no cuentan. */
     val filledSets: List<SetLog> get() = sets.filter { !it.isEmpty }
+
+    /**
+     * Las series que cuentan como entrenamiento: fuera las de calentamiento.
+     *
+     * Es lo que hay que mirar para los kilos movidos, la fuerza estimada y la progresión; si
+     * las de aproximación entraran, bastaria con calentar mucho para «mejorar».
+     */
+    val workingSets: List<SetLog> get() = filledSets.filter { !it.warmup }
 }
 
 /**
@@ -98,6 +117,14 @@ data class ProgressState(
      * empezar la próxima vez por debajo de donde de verdad se está.
      */
     val exerciseReps: Map<String, String> = emptyMap(),
+    /**
+     * "Este ejercicio mio es como este del catalogo" (clave: el nombre del plan).
+     *
+     * Lo eliges tu desde la ficha cuando la app no conoce un ejercicio, y con eso hereda
+     * dibujo, tecnica, musculos y sitio en el mapa. Vive en el progreso y no en el plan para
+     * que reimportar el plan corregido no se lo lleve por delante.
+     */
+    val exerciseAliases: Map<String, String> = emptyMap(),
     // En Resultados, el día más reciente arriba (con 30+ días completados, bajar hasta
     // el último era un scroll interminable).
     val resultsNewestFirst: Boolean = true,
@@ -152,16 +179,25 @@ data class ProgressState(
         val nuevosPesos = exerciseWeights.toMutableMap()
         val nuevasReps = exerciseReps.toMutableMap()
         completedSets.groupBy { it.exerciseIndex }.forEach { (idx, seriesDelEjercicio) ->
-            // El peso del ejercicio es el MÁS ALTO de sus series, no el de la última: si hoy
-            // fueron 10, 12 y 11, lo que levantas son 12. El detalle vive en `sets`.
-            val pesoTope = heaviestWeight(seriesDelEjercicio.map { it.weight })
-                .ifBlank { null }
+            // El peso del ejercicio es el MÁS ALTO de sus series DE TRABAJO, no el de la
+            // última: si hoy fueron 10, 12 y 11, lo que levantas son 12. Las de calentamiento
+            // no entran: aproximar con la barra vacía no dice nada de lo que mueves.
+            val pesoTope = heaviestWeight(
+                seriesDelEjercicio.filter { !it.warmup }.map { it.weight }
+            ).ifBlank { null }
             val clave = "$dayNumber-$idx"
             val previo = nuevosLogs[clave] ?: ExerciseLog()
             // En el orden en que se hicieron, que es el que se lee luego en el resumen.
             val desglose = seriesDelEjercicio
                 .sortedBy { it.setNumber }
-                .map { SetLog(weight = it.weight.trim(), reps = it.reps.trim()) }
+                .map {
+                    SetLog(
+                        weight = it.weight.trim(),
+                        reps = it.reps.trim(),
+                        warmup = it.warmup,
+                        rir = it.rir.trim()
+                    )
+                }
             nuevosLogs[clave] = previo.copy(
                 weight = pesoTope ?: previo.weight,
                 done = true,
@@ -169,7 +205,7 @@ data class ProgressState(
             )
             val nombre = PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(idx)?.name
             if (pesoTope != null && !nombre.isNullOrBlank()) nuevosPesos[nombre] = pesoTope
-            val repsDeArranque = desglose.firstOrNull { it.reps.isNotBlank() }?.reps
+            val repsDeArranque = desglose.firstOrNull { !it.warmup && it.reps.isNotBlank() }?.reps
             if (repsDeArranque != null && !nombre.isNullOrBlank()) nuevasReps[nombre] = repsDeArranque
         }
         return copy(

@@ -49,6 +49,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import com.marc.gymplan100.data.ExerciseAliases
 import com.marc.gymplan100.data.ExerciseGuides
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.ExerciseKind
@@ -67,7 +71,12 @@ fun ExerciseGuideSheet(
     onDismiss: () -> Unit,
     /** Para que el consejo de cuando no hay ficha encaje: a un bloque de cardio no se le
      *  dice que controle el peso y no arquee la espalda. */
-    kind: ExerciseKind = ExerciseKind.STRENGTH
+    kind: ExerciseKind = ExerciseKind.STRENGTH,
+    /**
+     * Guarda a que ejercicio del catalogo se parece este (null lo desvincula). Si no se pasa,
+     * la ficha es de solo lectura: hay sitios donde ensenarla sin poder tocar nada.
+     */
+    onAlias: ((String?) -> Unit)? = null
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val guide = ExerciseGuides.forName(LocalContext.current, exerciseName)
@@ -155,6 +164,13 @@ fun ExerciseGuideSheet(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                // Un plan que te traes llama a las cosas como quiere. En vez de pedirte que
+                // escribas musculos y tecnica a mano —que no lo haria nadie—, basta con decir
+                // a cual se parece: hereda dibujo, ficha, musculos y sitio en el mapa.
+                if (onAlias != null && kind != ExerciseKind.CARDIO) {
+                    Spacer(Modifier.height(8.dp))
+                    SelectorDeParecido(exerciseName, onAlias)
+                }
                 Spacer(Modifier.height(8.dp))
                 return@Column
             }
@@ -306,5 +322,77 @@ private fun Bullet(text: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("•", style = MaterialTheme.typography.bodyMedium)
         Text(text, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+/**
+ * "Se parece a...": lista buscable del catalogo para adoptar un ejercicio desconocido.
+ *
+ * Con buscador porque el catalogo pasa de ochenta entradas y sin filtrar seria una lista
+ * infinita en la que nadie encuentra nada.
+ */
+@Composable
+private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit) {
+    var abierto by remember { mutableStateOf(false) }
+    var busqueda by remember { mutableStateOf("") }
+    val actual = ExerciseAliases.aliasOf(exerciseName)
+
+    if (actual != null) {
+        Text(
+            "Ahora se comporta como \u00ab$actual\u00bb.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(onClick = { abierto = true }, shape = CircleShape) {
+            Text(if (actual == null) "Se parece a\u2026" else "Cambiar", maxLines = 1)
+        }
+        if (actual != null) {
+            OutlinedButton(onClick = { onAlias(null) }, shape = CircleShape) {
+                Text("Quitar", maxLines = 1)
+            }
+        }
+    }
+
+    if (abierto) {
+        val todos = remember { ExerciseImages.catalogNames() }
+        val filtrados = remember(busqueda, todos) {
+            if (busqueda.isBlank()) todos
+            else todos.filter { it.contains(busqueda.trim(), ignoreCase = true) }
+        }
+        ModalBottomSheet(onDismissRequest = { abierto = false }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("\u00bfA cu\u00e1l se parece?", style = MaterialTheme.typography.headlineSmall)
+                OutlinedTextField(
+                    value = busqueda,
+                    onValueChange = { busqueda = it },
+                    label = { Text("Buscar") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                filtrados.take(40).forEach { nombre ->
+                    TextButton(
+                        onClick = { onAlias(nombre); abierto = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(nombre, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+                if (filtrados.isEmpty()) {
+                    Text(
+                        "Nada con ese nombre.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
     }
 }

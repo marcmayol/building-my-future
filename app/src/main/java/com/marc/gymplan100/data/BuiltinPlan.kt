@@ -58,7 +58,8 @@ object BuiltinPlan {
                     Exercise("Jalón al pecho agarre neutro", "3 x 12"),
                     Exercise("Press de hombros en máquina", "2 x 12"),
                     Exercise("Elevaciones laterales", "2 x 12"),
-                    Exercise("Superserie curl + extensión de tríceps", "2 x 12"),
+                    Exercise("Curl de bíceps con mancuernas", "2 x 12", supersetGroup = "brazos"),
+                    Exercise("Extensión de tríceps en polea", "2 x 12", supersetGroup = "brazos"),
                 )
             ),
             WorkoutTemplate(
@@ -137,7 +138,8 @@ object BuiltinPlan {
                     Exercise("Jalón al pecho agarre neutro", "3 x 12"),
                     Exercise("Elevaciones laterales", "3 x 12"),
                     Exercise("Face pull en polea", "3 x 15"),
-                    Exercise("Superserie curl + extensión", "3 x 12"),
+                    Exercise("Curl de bíceps con mancuernas", "3 x 12", supersetGroup = "brazos"),
+                    Exercise("Extensión de tríceps en polea", "3 x 12", supersetGroup = "brazos"),
                 )
             ),
             WorkoutTemplate(
@@ -225,7 +227,8 @@ object BuiltinPlan {
                     Exercise("Remo sentado", "3 x 10"),
                     Exercise("Press de hombros", "3 x 10"),
                     Exercise("Jalón al pecho", "3 x 12"),
-                    Exercise("Superserie curl + extensión", "3 x 12"),
+                    Exercise("Curl de bíceps con mancuernas", "3 x 12", supersetGroup = "brazos"),
+                    Exercise("Extensión de tríceps en polea", "3 x 12", supersetGroup = "brazos"),
                 )
             ),
             WorkoutTemplate(
@@ -302,7 +305,8 @@ object BuiltinPlan {
                     Exercise("Remo sentado", "4 x 8"),
                     Exercise("Press de hombros", "3 x 10"),
                     Exercise("Jalón al pecho", "3 x 10"),
-                    Exercise("Superserie curl + extensión", "3 x 12"),
+                    Exercise("Curl de bíceps con mancuernas", "3 x 12", supersetGroup = "brazos"),
+                    Exercise("Extensión de tríceps en polea", "3 x 12", supersetGroup = "brazos"),
                 )
             ),
             WorkoutTemplate(

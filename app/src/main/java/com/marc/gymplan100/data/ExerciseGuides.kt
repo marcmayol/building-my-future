@@ -643,5 +643,5 @@ object ExerciseGuides {
         map[name] ?: ExerciseImages.slugFor(name)?.let { catalogo(context)[it] }
 
     /** Solo la escrita a mano, para donde no hay contexto a mano. */
-    fun forName(name: String): ExerciseGuide? = map[name]
+    fun forName(name: String): ExerciseGuide? = map[ExerciseAliases.resolve(name)]
 }

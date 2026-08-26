@@ -237,7 +237,8 @@ fun DayScreen(
                 exerciseName = ex.name,
                 scheme = ex.scheme,
                 onDismiss = { guideFor = null },
-                kind = ex.kind
+                kind = ex.kind,
+                onAlias = { viewModel.setExerciseAlias(ex.name, it) }
             )
         }
     }

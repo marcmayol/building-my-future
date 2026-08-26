@@ -112,6 +112,28 @@ object PlanStore {
         if (activeId(context) == id) setActive(context, BuiltinPlan.ID)
     }
 
+    // ----------------------------------------------------------- Copia de seguridad
+
+    /** Los planes guardados y cual esta activo, para la copia. */
+    fun exportAll(context: Context): Map<String, String> {
+        val p = prefs(context)
+        val out = mutableMapOf<String, String>()
+        p.getString(KEY_PLANS, null)?.let { out[KEY_PLANS] = it }
+        p.getString(KEY_ACTIVE, null)?.let { out[KEY_ACTIVE] = it }
+        out[KEY_ELEGIDO] = p.getBoolean(KEY_ELEGIDO, false).toString()
+        return out
+    }
+
+    /** Restaura los planes de una copia, dejando fuera lo que hubiera antes. */
+    fun importAll(context: Context, values: Map<String, String>) {
+        prefs(context).edit()
+            .clear()
+            .putString(KEY_PLANS, values[KEY_PLANS])
+            .putString(KEY_ACTIVE, values[KEY_ACTIVE])
+            .putBoolean(KEY_ELEGIDO, values[KEY_ELEGIDO]?.toBoolean() ?: true)
+            .commit()
+    }
+
     /** Cambia el plan activo y lo deja cargado. Devuelve el plan que queda activo. */
     fun setActive(context: Context, id: String): TrainingPlan {
         prefs(context).edit()

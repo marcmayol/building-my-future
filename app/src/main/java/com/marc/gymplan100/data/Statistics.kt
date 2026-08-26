@@ -146,7 +146,8 @@ object Statistics {
     fun oneRmProgression(progress: ProgressState): Map<String, List<WeightPoint>> {
         val out = sortedMapOf<String, MutableList<WeightPoint>>()
         for ((key, log) in progress.logs) {
-            val best = bestOneRm(log.filledSets) ?: continue
+            // Solo las series de trabajo: calentar mucho no te hace mas fuerte.
+            val best = bestOneRm(log.workingSets) ?: continue
             val dash = key.indexOf('-')
             if (dash <= 0) continue
             val day = key.substring(0, dash).toIntOrNull() ?: continue
@@ -178,7 +179,7 @@ object Statistics {
     fun volumeByDay(progress: ProgressState): Map<Int, Float> {
         val out = sortedMapOf<Int, Float>()
         for ((key, log) in progress.logs) {
-            val v = volume(log.filledSets)
+            val v = volume(log.workingSets)
             if (v <= 0f) continue
             val day = key.substringBefore('-').toIntOrNull() ?: continue
             out[day] = (out[day] ?: 0f) + v

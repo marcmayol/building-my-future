@@ -31,7 +31,9 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -320,6 +322,23 @@ private fun WorkingContent(
         viewModel.setSetReps(reps)
     }
 
+    // Serie de aproximación: no gasta serie del plan ni cuenta para los kilos movidos, la
+    // fuerza estimada o la progresión. Se apaga sola al pasar de serie.
+    // La cuenta de series hechas entra en la clave a proposito: una aproximacion no cambia el
+    // numero de serie, asi que sin ella la casilla se quedaria marcada y la serie buena se
+    // apuntaria como calentamiento sin que nadie lo notara.
+    var esCalentamiento by rememberSaveable(s.exerciseIndex, s.setNumber, s.completedSets.size) {
+        mutableStateOf(false)
+    }
+
+    // Superserie: con quién va encadenado este ejercicio.
+    val grupo = com.marc.gymplan100.data.SessionEngine.supersetMembers(s.dayNumber, s.exerciseIndex)
+    val posEnGrupo = grupo.indexOf(s.exerciseIndex)
+    val enSuperserie = grupo.size > 1
+    val siguienteDelGrupo = if (enSuperserie && posEnGrupo < grupo.lastIndex) {
+        day.template.exercises.getOrNull(grupo[posEnGrupo + 1])?.name
+    } else null
+
     // Qué toca hoy y por qué. Un número que sube solo sin explicación se lee como un fallo de
     // la app, así que el motivo va escrito debajo del peso.
     val progression = remember(s.exerciseIndex, s.setNumber, s.completedSets.size) {
@@ -389,7 +408,9 @@ private fun WorkingContent(
                         dark = dark,
                         reps = if (repsRange != null) reps else null,
                         onReps = { reps = it; repsTouched = true },
-                        hint = pesoHint
+                        hint = pesoHint,
+                        warmup = esCalentamiento,
+                        onWarmup = { esCalentamiento = it }
                     )
                 } else if (repsRange != null) {
                     // Una dominada no lleva kilos pero sí repeticiones, y son justo las que
@@ -419,13 +440,13 @@ private fun WorkingContent(
                     dark = dark, tint = SessionTint.WORK
                 )
                 bodyweight -> SessionPrimary(
-                    text = "Serie hecha",
-                    onClick = { viewModel.completeSet("", reps) },
+                    text = if (esCalentamiento) "Aproximación hecha" else "Serie hecha",
+                    onClick = { viewModel.completeSet("", reps, esCalentamiento) },
                     dark = dark, tint = SessionTint.WORK
                 )
                 else -> SessionPrimary(
-                    text = "Serie hecha",
-                    onClick = { viewModel.completeSet(weight, reps) },
+                    text = if (esCalentamiento) "Aproximación hecha" else "Serie hecha",
+                    onClick = { viewModel.completeSet(weight, reps, esCalentamiento) },
                     dark = dark, tint = SessionTint.WORK
                 )
             }
@@ -446,6 +467,16 @@ private fun WorkingContent(
             style = MaterialTheme.typography.bodyLarge,
             color = tintAccent(SessionTint.WORK)
         )
+        if (enSuperserie) {
+            Spacer(Modifier.height(Space.x1))
+            Text(
+                if (siguienteDelGrupo != null)
+                    "SUPERSERIE · sin descanso, encadenas con ${ExerciseImages.headlineName(siguienteDelGrupo)}"
+                else "SUPERSERIE · al acabar esta, a descansar",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
         if (imageRes != null) {
             Spacer(Modifier.height(Space.x4))
             // Un circuito son varios movimientos: en mitad de la serie es justo cuando hace
@@ -485,7 +516,8 @@ private fun WorkingContent(
         ExerciseGuideSheet(
             exerciseName = ex.name,
             scheme = ex.scheme,
-            onDismiss = { guideFromPlan = null }
+            onDismiss = { guideFromPlan = null },
+            onAlias = { viewModel.setExerciseAlias(ex.name, it) }
         )
     }
 }
@@ -562,6 +594,8 @@ private fun WeightBlock(
      * botones ya lo enseñan los propios botones.
      */
     hint: String,
+    warmup: Boolean = false,
+    onWarmup: (Boolean) -> Unit = {},
 ) {
     val styles = LocalAppTextStyles.current
     var showWheel by remember { mutableStateOf(false) }
@@ -617,6 +651,18 @@ private fun WeightBlock(
                 modifier = Modifier.weight(1f)
             )
             TextButton(onClick = { showWheel = true }) { Text("Rueda") }
+        }
+        // Aproximar antes de la serie buena es normal y hasta ahora no había dónde apuntarlo:
+        // o se contaba como serie de trabajo (y ensuciaba los kilos movidos y la progresión)
+        // o se perdía. Marcada aquí, se guarda pero no cuenta.
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = warmup, onCheckedChange = onWarmup)
+            Text(
+                "Serie de calentamiento",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable { onWarmup(!warmup) }
+            )
         }
         if (reps != null) {
             Spacer(Modifier.height(Space.x3))
@@ -785,7 +831,10 @@ private fun RestingContent(
         order.getOrNull(pos + 1)?.let { day.template.exercises.getOrNull(it) }
     }
     val nextIsNewExercise = nextExercise != null && nextExercise !== exercise
-    val nextSetNumber = if (s.setNumber < totalSets) s.setNumber + 1 else 1
+    // Igual que en el motor: una aproximacion se apunta pero no avanza el plan, asi que la
+    // serie que viene sale de contar el trabajo hecho y no de sumarle uno al contador.
+    val trabajoHecho = s.completedSets.count { it.exerciseIndex == s.exerciseIndex && !it.warmup }
+    val nextSetNumber = if (trabajoHecho < totalSets) trabajoHecho + 1 else 1
     val nextTotalSets = nextExercise?.let { setCountFromScheme(it.scheme) } ?: 0
 
     val nextIsTimed = nextExercise != null && secondsPerSetFromScheme(nextExercise.scheme) != null
@@ -812,6 +861,34 @@ private fun RestingContent(
             SessionSecondary("+30 s", { viewModel.adjustRest(30) })
         },
         contextCard = {
+            // El esfuerzo se pregunta aqui y no en la serie: justo al acabar es cuando sabes si
+            // te has quedado corto, y la pantalla de la serie ya tiene bastante. En palabras y
+            // no en numeros porque "RIR 2" no lo dice nadie en un gimnasio.
+            val ultima = s.completedSets.lastOrNull()
+            if (ultima != null && !ultima.warmup) {
+                SessionCard(label = "¿Cómo ha ido?", dark = dark) {
+                    // "Fallo" y no "Al limite": con el texto del sistema al 150 % la etiqueta
+                    // larga no cabia en su tercio y se quedaba en "Al". Ademas es la palabra
+                    // que se usa en el gimnasio.
+                    Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
+                        listOf(
+                            "Fácil" to "3",
+                            "Justo" to "1",
+                            "Fallo" to "0"
+                        ).forEach { (etiqueta, valor) ->
+                            FilterChip(
+                                selected = ultima.rir == valor,
+                                onClick = {
+                                    viewModel.setLastSetRir(if (ultima.rir == valor) "" else valor)
+                                },
+                                label = { Text(etiqueta, maxLines = 1) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(Space.x2))
+            }
             if (nextExercise != null) {
                 SessionCard(
                     label = if (nextIsNewExercise) "Después · deja la máquina lista" else "Después",
@@ -910,7 +987,9 @@ private fun RestingContent(
                         primaryColor = tintAccent(SessionTint.REST),
                         secondaryColor = LocalAppColors.current.warmup,
                         separatorColor = Color.Transparent,
-                        modifier = Modifier.widthIn(max = 230.dp)
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .widthIn(max = 230.dp)
                     )
                 } else if (nextImageRes != null) {
                     Image(
@@ -919,6 +998,9 @@ private fun RestingContent(
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .fillMaxWidth()
+                            // weight con fill=false: si el hueco no da para la imagen Y el
+                            // boton de debajo, encoge la imagen en vez de taparlo.
+                            .weight(1f, fill = false)
                             .heightIn(max = 230.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(Color.White)
@@ -949,7 +1031,8 @@ private fun RestingContent(
         ExerciseGuideSheet(
             exerciseName = nextExercise.name,
             scheme = nextExercise.scheme,
-            onDismiss = { showNextGuide = false }
+            onDismiss = { showNextGuide = false },
+            onAlias = { viewModel.setExerciseAlias(nextExercise.name, it) }
         )
     }
     if (showDayPlan) {
@@ -964,7 +1047,8 @@ private fun RestingContent(
         ExerciseGuideSheet(
             exerciseName = ex.name,
             scheme = ex.scheme,
-            onDismiss = { guideFromPlan = null }
+            onDismiss = { guideFromPlan = null },
+            onAlias = { viewModel.setExerciseAlias(ex.name, it) }
         )
     }
 }

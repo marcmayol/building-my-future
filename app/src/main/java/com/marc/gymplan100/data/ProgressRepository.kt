@@ -115,4 +115,34 @@ class ProgressRepository(private val context: Context) {
             prefs[profileKey] = json.encodeToString(profile)
         }
     }
+
+    // ----------------------------------------------------------- Copia de seguridad
+
+    /**
+     * Todas las claves del almacen, tal cual, para la copia de seguridad.
+     *
+     * Se vuelca entero en vez de campo por campo a proposito: asi lo que guarde una version
+     * futura entra solo en la copia. Una lista de campos que hay que acordarse de ampliar es
+     * justo como se pierden los datos que creias salvados.
+     */
+    suspend fun exportAll(): Map<String, String> =
+        context.dataStore.data.first().asMap()
+            .mapNotNull { (clave, valor) ->
+                (valor as? String)?.let { clave.name to it }
+            }
+            .toMap()
+
+    /**
+     * Restaura una copia: se limpia lo que hay y se escribe lo que trae.
+     *
+     * Se limpia primero porque restaurar tiene que dejar el telefono como estaba el dia de la
+     * copia; si solo se sobrescribiera, un plan borrado despues seguiria vivo y el resultado no
+     * seria ni lo de antes ni lo de ahora.
+     */
+    suspend fun importAll(values: Map<String, String>) {
+        context.dataStore.edit { prefs ->
+            prefs.clear()
+            values.forEach { (clave, valor) -> prefs[stringPreferencesKey(clave)] = valor }
+        }
+    }
 }

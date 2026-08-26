@@ -51,6 +51,13 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.ui.theme.Space
 import com.marc.gymplan100.ui.theme.Touch
 import androidx.health.connect.client.PermissionController
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import com.marc.gymplan100.data.Backup
+import com.marc.gymplan100.data.BackupFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.marc.gymplan100.BuildConfig
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
@@ -232,6 +239,8 @@ fun SettingsScreen(
                 }
             }
 
+            item { SeccionCopia(viewModel) }
+
             item { SeccionActualizaciones() }
 
             item {
@@ -278,6 +287,122 @@ fun SettingsScreen(
  * Actualizaciones y "acerca de". Este es el único sitio donde la comprobación
  * informa de errores o del "estás al día": el usuario la ha pedido a mano.
  */
+/**
+ * La copia de seguridad: un archivo tuyo con todo lo que la app sabe de ti.
+ *
+ * Es la unica pieza de la app que existe por lo que puede pasar y no se puede deshacer. Todo
+ * vive en este telefono y no hay cuenta ni nube donde recuperarlo, asi que la copia se guarda
+ * donde tu digas (Drive, el PC, la tarjeta) y se restaura desde donde tu digas.
+ *
+ * Restaurar sobrescribe: por eso se lee y se comprueba el archivo ANTES de tocar nada, y se
+ * dice cuantos dias trae y con que se van a sustituir.
+ */
+@Composable
+private fun SeccionCopia(viewModel: PlanViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var mensaje by remember { mutableStateOf<String?>(null) }
+    var porRestaurar by remember { mutableStateOf<BackupFile?>(null) }
+
+    val guardar = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            mensaje = runCatching {
+                val texto = Backup.create(context, BuildConfig.VERSION_NAME, System.currentTimeMillis())
+                withContext(Dispatchers.IO) {
+                    context.contentResolver.openOutputStream(uri)?.use { salida ->
+                        salida.write(texto.toByteArray())
+                    } ?: error("no se pudo escribir")
+                }
+                "Copia guardada."
+            }.getOrElse { "No se ha podido guardar la copia." }
+        }
+    }
+
+    val abrir = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val leido = runCatching {
+                withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() }
+                }
+            }.getOrNull()
+            if (leido == null) {
+                mensaje = "No se ha podido leer el archivo."
+                return@launch
+            }
+            when (val resultado = Backup.parse(leido)) {
+                is Backup.Result.Ok -> porRestaurar = resultado.file
+                is Backup.Result.Error -> mensaje = resultado.message
+            }
+        }
+    }
+
+    Bloque {
+        Text("Copia de seguridad", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.size(Space.x1))
+        Text(
+            "Tus días, tus pesos, tu historial y tus planes viven solo en este teléfono. " +
+                "Guarda una copia donde quieras y podrás recuperarlo todo en otro móvil.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.size(Space.x3))
+        Button(
+            onClick = { guardar.launch(Backup.suggestedName(System.currentTimeMillis())) },
+            shape = CircleShape,
+            modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
+        ) { Text("Guardar una copia", maxLines = 1) }
+        Spacer(Modifier.size(Space.x2))
+        OutlinedButton(
+            onClick = { abrir.launch(arrayOf("application/json", "text/plain", "*/*")) },
+            shape = CircleShape,
+            modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
+        ) { Text("Restaurar una copia", maxLines = 1) }
+        if (mensaje != null) {
+            Spacer(Modifier.size(Space.x2))
+            Text(
+                mensaje.orEmpty(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+
+    porRestaurar?.let { copia ->
+        AlertDialog(
+            onDismissRequest = { porRestaurar = null },
+            title = { Text("¿Restaurar esta copia?") },
+            text = {
+                Text(
+                    "La copia trae " + copia.resumen() + ". Al restaurarla se sustituye " +
+                        "TODO lo que hay ahora en la app: días, pesos, historial y planes."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val file = copia
+                    porRestaurar = null
+                    scope.launch {
+                        mensaje = runCatching {
+                            Backup.restore(context, file)
+                            viewModel.reloadAfterRestore()
+                            "Copia restaurada."
+                        }.getOrElse { "No se ha podido restaurar la copia." }
+                    }
+                }) { Text("Restaurar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { porRestaurar = null }) { Text("Cancelar") }
+            }
+        )
+    }
+}
+
 @Composable
 private fun SeccionActualizaciones() {
     val context = LocalContext.current

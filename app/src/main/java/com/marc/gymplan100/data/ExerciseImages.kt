@@ -273,7 +273,9 @@ object ExerciseImages {
      * Drawable de la ilustración del ejercicio para el género indicado (femenino si [female],
      * masculino en caso contrario), o null si el ejercicio no tiene imagen.
      */
-    fun forName(context: Context, name: String, female: Boolean): Int? {
+    fun forName(context: Context, rawName: String, female: Boolean): Int? {
+        // Un ejercicio de un plan propio puede tener un alias: "se parece a este del catalogo".
+        val name = ExerciseAliases.resolve(rawName)
         nameToSlug[name]?.let { slug ->
             val id = drawableFor(context, slug, female)
             if (id != 0) return id
@@ -288,8 +290,8 @@ object ExerciseImages {
      * Movimientos de un ejercicio compuesto ya resueltos a drawable, en orden y solo los que
      * tienen ilustración. Vacío si el nombre no es un compuesto conocido.
      */
-    fun circuitMoves(context: Context, name: String, female: Boolean): List<ResolvedMove> {
-        val moves = nameToCompoundMoves[name] ?: return emptyList()
+    fun circuitMoves(context: Context, rawName: String, female: Boolean): List<ResolvedMove> {
+        val moves = nameToCompoundMoves[ExerciseAliases.resolve(rawName)] ?: return emptyList()
         return moves.mapNotNull { move ->
             val id = drawableFor(context, move.slug, female)
             if (id != 0) ResolvedMove(move.label, move.dose, id) else null
@@ -297,7 +299,8 @@ object ExerciseImages {
     }
 
     /** ¿Es un circuito o una superserie, es decir, varios movimientos en un solo ejercicio? */
-    fun isCompound(name: String): Boolean = nameToCompoundMoves.containsKey(name)
+    fun isCompound(name: String): Boolean =
+        nameToCompoundMoves.containsKey(ExerciseAliases.resolve(name))
 
     /**
      * El nombre para un titular grande. A un compuesto se le quita el paréntesis con la lista
@@ -309,8 +312,13 @@ object ExerciseImages {
         if (isCompound(name)) name.substringBefore(" (").trim() else name
 
     /** ¿Sabemos con qué ilustrar este ejercicio? Slug propio o movimientos de un compuesto. */
-    fun hasVisual(name: String): Boolean =
-        nameToSlug.containsKey(name) || nameToCompoundMoves.containsKey(name)
+    fun hasVisual(name: String): Boolean = ExerciseAliases.resolve(name).let {
+        nameToSlug.containsKey(it) || nameToCompoundMoves.containsKey(it)
+    }
+
+    /** Los nombres del catalogo, ordenados, para poder elegir a cual se parece el tuyo. */
+    fun catalogNames(): List<String> =
+        (nameToSlug.keys + nameToCompoundMoves.keys).distinct().sorted()
 
     /**
      * Slug del catálogo al que corresponde este nombre, o el del primer movimiento si es un

@@ -68,7 +68,7 @@ object MuscleLoad {
 
     /** Series que cuenta un ejercicio de un día: las apuntadas o, si no las hay, las del plan. */
     private fun seriesOf(log: ExerciseLog, exercise: Exercise): Float {
-        val apuntadas = log.filledSets.size
+        val apuntadas = log.workingSets.size
         if (apuntadas > 0) return apuntadas.toFloat()
         return if (log.done) setCountFromScheme(exercise.scheme).toFloat() else 0f
     }
