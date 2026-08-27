@@ -1,8 +1,8 @@
 {
-  "versionCode": 22,
-  "versionName": "2.6",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.6/building-my-future-v2.6.apk",
-  "sha256": "536f218e5e3730db8f1ea8b7bb91ddc8e0f81d2b107990412012b21903dbaa37",
-  "notas": "Copia de seguridad de todo, superseries de verdad, series de calentamiento que no cuentan y el esfuerzo de cada serie.",
+  "versionCode": 23,
+  "versionName": "2.7",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.7/building-my-future-v2.7.apk",
+  "sha256": "f01184371ae86821d946a2948575b6acdb055843b37978971e354404b00c4ca7",
+  "notas": "Ya puedes elegir el tema en Ajustes: el del movil, claro u oscuro.",
   "check_horas": 24
 }
