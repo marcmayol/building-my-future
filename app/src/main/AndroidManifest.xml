@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Las alarmas se pierden al reiniciar: hay que volver a ponerlas al encender. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
@@ -78,6 +80,19 @@
         <receiver
             android:name=".notify.SkipActionReceiver"
             android:exported="false" />
+
+        <!-- El aviso de "hoy toca gimnasio" a la hora que hayas dicho. -->
+        <receiver
+            android:name=".notify.TrainingAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notify.BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Recibe las órdenes del reloj (Pixel Watch) por la Data Layer de Wear OS. -->
         <service

@@ -43,6 +43,9 @@ class MainActivity : ComponentActivity() {
         // Antes de pintar nada: si no, se arranca con el tema del sistema y se cambia a mitad
         // de arranque, y ese parpadeo se nota.
         AppTheme.load(this)
+        // Las alarmas se pierden si el sistema mata la app o limpia sus alarmas: al abrir se
+        // vuelve a dejar puesta la proxima, que sale barato y evita quedarse sin aviso.
+        com.marc.gymplan100.notify.TrainingReminder.reschedule(this)
         enableEdgeToEdge()
         maybeRequestNotificationPermission()
         readSessionExtra(intent)

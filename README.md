@@ -48,6 +48,9 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 - **Resultados**: histórico de cada día con su duración y los pesos de cada ejercicio, **serie a serie** ("10 · 12 · 11 kg"), incluido lo que apuntes al acabar un entreno libre.
 - Entrenamiento **especial** (sesión libre guiada) y **extra** (bonus que no cuenta como día del plan); al terminar se apunta lo hecho **con peso y repeticiones de cada serie**.
 
+**Que no se te pase**
+- **Recordatorios**: dile qué días sueles entrenar y a qué hora, y la app te avisa con el día que toca. El plan sigue yendo por días numerados —el día 47 es el 47 lo hagas el martes o el sábado—, así que son **100 días de entrenamiento** repartidos como entrenes tú. Si ese día ya has entrenado, no te molesta.
+
 **Tus datos son tuyos**
 - **Copia de seguridad**: guarda un archivo con todo (días, pesos, historial, planes y ajustes) donde quieras —Drive, el PC, la tarjeta— y restaurándolo recuperas el móvil tal y como estaba. Sin cuenta y sin nube: el archivo es tuyo y lo puedes abrir.
 - **Ejercicios que la app no conoce**: si tu plan trae uno con otro nombre, dile a cuál se parece y hereda ilustración, ficha, músculos y su sitio en el mapa.

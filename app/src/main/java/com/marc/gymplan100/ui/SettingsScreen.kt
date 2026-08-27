@@ -60,6 +60,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.marc.gymplan100.ui.theme.AppTheme
 import com.marc.gymplan100.ui.theme.ThemeMode
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.marc.gymplan100.notify.TrainingReminder
+import com.marc.gymplan100.notify.WEEKDAY_LABELS
 import com.marc.gymplan100.BuildConfig
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
@@ -241,6 +244,8 @@ fun SettingsScreen(
                 }
             }
 
+            item { SeccionRecordatorios() }
+
             item {
                 val context = LocalContext.current
                 WheelCard(
@@ -322,6 +327,98 @@ fun SettingsScreen(
  * Restaurar sobrescribe: por eso se lee y se comprueba el archivo ANTES de tocar nada, y se
  * dice cuantos dias trae y con que se van a sustituir.
  */
+/**
+ * Los días y la hora a la que la app te recuerda que toca gimnasio.
+ *
+ * El plan sigue yendo por días numerados y no por fechas: el día 47 es el 47 lo hagas el martes
+ * o el sábado. Lo que faltaba no era un calendario, sino que la app supiera cuándo sueles ir.
+ * Con esto, «100 días» pasa a ser «100 días de entrenamiento» repartidos como entrenes tú.
+ */
+@Composable
+private fun SeccionRecordatorios() {
+    val context = LocalContext.current
+    // El estado no necesita sobrevivir a nada: cada cambio se guarda al instante en las
+    // preferencias, que son la fuente de verdad, y de ahi se relee al volver a Ajustes.
+    var activo by remember { mutableStateOf(TrainingReminder.isEnabled(context)) }
+    var dias by remember { mutableStateOf(TrainingReminder.days(context)) }
+    var minuto by remember { mutableStateOf(TrainingReminder.minuteOfDay(context)) }
+
+    fun guardar() = TrainingReminder.save(context, activo, dias, minuto)
+
+    Bloque {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Recordarme ir al gimnasio",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.size(Space.x3))
+            Switch(
+                checked = activo,
+                onCheckedChange = { activo = it; guardar() }
+            )
+        }
+        Spacer(Modifier.size(Space.x1))
+        Text(
+            "Elige qué días sueles entrenar y a qué hora quieres el aviso. Si ese día ya has " +
+                "entrenado, no te molesta.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (activo) {
+            Spacer(Modifier.size(Space.x3))
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                verticalArrangement = Arrangement.spacedBy(Space.x2)
+            ) {
+                WEEKDAY_LABELS.forEach { (numero, letra) ->
+                    FilterChip(
+                        selected = numero in dias,
+                        onClick = {
+                            val nuevos = dias.toMutableSet()
+                            if (!nuevos.remove(numero)) nuevos.add(numero)
+                            dias = nuevos
+                            guardar()
+                        },
+                        label = { Text(letra, maxLines = 1) }
+                    )
+                }
+            }
+            Spacer(Modifier.size(Space.x3))
+            Text(
+                "A las ${TrainingReminder.formatTime(minuto)}",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            // Cuartos de hora: nadie queda con el gimnasio a las 18:07, y una rueda de 1440
+            // valores es imposible de manejar con el pulgar.
+            val pasos = remember { (0 until 24 * 4).map { it * 15 } }
+            val indice = pasos.indexOfFirst { it >= minuto }.coerceAtLeast(0)
+            CarrilDeScroll {
+                WheelPicker(
+                    items = pasos.map { TrainingReminder.formatTime(it) },
+                    selectedIndex = indice,
+                    onSelectedIndexChange = { i ->
+                        minuto = pasos[i.coerceIn(0, pasos.lastIndex)]
+                        guardar()
+                    }
+                )
+            }
+            if (dias.isEmpty()) {
+                Text(
+                    "Sin días elegidos no hay aviso que dar.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun SeccionCopia(viewModel: PlanViewModel) {
     val context = LocalContext.current
