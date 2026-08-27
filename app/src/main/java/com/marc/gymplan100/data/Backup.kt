@@ -1,6 +1,7 @@
 package com.marc.gymplan100.data
 
 import android.content.Context
+import com.marc.gymplan100.ui.theme.AppTheme
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -29,7 +30,14 @@ data class BackupFile(
     /** Todo el progreso: días, registros, historial, sesión activa y perfil. */
     val progreso: Map<String, String> = emptyMap(),
     /** Los planes guardados y cuál está activo. */
-    val planes: Map<String, String> = emptyMap()
+    val planes: Map<String, String> = emptyMap(),
+    /**
+     * Ajustes de la app que no viven en el progreso ni en los planes (de momento, el tema).
+     *
+     * Vacío en las copias hechas antes de que existiera: restaurar una de esas deja el tema
+     * como estaba en vez de romperse, que es lo que tiene que pasar.
+     */
+    val ajustes: Map<String, String> = emptyMap()
 ) {
     /** Cuántos días completados hay dentro, para poder avisar antes de sobrescribir. */
     fun resumen(): String {
@@ -75,7 +83,8 @@ object Backup {
                 creado = now,
                 version = version,
                 progreso = repo.exportAll(),
-                planes = PlanStore.exportAll(context)
+                planes = PlanStore.exportAll(context),
+                ajustes = AppTheme.export()
             )
         )
     }
@@ -111,6 +120,7 @@ object Backup {
     suspend fun restore(context: Context, file: BackupFile) {
         PlanStore.importAll(context, file.planes)
         ProgressRepository(context).importAll(file.progreso)
+        if (file.ajustes.isNotEmpty()) AppTheme.import(context, file.ajustes)
         // El plan activo puede haber cambiado: la ventana que mira toda la app se reabre.
         PlanStore.load(context)
     }

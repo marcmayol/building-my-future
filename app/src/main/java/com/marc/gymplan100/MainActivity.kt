@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.marc.gymplan100.ui.GymNavHost
+import com.marc.gymplan100.ui.theme.AppTheme
 import com.marc.gymplan100.ui.theme.GymPlanTheme
 import com.marcm.actualizador.Modo
 import kotlinx.coroutines.delay
@@ -39,11 +40,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Antes de pintar nada: si no, se arranca con el tema del sistema y se cambia a mitad
+        // de arranque, y ese parpadeo se nota.
+        AppTheme.load(this)
         enableEdgeToEdge()
         maybeRequestNotificationPermission()
         readSessionExtra(intent)
         setContent {
-            GymPlanTheme {
+            GymPlanTheme(darkTheme = AppTheme.isDark()) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

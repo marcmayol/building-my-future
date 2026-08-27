@@ -58,6 +58,8 @@ import com.marc.gymplan100.data.Backup
 import com.marc.gymplan100.data.BackupFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.marc.gymplan100.ui.theme.AppTheme
+import com.marc.gymplan100.ui.theme.ThemeMode
 import com.marc.gymplan100.BuildConfig
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
@@ -236,6 +238,29 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            }
+
+            item {
+                val context = LocalContext.current
+                WheelCard(
+                    title = "Tema",
+                    explicacion = "Cómo se ve la app. Por defecto sigue al móvil, pero puedes " +
+                        "fijarla en claro o en oscuro."
+                ) {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                        verticalArrangement = Arrangement.spacedBy(Space.x2)
+                    ) {
+                        ThemeMode.entries.forEach { modo ->
+                            FilterChip(
+                                selected = AppTheme.mode == modo,
+                                onClick = { AppTheme.set(context, modo) },
+                                label = { Text(modo.label, maxLines = 1) }
+                            )
+                        }
+                    }
                 }
             }
 
