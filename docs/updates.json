@@ -1,8 +1,8 @@
 {
-  "versionCode": 23,
-  "versionName": "2.7",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.7/building-my-future-v2.7.apk",
-  "sha256": "f01184371ae86821d946a2948575b6acdb055843b37978971e354404b00c4ca7",
-  "notas": "Ya puedes elegir el tema en Ajustes: el del movil, claro u oscuro.",
+  "versionCode": 24,
+  "versionName": "2.8",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.8/building-my-future-v2.8.apk",
+  "sha256": "a582b13407f8f19972200f972bd8ab73cc152d1e292651c62c04c18b08b47ce1",
+  "notas": "Recordatorios: dile que dias vas al gimnasio y a que hora, y la app te avisa con el dia que toca.",
   "check_horas": 24
 }
