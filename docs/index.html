@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Building My Future</title>
+  <meta name="description" content="App Android que te guía el entrenamiento en vivo: descansos que avisan con la pantalla apagada, el peso que sube solo y te dice por qué. Sin cuentas y sin nube." />
+  <meta property="og:title" content="Building My Future" />
+  <meta property="og:description" content="Te guía la sesión en vivo y te dice cuándo toca subir el peso, y por qué. Sin cuentas y sin nube." />
+  <style>
+    :root {
+      --bg: #fdf6f2; --card: #fffaf7; --ink: #241016; --muted: #7c6a63;
+      --brand: #d23a1c; --accent: #d23a1c; --line: #f0ded4;
+      --ambar: #c9821f; --magenta: #b4144a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0708; --card: #191013; --ink: #f6e9e4; --muted: #b3a09a;
+        --brand: #ff6a4d; --accent: #ff6a4d; --line: #33232a;
+        --ambar: #ffb24d; --magenta: #ff2e6e;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.6;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 48px 20px 64px; }
+    header { text-align: center; margin-bottom: 36px; }
+    .mark { font-size: 44px; }
+    h1 {
+      font-size: 2.2rem; margin: 8px 0 6px; letter-spacing: -.02em;
+      background: linear-gradient(90deg, var(--ambar), var(--accent) 55%, var(--magenta));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .sub { color: var(--muted); margin: 0 auto; max-width: 36em; }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      padding: 22px 24px; margin: 18px 0;
+    }
+    h2 { font-size: 1.15rem; color: var(--brand); margin: 0 0 10px; }
+    ul { margin: 0; padding-left: 1.2em; }
+    li { margin: 8px 0; }
+    .cta { text-align: center; margin: 34px 0 8px; }
+    .btn {
+      display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+      font-weight: 600; padding: 14px 26px; border-radius: 999px; font-size: 1.05rem;
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .hint { color: var(--muted); font-size: .9rem; margin-top: 10px; }
+    footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 40px; }
+    a { color: var(--accent); }
+    code { background: var(--bg); padding: 1px 6px; border-radius: 6px;
+           font-size: .9em; border: 1px solid var(--line); }
+    .quote {
+      border-left: 3px solid var(--accent); padding: 2px 0 2px 14px; margin: 14px 0 0;
+      color: var(--muted); font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="mark">🏋️</div>
+      <h1>Building My Future</h1>
+      <p class="sub">
+        No es una lista de ejercicios que tachas: te lleva la sesión en vivo, apunta lo que
+        levantas y te dice cuándo toca subir el peso —y por qué—.
+      </p>
+    </header>
+
+    <div class="card">
+      <h2>Te guía mientras entrenas</h2>
+      <ul>
+        <li><strong>Los descansos avisan con la pantalla apagada.</strong> Suena la alarma y vibra aunque el móvil esté en el bolsillo, y la cuenta atrás se ve en la pantalla de bloqueo con un botón para pasar a la siguiente serie sin desbloquear.</li>
+        <li><strong>Cada serie, con su peso y sus repeticiones.</strong> Vienen puestas desde el plan: solo las tocas el día que no salen. Las de aproximación se marcan como calentamiento y no ensucian tus números.</li>
+        <li><strong>Superseries de verdad</strong>: encadenas los dos ejercicios sin descanso y descansas al acabar el par, cada uno con su peso.</li>
+        <li><strong>«Máquina ocupada»</strong>: manda ese ejercicio al final y sigues con el siguiente, sin perder el sitio.</li>
+        <li><strong>Deja la máquina lista</strong>: durante el descanso preparas el peso de la próxima serie.</li>
+        <li><strong>Desde el reloj</strong> (Wear OS): marcas la serie desde la muñeca con el móvil en la taquilla.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Aprende de lo que haces</h2>
+      <ul>
+        <li><strong>El peso sube solo.</strong> Cuando cierras todas las series arriba del rango, te propone más carga —con el salto que de verdad existe en la máquina— y te escribe el motivo debajo.</li>
+        <li><strong>Y baja cuando toca.</strong> Si llevas tres sesiones atascado en un ejercicio, te propone bajar un 10 % para volver a subir desde ahí. Es la mitad que nadie hace solo.</li>
+        <li><strong>Fuerza estimada (1RM)</strong>, porque los kilos a secas engañan: 40 × 12 y 50 × 5 son casi el mismo esfuerzo.</li>
+        <li><strong>Mapa muscular</strong>: qué trabaja cada ejercicio y, sobre todo, <em>qué se ha llevado cada músculo esta semana</em>. Es lo único que dice si vas compensado o llevas tres semanas sin tocar pierna.</li>
+        <li><strong>Rachas, récords y kilos movidos</strong>, con un mapa de calor de tu constancia.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>El plan es tuyo</h2>
+      <ul>
+        <li>Viene con un <strong>reto de 100 días</strong> y once planes más, pero puedes <strong>traerte el tuyo</strong> escrito en Markdown o JSON, o crearlo en la app.</li>
+        <li><strong>Cada plan guarda su progreso por separado</strong>: alternas entre ellos sin perder nada.</li>
+        <li>Si tu plan trae un ejercicio que la app no conoce, le dices <strong>a cuál se parece</strong> y hereda dibujo, ficha y músculos.</li>
+        <li><strong>Recordatorios</strong>: le dices qué días sueles ir y a qué hora, y te avisa con el día que toca. Los días del plan no son fechas, así que son <strong>100 días de entrenamiento</strong> repartidos como entrenes tú. Si ya has entrenado ese día, no te molesta.</li>
+      </ul>
+    </div>
+
+    <div class="cta">
+      <a class="btn" href="https://github.com/marcmayol/building-my-future/releases/latest">
+        Descargar la app (APK)
+      </a>
+      <p class="hint">
+        Android 8 o superior · gratis y sin anuncios.<br />
+        La app se <strong>actualiza sola</strong> desde aquí.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Cómo instalar</h2>
+      <ul>
+        <li>Descarga el <code>.apk</code> desde el botón de arriba.</li>
+        <li>Ábrelo en el móvil y acepta instalar de orígenes desconocidos si lo pide.</li>
+        <li>Concede el permiso de notificaciones: sin él no suenan los descansos.</li>
+        <li>Si el móvil te lo ofrece, quita el ahorro de batería para la app; así el aviso del descanso llega puntual con la pantalla apagada.</li>
+        <li>La Release incluye también el APK del reloj, que se instala por <code>adb</code> (Wear OS no deja hacerlo desde el móvil).</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Sin cuentas, sin nube, sin anuncios</h2>
+      <p style="margin:0">
+        No hay registro ni servidor: tus días, tus pesos y tu historial no salen del móvil.
+        Por eso mismo la app trae su propia <strong>copia de seguridad</strong>: guardas un
+        archivo donde quieras y lo restauras en otro teléfono tal y como estaba.
+      </p>
+      <p class="quote">
+        Lo único que la app pide a internet es mirar si hay versión nueva.
+      </p>
+    </div>
+
+    <footer>
+      Un proyecto personal, hecho para usarlo en el gimnasio de verdad ·
+      <a href="https://github.com/marcmayol/building-my-future">Código en GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
