@@ -174,6 +174,11 @@ object ExerciseImages {
         "Bird dog" to "bird-dog",
         "Bird dog lento (5 s por repetición)" to "bird-dog",
         "Dead bug" to "dead-bug",
+        // Los tres vivían solo dentro de un circuito; ahora son ejercicios por su cuenta y el
+        // dibujo es el mismo que ya se usaba ahí dentro.
+        "Rodillas al pecho" to "mountain-climbers",
+        "Rueda abdominal" to "ab-wheel-rollout",
+        "Elevación de piernas" to "lying-leg-raise",
         "Dead bug con banda" to "dead-bug",
         "Dead bug con brazos" to "dead-bug",
         "Dead bug lento" to "dead-bug",

@@ -1099,7 +1099,9 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val next = SessionEngine.completeSet(
             s, weight, System.currentTimeMillis(), repsFinales, warmup, rir
         )
-        if (next.phase == SessionPhase.FINISHED) {
+        // Encadenando una superserie no hay descanso que programar, y el aviso del ejercicio
+        // que se acaba de cerrar hay que quitarlo: si no, sonaria en mitad del siguiente.
+        if (next.phase != SessionPhase.RESTING) {
             RestReminder.cancel(getApplication())
         } else {
             val kind = if (next.restBetweenExercises) RestReminder.KIND_BETWEEN_EXERCISES

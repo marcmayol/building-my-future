@@ -37,8 +37,17 @@ object MuscleTargets {
     private val coreSide = MuscleTarget(setOf("obliques"), setOf("abs"))
     private val coreCircuit = MuscleTarget(setOf("abs", "obliques"), setOf("lower-back"))
     private val deepCore = MuscleTarget(setOf("abs"), setOf("lower-back"))
+    // Los movimientos que hasta ahora solo existían dentro de un circuito, y que al partirlo
+    // pasan a ser ejercicios de pleno derecho.
+    private val mountainClimbers =
+        MuscleTarget(setOf("abs"), setOf("obliques", "deltoids", "quadriceps"))
+    private val abWheel = MuscleTarget(setOf("abs"), setOf("lower-back", "deltoids", "upper-back"))
+    private val legRaise = MuscleTarget(setOf("abs"), setOf("quadriceps", "obliques"))
 
     private val map: Map<String, MuscleTarget> = mapOf(
+        "Rodillas al pecho" to mountainClimbers,
+        "Rueda abdominal" to abWheel,
+        "Elevación de piernas" to legRaise,
         "Press de pecho en máquina" to chestPress,
         "Press de pecho" to chestPress,
         "Press inclinado o pec deck" to chestPress,

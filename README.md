@@ -26,7 +26,7 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 **Entrenamiento guiado en vivo**
 - Calentamiento con cuenta atrás ajustable (pausa/reanuda).
 - **Cada serie con su peso y sus repeticiones**: la primera con 10 kg x 12, la segunda con 12 x 12 y la tercera con 11 x 10 se apuntan tal cual, y el desglose se guarda con el día. Las repeticiones vienen puestas desde el plan: solo se tocan el día que no salen. También **series por tiempo** (planchas, isométricos) con su propia cuenta atrás.
-- **Superseries de verdad**: los ejercicios encadenados se hacen uno detrás de otro y el descanso cae al acabar el par, cada uno con su peso y su progresión.
+- **Superseries y circuitos de verdad**: los ejercicios encadenados se hacen uno detrás de otro y el descanso cae al acabar la vuelta, cada uno con su peso, su cuenta atrás y su progresión. Un circuito de core deja de ser «tres vueltas» a secas y pasa a guiarte plancha, rodillas al pecho y plancha lateral, una a una y con su temporizador.
 - **Series de calentamiento**: se apuntan, pero no cuentan para los kilos movidos, la fuerza estimada ni la progresión.
 - **Qué tal ha ido**: al descansar puedes marcar si la serie fue fácil, justa o al fallo.
 - **El peso sugerido sube solo**: cuando cierras todas las series en el tope del rango, la app propone más carga —con el salto que de verdad existe en la máquina— y escribe el motivo debajo. Si llevas tres sesiones atascado, propone bajar un 10 % para volver a subir desde ahí.

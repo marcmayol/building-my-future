@@ -147,7 +147,15 @@ object SessionEngine {
                 completedSets = s.completedSets + newSet,
                 occupiedSkips = 0,
                 plannedWeight = "",
-                currentReps = ""
+                currentReps = "",
+                // De vuelta a WORKING con el cronometro a cero: en un circuito de planchas, el
+                // siguiente heredaba la cuenta atras del anterior y aparecia con el tiempo ya
+                // agotado ("+0:02 ¡tiempo!") antes de empezarlo.
+                phase = SessionPhase.WORKING,
+                timedTargetSeconds = 0,
+                timedStartMillis = 0L,
+                timedElapsedBeforePause = 0,
+                timedPaused = false
             )
         }
 

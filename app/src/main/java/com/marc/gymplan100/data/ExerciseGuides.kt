@@ -402,6 +402,61 @@ object ExerciseGuides {
         videoQuery = "sentadilla goblet técnica"
     )
 
+    private val rodillasAlPecho = ExerciseGuide(
+        muscles = "Core (abdomen y oblicuos), hombros y piernas; sube también las pulsaciones.",
+        howTo = "Ponte en plancha alta, con las manos bajo los hombros y el cuerpo en línea. " +
+            "Lleva una rodilla hacia el pecho y devuélvela, alternando a buen ritmo, como si " +
+            "corrieras en el sitio. Va por tiempo, no por repeticiones: mantén el ritmo hasta " +
+            "que suene.",
+        mistakes = listOf(
+            "Subir y bajar la cadera a cada rodilla en vez de mantenerla quieta.",
+            "Apoyar el pie entero adelante en vez de solo acercar la rodilla.",
+            "Ir tan rápido que se pierde la línea del cuerpo."
+        ),
+        alternatives = listOf(
+            "Más despacio y controlado, tocando el suelo con la punta.",
+            "Con las manos elevadas en un banco (más fácil).",
+            "Plancha normal si la muñeca molesta."
+        ),
+        videoQuery = "mountain climbers rodillas al pecho técnica"
+    )
+
+    private val ruedaAbdominal = ExerciseGuide(
+        muscles = "Core entero (abdomen y lumbar), con hombros y dorsal aguantando.",
+        howTo = "De rodillas, agarra la rueda con las dos manos bajo los hombros. Rueda hacia " +
+            "delante lo que puedas SIN que la espalda se arquee, y vuelve apretando el abdomen. " +
+            "El recorrido lo marca tu control, no tus brazos.",
+        mistakes = listOf(
+            "Arquear la zona lumbar al estirarse: es la señal de que has ido demasiado lejos.",
+            "Tirar con los brazos en vez de traer el cuerpo con el abdomen.",
+            "Empezar de pie sin tener el movimiento de rodillas dominado."
+        ),
+        alternatives = listOf(
+            "Recorrido corto, parando antes de que la espalda ceda.",
+            "Con una barra con discos en el suelo, si no hay rueda.",
+            "Plancha o dead bug."
+        ),
+        videoQuery = "rueda abdominal ab wheel rollout técnica"
+    )
+
+    private val elevacionPiernas = ExerciseGuide(
+        muscles = "Abdomen, sobre todo la parte baja, y flexores de la cadera.",
+        howTo = "Tumbado boca arriba, manos bajo los glúteos o al lado. Sube las piernas rectas " +
+            "hasta la vertical y bájalas despacio SIN que la lumbar se despegue del suelo. Si se " +
+            "despega, no bajes tanto.",
+        mistakes = listOf(
+            "Despegar la lumbar del suelo al bajar (así trabaja la espalda, no el abdomen).",
+            "Dejar caer las piernas de golpe.",
+            "Doblar mucho las rodillas para llegar más abajo."
+        ),
+        alternatives = listOf(
+            "Con las rodillas dobladas (más fácil).",
+            "Colgado de la barra, si tienes agarre.",
+            "Dead bug, que enseña lo mismo con menos riesgo."
+        ),
+        videoQuery = "elevación de piernas tumbado abdominal técnica"
+    )
+
     private val plancha = ExerciseGuide(
         muscles = "Core (abdomen y zona lumbar), hombros.",
         howTo = "Apoya los antebrazos y las puntas de los pies en el suelo, codos bajo los hombros. " +
@@ -563,6 +618,9 @@ object ExerciseGuides {
     // --- Mapa nombre del plan -> guía ---
 
     private val map: Map<String, ExerciseGuide> = mapOf(
+        "Rodillas al pecho" to rodillasAlPecho,
+        "Rueda abdominal" to ruedaAbdominal,
+        "Elevación de piernas" to elevacionPiernas,
         "Press de pecho en máquina" to pressPecho,
         "Press de pecho" to pressPecho,
         "Press inclinado o pec deck" to pressInclinado,

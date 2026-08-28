@@ -165,7 +165,9 @@ object BuiltinPlan {
                     Exercise("Press de pecho", "3 x 12"),
                     Exercise("Remo sentado", "3 x 12"),
                     Exercise("Press de hombros", "3 x 10"),
-                    Exercise("Circuito core (plancha, rodillas, plancha lateral)", "3 vueltas"),
+                    Exercise("Plancha", "3 x 30 s", kind = ExerciseKind.TIME, supersetGroup = "core"),
+                    Exercise("Rodillas al pecho", "3 x 30 s", kind = ExerciseKind.TIME, supersetGroup = "core"),
+                    Exercise("Plancha lateral", "3 x 20 s", note = "por lado", kind = ExerciseKind.TIME, supersetGroup = "core"),
                 )
             ),
         )
@@ -241,7 +243,9 @@ object BuiltinPlan {
                     Exercise("Extensión de piernas", "3 x 12"),
                     Exercise("Hip thrust", "3 x 12"),
                     Exercise("Elevación de gemelos", "4 x 15"),
-                    Exercise("Circuito core (plancha, rueda, elevación piernas)", "3 vueltas"),
+                    Exercise("Plancha", "3 x 30 s", kind = ExerciseKind.TIME, supersetGroup = "core"),
+                    Exercise("Rueda abdominal", "3 x 10", kind = ExerciseKind.BODYWEIGHT, supersetGroup = "core"),
+                    Exercise("Elevación de piernas", "3 x 12", kind = ExerciseKind.BODYWEIGHT, supersetGroup = "core"),
                 )
             ),
         )
@@ -319,7 +323,9 @@ object BuiltinPlan {
                     Exercise("Extensión de piernas", "4 x 12"),
                     Exercise("Hip thrust", "4 x 12"),
                     Exercise("Elevación de gemelos", "4 x 20"),
-                    Exercise("Circuito core (plancha, plancha lateral, dead bug)", "4 vueltas"),
+                    Exercise("Plancha", "4 x 30 s", kind = ExerciseKind.TIME, supersetGroup = "core"),
+                    Exercise("Plancha lateral", "4 x 20 s", note = "por lado", kind = ExerciseKind.TIME, supersetGroup = "core"),
+                    Exercise("Dead bug", "4 x 10", note = "alternando", kind = ExerciseKind.BODYWEIGHT, supersetGroup = "core"),
                 )
             ),
         )
