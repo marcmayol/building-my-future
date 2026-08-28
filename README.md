@@ -1,6 +1,6 @@
 # Building My Future 
 
-App Android nativa (Kotlin + Jetpack Compose) para seguir un plan de entrenamiento. No es solo una lista de ejercicios: **te guía la sesión en vivo** —calentamiento, series, descansos con aviso— y guarda todo tu progreso en el dispositivo.
+App Android nativa (Kotlin + Jetpack Compose) para seguir un plan de entrenamiento. No es solo una lista de ejercicios: **te guía la sesión en vivo** —calentamiento, series, descansos con aviso—, **te dice cuándo toca subir el peso y por qué**, y guarda todo tu progreso en el dispositivo. Sin cuenta, sin nube y sin anuncios.
 
 > 🏋️ Reto personal de 100 días para construir el hábito del gimnasio, con la sesión guiada paso a paso incluso con la pantalla apagada.
 
@@ -43,6 +43,7 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 
 **Seguimiento y motivación**
 - **Estadísticas**: resumen (racha actual y máxima, días completados, tiempo total, series y **kilos movidos**), **gráfica de progresión de peso** por ejercicio con vista de **fuerza estimada (1RM)** —que es la única forma de comparar días con esquemas distintos—, **constancia** (entrenos por semana + mapa de calor tipo calendario) y **records personales**.
+- **Mapa muscular**: qué trabaja cada ejercicio (en su ficha y, durante el descanso, el de lo que viene), qué toca hoy en la ficha del día y —en Estadísticas— **lo que se ha llevado cada músculo en los últimos siete días**, contado en series. Es lo único que dice si vas compensado o llevas tres semanas sin tocar pierna.
 - **Logros / hitos** del reto con celebración al desbloquearlos (y sorpresa al completar los 100 días 🏆).
 - **Mis pesos**: el peso de referencia de cada máquina —el **más alto** que has movido en ella—, siempre a mano.
 - **Resultados**: histórico de cada día con su duración y los pesos de cada ejercicio, **serie a serie** ("10 · 12 · 11 kg"), incluido lo que apuntes al acabar un entreno libre.
@@ -83,15 +84,21 @@ app/src/main/java/com/marc/gymplan100/
 │   ├── PlanMarkdown.kt        lector de planes escritos en Markdown
 │   ├── PlanStore.kt           planes guardados y cuál está activo
 │   ├── Models.kt / ProgressModels.kt / SessionModels.kt
-│   ├── SessionEngine.kt       transiciones de la sesión (funciones puras)
+│   ├── SessionEngine.kt       transiciones de la sesión, superseries incluidas (puras)
+│   ├── Progression.kt         cuándo toca subir peso, y por qué (doble progresión + deload)
 │   ├── ProgressRepository.kt  persistencia con DataStore
-│   ├── Statistics.kt          cálculos de estadísticas
+│   ├── Backup.kt              copia de seguridad de todo, en un archivo tuyo
+│   ├── Statistics.kt          estadísticas, fuerza estimada (1RM) y kilos movidos
+│   ├── MuscleLoad.kt          qué se ha llevado cada músculo, en series
+│   ├── MuscleTargets.kt / MuscleMapData.kt   qué trabaja cada ejercicio y sus trazados
 │   ├── ExerciseGuides.kt / ExerciseImages.kt   guías e imágenes
+│   ├── ExerciseAliases.kt     «este ejercicio mío es como este del catálogo»
 │   └── Achievements.kt        logros e hitos
 ├── health/                    integración con Health Connect
-├── notify/                    avisos de descanso (suenan con pantalla apagada)
+├── notify/                    avisos de descanso y recordatorios de ir al gimnasio
 ├── wear/                      puente con el reloj (Wear OS)
 └── ui/                        pantallas Compose (Home, sesión, estadísticas, resultados…)
+    └── theme/AppTheme.kt      claro, oscuro o el del móvil
 wear/                          app del reloj (Wear OS)
 ```
 
