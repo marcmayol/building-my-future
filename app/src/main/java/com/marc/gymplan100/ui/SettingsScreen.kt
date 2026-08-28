@@ -63,6 +63,8 @@ import com.marc.gymplan100.ui.theme.ThemeMode
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.marc.gymplan100.notify.TrainingReminder
 import com.marc.gymplan100.notify.WEEKDAY_LABELS
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import com.marc.gymplan100.BuildConfig
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
@@ -370,22 +372,45 @@ private fun SeccionRecordatorios() {
         )
         if (activo) {
             Spacer(Modifier.size(Space.x3))
-            FlowRow(
+            // Los siete a partes iguales en una sola fila: con chips normales el domingo no
+            // cabia y se caia solo a la linea de abajo, que para una semana se lee fatal.
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Space.x2),
-                verticalArrangement = Arrangement.spacedBy(Space.x2)
+                horizontalArrangement = Arrangement.spacedBy(Space.x1)
             ) {
                 WEEKDAY_LABELS.forEach { (numero, letra) ->
-                    FilterChip(
-                        selected = numero in dias,
-                        onClick = {
-                            val nuevos = dias.toMutableSet()
-                            if (!nuevos.remove(numero)) nuevos.add(numero)
-                            dias = nuevos
-                            guardar()
-                        },
-                        label = { Text(letra, maxLines = 1) }
-                    )
+                    val elegido = numero in dias
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = Touch.min)
+                            .clip(CircleShape)
+                            .background(
+                                if (elegido) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surface
+                            )
+                            .border(
+                                1.dp,
+                                if (elegido) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                CircleShape
+                            )
+                            .clickable {
+                                val nuevos = dias.toMutableSet()
+                                if (!nuevos.remove(numero)) nuevos.add(numero)
+                                dias = nuevos
+                                guardar()
+                            }
+                    ) {
+                        Text(
+                            letra,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1,
+                            color = if (elegido) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
             Spacer(Modifier.size(Space.x3))
