@@ -1,8 +1,8 @@
 {
-  "versionCode": 25,
-  "versionName": "2.8.1",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.8.1/building-my-future-v2.8.1.apk",
-  "sha256": "e2a9edd610488d2037f751a9139a1ea121556d5f07e16565195230f14806e642",
-  "notas": "Los dias de la semana de los recordatorios, alineados en una sola fila.",
+  "versionCode": 26,
+  "versionName": "2.9",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.9/building-my-future-v2.9.apk",
+  "sha256": "615bee6106f37c91b8198d787f79142ea598ba7a25d49247105d8c543838b571",
+  "notas": "Los circuitos ya se guian movimiento a movimiento, cada uno con su cuenta atras.",
   "check_horas": 24
 }
