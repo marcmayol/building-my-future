@@ -1,6 +1,6 @@
-# Building My Future · Plan 100 Días
+# Building My Future 
 
-App Android nativa (Kotlin + Jetpack Compose) para seguir un plan de entrenamiento de fuerza de **100 días, 5 sesiones por semana**, repartido en 4 fases. No es solo una lista de ejercicios: **te guía la sesión en vivo** —calentamiento, series, descansos con aviso— y guarda todo tu progreso en el dispositivo.
+App Android nativa (Kotlin + Jetpack Compose) para seguir un plan de entrenamiento. No es solo una lista de ejercicios: **te guía la sesión en vivo** —calentamiento, series, descansos con aviso— y guarda todo tu progreso en el dispositivo.
 
 > 🏋️ Reto personal de 100 días para construir el hábito del gimnasio, con la sesión guiada paso a paso incluso con la pantalla apagada.
 
