@@ -1,8 +1,8 @@
 {
-  "versionCode": 24,
-  "versionName": "2.8",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.8/building-my-future-v2.8.apk",
-  "sha256": "a582b13407f8f19972200f972bd8ab73cc152d1e292651c62c04c18b08b47ce1",
-  "notas": "Recordatorios: dile que dias vas al gimnasio y a que hora, y la app te avisa con el dia que toca.",
+  "versionCode": 25,
+  "versionName": "2.8.1",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.8.1/building-my-future-v2.8.1.apk",
+  "sha256": "e2a9edd610488d2037f751a9139a1ea121556d5f07e16565195230f14806e642",
+  "notas": "Los dias de la semana de los recordatorios, alineados en una sola fila.",
   "check_horas": 24
 }
