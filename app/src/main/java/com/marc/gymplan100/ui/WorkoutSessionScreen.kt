@@ -147,7 +147,7 @@ fun WorkoutSessionScreen(
             )
         }
         SessionPhase.FINISHED -> FinishedContent(
-            s = s, day = day, now = now, dark = dark,
+            s = s, day = day, now = now, dark = dark, viewModel = viewModel,
             onFinish = { viewModel.finishSession(); onExit() },
             onExit = { showQuitDialog = true }
         )
@@ -1104,6 +1104,7 @@ private fun FinishedContent(
     day: TrainingDay,
     now: Long,
     dark: Boolean,
+    viewModel: PlanViewModel,
     onFinish: () -> Unit,
     onExit: () -> Unit
 ) {
@@ -1169,6 +1170,44 @@ private fun FinishedContent(
                     formatSecs(if (sets > 0) totalRest / sets else 0), "",
                     "media por serie", Modifier.weight(1f), dark
                 )
+            }
+            // Las calorias se calculaban para mandarlas a Google Health y no se ensenaban en
+            // ningun sitio, que es justo lo primero que uno mira al terminar. Es una estimacion
+            // por formula (peso y minutos), no una medicion: se dice tal cual.
+            val kcal = viewModel.estimatedKcal(((now - s.startMillis) / 1000).toInt())
+            Spacer(Modifier.height(Space.x3))
+            if (kcal != null) {
+                SessionCard(label = "Calorías", dark = dark) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            "~$kcal",
+                            style = styles.displayCard,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            " kcal",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                    }
+                    Text(
+                        if (viewModel.usesWatch)
+                            "Estimadas por tu peso y el tiempo. Las de verdad las mide tu reloj: " +
+                                "míralas en Google Health."
+                        else "Estimadas por tu peso y el tiempo que ha durado, no medidas.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                SessionCard(label = "Calorías", dark = dark) {
+                    Text(
+                        "Pon tu peso en Ajustes y las calcularé al acabar cada entreno.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
             if (weights.isNotEmpty()) {
                 Spacer(Modifier.height(Space.x3))

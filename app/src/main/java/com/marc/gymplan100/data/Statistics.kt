@@ -190,6 +190,25 @@ object Statistics {
     /** Kilos movidos en total, sumando todos los días con desglose. */
     fun totalVolume(progress: ProgressState): Float = volumeByDay(progress).values.sum()
 
+    // ------------------------------------------------------------ Calorías del entreno
+
+    /** MET de un entreno de fuerza vigoroso, que es lo que hace la app. */
+    const val MET_FUERZA = 5.0
+
+    /**
+     * Calorías activas de un entreno con la fórmula MET estándar:
+     * `kcal = MET · 3,5 · peso_kg / 200 · minutos`.
+     *
+     * Null sin peso o sin tiempo: sin peso la cuenta no tiene base, y preferimos no enseñar un
+     * número inventado. Es una estimación por fórmula, no una medición: no sabe si has
+     * descansado de más ni cuánto te has esforzado, solo cuánto pesas y cuánto ha durado.
+     */
+    fun activeKcal(weightKg: Int, seconds: Int): Int? {
+        if (weightKg <= 0 || seconds <= 0) return null
+        val minutos = seconds / 60.0
+        return Math.round(MET_FUERZA * 3.5 * weightKg / 200.0 * minutos).toInt().takeIf { it > 0 }
+    }
+
     // ------------------------------------------------------------------- Constancia
 
     private fun millisToDate(millis: Long, zone: ZoneId): LocalDate =

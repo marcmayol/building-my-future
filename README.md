@@ -59,6 +59,7 @@ por `adb` (Wear OS no permite instalarlo desde el móvil fuera de Play Store).
 **Integraciones**
 - **Wear OS**: controla la sesión desde el reloj (p. ej. Pixel Watch). Si el reloj mide el pulso, las calorías reales las aporta Google Health y la app evita el doble conteo.
 - **Health Connect (Google Health)**: cada entreno se guarda automáticamente con su duración y el detalle de ejercicios y pesos; estimación de calorías activas (fórmula MET) cuando no hay reloj.
+- **Las calorías se ven al terminar**, en el resumen del día, dichas por lo que son: una estimación a partir de tu peso y del tiempo, no una medición. Con el reloj puesto, las de verdad las mide él y las lleva Google Health.
 
 Diseño con tema cálido naranja/magenta y **modo oscuro**, que puedes dejar en el del móvil o fijar en claro u oscuro desde *Ajustes → Tema*.
 

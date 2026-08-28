@@ -32,6 +32,7 @@ import com.marc.gymplan100.data.EjercicioCatalogo
 import com.marc.gymplan100.data.Protocolo
 import com.marc.gymplan100.data.Rutina
 import com.marc.gymplan100.data.SessionEngine
+import com.marc.gymplan100.data.Statistics
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.data.SessionRecord
 import com.marc.gymplan100.data.SetLog
@@ -1304,14 +1305,21 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * vigoroso). Devuelve null si no hay peso definido, porque sin peso la estimación no
      * tiene base y preferimos no inventar un número.
      */
-    private fun estimateActiveKcal(startMillis: Long, endMillis: Long): Double? {
-        val weightKg = _profile.value.weightKg
-        if (weightKg <= 0) return null
-        val minutes = (endMillis - startMillis).coerceAtLeast(0L) / 60000.0
-        if (minutes <= 0) return null
-        val met = 5.0
-        return met * 3.5 * weightKg / 200.0 * minutes
-    }
+    private fun estimateActiveKcal(startMillis: Long, endMillis: Long): Double? =
+        estimatedKcal(((endMillis - startMillis).coerceAtLeast(0L) / 1000).toInt())?.toDouble()
+
+    /**
+     * Calorías estimadas de un entreno de [seconds] segundos, para enseñarlas al terminar.
+     *
+     * Se calculan aunque se entrene con reloj: a Google Health no se le mandan (las suyas son
+     * de verdad, medidas con el pulso, y duplicarlas sería mentir), pero enseñar el número en
+     * la pantalla del resumen no duplica nada y responde a la única pregunta que todo el mundo
+     * se hace al acabar.
+     */
+    fun estimatedKcal(seconds: Int): Int? = Statistics.activeKcal(_profile.value.weightKg, seconds)
+
+    /** El usuario entrena con reloj: las calorías buenas las tiene Google Health, no nosotros. */
+    val usesWatch: Boolean get() = _profile.value.usesWatch
 
     /** Construye el detalle (ejercicios + pesos + duración) que se guarda en las notas de la sesión. */
     private fun buildWorkoutNotes(
