@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        Permisos que Google Play tiene restringidos y que esta variante no necesita:
+
+        · USE_EXACT_ALARM está reservado a apps cuya función principal es ser despertador o
+          calendario. Un temporizador de descanso no encaja ahí, así que la variante de Play
+          se queda solo con SCHEDULE_EXACT_ALARM, que concede el usuario desde Ajustes.
+
+        · REQUEST_IGNORE_BATTERY_OPTIMIZATIONS tiene una lista tasada de usos permitidos y
+          "que suene el aviso del descanso" no está en ella. El aviso de la portada sigue
+          llevando al ajuste del sistema, que es la vía correcta.
+    -->
+    <uses-permission
+        android:name="android.permission.USE_EXACT_ALARM"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+        tools:node="remove" />
+</manifest>

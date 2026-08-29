@@ -41,7 +41,10 @@ RAIZ = Path(__file__).resolve().parents[1]
 GRADLE_PROPS = RAIZ / "gradle.properties"
 MANIFIESTO = RAIZ / "docs" / "updates.json"
 FIRMA_ESPERADA = RAIZ / "scripts" / "firma_esperada.txt"
-APK_MOVIL = RAIZ / "app" / "build" / "outputs" / "apk" / "release" / "app-release.apk"
+# La app se compila en dos sabores: `directo` (el que se reparte aqui, con su
+# auto-actualizacion) y `play` (para la tienda, sin ella). Este script publica SIEMPRE el
+# directo: es el que instalan quienes vienen por esta pagina.
+APK_MOVIL = RAIZ / "app" / "build" / "outputs" / "apk" / "directo" / "release" / "app-directo-release.apk"
 APK_RELOJ = RAIZ / "wear" / "build" / "outputs" / "apk" / "release" / "wear-release.apk"
 
 _REPO = "marcmayol/building-my-future"
@@ -248,7 +251,7 @@ def verificar_coherencia(vc_declarado: int, apk: Path, reloj: Path, manifiesto: 
 
 def construir() -> tuple[Path, Path]:
     asegurar_firma()
-    _ejecutar([_gradlew(), ":app:assembleRelease", ":wear:assembleRelease"])
+    _ejecutar([_gradlew(), ":app:assembleDirectoRelease", ":wear:assembleRelease"])
     for ruta in (APK_MOVIL, APK_RELOJ):
         if not ruta.is_file():
             raise SystemExit(f"No se generó el APK de release: {ruta}")

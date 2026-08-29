@@ -5,6 +5,8 @@
 
 package com.marc.gymplan100.ui
 
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +56,7 @@ import androidx.health.connect.client.PermissionController
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
+import com.marc.gymplan100.update.Updates
 import com.marc.gymplan100.data.Backup
 import com.marc.gymplan100.data.BackupFile
 import kotlinx.coroutines.Dispatchers
@@ -70,9 +73,6 @@ import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.UserProfile
-import com.marcm.actualizador.EstadoActualizacion
-import com.marcm.actualizador.Modo
-import com.marcm.actualizador.TipoError
 import kotlinx.coroutines.launch
 
 private val WEIGHTS = (30..200).toList()      // kg
@@ -273,7 +273,9 @@ fun SettingsScreen(
 
             item { SeccionCopia(viewModel) }
 
-            item { SeccionActualizaciones() }
+            item { Bloque { Updates.SettingsSection() } }
+
+            item { SeccionCreditos() }
 
             item {
                 Bloque {
@@ -444,6 +446,54 @@ private fun SeccionRecordatorios() {
     }
 }
 
+/**
+ * De dónde salen las ilustraciones y con qué licencia.
+ *
+ * No es un adorno: las 166 imágenes de los ejercicios son de everkinetic y están bajo
+ * CC BY-SA 4.0, que permite usarlas —también comercialmente— pero **exige citar al autor**.
+ * Hasta ahora el crédito solo estaba en el README del repositorio, donde no lo ve nadie que
+ * use la app. Aquí sí.
+ */
+@Composable
+private fun SeccionCreditos() {
+    val context = LocalContext.current
+    Bloque {
+        Text("Créditos", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.size(Space.x1))
+        Text(
+            "Las ilustraciones de los ejercicios son del set libre everkinetic, " +
+                "con licencia Creative Commons BY-SA 4.0.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.size(Space.x2))
+        Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
+            TextButton(onClick = {
+                context.startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/everkinetic/data"))
+                )
+            }) { Text("Ver el set", maxLines = 1) }
+            TextButton(onClick = {
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://creativecommons.org/licenses/by-sa/4.0/deed.es")
+                    )
+                )
+            }) { Text("La licencia", maxLines = 1) }
+        }
+        Spacer(Modifier.size(Space.x2))
+        TextButton(onClick = {
+            context.startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://marcmayol.com/building-my-future/privacidad.html")
+                )
+            )
+        }) { Text("Privacidad", maxLines = 1) }
+    }
+}
+
 @Composable
 private fun SeccionCopia(viewModel: PlanViewModel) {
     val context = LocalContext.current
@@ -551,106 +601,7 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
 }
 
 @Composable
-private fun SeccionActualizaciones() {
-    val context = LocalContext.current
-    val actualizador = remember(context) { (context.applicationContext as GymApp).actualizador }
-    val estado by actualizador.estado.collectAsState()
-    var buscarAuto by remember { mutableStateOf(actualizador.buscarAutomaticamente) }
-    val scope = rememberCoroutineScope()
-
-    Bloque {
-        Text("Actualizaciones", style = MaterialTheme.typography.titleMedium)
-        Spacer(Modifier.size(Space.x1))
-        Text(
-            "La app se instala fuera de Play Store, así que se actualiza sola desde " +
-                "su página de versiones.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.size(Space.x3))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Buscar actualizaciones", modifier = Modifier.weight(1f))
-            Spacer(Modifier.size(Space.x3))
-            Switch(
-                checked = buscarAuto,
-                onCheckedChange = {
-                    buscarAuto = it
-                    actualizador.buscarAutomaticamente = it
-                }
-            )
-        }
-        Spacer(Modifier.size(Space.x2))
-        OutlinedButton(
-            onClick = { scope.launch { actualizador.comprobar(Modo.MANUAL) } },
-            shape = CircleShape,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = Touch.primary)
-        ) { Text("Buscar ahora") }
-
-        if (estado is EstadoActualizacion.Disponible) {
-            Spacer(Modifier.size(Space.x2))
-            Button(
-                onClick = { actualizador.actualizarAhora() },
-                shape = CircleShape,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = Touch.primary)
-            ) {
-                Text(
-                    "Actualizar a la " +
-                        (estado as EstadoActualizacion.Disponible).info.versionName
-                )
-            }
-        }
-
-        EstadoComprobacionManual(estado)
-
-        Spacer(Modifier.size(Space.x3))
-        Text(
-            "Versión ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-/** Traduce el estado a una línea legible bajo el botón de comprobar. */
-@Composable
-private fun EstadoComprobacionManual(estado: EstadoActualizacion) {
-    val texto = when (estado) {
-        EstadoActualizacion.Comprobando -> "Buscando…"
-        EstadoActualizacion.AlDia -> "Estás al día ✓"
-        is EstadoActualizacion.Disponible -> null       // ya lo dice el botón
-        is EstadoActualizacion.Descargando -> "Descargando… ${estado.porcentaje}%"
-        EstadoActualizacion.Verificando -> "Comprobando la copia…"
-        EstadoActualizacion.Instalando -> "Instalando…"
-        is EstadoActualizacion.Error -> when (estado.tipo) {
-            TipoError.SIN_RED -> "Sin conexión. Inténtalo más tarde."
-            TipoError.HTTP, TipoError.MANIFIESTO -> "No se pudo consultar si hay versión nueva."
-            TipoError.DESCARGA -> "Falló la descarga."
-            TipoError.HASH -> "La descarga llegó corrupta y se ha borrado."
-            TipoError.INSTALACION -> estado.mensaje ?: "No se pudo instalar."
-        }
-        EstadoActualizacion.Inactivo, EstadoActualizacion.PidiendoPermiso -> null
-    }
-    if (texto != null) {
-        Spacer(Modifier.size(8.dp))
-        Text(
-            texto,
-            style = MaterialTheme.typography.bodySmall,
-            color = if (estado is EstadoActualizacion.Error) MaterialTheme.colorScheme.error
-            else MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-/** Un ajuste = un bloque de color. Sustituye a las tarjetas del diseño anterior. */
-@Composable
-private fun Bloque(content: @Composable () -> Unit) {
+internal fun Bloque(content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

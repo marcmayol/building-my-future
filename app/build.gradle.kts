@@ -40,6 +40,30 @@ android {
         }
     }
 
+    // Dos formas de repartir la MISMA app:
+    //
+    //  - `play`    va a Google Play, que prohibe que una app se actualice por fuera de la
+    //              tienda: aqui no entra el modulo :actualizador ni sus permisos.
+    //  - `directo` es la de siempre (DracApps y el movil de casa), con su auto-actualizacion.
+    //              Lleva sufijo en el applicationId para poder tener las dos a la vez: una
+    //              como app de verdad y otra como banco de pruebas.
+    flavorDimensions += "distribucion"
+    productFlavors {
+        create("play") {
+            dimension = "distribucion"
+            // Identidad nueva y definitiva para la tienda, sobre el dominio propio: el
+            // applicationId de una app publicada en Play NO se puede cambiar nunca, y
+            // "gymplan100" era el nombre de trabajo de hace cuatro versiones, no el de la app.
+            applicationId = "com.marcmayol.buildingmyfuture"
+        }
+        create("directo") {
+            dimension = "distribucion"
+            // Se queda con el applicationId de siempre a proposito: es la que ya esta
+            // instalada en los moviles de casa, y cambiarselo la convertiria en otra app
+            // distinta que habria que instalar a mano perdiendo el progreso.
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -72,7 +96,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":actualizador"))
+    // Solo en la variante que se reparte fuera de Play.
+    "directoImplementation"(project(":actualizador"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

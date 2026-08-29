@@ -21,7 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.marc.gymplan100.ui.GymNavHost
 import com.marc.gymplan100.ui.theme.AppTheme
 import com.marc.gymplan100.ui.theme.GymPlanTheme
-import com.marcm.actualizador.Modo
+import com.marc.gymplan100.update.Updates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
         // Es silenciosa: si falla (sin red, JSON roto…), no se entera nadie.
         lifecycleScope.launch {
             delay(3000)
-            (application as GymApp).actualizador.comprobar(Modo.AUTOMATICO)
+            Updates.checkOnOpen(this@MainActivity)
         }
     }
 
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         // Reanuda la actualización si el usuario acaba de conceder el permiso de
         // instalación, y deshace el "Instalando" cuando lo resolvió el sistema.
-        (application as GymApp).actualizador.onPermisoQuizaConcedido()
+        Updates.onResume(this)
     }
 
     override fun onNewIntent(intent: Intent) {

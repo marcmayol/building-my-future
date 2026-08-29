@@ -67,6 +67,7 @@ import java.util.Locale
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
+import com.marc.gymplan100.update.Updates
 import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.Phase
 import com.marc.gymplan100.data.PlanData
@@ -122,9 +123,6 @@ fun HomeScreen(
     }
     val showBatteryHint = !progress.batteryHintDismissed && !ignoringBattery
 
-    // Auto-actualización: el banner solo aparece si hay versión nueva o descarga en curso.
-    val actualizador = remember(context) { (context.applicationContext as GymApp).actualizador }
-    val estadoActualizacion by actualizador.estado.collectAsState()
 
     // La portada no vive dentro de un Scaffold, así que los márgenes del sistema se piden
     // aquí. Iban a ojo (44 dp) y la barra de estado de este móvil mide 48,8: el logo estaba
@@ -184,14 +182,9 @@ fun HomeScreen(
             )
         }
 
-        if (estadoActualizacion.pintaBanner) {
-            item {
-                BannerActualizacion(
-                    estado = estadoActualizacion,
-                    onActualizar = { actualizador.actualizarAhora() }
-                )
-            }
-        }
+        // El aviso de version nueva. En la variante de Play no pinta nada: alli avisa la
+        // propia tienda, y la app ni siquiera lleva el actualizador dentro.
+        item { Updates.Banner() }
 
         if (showBatteryHint) {
             item {
