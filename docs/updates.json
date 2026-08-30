@@ -1,8 +1,8 @@
 {
-  "versionCode": 27,
-  "versionName": "2.10",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.10/building-my-future-v2.10.apk",
-  "sha256": "489272dc1cbe0794a05a2b432e8be26908fcfdcd56cf1977d7f1629a0987bfce",
-  "notas": "Las calorias del entreno ya se ven al terminar el dia.",
+  "versionCode": 28,
+  "versionName": "2.11",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.11/building-my-future-v2.11.apk",
+  "sha256": "be94102f2b05c58df63dc278cac9275336bdc8a6faefd0db829cebdcbdfbb3dd",
+  "notas": "Aviso cuando falta el permiso de alarmas exactas, que es lo que hace que el descanso suene puntual.",
   "check_horas": 24
 }
