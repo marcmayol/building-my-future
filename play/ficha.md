@@ -86,10 +86,40 @@ Hay que rellenar la declaración aparte. Lo que hace la app:
 
 ---
 
+## Una sola ficha, dos artefactos
+
+Wear OS **no lleva ficha aparte**: el móvil y el reloj van en la MISMA app de Play y en la
+misma versión. Quien busque la app desde el reloj la verá porque el artefacto del reloj
+declara `uses-feature android.hardware.type.watch`.
+
+Para que Play los acepte juntos hacen falta tres cosas, y las tres están ya:
+
+| | |
+|---|---|
+| Mismo `applicationId` | `com.marcmayol.buildingmyfuture` en los dos |
+| `versionCode` **distinto** por artefacto | móvil `N`, reloj `N + 10000` (28 y 10028) |
+| El reloj declarado como dependiente | `com.google.android.wearable.standalone = false` |
+
+Ese `standalone=false` es importante y es verdad: el móvil es el cerebro y el reloj es el
+mando. Si dijera `true`, Play ofrecería la app a relojes sin el teléfono y no funcionaría.
+
+```
+gradlew.bat :app:bundlePlayRelease     -> app/build/outputs/bundle/playRelease/app-play-release.aab
+gradlew.bat :wear:bundlePlayRelease    -> wear/build/outputs/bundle/playRelease/wear-play-release.aab
+```
+
+Los dos se suben a la **misma release** del mismo track.
+
 ## Antes de subir
 
-1. **Compilar el sabor `play`**, nunca el `directo`:
-   `gradlew.bat :app:bundlePlayRelease` (Play prefiere AAB) y `:wear:assemblePlayRelease` si se sube el reloj.
-2. **Play App Signing**: el keystore actual (`building-my-future-release.jks`) pasa a ser la *upload key*. Guardarlo como oro.
-3. **La app del reloj va aparte** y con el mismo applicationId (`com.marcmayol.buildingmyfuture`); si no, la Data Layer no las empareja.
-4. Si la cuenta es personal y nueva: **12 testers durante 14 días seguidos** en test cerrado antes de poder pasar a producción.
+1. **Compilar el sabor `play`**, nunca el `directo`: el directo lleva el auto-actualizador y
+   eso es rechazo seguro.
+2. **Subir los DOS bundles a la misma release**: el del móvil y el del reloj. No son dos apps
+   ni dos fichas (ver arriba).
+3. **Play App Signing**: el keystore actual (`building-my-future-release.jks`) pasa a ser la
+   *upload key*. Guardarlo como oro: sin él no se puede volver a subir nada.
+4. Si la cuenta es personal y nueva: **12 testers durante 14 días seguidos** en test cerrado
+   antes de poder pasar a producción.
+5. Ese periodo de prueba es buen momento para **migrar tu móvil y el de tu padre**: guardar
+   copia desde Ajustes, instalar la de Play, restaurar. Hasta entonces, la app directa sigue
+   funcionando y actualizándose como siempre.

@@ -49,6 +49,11 @@ android {
         create("play") {
             dimension = "distribucion"
             applicationId = "com.marcmayol.buildingmyfuture"
+            // Movil y reloj van en la MISMA ficha de Play, y Play exige que cada artefacto
+            // tenga su propio versionCode: con los dos en 28 rechaza el segundo que subas.
+            // El offset deja las dos series separadas para siempre y se lee de un vistazo
+            // (10028 = reloj de la 28) en vez de tener que acordarse de sumar uno a mano.
+            versionCode = providers.gradleProperty("appVersionCode").get().toInt() + 10_000
         }
         create("directo") {
             dimension = "distribucion"
