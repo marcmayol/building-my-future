@@ -40,6 +40,21 @@ android {
         }
     }
 
+    // Los mismos dos sabores que el movil, y por un motivo que no es cosmetico: la capa de
+    // datos de Wear OS empareja el reloj con el telefono por applicationId. Un reloj
+    // `com.marc.gymplan100` no le hablaria a la app de Play, que es
+    // `com.marcmayol.buildingmyfuture`, y el mando dejaria de funcionar.
+    flavorDimensions += "distribucion"
+    productFlavors {
+        create("play") {
+            dimension = "distribucion"
+            applicationId = "com.marcmayol.buildingmyfuture"
+        }
+        create("directo") {
+            dimension = "distribucion"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false

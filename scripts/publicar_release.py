@@ -45,7 +45,7 @@ FIRMA_ESPERADA = RAIZ / "scripts" / "firma_esperada.txt"
 # auto-actualizacion) y `play` (para la tienda, sin ella). Este script publica SIEMPRE el
 # directo: es el que instalan quienes vienen por esta pagina.
 APK_MOVIL = RAIZ / "app" / "build" / "outputs" / "apk" / "directo" / "release" / "app-directo-release.apk"
-APK_RELOJ = RAIZ / "wear" / "build" / "outputs" / "apk" / "release" / "wear-release.apk"
+APK_RELOJ = RAIZ / "wear" / "build" / "outputs" / "apk" / "directo" / "release" / "wear-directo-release.apk"
 
 _REPO = "marcmayol/building-my-future"
 _PAGES_URL = "https://marcmayol.com/building-my-future/updates.json"
@@ -251,7 +251,7 @@ def verificar_coherencia(vc_declarado: int, apk: Path, reloj: Path, manifiesto: 
 
 def construir() -> tuple[Path, Path]:
     asegurar_firma()
-    _ejecutar([_gradlew(), ":app:assembleDirectoRelease", ":wear:assembleRelease"])
+    _ejecutar([_gradlew(), ":app:assembleDirectoRelease", ":wear:assembleDirectoRelease"])
     for ruta in (APK_MOVIL, APK_RELOJ):
         if not ruta.is_file():
             raise SystemExit(f"No se generó el APK de release: {ruta}")

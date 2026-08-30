@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 108 108">
+  <defs>
+    <radialGradient id="fondo" gradientUnits="userSpaceOnUse" cx="54" cy="17" r="120">
+      <stop offset="0" stop-color="#2A1410"/>
+      <stop offset="0.55" stop-color="#161013"/>
+      <stop offset="1" stop-color="#0A0708"/>
+    </radialGradient>
+      <linearGradient id="g0" gradientUnits="userSpaceOnUse" x1="56" y1="52" x2="144" y2="68"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g1" gradientUnits="userSpaceOnUse" x1="40" y1="28" x2="58" y2="92"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g2" gradientUnits="userSpaceOnUse" x1="22" y1="38" x2="37" y2="82"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g3" gradientUnits="userSpaceOnUse" x1="10" y1="48" x2="20" y2="72"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g4" gradientUnits="userSpaceOnUse" x1="142" y1="28" x2="160" y2="92"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g5" gradientUnits="userSpaceOnUse" x1="163" y1="38" x2="178" y2="82"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g6" gradientUnits="userSpaceOnUse" x1="180" y1="48" x2="190" y2="72"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g7" gradientUnits="userSpaceOnUse" x1="56" y1="52" x2="144" y2="68"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g8" gradientUnits="userSpaceOnUse" x1="40" y1="28" x2="58" y2="92"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g9" gradientUnits="userSpaceOnUse" x1="22" y1="38" x2="37" y2="82"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g10" gradientUnits="userSpaceOnUse" x1="10" y1="48" x2="20" y2="72"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g11" gradientUnits="userSpaceOnUse" x1="142" y1="28" x2="160" y2="92"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g12" gradientUnits="userSpaceOnUse" x1="163" y1="38" x2="178" y2="82"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+      <linearGradient id="g13" gradientUnits="userSpaceOnUse" x1="180" y1="48" x2="190" y2="72"><stop offset="0" stop-color="#FFB24D"/><stop offset="0.5" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2E6E"/></linearGradient>
+  </defs>
+  <rect width="108" height="108" fill="url(#fondo)"/>
+  <g transform="translate(-46,-46) translate(100,100) scale(0.47) translate(-100,-100)">
+    <g transform="translate(0,40) translate(100,60) rotate(-34) scale(0.78) translate(-100,-60)">
+      <path d="M64,52 L136,52 A8,8 0 0 1 144,60 L144,60 A8,8 0 0 1 136,68 L64,68 A8,8 0 0 1 56,60 L56,60 A8,8 0 0 1 64,52 Z" fill="url(#g0)" fill-opacity="0.5"/>
+      <path d="M47,28 L51,28 A7,7 0 0 1 58,35 L58,85 A7,7 0 0 1 51,92 L47,92 A7,7 0 0 1 40,85 L40,35 A7,7 0 0 1 47,28 Z" fill="url(#g1)" fill-opacity="0.5"/>
+      <path d="M28,38 L31,38 A6,6 0 0 1 37,44 L37,76 A6,6 0 0 1 31,82 L28,82 A6,6 0 0 1 22,76 L22,44 A6,6 0 0 1 28,38 Z" fill="url(#g2)" fill-opacity="0.5"/>
+      <path d="M15,48 L15,48 A5,5 0 0 1 20,53 L20,67 A5,5 0 0 1 15,72 L15,72 A5,5 0 0 1 10,67 L10,53 A5,5 0 0 1 15,48 Z" fill="url(#g3)" fill-opacity="0.5"/>
+      <path d="M149,28 L153,28 A7,7 0 0 1 160,35 L160,85 A7,7 0 0 1 153,92 L149,92 A7,7 0 0 1 142,85 L142,35 A7,7 0 0 1 149,28 Z" fill="url(#g4)" fill-opacity="0.5"/>
+      <path d="M169,38 L172,38 A6,6 0 0 1 178,44 L178,76 A6,6 0 0 1 172,82 L169,82 A6,6 0 0 1 163,76 L163,44 A6,6 0 0 1 169,38 Z" fill="url(#g5)" fill-opacity="0.5"/>
+      <path d="M185,48 L185,48 A5,5 0 0 1 190,53 L190,67 A5,5 0 0 1 185,72 L185,72 A5,5 0 0 1 180,67 L180,53 A5,5 0 0 1 185,48 Z" fill="url(#g6)" fill-opacity="0.5"/>
+    </g>
+    <g transform="translate(0,40) translate(100,60) rotate(34) scale(0.78) translate(-100,-60)">
+      <path d="M64,52 L136,52 A8,8 0 0 1 144,60 L144,60 A8,8 0 0 1 136,68 L64,68 A8,8 0 0 1 56,60 L56,60 A8,8 0 0 1 64,52 Z" fill="url(#g7)" fill-opacity="1"/>
+      <path d="M47,28 L51,28 A7,7 0 0 1 58,35 L58,85 A7,7 0 0 1 51,92 L47,92 A7,7 0 0 1 40,85 L40,35 A7,7 0 0 1 47,28 Z" fill="url(#g8)" fill-opacity="1"/>
+      <path d="M28,38 L31,38 A6,6 0 0 1 37,44 L37,76 A6,6 0 0 1 31,82 L28,82 A6,6 0 0 1 22,76 L22,44 A6,6 0 0 1 28,38 Z" fill="url(#g9)" fill-opacity="1"/>
+      <path d="M15,48 L15,48 A5,5 0 0 1 20,53 L20,67 A5,5 0 0 1 15,72 L15,72 A5,5 0 0 1 10,67 L10,53 A5,5 0 0 1 15,48 Z" fill="url(#g10)" fill-opacity="1"/>
+      <path d="M149,28 L153,28 A7,7 0 0 1 160,35 L160,85 A7,7 0 0 1 153,92 L149,92 A7,7 0 0 1 142,85 L142,35 A7,7 0 0 1 149,28 Z" fill="url(#g11)" fill-opacity="1"/>
+      <path d="M169,38 L172,38 A6,6 0 0 1 178,44 L178,76 A6,6 0 0 1 172,82 L169,82 A6,6 0 0 1 163,76 L163,44 A6,6 0 0 1 169,38 Z" fill="url(#g12)" fill-opacity="1"/>
+      <path d="M185,48 L185,48 A5,5 0 0 1 190,53 L190,67 A5,5 0 0 1 185,72 L185,72 A5,5 0 0 1 180,67 L180,53 A5,5 0 0 1 185,48 Z" fill="url(#g13)" fill-opacity="1"/>
+    </g>
+  </g>
+</svg>
