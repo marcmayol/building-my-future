@@ -88,6 +88,44 @@ object RestReminder {
         }
     }
 
+    /**
+     * ¿Nos deja el sistema despertar a la hora exacta?
+     *
+     * Importa más de lo que parece: sin ese permiso el aviso del descanso se programa como
+     * inexacto y Android puede retrasarlo varios minutos para agrupar trabajo, que en una app
+     * cuyo trabajo es avisar a los noventa segundos lo estropea todo. Hasta ahora nunca fallaba
+     * porque el manifiesto pedía USE_EXACT_ALARM, que se concede solo; la versión de Google
+     * Play no puede pedirlo (está reservado a despertadores y calendarios), así que ahí sí
+     * hace falta preguntar.
+     */
+    fun canScheduleExact(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
+        return context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
+    }
+
+    /** Lleva al ajuste del sistema donde se concede. */
+    fun openExactAlarmSettings(context: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+        runCatching {
+            context.startActivity(
+                Intent(
+                    android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                    android.net.Uri.parse("package:" + context.packageName)
+                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        }.onFailure {
+            // Algunos fabricantes no traen esa pantalla: se abre la ficha de la app.
+            runCatching {
+                context.startActivity(
+                    Intent(
+                        android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        android.net.Uri.parse("package:" + context.packageName)
+                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            }
+        }
+    }
+
     fun schedule(context: Context, triggerAtMillis: Long, kind: Int, dayNumber: Int) {
         ensureChannel(context)
         val am = context.getSystemService(AlarmManager::class.java)

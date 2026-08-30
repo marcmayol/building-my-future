@@ -67,6 +67,7 @@ import java.util.Locale
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
+import com.marc.gymplan100.notify.RestReminder
 import com.marc.gymplan100.update.Updates
 import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.Phase
@@ -122,6 +123,19 @@ fun HomeScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val showBatteryHint = !progress.batteryHintDismissed && !ignoringBattery
+
+    // Sin permiso de alarmas exactas el aviso del descanso llega tarde, y en la version de
+    // Google Play no se puede dar por hecho: alli el permiso que se concedia solo no existe.
+    var puedeExactas by remember { mutableStateOf(RestReminder.canScheduleExact(context)) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                puedeExactas = RestReminder.canScheduleExact(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
 
     // La portada no vive dentro de un Scaffold, así que los márgenes del sistema se piden
@@ -185,6 +199,38 @@ fun HomeScreen(
         // El aviso de version nueva. En la variante de Play no pinta nada: alli avisa la
         // propia tienda, y la app ni siquiera lleva el actualizador dentro.
         item { Updates.Banner() }
+
+        if (!puedeExactas) {
+            item {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(Space.x4)) {
+                        Text(
+                            "El descanso puede llegar tarde",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(Modifier.height(Space.x1))
+                        Text(
+                            "Para que el aviso suene justo a los 90 segundos, y no cuando al " +
+                                "sistema le venga bien, hay que darle permiso para alarmas exactas.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(Space.x3))
+                        Button(
+                            onClick = { RestReminder.openExactAlarmSettings(context) },
+                            shape = CircleShape,
+                            modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
+                        ) { Text("Dar permiso", maxLines = 1) }
+                    }
+                }
+            }
+        }
 
         if (showBatteryHint) {
             item {
