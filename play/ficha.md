@@ -108,35 +108,40 @@ Hay que rellenar la declaración aparte. Lo que hace la app:
 
 ---
 
-## Una sola ficha, dos artefactos
+## El reloj va aparte (esto estaba mal escrito)
 
-Wear OS **no lleva ficha aparte**: el móvil y el reloj van en la MISMA app de Play y en la
-misma versión. Quien busque la app desde el reloj la verá porque el artefacto del reloj
-declara `uses-feature android.hardware.type.watch`.
+Aqui decia que el movil y el reloj iban en la **misma release**. **Es falso**, y Play lo dice con
+un error al intentarlo:
 
-Para que Play los acepte juntos hacen falta tres cosas, y las tres están ya:
+> *Este APK o paquete requiere la funcion `android.hardware.type.watch` del sistema Wear OS.
+> Para publicar esta version en el canal actual, debes quitar este artefacto.*
 
-| | |
+Play separa por **factor de forma**. Arriba a la derecha, en *Probar y publicar*, hay un
+selector con dos entradas:
+
+| Factor de forma | Que se sube ahi |
 |---|---|
-| Mismo `applicationId` | `com.marcmayol.buildingmyfuture` en los dos |
-| `versionCode` **distinto** por artefacto | móvil `N`, reloj `N + 10000` (31 y 10031) |
-| El reloj declarado como dependiente | `com.google.android.wearable.standalone = false` |
+| Teléfonos, Tablets, Chrome OS, Android XR | el bundle del **movil** |
+| **Solo en Wear OS** | el bundle del **reloj** |
 
-Ese `standalone=false` es importante y es verdad: el móvil es el cerebro y el reloj es el
-mando. Si dijera `true`, Play ofrecería la app a relojes sin el teléfono y no funcionaría.
+Son **dos versiones distintas**, cada una en su canal, aunque compartan ficha y `applicationId`.
+Lo que si sigue siendo cierto es que necesitan `versionCode` distinto (movil `N`, reloj
+`N + 10000`) y que el reloj declare `standalone = false`.
 
 ```
 gradlew.bat :app:bundlePlayRelease     -> app/build/outputs/bundle/playRelease/app-play-release.aab
 gradlew.bat :wear:bundlePlayRelease    -> wear/build/outputs/bundle/playRelease/wear-play-release.aab
 ```
 
-Los dos se suben a la **misma release** del mismo track.
+## El nivel de API minimo sube solo
 
-> **Mira siempre qué hay subido antes de numerar.** El `versionCode` solo puede subir, y el
-> historial no es correlativo: a 5-sep-2026 el explorador de app bundles tiene **30** y **28**
-> del móvil y **10029** y **10028** del reloj. Un 29 se habría rechazado dos veces —el móvil
-> por debajo del 30, y el reloj chocando con un 10029 que ya existe—, así que la 2.12 va con
-> **31 / 10031**. Saltar números no cuesta nada; repetirlos, una subida perdida.
+Play exige un `targetSdk` minimo y lo va subiendo cada año. A 6-sep-2026 pide **36**, y con 35
+rechaza la subida:
+
+> *Actualmente, tu aplicacion esta orientada al nivel 35 de la API, pero debe orientarse, al
+> menos, al nivel 36.*
+
+Ojo: el `targetSdk` del **reloj** tambien cuenta, no solo el del movil.
 
 ## Antes de subir
 

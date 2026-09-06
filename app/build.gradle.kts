@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId = "com.marc.gymplan100"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         // Fuente única en gradle.properties: la comparten el reloj y el manifiesto
         // de actualizaciones, así que no puede haber dos numeraciones desalineadas.
         versionCode = providers.gradleProperty("appVersionCode").get().toInt()

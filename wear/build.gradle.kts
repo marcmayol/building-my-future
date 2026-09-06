@@ -15,14 +15,14 @@ val keystoreProps = Properties().apply {
 
 android {
     namespace = "com.marc.gymplan100.wear"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         // Mismo applicationId que el móvil: así Wear OS las reconoce como la misma app
         // y la instalación del reloj se asocia al teléfono.
         applicationId = "com.marc.gymplan100"
         minSdk = 30
-        targetSdk = 35
+        targetSdk = 36
         // Misma versión que el móvil (gradle.properties): el APK del reloj viaja como
         // asset de la misma Release y así se sabe de un vistazo cuál llevas puesta.
         versionCode = providers.gradleProperty("appVersionCode").get().toInt()
