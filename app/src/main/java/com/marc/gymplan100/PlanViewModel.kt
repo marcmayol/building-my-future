@@ -173,9 +173,31 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         _needsWelcome.value = false
     }
 
+    private val _needsTour = MutableStateFlow(false)
+    /**
+     * El recorrido de la primera vez. Va **detrás** de la bienvenida: primero se elige plan y
+     * luego se enseña la app, ya con la portada llena y con cada sitio que se nombra existiendo
+     * de verdad.
+     */
+    val needsTour: StateFlow<Boolean> = _needsTour.asStateFlow()
+
+    /** Lo ha visto entero o lo ha saltado: no vuelve a salir solo. */
+    fun tourDone() {
+        PlanStore.marcarTourVisto(getApplication())
+        _needsTour.value = false
+    }
+
+    /** Volver a verlo a mano, desde Ajustes. */
+    fun showTourAgain() {
+        _needsTour.value = true
+    }
+
     private fun refreshWelcome() {
         val hayProgreso = _progress.value.completedDays.isNotEmpty() || _history.value.isNotEmpty()
         _needsWelcome.value = PlanStore.necesitaBienvenida(getApplication(), hayProgreso)
+        // Se pregunta AQUI y no mas tarde: en cuanto elija plan, marcarPlanElegido borra la
+        // unica senal que distingue a quien estrena la app de quien lleva un ano con ella.
+        _needsTour.value = PlanStore.necesitaTour(getApplication(), hayProgreso)
     }
 
     private fun refreshPlans() {

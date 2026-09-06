@@ -98,6 +98,9 @@ android {
 dependencies {
     // Solo en la variante que se reparte fuera de Play.
     "directoImplementation"(project(":actualizador"))
+    // Y solo en la de Play: las estrellas dentro de la app. La pinta la tienda, asi que esta
+    // libreria no aporta ningun permiso ni ninguna conexion propia.
+    "playImplementation"(libs.play.review)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

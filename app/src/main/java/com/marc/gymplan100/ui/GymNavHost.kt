@@ -261,6 +261,13 @@ fun GymNavHost(
             )
         }
 
+        // Y detrás de la bienvenida, el recorrido: qué hace la app y dónde está cada cosa. Los
+        // dos van encima de todo, pero nunca a la vez.
+        val needsTour by viewModel.needsTour.collectAsState()
+        if (!needsWelcome && needsTour) {
+            TourScreen(onDone = { viewModel.tourDone() })
+        }
+
         celebration?.let {
             CelebrationDialog(
                 celebration = it,

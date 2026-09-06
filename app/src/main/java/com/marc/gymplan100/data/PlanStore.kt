@@ -23,6 +23,7 @@ object PlanStore {
 
     /** Ya se eligió plan alguna vez (a mano o con el asistente): no hay que dar la bienvenida. */
     private const val KEY_ELEGIDO = "plan_elegido_alguna_vez"
+    private const val KEY_TOUR = "tour_visto"
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
@@ -81,6 +82,29 @@ object PlanStore {
         prefs(context).edit().putBoolean(KEY_ELEGIDO, true).apply()
     }
 
+    /**
+     * ¿Hay que enseñarle la app por dentro?
+     *
+     * Solo a quien la estrena, y **hay que preguntarlo antes de que elija plan**: en cuanto
+     * elige, [marcarPlanElegido] deja [KEY_ELEGIDO] a `true` y esto ya no sabría distinguir al
+     * recién llegado del que lleva un año. Por eso se decide a la vez que la bienvenida y se
+     * guarda la respuesta, en lugar de volver a preguntarla más tarde.
+     */
+    fun necesitaTour(context: Context, tieneProgreso: Boolean): Boolean {
+        val p = prefs(context)
+        if (p.getBoolean(KEY_TOUR, false)) return false
+        if (tieneProgreso || p.getBoolean(KEY_ELEGIDO, false)) {
+            marcarTourVisto(context)
+            return false
+        }
+        return true
+    }
+
+    /** Ya ha visto el recorrido (o lo ha saltado): no vuelve a salir solo. */
+    fun marcarTourVisto(context: Context) {
+        prefs(context).edit().putBoolean(KEY_TOUR, true).apply()
+    }
+
     /** El plan activo; si el guardado ya no existe, se vuelve al de la app. */
     fun activePlan(context: Context): TrainingPlan {
         val id = activeId(context)
@@ -121,6 +145,7 @@ object PlanStore {
         p.getString(KEY_PLANS, null)?.let { out[KEY_PLANS] = it }
         p.getString(KEY_ACTIVE, null)?.let { out[KEY_ACTIVE] = it }
         out[KEY_ELEGIDO] = p.getBoolean(KEY_ELEGIDO, false).toString()
+        out[KEY_TOUR] = p.getBoolean(KEY_TOUR, false).toString()
         return out
     }
 
@@ -131,6 +156,10 @@ object PlanStore {
             .putString(KEY_PLANS, values[KEY_PLANS])
             .putString(KEY_ACTIVE, values[KEY_ACTIVE])
             .putBoolean(KEY_ELEGIDO, values[KEY_ELEGIDO]?.toBoolean() ?: true)
+            // Restaurar una copia NO es estrenar la app: el `clear()` de arriba se lleva por
+            // delante la marca del recorrido, y sin esto volvería a salir en un móvil nuevo
+            // con todo el progreso dentro. Ante la duda, por visto.
+            .putBoolean(KEY_TOUR, values[KEY_TOUR]?.toBoolean() ?: true)
             .commit()
     }
 

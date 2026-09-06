@@ -57,6 +57,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import com.marc.gymplan100.update.Updates
+import com.marc.gymplan100.review.Valoracion
 import com.marc.gymplan100.data.Backup
 import com.marc.gymplan100.data.BackupFile
 import kotlinx.coroutines.Dispatchers
@@ -274,6 +275,28 @@ fun SettingsScreen(
             item { SeccionCopia(viewModel) }
 
             item { Bloque { Updates.SettingsSection() } }
+
+            item {
+                Bloque {
+                    Text("Cómo funciona", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.size(Space.x1))
+                    Text(
+                        "El recorrido de la primera vez: qué hace la app y dónde está cada " +
+                            "cosa. Se puede volver a ver siempre que quieras.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.size(Space.x2))
+                    TextButton(onClick = {
+                        // El recorrido se dibuja encima de todo desde el NavHost, así que hay
+                        // que salir de Ajustes o quedaría esta pantalla debajo esperando.
+                        onBack()
+                        viewModel.showTourAgain()
+                    }) { Text("Ver el recorrido", maxLines = 1) }
+                }
+            }
+
+            item { Bloque { Valoracion.SettingsSection() } }
 
             item { SeccionCreditos() }
 

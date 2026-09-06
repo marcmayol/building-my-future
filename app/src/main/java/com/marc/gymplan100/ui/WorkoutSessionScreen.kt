@@ -69,6 +69,7 @@ import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.MuscleTargets
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.review.Valoracion
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.setsSummary
 import com.marc.gymplan100.data.contar
@@ -103,6 +104,15 @@ fun WorkoutSessionScreen(
     var apuntando by remember { mutableStateOf(false) }
     var tiempoLibre by remember { mutableStateOf(0L) }
     val dark = isSystemInDarkTheme()
+    val context = LocalContext.current
+
+    // Terminar de entrenar es el unico momento en que tiene sentido preguntar por la app: se
+    // acaba de usar para lo que sirve. Quien decide si hoy toca —y si toca alguna vez— es
+    // Valoracion; aqui solo se le dice que el entreno ha terminado.
+    fun cierraElEntreno() {
+        Valoracion.trasEntrenar(context)
+        onExit()
+    }
 
     // Reloj que avanza cada medio segundo para refrescar cronómetros.
     var now by remember { mutableStateOf(System.currentTimeMillis()) }
@@ -134,8 +144,8 @@ fun WorkoutSessionScreen(
             FreeSessionLog(
                 day = day,
                 elapsedMs = tiempoLibre,
-                onSave = { apuntado -> viewModel.finishFreeSession(apuntado); onExit() },
-                onSkip = { viewModel.finishSession(); onExit() }
+                onSave = { apuntado -> viewModel.finishFreeSession(apuntado); cierraElEntreno() },
+                onSkip = { viewModel.finishSession(); cierraElEntreno() }
             )
         } else {
             FreeContent(
@@ -148,7 +158,7 @@ fun WorkoutSessionScreen(
         }
         SessionPhase.FINISHED -> FinishedContent(
             s = s, day = day, now = now, dark = dark, viewModel = viewModel,
-            onFinish = { viewModel.finishSession(); onExit() },
+            onFinish = { viewModel.finishSession(); cierraElEntreno() },
             onExit = { showQuitDialog = true }
         )
     }
