@@ -8,8 +8,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.app.ActivityCompat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,13 +28,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.ambient.AmbientLifecycleObserver
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.ScalingLazyListScope
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.PositionIndicator
+import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import kotlinx.coroutines.delay
 
@@ -115,105 +125,149 @@ fun WearApp(ambient: State<Boolean>, ambientTick: State<Int>) {
     })
 
     MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-                .padding(horizontal = 12.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        // Lista con escala en vez de una Column fija: Play rechazó la 2.12 porque en un reloj
+        // redondo el último botón quedaba fuera del círculo y, con la fuente del sistema
+        // grande, el título se cortaba por los lados. Así el contenido hace scroll (con la
+        // corona también), lo que cae en los bordes se encoge y nada queda inalcanzable.
+        val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+        // La lista se centra en el primer elemento, que con la fuente grande deja el título
+        // pegado al borde de arriba. Arriba del todo, y otra vez en cada serie o ejercicio
+        // nuevo: lo primero que hay que ver es qué toca y el botón de «Serie hecha».
+        LaunchedEffect(state.active, state.exercise, state.setNumber) {
+            listState.scrollBy(-100_000f)
+        }
+        val config = LocalConfiguration.current
+        // Margen lateral en % de la pantalla (las pautas de Wear): en redonda la cuerda se
+        // estrecha arriba y abajo, así que el texto necesita bastante más aire que los chips.
+        val width = config.screenWidthDp.dp
+        val round = config.isScreenRound
+        val textPadding = if (round) width * 0.12f else width * 0.04f
+        val chipPadding = if (round) width * 0.10f else width * 0.02f
+        Scaffold(
+            modifier = Modifier.background(Color.Black),
+            positionIndicator = { if (!isAmbient) PositionIndicator(scalingLazyListState = listState) }
         ) {
-            if (!state.active) {
-                Text(
-                    text = "Sin entrenamiento en curso",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.title3,
-                    color = if (isAmbient) Color.Gray else MaterialTheme.colors.onBackground
-                )
-                if (!isAmbient) {
-                    Spacer(Modifier.height(10.dp))
-                    val label = if (state.nextDay > 0) "Empezar · Día ${state.nextDay}"
-                    else "Empezar entreno"
-                    Chip(
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(label, textAlign = TextAlign.Center) },
-                        onClick = { sendCommand(context, CMD_START) },
-                        colors = ChipDefaults.primaryChipColors()
+            ScalingLazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = listState,
+                autoCentering = null,
+                contentPadding = PaddingValues(
+                    top = config.screenHeightDp.dp * 0.15f,
+                    bottom = config.screenHeightDp.dp * 0.25f
+                ),
+                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (!state.active) {
+                    item {
+                        Text(
+                            text = "Sin entrenamiento en curso",
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = textPadding),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.title3,
+                            color = if (isAmbient) Color.Gray else MaterialTheme.colors.onBackground
+                        )
+                    }
+                    if (!isAmbient) {
+                        item {
+                            val label = if (state.nextDay > 0) "Empezar · Día ${state.nextDay}"
+                            else "Empezar entreno"
+                            WearChip(label, chipPadding, primary = true) { sendCommand(context, CMD_START) }
+                        }
+                    }
+                } else {
+                    sessionItems(
+                        state = state,
+                        isAmbient = isAmbient,
+                        ambientTick = ambientTick.value,
+                        textPadding = textPadding,
+                        chipPadding = chipPadding,
+                        onPrimary = { sendCommand(context, CMD_PRIMARY) },
+                        onSwap = { sendCommand(context, CMD_SWAP) }
                     )
                 }
-            } else {
-                SessionContent(
-                    state = state,
-                    isAmbient = isAmbient,
-                    ambientTick = ambientTick.value,
-                    onPrimary = { sendCommand(context, CMD_PRIMARY) },
-                    onSwap = { sendCommand(context, CMD_SWAP) }
-                )
             }
         }
     }
 }
 
+/** Botón a todo el ancho que admite dos líneas: con la fuente grande una sola no cabe. */
 @Composable
-private fun SessionContent(
+private fun WearChip(label: String, padding: Dp, primary: Boolean, onClick: () -> Unit) {
+    Chip(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = padding),
+        label = {
+            Text(
+                label,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        onClick = onClick,
+        colors = if (primary) ChipDefaults.primaryChipColors() else ChipDefaults.secondaryChipColors()
+    )
+}
+
+private fun ScalingLazyListScope.sessionItems(
     state: WearState,
     isAmbient: Boolean,
     ambientTick: Int,
+    textPadding: Dp,
+    chipPadding: Dp,
     onPrimary: () -> Unit,
     onSwap: () -> Unit
 ) {
-    // En ambiente atenuamos a gris (evita consumo y quemado de pantalla); interactivo, color pleno.
-    val titleColor = if (isAmbient) Color(0xFFCCCCCC) else MaterialTheme.colors.onBackground
-    val subColor = if (isAmbient) Color.Gray else MaterialTheme.colors.onSurfaceVariant
+    item {
+        // En ambiente atenuamos a gris (evita consumo y quemado de pantalla); interactivo, color pleno.
+        val titleColor = if (isAmbient) Color(0xFFCCCCCC) else MaterialTheme.colors.onBackground
+        val subColor = if (isAmbient) Color.Gray else MaterialTheme.colors.onSurfaceVariant
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = textPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = state.exercise,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.title3,
+                color = titleColor
+            )
+            if (state.totalSets > 0) {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = "Serie ${state.setNumber} de ${state.totalSets}",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.caption1,
+                    color = subColor
+                )
+            }
 
-    Text(
-        text = state.exercise,
-        textAlign = TextAlign.Center,
-        maxLines = 2,
-        style = MaterialTheme.typography.title3,
-        color = titleColor
-    )
-    if (state.totalSets > 0) {
-        Spacer(Modifier.height(2.dp))
-        Text(
-            text = "Serie ${state.setNumber} de ${state.totalSets}",
-            style = MaterialTheme.typography.caption1,
-            color = subColor
-        )
-    }
-
-    // Cuenta atrás de la fase actual (descanso, calentamiento o serie por tiempo).
-    if (state.endTime > 0L && !state.paused) {
-        Spacer(Modifier.height(4.dp))
-        Countdown(endTime = state.endTime, isAmbient = isAmbient, ambientTick = ambientTick, color = titleColor)
-    } else if (state.startTime > 0L) {
-        // Cronómetro libre: aquí no hay plan que seguir, lo único que importa es el tiempo.
-        Spacer(Modifier.height(4.dp))
-        Elapsed(startTime = state.startTime, isAmbient = isAmbient, ambientTick = ambientTick, color = titleColor)
-    } else if (state.paused) {
-        Spacer(Modifier.height(4.dp))
-        Text("En pausa", style = MaterialTheme.typography.title2, color = titleColor)
+            // Cuenta atrás de la fase actual (descanso, calentamiento o serie por tiempo).
+            if (state.endTime > 0L && !state.paused) {
+                Spacer(Modifier.height(4.dp))
+                Countdown(endTime = state.endTime, isAmbient = isAmbient, ambientTick = ambientTick, color = titleColor)
+            } else if (state.startTime > 0L) {
+                // Cronómetro libre: aquí no hay plan que seguir, lo único que importa es el tiempo.
+                Spacer(Modifier.height(4.dp))
+                Elapsed(startTime = state.startTime, isAmbient = isAmbient, ambientTick = ambientTick, color = titleColor)
+            } else if (state.paused) {
+                Spacer(Modifier.height(4.dp))
+                Text("En pausa", style = MaterialTheme.typography.title2, color = titleColor)
+            }
+        }
     }
 
     // En modo ambiente no hay táctil: ocultamos los botones (se ven al tocar/levantar la muñeca).
     if (!isAmbient) {
-        Spacer(Modifier.height(12.dp))
         if (state.primaryLabel.isNotBlank()) {
-            Chip(
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(state.primaryLabel, textAlign = TextAlign.Center) },
-                onClick = onPrimary,
-                colors = ChipDefaults.primaryChipColors()
-            )
+            item { WearChip(state.primaryLabel, chipPadding, primary = true, onClick = onPrimary) }
         }
         if (state.canSwap) {
-            Spacer(Modifier.height(6.dp))
-            Chip(
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(state.swapLabel, textAlign = TextAlign.Center) },
-                onClick = onSwap,
-                colors = ChipDefaults.secondaryChipColors()
-            )
+            item { WearChip(state.swapLabel, chipPadding, primary = false, onClick = onSwap) }
         }
     }
 }
