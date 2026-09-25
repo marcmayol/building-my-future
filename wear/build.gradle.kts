@@ -62,7 +62,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 encendido desde la 2.13: Play avisa de que la optimizacion DEX estaba por
+            // debajo del umbral (1 % de ofuscacion) y penaliza la visibilidad desde feb-2027.
+            // El mapping.txt de cada AAB hay que subirlo a Play con el bundle.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

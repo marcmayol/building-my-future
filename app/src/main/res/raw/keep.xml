@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Las ilustraciones de los ejercicios se buscan por nombre con getIdentifier
+     (ExerciseImages.kt), y el encogedor de recursos de R8 no ve esas referencias:
+     sin esto las borraria del APK y los ejercicios se quedarian sin dibujo. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ex_*" />

@@ -14,6 +14,8 @@ Lo que hay que subir a Play Console, ya preparado.
   escrito encima. Salen de las anteriores con `scripts/generar_capturas_play.py`.
 - **`acceso-produccion.md`** — las diez respuestas del formulario de acceso a producción, que
   se rellena al terminar el test cerrado.
+- **`version-2.13-r8.md`** — R8 encendido (aviso de optimización DEX de Play), que sale en la
+  2.13: qué cambia, cómo se probó y cómo publicarla.
 
 ## Cómo se generaron los gráficos
 
