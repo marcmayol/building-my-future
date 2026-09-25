@@ -1,8 +1,8 @@
 {
-  "versionCode": 28,
-  "versionName": "2.11",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.11/building-my-future-v2.11.apk",
-  "sha256": "be94102f2b05c58df63dc278cac9275336bdc8a6faefd0db829cebdcbdfbb3dd",
-  "notas": "Aviso cuando falta el permiso de alarmas exactas, que es lo que hace que el descanso suene puntual.",
+  "versionCode": 35,
+  "versionName": "2.13",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.13/building-my-future-v2.13.apk",
+  "sha256": "906c9e21f140551a1a23094b639b9b0532424cedb81de15bb5ed42011918f3c3",
+  "notas": "Puedes terminar un entreno a medias y guardar lo que has hecho (el día cuenta). Nuevo plan «En casa»: 8 semanas, 3 días, solo con tu cuerpo. El reloj cabe mejor en pantallas redondas y con letra grande. App más ligera.",
   "check_horas": 24
 }
