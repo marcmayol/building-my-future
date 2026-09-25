@@ -294,7 +294,9 @@ def publicar(apk: Path, reloj: Path, manifiesto: dict, notas: str) -> None:
     ])
     _ejecutar(["git", "add", str(MANIFIESTO), str(FIRMA_ESPERADA)])
     _ejecutar(["git", "commit", "-m", f"Publica el manifiesto de la v{vn}"])
-    _ejecutar(["git", "push", "origin", "main"])
+    # HEAD:main y no "main": desde otra rama o un worktree, "main" sube la rama local
+    # (que no tiene este commit) y el manifiesto se queda sin publicar sin ningún error.
+    _ejecutar(["git", "push", "origin", "HEAD:main"])
 
 def verificar_url_publica(vc_esperado: int, intentos: int = 30, espera_s: int = 10) -> None:
     """La URL de Pages puede tardar por la caché del CDN: reintenta unos minutos."""
