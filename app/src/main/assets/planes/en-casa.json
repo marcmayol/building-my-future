@@ -1,0 +1,252 @@
+{
+ "id": "en-casa",
+ "nombre": "En casa",
+ "descripcion": "Cuerpo completo sin material · Principiante · 3 días/semana\nPara entrenar en el salón: sin pesas, sin barra y sin gomas, solo tu cuerpo y una silla firme o el sofá. Tres sesiones de 30 a 40 minutos a la semana durante 8 semanas. Como aquí no hay kilos que subir, se progresa con más repeticiones, más tiempo y variantes más difíciles.",
+ "origen": "json",
+ "objetivo": "musculo",
+ "nivel": "principiante",
+ "diasSemana": 3,
+ "material": "nada",
+ "bloqueExtra": false,
+ "fases": [
+  {
+   "nombre": "Base",
+   "semanas": 4,
+   "descripcion": "Aprender los patrones con técnica limpia y coger el hábito. Descansos de 60 a 90 segundos, sin llegar al fallo. Si las flexiones del suelo no salen, apoya las manos en la mesa o en el sofá: cuenta igual.",
+   "progresion": "Cuando completes todas las series en el tope del rango, añade 2 repeticiones o 10 segundos la sesión siguiente. En la semana 4, si todo sale con facilidad, ya estás listo para la fase 2.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo completo A",
+     "calentamiento": "5 min: marcha en el sitio, círculos de brazos y de cadera, 10 sentadillas lentas",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla (nivel actual)",
+       "esquema": "3 x 12-15",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Empuje (nivel actual)",
+       "esquema": "3 x 8-12",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Puente de glúteos",
+       "esquema": "3 x 15",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Bird dog",
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Plancha",
+       "esquema": "3 x 20-30 s",
+       "tipo": "tiempo"
+      },
+      {
+       "nombre": "Rodillas al pecho",
+       "esquema": "3 x 30 s",
+       "tipo": "tiempo"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Cuerpo completo B",
+     "calentamiento": "5 min: marcha en el sitio + movilidad de hombros y tobillos",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Zancadas estáticas",
+       "esquema": "3 x 10 por pierna",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Empuje con manos elevadas",
+       "esquema": "3 x 10-15",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Deslizamientos de brazos en pared (wall slides)",
+       "esquema": "3 x 12",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de talones a una pierna",
+       "esquema": "3 x 12 por pierna",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Dead bug",
+       "esquema": "3 x 8 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Plancha lateral",
+       "esquema": "3 x 20 s por lado",
+       "tipo": "tiempo"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo completo C",
+     "calentamiento": "5 min: marcha en el sitio, círculos de brazos y de cadera, 10 puentes de glúteos",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla (nivel actual)",
+       "esquema": "3 x 15",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Fondos entre sillas o en banco",
+       "esquema": "3 x 8-12",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Puente de glúteos a una pierna",
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Plancha con toque de hombro",
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de piernas tumbado",
+       "esquema": "3 x 10",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Rodillas al pecho",
+       "esquema": "3 x 30 s",
+       "tipo": "tiempo"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Más difícil",
+   "semanas": 4,
+   "descripcion": "Las mismas familias de movimiento con variantes más duras: una pierna, manos juntas y más tiempo bajo tensión. Descansos de 60 a 90 segundos. Si una variante no sale en el mínimo del rango, vuelve a la de la fase 1 esa serie.",
+   "progresion": "Igual que en la fase 1: tope del rango en todas las series, y la próxima sesión 2 repeticiones o 10 segundos más. Al terminar puedes empezar otra vuelta o pasar a Calistenia si consigues una barra.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo completo A",
+     "calentamiento": "5 min: marcha en el sitio, círculos de brazos y de cadera, 10 sentadillas lentas",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla búlgara",
+       "esquema": "3 x 8-10 por pierna",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Empuje (nivel actual)",
+       "esquema": "4 x 8-12",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Puente de glúteos a una pierna",
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Hollow hold",
+       "esquema": "3 x 20-30 s",
+       "tipo": "tiempo"
+      },
+      {
+       "nombre": "Rodillas al pecho",
+       "esquema": "4 x 30 s",
+       "tipo": "tiempo"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Cuerpo completo B",
+     "calentamiento": "5 min: marcha en el sitio + movilidad de hombros y tobillos",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Zancada caminando",
+       "esquema": "3 x 12 por pierna",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Flexión en diamante",
+       "esquema": "3 x 6-10",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Deslizamientos de brazos en pared (wall slides)",
+       "esquema": "3 x 15",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de talones a una pierna",
+       "esquema": "4 x 15 por pierna",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Plancha lateral con elevación de cadera",
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Dead bug",
+       "esquema": "3 x 10 por lado",
+       "tipo": "peso corporal"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo completo C",
+     "calentamiento": "5 min: marcha en el sitio, círculos de brazos y de cadera, 10 puentes de glúteos",
+     "estiramientos": "Estiramientos: 5 min",
+     "ejercicios": [
+      {
+       "nombre": "Sentadilla a una pierna asistida",
+       "esquema": "3 x 6-8 por pierna",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Fondos entre sillas o en banco",
+       "esquema": "4 x 10-12",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Bird dog",
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Plancha con toque de hombro",
+       "esquema": "3 x 12 por lado",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Hollow rock",
+       "esquema": "3 x 10-15",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de piernas tumbado",
+       "esquema": "3 x 12",
+       "tipo": "peso corporal"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

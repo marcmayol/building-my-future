@@ -164,24 +164,60 @@ fun WorkoutSessionScreen(
     }
 
     if (showQuitDialog) {
+        // Terminar antes de tiempo solo tiene sentido si ya hay algo apuntado. En el cronómetro
+        // libre y en el resumen final no se ofrece: ahí ya está el botón de terminar.
+        val seriesHechas = s.completedSets.count { !it.warmup }
+        val puedeTerminar = seriesHechas > 0 &&
+            s.phase != SessionPhase.FREE && s.phase != SessionPhase.FINISHED
         AlertDialog(
             onDismissRequest = { showQuitDialog = false },
             title = { Text("¿Dejas el entreno a medias?", style = MaterialTheme.typography.headlineSmall) },
             text = {
                 Text(
-                    "Puedes reanudarlo cuando quieras: se guarda por dónde ibas, series y " +
-                        "pesos incluidos."
+                    if (puedeTerminar)
+                        "Llevas ${contar(seriesHechas, "serie", "series")}. Si lo terminas " +
+                            "ahora, se guarda lo hecho y el día ${s.dayNumber} cuenta como " +
+                            "completado. Si lo dejas para luego, sigues por donde ibas."
+                    else
+                        "Puedes reanudarlo cuando quieras: se guarda por dónde ibas, series y " +
+                            "pesos incluidos."
                 )
             },
+            // Tres salidas no caben en los dos huecos del diálogo: van apiladas, de la que
+            // guarda más a la que no guarda nada.
             confirmButton = {
-                Button(onClick = { showQuitDialog = false; onExit() }) { Text("Reanudar luego") }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showQuitDialog = false
-                    viewModel.cancelSession()
-                    onExit()
-                }) { Text("Descartar el entreno") }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Space.x1)
+                ) {
+                    if (puedeTerminar) {
+                        Button(
+                            onClick = {
+                                showQuitDialog = false
+                                viewModel.finishSession()
+                                cierraElEntreno()
+                            },
+                            modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
+                        ) { Text("Terminar y guardar") }
+                        OutlinedButton(
+                            onClick = { showQuitDialog = false; onExit() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Reanudar luego") }
+                    } else {
+                        Button(
+                            onClick = { showQuitDialog = false; onExit() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Reanudar luego") }
+                    }
+                    TextButton(
+                        onClick = {
+                            showQuitDialog = false
+                            viewModel.cancelSession()
+                            onExit()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Descartar el entreno") }
+                }
             }
         )
     }
