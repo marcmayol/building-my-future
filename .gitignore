@@ -19,3 +19,7 @@ keystore.properties
 
 # Kotlin (sesiones del compilador)
 .kotlin/
+
+# Bundles para Play: se suben a mano, no viven en git
+para_subir/*.aab
+para_subir/*mapping*.txt
