@@ -1174,7 +1174,19 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         saveActive(SessionEngine.endRest(s, System.currentTimeMillis()))
     }
 
-    /** Finaliza la sesión: guarda el histórico, marca el día y vuelca los pesos a los registros. */
+    /**
+     * Guarda lo apuntado hasta ahora en un entreno libre, sin terminarlo. Es un borrador: no
+     * toca pesos, logs ni historial hasta [finishFreeSession], así que corregirlo cuesta nada.
+     */
+    fun saveFreeLog(entries: List<LoggedExercise>) {
+        val s = _active.value ?: return
+        if (s.phase != SessionPhase.FREE) return
+        val borrador = entries
+            .map { it.copy(name = it.name.trim()) }
+            .filter { it.name.isNotEmpty() || it.setsOrSingle.isNotEmpty() }
+        saveActive(s.copy(freeLog = borrador))
+    }
+
     /**
      * Termina un entreno libre apuntando lo que se ha hecho.
      *
@@ -1235,6 +1247,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         finishSession(logged = limpias)
     }
 
+    /** Finaliza la sesión: guarda el histórico, marca el día y vuelca los pesos a los registros. */
     fun finishSession(logged: List<LoggedExercise> = emptyList()) {
         val s = _active.value ?: return
         val end = System.currentTimeMillis()

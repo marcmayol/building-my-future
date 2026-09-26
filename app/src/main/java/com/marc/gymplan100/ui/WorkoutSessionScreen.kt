@@ -100,8 +100,8 @@ fun WorkoutSessionScreen(
     val session by viewModel.activeSession.collectAsState()
     val day = PlanData.dayByNumber(dayNumber) ?: PlanData.days.first()
     var showQuitDialog by remember { mutableStateOf(false) }
-    // Apuntando lo hecho al terminar un entreno libre (el paso previo a guardarlo).
-    var apuntando by remember { mutableStateOf(false) }
+    // Apuntando lo hecho en un entreno libre: sobre la marcha o al terminar (null = cronómetro).
+    var apuntando by remember { mutableStateOf<ModoApunte?>(null) }
     var tiempoLibre by remember { mutableStateOf(0L) }
     val dark = isSystemInDarkTheme()
     val context = LocalContext.current
@@ -138,22 +138,31 @@ fun WorkoutSessionScreen(
         SessionPhase.WORKING -> WorkingContent(s, day, dark, dayContext, viewModel) { showQuitDialog = true }
         SessionPhase.TIMED_SET -> TimedSetContent(s, day, now, dark, dayContext, viewModel) { showQuitDialog = true }
         SessionPhase.RESTING -> RestingContent(s, day, now, dark, dayContext, viewModel) { showQuitDialog = true }
-        SessionPhase.FREE -> if (apuntando) {
-            // Entrenando libre el cronómetro solo guardaba el tiempo: antes de cerrar, se
-            // ofrece apuntar qué se ha hecho, con los ejercicios del día ya puestos.
-            FreeSessionLog(
-                day = day,
-                elapsedMs = tiempoLibre,
-                onSave = { apuntado -> viewModel.finishFreeSession(apuntado); cierraElEntreno() },
-                onSkip = { viewModel.finishSession(); cierraElEntreno() }
-            )
-        } else {
-            FreeContent(
+        SessionPhase.FREE -> when (val modo = apuntando) {
+            // Entrenando libre se puede ir apuntando sobre la marcha (borrador en la sesión) y,
+            // al finalizar, se repasa lo apuntado o, si no hay nada, se pide entonces.
+            null -> FreeContent(
                 s = s, day = day, now = now, dark = dark,
+                onLog = { apuntando = ModoApunte.DURANTE },
                 // El cronómetro se para al pulsar finalizar: lo que se enseña mientras se
                 // apunta es el tiempo entrenado, no el rato que se ha tardado en escribirlo.
-                onFinish = { tiempoLibre = now - s.startMillis; apuntando = true },
+                onFinish = { tiempoLibre = now - s.startMillis; apuntando = ModoApunte.AL_TERMINAR },
                 onExit = { showQuitDialog = true }
+            )
+            else -> FreeSessionLog(
+                day = day,
+                elapsedMs = tiempoLibre,
+                modo = modo,
+                inicial = s.freeLog,
+                onSave = { apuntado ->
+                    if (modo == ModoApunte.DURANTE) {
+                        viewModel.saveFreeLog(apuntado); apuntando = null
+                    } else {
+                        viewModel.finishFreeSession(apuntado); cierraElEntreno()
+                    }
+                },
+                onBack = { apuntado -> viewModel.saveFreeLog(apuntado); apuntando = null },
+                onSkip = { viewModel.finishSession(); cierraElEntreno() }
             )
         }
         SessionPhase.FINISHED -> FinishedContent(
@@ -1107,15 +1116,55 @@ private fun FreeContent(
     day: TrainingDay,
     now: Long,
     dark: Boolean,
+    onLog: () -> Unit,
     onFinish: () -> Unit,
     onExit: () -> Unit
 ) {
+    val apuntados = s.freeLog.filter { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
     SessionShell(
         tint = SessionTint.WORK,
         dark = dark,
         stateLabel = if (s.extra) "Entrenamiento extra" else "Entrenamiento libre",
         context = if (s.extra) "no cuenta día" else "Día ${s.dayNumber}",
         onExit = onExit,
+        contextCard = {
+            // Lo apuntado, a la vista y en el orden en que se hizo. Solo los últimos cuatro:
+            // el resto se ve (y se edita) al abrir la lista.
+            if (apuntados.isNotEmpty()) {
+                SessionCard(label = "Apuntado · ${contar(apuntados.size, "ejercicio", "ejercicios")}", dark = dark) {
+                    if (apuntados.size > 4) {
+                        Text(
+                            "y ${contar(apuntados.size - 4, "anterior", "anteriores")}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    apuntados.takeLast(4).forEach { e ->
+                        Row(modifier = Modifier.fillMaxWidth().padding(top = Space.x1)) {
+                            Text(
+                                e.name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Spacer(Modifier.width(Space.x2))
+                            Text(
+                                setsSummary(e.setsOrSingle),
+                                style = LocalAppTextStyles.current.tabular,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        secondaries = {
+            SessionSecondary(
+                if (apuntados.isEmpty()) "Apuntar ejercicio" else "Apuntar o editar",
+                onLog
+            )
+        },
         primary = {
             SessionPrimary(
                 text = "Finalizar y guardar",

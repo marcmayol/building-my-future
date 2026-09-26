@@ -75,33 +75,54 @@ import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
 import com.marc.gymplan100.ui.theme.Touch
 
+/** Cuándo se abre la pantalla de apuntar: con el cronómetro corriendo, o al darle a finalizar. */
+enum class ModoApunte { DURANTE, AL_TERMINAR }
+
 /**
- * Qué has hecho en un entrenamiento libre, al darle a finalizar.
+ * Qué has hecho en un entrenamiento libre: sobre la marcha ([ModoApunte.DURANTE]) o al darle
+ * a finalizar ([ModoApunte.AL_TERMINAR]).
  *
- * Sale con los ejercicios del día ya puestos, para que en el caso normal solo haya que
- * escribir pesos. Cada fila deja **elegir otro ejercicio de la lista o escribir el tuyo**,
+ * Si ya hay algo apuntado ([inicial]) se parte de ahí; al terminar, eso convierte la pantalla
+ * en un **repaso** (corregir o añadir lo que faltó) en vez de pedirlo todo de memoria. Si no
+ * hay nada, sale con los ejercicios del día ya puestos, para que en el caso normal solo haya
+ * que escribir pesos. Cada fila deja **elegir otro ejercicio de la lista o escribir el tuyo**,
  * porque entrenando libre es habitual salirse del plan.
  *
- * Lo primero que se ve es el tiempo que ya está guardado: quien no quiera apuntar nada no
- * tiene que sentir que ha perdido el entreno. Apuntar es opcional de verdad, y con el teclado
- * abierto se dice con todas las letras.
+ * Al terminar, lo primero que se ve es el tiempo que ya está guardado: quien no quiera apuntar
+ * nada no tiene que sentir que ha perdido el entreno.
+ *
+ * [onBack] guarda lo escrito como borrador y vuelve al cronómetro; [onSkip] termina sin apuntar.
  */
 @Composable
 fun FreeSessionLog(
     day: TrainingDay?,
     elapsedMs: Long,
+    modo: ModoApunte,
+    inicial: List<LoggedExercise>,
     onSave: (List<LoggedExercise>) -> Unit,
+    onBack: (List<LoggedExercise>) -> Unit,
     onSkip: () -> Unit
 ) {
-    // Precargado con el día del plan; si no hay, una fila en blanco para empezar.
+    val repaso = modo == ModoApunte.AL_TERMINAR &&
+        inicial.any { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
+
+    // Lo ya apuntado manda; si no hay nada, el día del plan; y si tampoco, una fila en blanco.
     val filas = remember {
         mutableStateListOf<LoggedExercise>().apply {
-            val delDia = day?.template?.exercises.orEmpty()
             val unaSerie = listOf(SetLog())
-            if (delDia.isEmpty()) add(LoggedExercise("", sets = unaSerie))
-            else delDia.forEach { add(LoggedExercise(name = it.name, sets = unaSerie)) }
+            val delDia = day?.template?.exercises.orEmpty()
+            when {
+                inicial.isNotEmpty() -> inicial.forEach {
+                    add(it.copy(sets = it.setsOrSingle.ifEmpty { unaSerie }))
+                }
+                delDia.isEmpty() -> add(LoggedExercise("", sets = unaSerie))
+                else -> delDia.forEach { add(LoggedExercise(name = it.name, sets = unaSerie)) }
+            }
         }
     }
+
+    // Atrás no tira lo escrito: vuelve al cronómetro con el borrador guardado.
+    androidx.activity.compose.BackHandler { onBack(filas.toList()) }
 
     // Para el desplegable: los del día primero y el resto del plan después, sin repetir.
     val sugerencias = remember {
@@ -151,19 +172,35 @@ fun FreeSessionLog(
         ) {
             item {
                 Text(
-                    "ENTRENO TERMINADO",
+                    if (modo == ModoApunte.DURANTE) "EN MARCHA · EL TIEMPO SIGUE CORRIENDO"
+                    else "ENTRENO TERMINADO",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(Space.x2))
-                Text("¿Qué has hecho?", style = MaterialTheme.typography.displaySmall)
+                Text(
+                    when {
+                        modo == ModoApunte.DURANTE -> "¿Qué llevas hecho?"
+                        repaso -> "Repasa lo apuntado"
+                        else -> "¿Qué has hecho?"
+                    },
+                    style = MaterialTheme.typography.displaySmall
+                )
                 // Escribiendo, la cabecera se encoge: el sitio lo necesitan las filas.
                 if (!tecladoAbierto) {
                     Spacer(Modifier.height(Space.x3))
-                    TiempoGuardado(elapsedMs)
-                    Spacer(Modifier.height(Space.x3))
+                    if (modo == ModoApunte.AL_TERMINAR) {
+                        TiempoGuardado(elapsedMs)
+                        Spacer(Modifier.height(Space.x3))
+                    }
                     Text(
-                        if (filas.size == 1 && filas[0].name.isBlank()) {
+                        if (modo == ModoApunte.DURANTE) {
+                            "Apunta cada ejercicio cuando lo acabes, o serie a serie. Se guarda " +
+                                "al volver, y al finalizar te lo enseño para repasarlo."
+                        } else if (repaso) {
+                            "Esto es lo que has ido apuntando. Corrige lo que haga falta o " +
+                                "añade lo que te dejaste."
+                        } else if (filas.size == 1 && filas[0].name.isBlank()) {
                             "Hoy no había ejercicios apuntados en el plan, así que empiezas en " +
                                 "blanco: escribe los que hayas hecho, o guarda solo el tiempo."
                         } else {
@@ -237,8 +274,14 @@ fun FreeSessionLog(
                     onClick = { onSave(filas.toList()) },
                     shape = CircleShape,
                     modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                ) { Text("Guardar y terminar") }
-                Subrayado("Terminar sin apuntar nada", onSkip)
+                ) { Text(if (modo == ModoApunte.DURANTE) "Listo, seguir entrenando" else "Guardar y terminar") }
+                // Con cosas apuntadas, "terminar sin apuntar nada" las tiraría: la salida
+                // secundaria pasa a ser volver al cronómetro, por si se finalizó sin querer.
+                when {
+                    modo == ModoApunte.DURANTE -> Unit
+                    repaso -> Subrayado("Seguir entrenando", { onBack(filas.toList()) })
+                    else -> Subrayado("Terminar sin apuntar nada", onSkip)
+                }
             }
         }
     }

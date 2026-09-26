@@ -120,8 +120,18 @@ data class ActiveSession(
     /** Total de pasos (militar) o de rondas/series (quema grasa). */
     val totalUnits: Int = 0,
     /** En el paso con alternativa (burpees/jumping jacks), si se eligió la alternativa. */
-    val useAlternative: Boolean = false
+    val useAlternative: Boolean = false,
+    /**
+     * Entreno libre: lo que se va apuntando sobre la marcha, antes de finalizar. Vive en la
+     * sesión (y no en la pantalla) para que sobreviva a que Android mate la app entre serie y
+     * serie; al finalizar se enseña para repasarlo en vez de pedirlo todo de memoria.
+     */
+    val freeLog: List<LoggedExercise> = emptyList()
 ) {
+    /** Hay al menos un ejercicio apuntado con alguna serie en el entreno libre. */
+    val hasFreeLog: Boolean
+        get() = freeLog.any { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
+
     /** Es una rutina especial (militar o quema grasa), no una sesión del plan de 100 días. */
     val isRoutine: Boolean get() = routineId != null
     /** Segundos de calentamiento transcurridos en el instante [now]. */
