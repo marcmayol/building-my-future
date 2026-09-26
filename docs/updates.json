@@ -1,8 +1,8 @@
 {
-  "versionCode": 35,
-  "versionName": "2.13",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.13/building-my-future-v2.13.apk",
-  "sha256": "906c9e21f140551a1a23094b639b9b0532424cedb81de15bb5ed42011918f3c3",
-  "notas": "Puedes terminar un entreno a medias y guardar lo que has hecho (el día cuenta). Nuevo plan «En casa»: 8 semanas, 3 días, solo con tu cuerpo. El reloj cabe mejor en pantallas redondas y con letra grande. App más ligera.",
+  "versionCode": 36,
+  "versionName": "2.14",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.14/building-my-future-v2.14.apk",
+  "sha256": "74c8a4fb0496566f9b5d0d68100d2ff867f954954448554dea9c2fa250351c48",
+  "notas": "Entreno libre: apunta los ejercicios sobre la marcha (kg y repeticiones por serie); al finalizar te los enseña para repasar. Lo escrito se guarda solo aunque se cierre la app.",
   "check_horas": 24
 }
