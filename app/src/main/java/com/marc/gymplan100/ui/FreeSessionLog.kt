@@ -43,6 +43,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -101,6 +106,7 @@ fun FreeSessionLog(
     inicial: List<LoggedExercise>,
     onSave: (List<LoggedExercise>) -> Unit,
     onBack: (List<LoggedExercise>) -> Unit,
+    onDraft: (List<LoggedExercise>) -> Unit,
     onSkip: () -> Unit
 ) {
     val repaso = modo == ModoApunte.AL_TERMINAR &&
@@ -123,6 +129,14 @@ fun FreeSessionLog(
 
     // Atrás no tira lo escrito: vuelve al cronómetro con el borrador guardado.
     androidx.activity.compose.BackHandler { onBack(filas.toList()) }
+
+    // Lo escrito va al borrador de la sesión mientras se escribe (con un respiro para no
+    // guardar a cada tecla): si se bloquea el móvil aquí y Android mata la app, no se pierde.
+    LaunchedEffect(Unit) {
+        snapshotFlow { filas.toList() }
+            .drop(1)
+            .collectLatest { delay(600); onDraft(it) }
+    }
 
     // Para el desplegable: los del día primero y el resto del plan después, sin repetir.
     val sugerencias = remember {
@@ -196,7 +210,7 @@ fun FreeSessionLog(
                     Text(
                         if (modo == ModoApunte.DURANTE) {
                             "Apunta cada ejercicio cuando lo acabes, o serie a serie. Se guarda " +
-                                "al volver, y al finalizar te lo enseño para repasarlo."
+                                "solo, y al finalizar te lo enseño para repasarlo."
                         } else if (repaso) {
                             "Esto es lo que has ido apuntando. Corrige lo que haga falta o " +
                                 "añade lo que te dejaste."

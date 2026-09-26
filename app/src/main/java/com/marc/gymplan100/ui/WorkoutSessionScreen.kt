@@ -101,8 +101,9 @@ fun WorkoutSessionScreen(
     val day = PlanData.dayByNumber(dayNumber) ?: PlanData.days.first()
     var showQuitDialog by remember { mutableStateOf(false) }
     // Apuntando lo hecho en un entreno libre: sobre la marcha o al terminar (null = cronómetro).
-    var apuntando by remember { mutableStateOf<ModoApunte?>(null) }
-    var tiempoLibre by remember { mutableStateOf(0L) }
+    // rememberSaveable: si Android mata la app con esta pantalla abierta, se vuelve a ella.
+    var apuntando by rememberSaveable { mutableStateOf<ModoApunte?>(null) }
+    var tiempoLibre by rememberSaveable { mutableStateOf(0L) }
     val dark = isSystemInDarkTheme()
     val context = LocalContext.current
 
@@ -162,6 +163,7 @@ fun WorkoutSessionScreen(
                     }
                 },
                 onBack = { apuntado -> viewModel.saveFreeLog(apuntado); apuntando = null },
+                onDraft = { apuntado -> viewModel.saveFreeLog(apuntado) },
                 onSkip = { viewModel.finishSession(); cierraElEntreno() }
             )
         }
