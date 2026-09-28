@@ -1,8 +1,8 @@
 {
-  "versionCode": 36,
-  "versionName": "2.14",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.14/building-my-future-v2.14.apk",
-  "sha256": "74c8a4fb0496566f9b5d0d68100d2ff867f954954448554dea9c2fa250351c48",
-  "notas": "Entreno libre: apunta los ejercicios sobre la marcha (kg y repeticiones por serie); al finalizar te los enseña para repasar. Lo escrito se guarda solo aunque se cierre la app.",
+  "versionCode": 37,
+  "versionName": "2.15",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.15/building-my-future-v2.15.apk",
+  "sha256": "27154071e9aab6e26c2710549ae9be89c1d7a30c8e40eadb28083f2871ea1975",
+  "notas": "Barra de navegación abajo: Inicio, Logros, Mis pesos, Resultados y Estadísticas a un toque desde cualquiera de ellas. Cada pestaña recuerda dónde estabas.",
   "check_horas": 24
 }
