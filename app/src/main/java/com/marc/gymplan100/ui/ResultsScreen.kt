@@ -19,14 +19,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -64,8 +62,7 @@ import com.marc.gymplan100.ui.theme.Touch
  */
 @Composable
 fun ResultsScreen(
-    viewModel: PlanViewModel,
-    onBack: () -> Unit
+    viewModel: PlanViewModel
 ) {
     val progress by viewModel.progress.collectAsState()
     val history by viewModel.history.collectAsState()
@@ -90,11 +87,6 @@ fun ResultsScreen(
             TopAppBar(
                 title = {
                     Text("Resultados", style = MaterialTheme.typography.headlineSmall)
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
                 },
                 actions = {
                     TextButton(onClick = { viewModel.toggleResultsOrder() }) {

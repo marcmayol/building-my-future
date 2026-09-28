@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,10 +33,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,7 +67,6 @@ import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
 import com.marc.gymplan100.notify.RestReminder
 import com.marc.gymplan100.update.Updates
-import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.Phase
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.contar
@@ -93,10 +90,6 @@ fun HomeScreen(
     onOpenDay: (Int) -> Unit,
     onResumeSession: (Int) -> Unit,
     onOpenSpecial: () -> Unit,
-    onOpenAchievements: () -> Unit,
-    onOpenWeights: () -> Unit,
-    onOpenResults: () -> Unit,
-    onOpenStats: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenPlans: () -> Unit = {}
 ) {
@@ -138,18 +131,18 @@ fun HomeScreen(
     }
 
 
-    // La portada no vive dentro de un Scaffold, así que los márgenes del sistema se piden
-    // aquí. Iban a ojo (44 dp) y la barra de estado de este móvil mide 48,8: el logo estaba
-    // ya medio metido debajo, y con una isla o un notch más alto sería peor. Van en el
+    // La portada vive en su propio Scaffold y sus márgenes salen de ahí (los PaddingValues del
+    // Scaffold): con la barra de abajo, el de la barra del sistema ya lo pone el Scaffold de la
+    // app y pedirlo a mano (WindowInsets.systemBars) lo contaba dos veces. Van en el
     // contentPadding y no en la pantalla para que la lista siga pasando por debajo al bajar.
-    val sistema = WindowInsets.systemBars.asPaddingValues()
+    Scaffold(containerColor = MaterialTheme.colorScheme.background) { inner ->
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(
             start = Space.screen,
             end = Space.screen,
-            top = sistema.calculateTopPadding() + Space.x3,
-            bottom = sistema.calculateBottomPadding() + 32.dp
+            top = inner.calculateTopPadding() + Space.x3,
+            bottom = inner.calculateBottomPadding() + 32.dp
         ),
         verticalArrangement = Arrangement.spacedBy(Space.x3)
     ) {
@@ -317,23 +310,6 @@ fun HomeScreen(
         item { FilaEspeciales(onClick = onOpenSpecial) }
 
         item {
-            Column {
-                AccesoFila(
-                    icon = R.drawable.ic_logros,
-                    label = "Logros",
-                    trailing = "${Achievements.unlockedIds(progress).size}/${Achievements.all.size}",
-                    onClick = onOpenAchievements
-                )
-                AccesoFila(R.drawable.ic_pesos, "Mis pesos", onClick = onOpenWeights)
-                AccesoFila(R.drawable.ic_resultados, "Resultados", onClick = onOpenResults)
-                AccesoFila(
-                    R.drawable.ic_estadisticas, "Estadísticas",
-                    onClick = onOpenStats, divider = false
-                )
-            }
-        }
-
-        item {
             Text(
                 "FASES DEL PLAN",
                 style = MaterialTheme.typography.labelMedium,
@@ -350,6 +326,7 @@ fun HomeScreen(
                 onClick = { onOpenPhase(phase.number) }
             )
         }
+    }
     }
 }
 
@@ -594,46 +571,6 @@ private fun FilaEspeciales(onClick: () -> Unit) {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-    }
-}
-
-/** Acceso como fila con icono lineal: los emoji se quedan en Logros, donde son contenido. */
-@Composable
-private fun AccesoFila(
-    icon: Int,
-    label: String,
-    trailing: String? = null,
-    divider: Boolean = true,
-    onClick: () -> Unit
-) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .heightIn(min = Touch.primary)
-                .padding(vertical = Space.x3),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(icon),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(22.dp)
-            )
-            Spacer(Modifier.size(Space.x4))
-            Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-            if (trailing != null) {
-                Text(
-                    trailing,
-                    style = LocalAppTextStyles.current.tabular,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-        if (divider) {
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        }
     }
 }
 

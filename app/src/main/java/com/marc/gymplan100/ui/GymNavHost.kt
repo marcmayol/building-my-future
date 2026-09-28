@@ -2,8 +2,21 @@ package com.marc.gymplan100.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -13,12 +26,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.R
 
 object Routes {
     const val HOME = "home"
@@ -40,6 +57,15 @@ object Routes {
     fun day(n: Int) = "day/$n"
     fun session(n: Int) = "session/$n"
     fun fatburnEx(id: String) = "fatburn/$id"
+}
+
+/** Las pestañas de la barra de abajo. Fuera de estas pantallas la barra no se ve. */
+private enum class Pestana(val route: String, val label: String, val icon: Int) {
+    INICIO(Routes.HOME, "Inicio", R.drawable.ic_inicio),
+    LOGROS(Routes.ACHIEVEMENTS, "Logros", R.drawable.ic_logros),
+    PESOS(Routes.WEIGHTS, "Mis pesos", R.drawable.ic_pesos),
+    RESULTADOS(Routes.RESULTS, "Resultados", R.drawable.ic_resultados),
+    ESTADISTICAS(Routes.STATS, "Estadísticas", R.drawable.ic_estadisticas)
 }
 
 /** Género del perfil, para elegir la ilustración del ejercicio (true = mujer). */
@@ -85,7 +111,25 @@ fun GymNavHost(
         }
     }
 
-    NavHost(navController = navController, startDestination = Routes.HOME) {
+    val rutaActual = navController.currentBackStackEntryAsState().value?.destination?.route
+    val conBarra = Pestana.entries.any { it.route == rutaActual }
+
+    // El Scaffold de toda la app. Sin márgenes propios (contentWindowInsets a cero): cada
+    // pantalla sigue pidiendo los suyos, y así las que no llevan barra quedan como estaban.
+    // Con la barra, el hueco que ocupa se consume para que el Scaffold de cada pantalla no
+    // vuelva a sumar debajo el margen de la barra del sistema.
+    Scaffold(
+        contentWindowInsets = WindowInsets(0),
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            if (conBarra) BarraInferior(navController, rutaActual)
+        }
+    ) { inner ->
+    NavHost(
+        navController = navController,
+        startDestination = Routes.HOME,
+        modifier = Modifier.padding(inner).consumeWindowInsets(inner)
+    ) {
         composable(Routes.HOME) {
             HomeScreen(
                 viewModel = viewModel,
@@ -99,10 +143,6 @@ fun GymNavHost(
                     }
                 },
                 onOpenSpecial = { navController.navigate(Routes.SPECIAL) },
-                onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
-                onOpenWeights = { navController.navigate(Routes.WEIGHTS) },
-                onOpenResults = { navController.navigate(Routes.RESULTS) },
-                onOpenStats = { navController.navigate(Routes.STATS) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenPlans = { navController.navigate(Routes.PLANS) }
             )
@@ -128,28 +168,16 @@ fun GymNavHost(
             )
         }
         composable(Routes.RESULTS) {
-            ResultsScreen(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() }
-            )
+            ResultsScreen(viewModel = viewModel)
         }
         composable(Routes.STATS) {
-            StatisticsScreen(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() }
-            )
+            StatisticsScreen(viewModel = viewModel)
         }
         composable(Routes.ACHIEVEMENTS) {
-            AchievementsScreen(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() }
-            )
+            AchievementsScreen(viewModel = viewModel)
         }
         composable(Routes.WEIGHTS) {
-            ExerciseWeightsScreen(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() }
-            )
+            ExerciseWeightsScreen(viewModel = viewModel)
         }
         composable(
             route = Routes.PHASE,
@@ -235,6 +263,7 @@ fun GymNavHost(
             )
         }
     }
+    }
 
     // Cierre del plan: encima de la navegación, al marcar el último día y una vez cerrada la
     // celebración de ese día. Vive aquí dentro porque necesita el navController para llevar
@@ -276,5 +305,48 @@ fun GymNavHost(
             )
         }
     }
+    }
+}
+
+/**
+ * Logros, pesos, resultados y estadísticas, a un toque desde cualquiera de ellas. Cada pestaña
+ * guarda dónde estaba (scroll incluido) y volver atrás desde una lleva siempre a Inicio.
+ */
+@Composable
+private fun BarraInferior(navController: NavHostController, rutaActual: String?) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+        Pestana.entries.forEach { pestana ->
+            NavigationBarItem(
+                selected = rutaActual == pestana.route,
+                onClick = {
+                    if (rutaActual == pestana.route) return@NavigationBarItem
+                    navController.navigate(pestana.route) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                icon = { Icon(painterResource(pestana.icon), contentDescription = null) },
+                // Sin el espaciado de las etiquetas del tema: con él «Estadísticas» no cabía ni
+                // a tamaño normal. Y en unidades fijas: con la letra del sistema al 150 % las
+                // cinco etiquetas se cortaban, y el icono ya dice qué es cada pestaña.
+                label = {
+                    Text(
+                        pestana.label,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = with(LocalDensity.current) { 12.dp.toSp() },
+                            letterSpacing = 0.sp
+                        ),
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+                )
+            )
+        }
     }
 }

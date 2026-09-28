@@ -18,10 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -50,19 +48,13 @@ import com.marc.gymplan100.ui.theme.Space
  */
 @Composable
 fun ExerciseWeightsScreen(
-    viewModel: PlanViewModel,
-    onBack: () -> Unit
+    viewModel: PlanViewModel
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text("Mis pesos", style = MaterialTheme.typography.headlineSmall)
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background

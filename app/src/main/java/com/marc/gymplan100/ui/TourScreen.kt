@@ -90,7 +90,7 @@ fun TourScreen(onDone: () -> Unit) {
             texto = "Cuando cierras todas las series arriba del rango, te propone más carga —" +
                 "con el salto que de verdad existe en la máquina— y te escribe el motivo " +
                 "debajo. Si llevas tres sesiones atascado, te propone bajar para volver a subir.",
-            donde = "Durante el entreno, y el histórico en «Mis pesos».",
+            donde = "Durante el entreno, y el histórico en «Mis pesos», en la barra de abajo.",
             icono = R.drawable.ic_pesos,
             color = app.work
         ),
@@ -99,7 +99,7 @@ fun TourScreen(onDone: () -> Unit) {
             texto = "Kilos movidos, fuerza estimada, rachas y un mapa muscular que dice qué se " +
                 "ha llevado cada músculo esta semana. Eso es lo que avisa de que llevas tres " +
                 "semanas sin tocar pierna.",
-            donde = "En la portada: «Estadísticas», «Resultados» y «Logros».",
+            donde = "En la barra de abajo: «Estadísticas», «Resultados» y «Logros».",
             icono = R.drawable.ic_estadisticas,
             color = app.streak
         ),

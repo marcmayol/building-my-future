@@ -23,14 +23,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -71,8 +67,7 @@ import java.time.LocalDate
 
 @Composable
 fun StatisticsScreen(
-    viewModel: PlanViewModel,
-    onBack: () -> Unit
+    viewModel: PlanViewModel
 ) {
     val progress by viewModel.progress.collectAsState()
     val history by viewModel.history.collectAsState()
@@ -95,11 +90,6 @@ fun StatisticsScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Estadísticas") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                }
             )
         }
     ) { inner ->
