@@ -1,8 +1,8 @@
 {
-  "versionCode": 37,
-  "versionName": "2.15",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.15/building-my-future-v2.15.apk",
-  "sha256": "27154071e9aab6e26c2710549ae9be89c1d7a30c8e40eadb28083f2871ea1975",
-  "notas": "Barra de navegación abajo: Inicio, Logros, Mis pesos, Resultados y Estadísticas a un toque desde cualquiera de ellas. Cada pestaña recuerda dónde estabas.",
+  "versionCode": 38,
+  "versionName": "2.16",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.16/building-my-future-v2.16.apk",
+  "sha256": "e8408916bcfa6c9ccb58373af63222a9589c3be8da5632cac1eda8c1bd19e734",
+  "notas": "Mis pesos, ordenado: los ejercicios van agrupados por músculo (pecho, espalda, pierna...) en secciones que se abren y se cierran. Y debajo de cada uno, tu PR: lo máximo que has movido nunca.",
   "check_horas": 24
 }
