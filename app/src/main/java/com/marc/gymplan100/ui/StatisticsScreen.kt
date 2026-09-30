@@ -769,7 +769,7 @@ private fun RecordsSection(
     productive: SessionRecord?
 ) {
     Column {
-        SectionTitle("Records personales")
+        SectionTitle("Tus PR · récords personales")
         Spacer(Modifier.height(10.dp))
 
         if (records.isNotEmpty()) {
