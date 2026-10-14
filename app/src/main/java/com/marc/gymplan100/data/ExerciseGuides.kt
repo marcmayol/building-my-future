@@ -615,6 +615,159 @@ object ExerciseGuides {
         videoQuery = "press de pecho al fallo finisher"
     )
 
+    // --- Para empezar si te cuesta moverte: de pie con apoyo o sentado, nunca en el suelo ---
+    // Tienen ficha propia porque la del catálogo explica la versión de siempre (la flexión en
+    // el suelo, la plancha en el suelo), y es justo lo que estos planes quieren evitar.
+
+    private val flexionPared = ExerciseGuide(
+        muscles = "Pectoral, hombro frontal y tríceps.",
+        howTo = "De pie frente a una pared, a un paso largo. Apoya las manos a la altura del " +
+            "pecho, algo más abiertas que los hombros. Dobla los codos y acerca el pecho a la " +
+            "pared con el cuerpo recto, como una tabla, y empuja para volver. Cuanto más cerca " +
+            "de la pared tengas los pies, más fácil.",
+        mistakes = listOf(
+            "Sacar el culo hacia atrás o hundir la cadera.",
+            "Abrir los codos en cruz: mejor a unos 45° del cuerpo.",
+            "Ponerse tan lejos que los pies resbalen."
+        ),
+        alternatives = listOf(
+            "Contra la encimera o una mesa firme cuando la pared se quede corta.",
+            "Más cerca de la pared si hoy cuesta."
+        ),
+        videoQuery = "flexiones en pared principiantes"
+    )
+
+    private val sentadillaSilla = ExerciseGuide(
+        muscles = "Cuádriceps y glúteos.",
+        howTo = "Siéntate en una silla firme, sin ruedas y apoyada contra la pared, con los pies " +
+            "a la anchura de la cadera. Echa el pecho un poco adelante y levántate empujando el " +
+            "suelo con los pies. Para bajar, siéntate despacio, sin dejarte caer. Si hace falta, " +
+            "ayúdate con las manos en los muslos o en los reposabrazos: con el tiempo dejarás de " +
+            "necesitarlo.",
+        mistakes = listOf(
+            "Dejarse caer en la silla en vez de bajar despacio.",
+            "Juntar las rodillas al levantarte.",
+            "Una silla baja o con ruedas: mejor alta y que no se mueva."
+        ),
+        alternatives = listOf(
+            "Con un cojín encima si la silla es baja.",
+            "Sentadilla a banco o cajón en el gimnasio."
+        ),
+        videoQuery = "levantarse de la silla ejercicio principiantes"
+    )
+
+    private val talonesSilla = ExerciseGuide(
+        muscles = "Gemelos y sóleo, y el equilibrio de los tobillos.",
+        howTo = "De pie detrás de una silla o junto a la encimera, agarrado con las dos manos. " +
+            "Sube a la punta de los pies despacio, aguanta un segundo arriba y baja despacio " +
+            "hasta apoyar el talón.",
+        mistakes = listOf(
+            "Hacerlo a rebotes.",
+            "Soltarse antes de tener equilibrio: el apoyo está para usarlo."
+        ),
+        alternatives = listOf(
+            "Sentado: sube y baja los talones con los pies apoyados.",
+            "Elevación de gemelos sentado en máquina en el gimnasio."
+        ),
+        videoQuery = "elevación de talones con apoyo en silla"
+    )
+
+    private val remoBotella = ExerciseGuide(
+        muscles = "Espalda (dorsal y romboides) y bíceps.",
+        howTo = "Apoya una mano en una mesa o una silla firme, con la espalda recta. Con la otra " +
+            "mano coge una botella de agua o una bolsa y súbela hacia la cadera llevando el codo " +
+            "atrás y pegado al cuerpo. Baja despacio. Las repeticiones son por brazo.",
+        mistakes = listOf(
+            "Girar el tronco para subir el peso.",
+            "Encoger el hombro hacia la oreja.",
+            "Curvar la espalda."
+        ),
+        alternatives = listOf(
+            "Sentado e inclinado hacia delante, con una botella en cada mano.",
+            "Remo sentado en máquina en el gimnasio."
+        ),
+        videoQuery = "remo con mancuerna apoyado principiantes"
+    )
+
+    private val pressHombrosBotellas = ExerciseGuide(
+        muscles = "Hombros y tríceps.",
+        howTo = "Sentado con la espalda apoyada, una botella en cada mano a la altura de los " +
+            "hombros. Súbelas por encima de la cabeza hasta casi estirar los brazos y bájalas " +
+            "despacio a la altura de las orejas.",
+        mistakes = listOf(
+            "Arquear la espalda para subir.",
+            "Bajar de golpe."
+        ),
+        alternatives = listOf(
+            "Un brazo cada vez si los dos a la vez molestan.",
+            "Press de hombros en máquina en el gimnasio."
+        ),
+        videoQuery = "press de hombros sentado principiantes"
+    )
+
+    private val curlBotellas = ExerciseGuide(
+        muscles = "Bíceps y antebrazo.",
+        howTo = "Sentado o de pie, una botella en cada mano y los brazos estirados a los lados. " +
+            "Dobla los codos y sube las botellas hacia los hombros sin mover los codos de su " +
+            "sitio. Baja despacio.",
+        mistakes = listOf(
+            "Balancear el cuerpo para subir.",
+            "Separar los codos del costado."
+        ),
+        alternatives = listOf(
+            "Alternando: un brazo y luego el otro.",
+            "Bolsas con algo de peso si las botellas se quedan cortas."
+        ),
+        videoQuery = "curl de bíceps con botellas de agua"
+    )
+
+    private val extensionSilla = ExerciseGuide(
+        muscles = "Cuádriceps.",
+        howTo = "Sentado con la espalda apoyada y los pies en el suelo. Estira una rodilla hasta " +
+            "que la pierna quede recta, aguanta dos segundos y bájala despacio. Cambia de pierna. " +
+            "Las repeticiones son por pierna.",
+        mistakes = listOf(
+            "Dar una patada rápida en vez de subir despacio.",
+            "Echarse hacia atrás para subir la pierna."
+        ),
+        alternatives = listOf(
+            "Más tiempo arriba si se queda fácil.",
+            "Extensión de piernas en máquina en el gimnasio."
+        ),
+        videoQuery = "extensión de rodilla sentado en silla"
+    )
+
+    private val planchaPared = ExerciseGuide(
+        muscles = "Abdomen y la musculatura que sujeta la espalda.",
+        howTo = "De pie frente a una pared o una encimera: apoya los antebrazos, da un paso " +
+            "atrás y deja el cuerpo recto de los talones a la cabeza. Aprieta un poco el " +
+            "abdomen y aguanta respirando normal. Cuanto más lejos los pies, más difícil.",
+        mistakes = listOf(
+            "Aguantar la respiración.",
+            "Hundir la cadera o sacar el culo."
+        ),
+        alternatives = listOf(
+            "Más cerca de la pared si hoy cuesta.",
+            "Con las manos en un banco cuando la pared se quede fácil."
+        ),
+        videoQuery = "plancha en la pared principiantes"
+    )
+
+    private val cardioSuave = ExerciseGuide(
+        muscles = "Corazón y piernas.",
+        howTo = "A un ritmo en el que puedas hablar sin ahogarte. Si necesitas parar, para y " +
+            "sigue cuando puedas: lo que cuenta es el tiempo total.",
+        mistakes = listOf(
+            "Empezar demasiado rápido.",
+            "Pensar que no vale si has tenido que parar."
+        ),
+        alternatives = listOf(
+            "Caminar por casa o por la calle.",
+            "Bici estática o cinta, la que te resulte más cómoda."
+        ),
+        videoQuery = "caminar para empezar a hacer ejercicio"
+    )
+
     // --- Mapa nombre del plan -> guía ---
 
     private val map: Map<String, ExerciseGuide> = mapOf(
@@ -665,6 +818,17 @@ object ExerciseGuides {
         "Circuito core (plancha, rueda, elevación piernas)" to circuitoRueda,
         "Circuito core (plancha, plancha lateral, dead bug)" to circuitoDeadBug,
         "Finisher: press de pecho ligero al fallo" to finisher,
+        "Flexión en pared" to flexionPared,
+        "Sentadilla a silla (sentarse y levantarse)" to sentadillaSilla,
+        "Elevación de talones agarrado a una silla" to talonesSilla,
+        "Remo con botella o bolsa, apoyado en la mesa" to remoBotella,
+        "Press de hombros sentado con botellas" to pressHombrosBotellas,
+        "Curl de bíceps con botellas de agua" to curlBotellas,
+        "Extensión de piernas sentado en silla" to extensionSilla,
+        "Plancha apoyada en banco o pared" to planchaPared,
+        "Paseo continuo a ritmo cómodo" to cardioSuave,
+        "Bici estática: bloque suave" to cardioSuave,
+        "Cinta caminando: bloque suave" to cardioSuave,
     )
 
     /**

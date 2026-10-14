@@ -1,5 +1,6 @@
 package com.marc.gymplan100
 
+import com.marc.gymplan100.data.ExerciseGuides
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.PlanCodec
@@ -69,6 +70,23 @@ class PlanPrimerosPasosTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun `los ejercicios adaptados tienen ficha propia, no la del suelo`() {
+        // La ficha del catálogo de «Flexión en pared» sería la de la flexión de siempre.
+        val adaptados = listOf(
+            "Flexión en pared",
+            "Sentadilla a silla (sentarse y levantarse)",
+            "Elevación de talones agarrado a una silla",
+            "Remo con botella o bolsa, apoyado en la mesa",
+            "Press de hombros sentado con botellas",
+            "Curl de bíceps con botellas de agua",
+            "Extensión de piernas sentado en silla",
+            "Plancha apoyada en banco o pared",
+        )
+        val sinFicha = adaptados.filter { ExerciseGuides.forName(it) == null }
+        assertTrue("Sin ficha propia: $sinFicha", sinFicha.isEmpty())
     }
 
     @Test
