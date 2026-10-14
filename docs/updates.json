@@ -1,8 +1,8 @@
 {
-  "versionCode": 38,
-  "versionName": "2.16",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.16/building-my-future-v2.16.apk",
-  "sha256": "e8408916bcfa6c9ccb58373af63222a9589c3be8da5632cac1eda8c1bd19e734",
-  "notas": "Mis pesos, ordenado: los ejercicios van agrupados por músculo (pecho, espalda, pierna...) en secciones que se abren y se cierran. Y debajo de cada uno, tu PR: lo máximo que has movido nunca.",
+  "versionCode": 39,
+  "versionName": "2.17",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.17/building-my-future-v2.17.apk",
+  "sha256": "c4e9581faa756ad6d216f598341e5f3f300365821d0f195aa65bb1c7741c1a88",
+  "notas": "Dos planes nuevos para empezar desde cero si te cuesta moverte: Primeros pasos en casa (de pie con apoyo o sentado, sin material) y Primeros pasos en el gimnasio (todo sentado en máquinas). Entreno libre a un toque desde la portada, para apuntar lo que haces sin seguir ninguna rutina. Y en el entreno libre ya puedes marcar series de calentamiento: se apuntan, pero no cuentan para tu peso ni para tu PR.",
   "check_horas": 24
 }
