@@ -90,6 +90,7 @@ fun HomeScreen(
     onOpenDay: (Int) -> Unit,
     onResumeSession: (Int) -> Unit,
     onOpenSpecial: () -> Unit,
+    onFreeWorkout: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenPlans: () -> Unit = {}
 ) {
@@ -305,6 +306,12 @@ fun HomeScreen(
         // que además lleva la fecha de fin. Se calla.
         if (done < total || total == 0) {
             item { ProgresoDelPlan(done = done, total = total) }
+        }
+
+        // A un toque, sin pasar por el menú de especiales: hay quien no quiere rutina, solo
+        // apuntar lo que hace. Con una sesión en marcha no se ofrece otra.
+        if (activeSession == null) {
+            item { FilaEntrenoLibre(onClick = onFreeWorkout) }
         }
 
         item { FilaEspeciales(onClick = onOpenSpecial) }
@@ -546,6 +553,38 @@ private fun ProgresoDelPlan(done: Int, total: Int) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+/**
+ * Entreno libre directo: arranca el cronómetro y apuntas lo que hagas, sin plan ni rutina.
+ * Con borde de color para que se distinga de los especiales, que van justo debajo.
+ */
+@Composable
+private fun FilaEntrenoLibre(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .border(1.5.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .padding(horizontal = Space.x4, vertical = Space.x4),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text("Entreno libre", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Sin rutina: entrenas a tu aire y apuntas lo que haces",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Text(
+            "Empezar",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = Space.x2)
+        )
     }
 }
 

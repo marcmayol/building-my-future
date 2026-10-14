@@ -146,4 +146,42 @@ class PlanAdvisorTest {
         )
         assertNull(r.best)
     }
+    // --- Los planes muy suaves: para quien le cuesta moverse -------------------------------
+
+    private val conSuaves = catalogo + listOf(
+        plan("suave-casa", PlanGoal.START, PlanLevel.GENTLE, 3, PlanEquipment.NONE),
+        plan("suave-gym", PlanGoal.START, PlanLevel.GENTLE, 3),
+    )
+
+    private fun recomiendaConSuaves(goal: PlanGoal, shape: Shape, days: Days, place: Place) =
+        PlanAdvisor.recommend(conSuaves, PlanAdvisor.Answers(goal, shape, days, place))
+
+    @Test fun `a quien le cuesta moverse en el gimnasio le toca el suave de maquinas`() {
+        val r = recomiendaConSuaves(PlanGoal.LOSE_FAT, Shape.LIMITED, Days.THREE, Place.GYM)
+        assertEquals("suave-gym", r.best?.plan?.id)
+        // Lo único que se le ofrece es suave: ni el arranque, que ya es demasiado.
+        assertTrue(r.alternatives.all { it.plan.level == PlanLevel.GENTLE })
+    }
+
+    @Test fun `a quien le cuesta moverse en casa le toca el suave de casa`() {
+        val r = recomiendaConSuaves(PlanGoal.MUSCLE, Shape.LIMITED, Days.TWO, Place.HOME)
+        assertEquals("suave-casa", r.best?.plan?.id)
+        assertTrue(r.alternatives.isEmpty())
+        assertTrue(r.best!!.reason.contains("te cuesta moverte"))
+    }
+
+    @Test fun `quien solo lleva tiempo parado sigue empezando por Arranque`() {
+        val r = recomiendaConSuaves(PlanGoal.MUSCLE, Shape.STOPPED, Days.THREE, Place.GYM)
+        assertEquals("arranque", r.best?.plan?.id)
+    }
+
+    @Test fun `a quien ya se mueve no se le ofrece un plan suave`() {
+        for (shape in listOf(Shape.SOMETIMES, Shape.REGULAR)) {
+            for (place in Place.entries) {
+                val r = recomiendaConSuaves(PlanGoal.LOSE_FAT, shape, Days.THREE, place)
+                val todos = listOfNotNull(r.best, r.closest) + r.alternatives
+                assertTrue(todos.none { it.plan.level == PlanLevel.GENTLE })
+            }
+        }
+    }
 }

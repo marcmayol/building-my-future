@@ -77,7 +77,8 @@ fun weightsSummary(sets: List<SetLog>): String {
 /**
  * Las series con kilos Y repeticiones, para lo que se apunta en el entreno libre:
  * "10 kg × 12 · 12 kg × 12 · 11 kg × 10". Si ninguna trae repeticiones, se lee como el
- * desglose de pesos de siempre.
+ * desglose de pesos de siempre. Las de calentamiento llevan "(cal.)" detrás: se apuntan,
+ * pero no son las que cuentan.
  */
 fun setsSummary(sets: List<SetLog>): String {
     val llenas = sets.filter { !it.isEmpty }
@@ -86,7 +87,7 @@ fun setsSummary(sets: List<SetLog>): String {
     // Sin kilos por ningún lado (unas dominadas, un ejercicio de peso corporal) las
     // repeticiones se leen solas: "× 12 · × 12" son dos aspas que no significan nada.
     if (llenas.none { it.weight.isNotBlank() }) {
-        return llenas.joinToString(" · ") { it.reps.trim().ifBlank { "—" } } + " reps"
+        return llenas.joinToString(" · ") { it.reps.trim().ifBlank { "—" } + marcaCal(it) } + " reps"
     }
     return llenas.joinToString(" · ") { serie ->
         val kg = serie.weight.trim()
@@ -95,9 +96,11 @@ fun setsSummary(sets: List<SetLog>): String {
             kg.isNotBlank() && reps.isNotBlank() -> "$kg kg × $reps"
             kg.isNotBlank() -> "$kg kg"
             else -> "× $reps"
-        }
+        } + marcaCal(serie)
     }
 }
+
+private fun marcaCal(serie: SetLog): String = if (serie.warmup) " (cal.)" else ""
 
 /** Estado completo del progreso, persistido como JSON. */
 @Serializable

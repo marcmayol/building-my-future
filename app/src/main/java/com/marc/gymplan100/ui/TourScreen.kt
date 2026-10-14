@@ -105,7 +105,7 @@ fun TourScreen(onDone: () -> Unit) {
         ),
         PasoDelTour(
             titulo = "El plan es tuyo. Los datos, también",
-            texto = "Vienen doce planes, pero puedes traerte el tuyo o crearlo dentro. No hay " +
+            texto = "Vienen quince planes, pero puedes traerte el tuyo o crearlo dentro. No hay " +
                 "cuenta ni servidor: todo se queda en el móvil, así que la copia de seguridad " +
                 "la guardas tú.",
             donde = "«Mis planes» en la portada, y la copia en Ajustes (la rueda de arriba).",

@@ -45,7 +45,7 @@ data class PlanDto(
     /** "perder grasa", "musculo", "fuerza", "mantener", "movilidad" o "empezar". */
     @JsonNames("goal")
     val objetivo: String = "",
-    /** "cero", "principiante", "intermedio" o "cualquiera". */
+    /** "suave", "cero", "principiante", "intermedio" o "cualquiera". */
     @JsonNames("level")
     val nivel: String = "",
     /** Días de entrenamiento por semana que pide el plan. */
@@ -190,6 +190,7 @@ object PlanCodec {
     }
 
     private fun levelFrom(raw: String): PlanLevel = when (raw.trim().lowercase()) {
+        "suave", "muy suave", "gentle" -> PlanLevel.GENTLE
         "cero", "zero" -> PlanLevel.ZERO
         "principiante", "beginner" -> PlanLevel.BEGINNER
         "intermedio", "intermediate" -> PlanLevel.INTERMEDIATE

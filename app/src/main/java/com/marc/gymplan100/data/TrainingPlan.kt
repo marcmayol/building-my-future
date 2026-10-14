@@ -6,8 +6,13 @@ package com.marc.gymplan100.data
  */
 enum class PlanGoal { LOSE_FAT, MUSCLE, STRENGTH, MAINTAIN, MOBILITY, START }
 
-/** Punto de partida de quien lo va a hacer. `ANY` = le vale a cualquiera. */
-enum class PlanLevel { ZERO, BEGINNER, INTERMEDIATE, ANY }
+/**
+ * Punto de partida de quien lo va a hacer. `ANY` = le vale a cualquiera.
+ *
+ * `GENTLE` está por debajo de `ZERO`: no es "nunca he ido al gimnasio" sino "me cuesta
+ * moverme" (mucho peso, años sin hacer nada, poca movilidad). Solo se le propone a quien lo dice.
+ */
+enum class PlanLevel { GENTLE, ZERO, BEGINNER, INTERMEDIATE, ANY }
 
 /** Qué hace falta para poder hacerlo. */
 enum class PlanEquipment {

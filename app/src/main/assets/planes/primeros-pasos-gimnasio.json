@@ -1,0 +1,358 @@
+{
+ "id": "primeros-pasos-gimnasio",
+ "nombre": "Primeros pasos en el gimnasio",
+ "descripcion": "Para empezar de verdad desde cero · Muy suave · 3 días/semana\nPensado para quien lleva años sin moverse, tiene mucho peso que perder o poca movilidad. Todo sentado en máquinas, con el peso mínimo, y cardio en bici o cinta a paso cómodo. Sesiones de 20 a 35 minutos durante 8 semanas. Si tienes una lesión o una enfermedad, consúltalo antes con tu médico.",
+ "origen": "json",
+ "objetivo": "empezar",
+ "nivel": "suave",
+ "diasSemana": 3,
+ "material": "gimnasio",
+ "bloqueExtra": false,
+ "fases": [
+  {
+   "nombre": "Conocer el gimnasio",
+   "semanas": 3,
+   "descripcion": "Sesiones de 20 a 25 minutos, todo sentado en máquinas. Descansos de 2 minutos o lo que necesites. Aquí no se viene a sufrir: se viene a aprender las máquinas y a volver.",
+   "progresion": "El peso no sube en esta fase. Tu único objetivo es venir los tres días y salir con ganas de volver.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo entero sentado",
+     "calentamiento": "Los primeros 3 min de bici, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Bici estática: bloque suave",
+       "esquema": "8 min",
+       "nota": "Mejor la bici de respaldo (reclinada) si la hay: es la más cómoda para empezar. Resistencia baja y un ritmo en el que puedas hablar.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Prensa de piernas (recorrido corto)",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Remo sentado en máquina",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "2 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Piernas y espalda en máquina",
+     "calentamiento": "Los primeros 3 min de cinta, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Cinta caminando: bloque suave",
+       "esquema": "8 min",
+       "nota": "Sin inclinación, a paso cómodo y agarrado a las barras si lo necesitas.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Jalón al pecho en polea",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de hombros en máquina (peso mínimo)",
+       "esquema": "1 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Curl de piernas sentado",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo entero y tronco",
+     "calentamiento": "Los primeros 3 min de bici, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Bici estática: bloque suave",
+       "esquema": "10 min",
+       "nota": "Mejor la bici de respaldo (reclinada) si la hay: es la más cómoda para empezar. Resistencia baja y un ritmo en el que puedas hablar.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Prensa de piernas (recorrido corto)",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Abducción de cadera en máquina",
+       "esquema": "2 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Plancha apoyada en banco o pared",
+       "esquema": "2 x 10 s",
+       "nota": "De pie: antebrazos en la pared o en la encimera, un paso atrás y el cuerpo recto. Respira normal.",
+       "tipo": "tiempo"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Coger ritmo",
+   "semanas": 3,
+   "descripcion": "Sesiones de 25 a 30 minutos. Se añade una serie y el cardio se alarga un poco. Las máquinas ya las conoces.",
+   "progresion": "Cuando hagas todas las series y repeticiones con margen, sube el peso al siguiente agujero. Uno solo.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo entero sentado",
+     "calentamiento": "Los primeros 3 min de bici, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Bici estática: bloque suave",
+       "esquema": "12 min",
+       "nota": "Mejor la bici de respaldo (reclinada) si la hay: es la más cómoda para empezar. Resistencia baja y un ritmo en el que puedas hablar.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Prensa de piernas (recorrido corto)",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Remo sentado en máquina",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "2 x 12",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Piernas y espalda en máquina",
+     "calentamiento": "Los primeros 3 min de cinta, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Cinta caminando: bloque suave",
+       "esquema": "12 min",
+       "nota": "Sin inclinación, a paso cómodo y agarrado a las barras si lo necesitas.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Jalón al pecho en polea",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de hombros en máquina (peso mínimo)",
+       "esquema": "2 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Curl de piernas sentado",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo entero y tronco",
+     "calentamiento": "Los primeros 3 min de bici, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Bici estática: bloque suave",
+       "esquema": "12 min",
+       "nota": "Mejor la bici de respaldo (reclinada) si la hay: es la más cómoda para empezar. Resistencia baja y un ritmo en el que puedas hablar.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Sentadilla a banco/cajón",
+       "esquema": "2 x 6",
+       "nota": "Banco o cajón alto detrás. Siéntate del todo y levántate; si cuesta, apóyate en las manos.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Prensa de piernas (recorrido corto)",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "3 x 8",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Abducción de cadera en máquina",
+       "esquema": "2 x 12",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Plancha apoyada en banco o pared",
+       "esquema": "2 x 20 s",
+       "nota": "De pie: antebrazos en la pared o en la encimera, un paso atrás y el cuerpo recto. Respira normal.",
+       "tipo": "tiempo"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Ganar confianza",
+   "semanas": 2,
+   "descripcion": "Sesiones de 30 a 35 minutos. Más repeticiones y un poco más de cardio. Ya entrenas como cualquiera en el gimnasio.",
+   "progresion": "Sube peso cuando llegues a 10 repeticiones limpias en todas las series. Al terminar, el paso natural es el plan Arranque.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "Cuerpo entero sentado",
+     "calentamiento": "Los primeros 3 min de bici, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Bici estática: bloque suave",
+       "esquema": "15 min",
+       "nota": "Mejor la bici de respaldo (reclinada) si la hay: es la más cómoda para empezar. Resistencia baja y un ritmo en el que puedas hablar.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Prensa de piernas (recorrido corto)",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Remo sentado en máquina",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "3 x 12",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Piernas y espalda en máquina",
+     "calentamiento": "Los primeros 3 min de cinta, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Cinta caminando: bloque suave",
+       "esquema": "15 min",
+       "nota": "Sin inclinación, a paso cómodo y agarrado a las barras si lo necesitas.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Extensión de piernas",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Jalón al pecho en polea",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de hombros en máquina (peso mínimo)",
+       "esquema": "2 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Curl de piernas sentado",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Cuerpo entero y tronco",
+     "calentamiento": "Los primeros 3 min de bici, aún más suaves",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Bici estática: bloque suave",
+       "esquema": "15 min",
+       "nota": "Mejor la bici de respaldo (reclinada) si la hay: es la más cómoda para empezar. Resistencia baja y un ritmo en el que puedas hablar.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Sentadilla a banco/cajón",
+       "esquema": "2 x 8",
+       "nota": "Banco o cajón alto detrás. Siéntate del todo y levántate; si cuesta, apóyate en las manos.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Prensa de piernas (recorrido corto)",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Press de pecho en máquina",
+       "esquema": "3 x 10",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Abducción de cadera en máquina",
+       "esquema": "3 x 12",
+       "nota": "Pide que te ajusten el asiento la primera vez y empieza con el peso más bajo de la máquina."
+      },
+      {
+       "nombre": "Plancha apoyada en banco o pared",
+       "esquema": "3 x 20 s",
+       "nota": "De pie: antebrazos en la pared o en la encimera, un paso atrás y el cuerpo recto. Respira normal.",
+       "tipo": "tiempo"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,385 @@
+{
+ "id": "primeros-pasos-casa",
+ "nombre": "Primeros pasos en casa",
+ "descripcion": "Para empezar de verdad desde cero · Muy suave · 3 días/semana\nPensado para quien lleva años sin moverse, tiene mucho peso que perder o poca movilidad. Todo de pie con apoyo o sentado, nada en el suelo, y sin material: una silla firme, una pared y un par de botellas de agua. Sesiones de 15 a 30 minutos durante 8 semanas. Si tienes una lesión o una enfermedad, consúltalo antes con tu médico.",
+ "origen": "json",
+ "objetivo": "empezar",
+ "nivel": "suave",
+ "diasSemana": 3,
+ "material": "nada",
+ "bloqueExtra": false,
+ "fases": [
+  {
+   "nombre": "Despertar el cuerpo",
+   "semanas": 3,
+   "descripcion": "Sesiones de 15 a 20 minutos. Todo de pie con algo firme a mano para agarrarte, o sentado. Nada en el suelo. Descansa lo que necesites entre series.",
+   "progresion": "En esta fase no se sube nada. Si un día cuesta más, haz una serie menos: el día cuenta igual. Lo que se entrena aquí es la costumbre.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "De pie y con apoyo",
+     "calentamiento": "3 min moviendo brazos, hombros y tobillos, sentado o de pie",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "8 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Sentadilla a silla (sentarse y levantarse)",
+       "esquema": "2 x 5",
+       "nota": "Silla firme, sin ruedas y contra la pared. Siéntate del todo y levántate; si hace falta, empújate con las manos en los muslos o en los reposabrazos.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Flexión en pared",
+       "esquema": "2 x 6",
+       "nota": "Manos en la pared a la altura del pecho. Cuanto más cerca de la pared tengas los pies, más fácil.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de talones agarrado a una silla",
+       "esquema": "2 x 8",
+       "nota": "De pie, agarrado al respaldo de una silla o a la encimera. Sube despacio y baja despacio.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Chin tuck (retracción de barbilla)",
+       "esquema": "2 x 6",
+       "tipo": "peso corporal"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Sentado, brazos y piernas",
+     "calentamiento": "3 min moviendo brazos, hombros y tobillos, sentado",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "8 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Remo con botella o bolsa, apoyado en la mesa",
+       "esquema": "2 x 8",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso. Las repeticiones son por brazo."
+      },
+      {
+       "nombre": "Press de hombros sentado con botellas",
+       "esquema": "2 x 6",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso."
+      },
+      {
+       "nombre": "Curl de bíceps con botellas de agua",
+       "esquema": "2 x 8",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso."
+      },
+      {
+       "nombre": "Extensión de piernas sentado en silla",
+       "esquema": "2 x 6",
+       "nota": "Sentado y con la espalda apoyada, estira una rodilla del todo, aguanta 2 s y baja. Las repeticiones son por pierna.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "2 x 10",
+       "nota": "Sentado, sube los talones del suelo y bájalos despacio.",
+       "tipo": "peso corporal"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Paseo y movilidad",
+     "calentamiento": "Empieza el paseo más despacio de lo normal",
+     "estiramientos": "Respiraciones lentas: 2 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "10 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Dorsiflexión de tobillo contra pared",
+       "esquema": "2 x 8",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Deslizamientos de brazos en pared (wall slides)",
+       "esquema": "2 x 6",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Estiramiento de pecho en marco de puerta",
+       "esquema": "2 x 20 s",
+       "tipo": "tiempo"
+      },
+      {
+       "nombre": "Estiramiento de gemelos en escalón o pared",
+       "esquema": "2 x 20 s",
+       "tipo": "tiempo"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Coger ritmo",
+   "semanas": 3,
+   "descripcion": "Sesiones de 20 a 25 minutos. Se añade una serie a lo básico y el paseo se alarga un poco.",
+   "progresion": "Sube una repetición cuando la última salga sin ahogarte ni dolor. Si te notas fuerte con las botellas, pon algo un poco más pesado.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "De pie y con apoyo",
+     "calentamiento": "3 min moviendo brazos, hombros y tobillos, sentado o de pie",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "12 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Sentadilla a silla (sentarse y levantarse)",
+       "esquema": "3 x 6",
+       "nota": "Silla firme, sin ruedas y contra la pared. Siéntate del todo y levántate; si hace falta, empújate con las manos en los muslos o en los reposabrazos.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Flexión en pared",
+       "esquema": "3 x 8",
+       "nota": "Manos en la pared a la altura del pecho. Cuanto más cerca de la pared tengas los pies, más fácil.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de talones agarrado a una silla",
+       "esquema": "2 x 12",
+       "nota": "De pie, agarrado al respaldo de una silla o a la encimera. Sube despacio y baja despacio.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Plancha apoyada en banco o pared",
+       "esquema": "2 x 15 s",
+       "nota": "De pie: antebrazos en la pared o en la encimera, un paso atrás y el cuerpo recto. Respira normal.",
+       "tipo": "tiempo"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Sentado, brazos y piernas",
+     "calentamiento": "3 min moviendo brazos, hombros y tobillos, sentado",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "12 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Remo con botella o bolsa, apoyado en la mesa",
+       "esquema": "3 x 8",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso. Las repeticiones son por brazo."
+      },
+      {
+       "nombre": "Press de hombros sentado con botellas",
+       "esquema": "2 x 8",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso."
+      },
+      {
+       "nombre": "Curl de bíceps con botellas de agua",
+       "esquema": "2 x 10",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso."
+      },
+      {
+       "nombre": "Extensión de piernas sentado en silla",
+       "esquema": "2 x 10",
+       "nota": "Sentado y con la espalda apoyada, estira una rodilla del todo, aguanta 2 s y baja. Las repeticiones son por pierna.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "2 x 15",
+       "nota": "Sentado, sube los talones del suelo y bájalos despacio.",
+       "tipo": "peso corporal"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Paseo y movilidad",
+     "calentamiento": "Empieza el paseo más despacio de lo normal",
+     "estiramientos": "Respiraciones lentas: 2 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "15 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Bisagra de cadera con palo o escoba (espalda recta)",
+       "esquema": "2 x 8",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Dorsiflexión de tobillo contra pared",
+       "esquema": "2 x 10",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Deslizamientos de brazos en pared (wall slides)",
+       "esquema": "2 x 8",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Chin tuck (retracción de barbilla)",
+       "esquema": "2 x 8",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Estiramiento de gemelos en escalón o pared",
+       "esquema": "2 x 30 s",
+       "tipo": "tiempo"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "Ganar confianza",
+   "semanas": 2,
+   "descripcion": "Sesiones de 25 a 30 minutos. Ya sabes hacer todo lo del plan: ahora se trata de hacerlo un poco más y con menos pausas.",
+   "progresion": "Si llegas al tope de repeticiones en todas las series, sube un poco el peso o aleja los pies de la pared. Al terminar, el paso natural es el plan En casa.",
+   "dias": [
+    {
+     "dia": "Día 1",
+     "titulo": "De pie y con apoyo",
+     "calentamiento": "3 min moviendo brazos, hombros y tobillos, sentado o de pie",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "15 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Sentadilla a silla (sentarse y levantarse)",
+       "esquema": "3 x 8",
+       "nota": "Silla firme, sin ruedas y contra la pared. Siéntate del todo y levántate; si hace falta, empújate con las manos en los muslos o en los reposabrazos.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Flexión en pared",
+       "esquema": "3 x 10",
+       "nota": "Manos en la pared a la altura del pecho. Cuanto más cerca de la pared tengas los pies, más fácil.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de talones agarrado a una silla",
+       "esquema": "3 x 12",
+       "nota": "De pie, agarrado al respaldo de una silla o a la encimera. Sube despacio y baja despacio.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Plancha apoyada en banco o pared",
+       "esquema": "3 x 20 s",
+       "nota": "De pie: antebrazos en la pared o en la encimera, un paso atrás y el cuerpo recto. Respira normal.",
+       "tipo": "tiempo"
+      }
+     ]
+    },
+    {
+     "dia": "Día 2",
+     "titulo": "Sentado, brazos y piernas",
+     "calentamiento": "3 min moviendo brazos, hombros y tobillos, sentado",
+     "estiramientos": "Estiramientos suaves: 3 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "15 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Remo con botella o bolsa, apoyado en la mesa",
+       "esquema": "3 x 10",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso. Las repeticiones son por brazo."
+      },
+      {
+       "nombre": "Press de hombros sentado con botellas",
+       "esquema": "3 x 8",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso."
+      },
+      {
+       "nombre": "Curl de bíceps con botellas de agua",
+       "esquema": "3 x 10",
+       "nota": "Una botella de agua de 1,5 l pesa 1,5 kg; una bolsa con libros, lo que le pongas. Apunta ese peso."
+      },
+      {
+       "nombre": "Extensión de piernas sentado en silla",
+       "esquema": "3 x 10",
+       "nota": "Sentado y con la espalda apoyada, estira una rodilla del todo, aguanta 2 s y baja. Las repeticiones son por pierna.",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Elevación de gemelos sentado",
+       "esquema": "3 x 15",
+       "nota": "Sentado, sube los talones del suelo y bájalos despacio.",
+       "tipo": "peso corporal"
+      }
+     ]
+    },
+    {
+     "dia": "Día 3",
+     "titulo": "Paseo y movilidad",
+     "calentamiento": "Empieza el paseo más despacio de lo normal",
+     "estiramientos": "Respiraciones lentas: 2 min",
+     "ejercicios": [
+      {
+       "nombre": "Paseo continuo a ritmo cómodo",
+       "esquema": "20 min",
+       "nota": "Por casa o por la calle, a un ritmo en el que puedas hablar. Si necesitas parar, para: el tiempo se suma igual.",
+       "tipo": "cardio"
+      },
+      {
+       "nombre": "Bisagra de cadera con palo o escoba (espalda recta)",
+       "esquema": "3 x 8",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Dorsiflexión de tobillo contra pared",
+       "esquema": "2 x 10",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Deslizamientos de brazos en pared (wall slides)",
+       "esquema": "2 x 10",
+       "tipo": "peso corporal"
+      },
+      {
+       "nombre": "Estiramiento de pecho en marco de puerta",
+       "esquema": "2 x 30 s",
+       "tipo": "tiempo"
+      },
+      {
+       "nombre": "Estiramiento de gemelos en escalón o pared",
+       "esquema": "2 x 30 s",
+       "tipo": "tiempo"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

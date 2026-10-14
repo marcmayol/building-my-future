@@ -17,6 +17,7 @@ import com.marc.gymplan100.data.BuiltinPlan
 import com.marc.gymplan100.data.PlanAdvisor
 import com.marc.gymplan100.data.PlanEquipment
 import com.marc.gymplan100.data.PlanGoal
+import com.marc.gymplan100.data.PlanLevel
 import com.marc.gymplan100.data.PlanCodec
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.PlanDto
@@ -509,6 +510,17 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun nextPlanSuggestion(): PlanAdvisor.Suggestion? {
         val terminado = PlanData.active
+        // Tras un plan suave el siguiente escalón es fijo: el arranque en el gimnasio y el de
+        // casa en casa. El recomendador no sirve aquí porque daría por hecho la constancia.
+        if (terminado.level == PlanLevel.GENTLE) {
+            val siguiente = if (terminado.equipment == PlanEquipment.GYM) "arranque" else "en-casa"
+            return _plans.value.firstOrNull { it.id == siguiente }?.let {
+                PlanAdvisor.Suggestion(
+                    it,
+                    "Ya te mueves con soltura: toca un poco más de trabajo, con el mismo cuidado."
+                )
+            }
+        }
         val objetivo = when (terminado.goal) {
             // Quien acaba el plan de empezar ya no está empezando.
             PlanGoal.START -> PlanGoal.LOSE_FAT
@@ -1199,17 +1211,20 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val limpias = entries
             .map { entrada ->
                 val series = entrada.sets
-                    .map { SetLog(it.weight.trim(), it.reps.trim()) }
+                    // copy y no un SetLog nuevo: así no se pierde si era de calentamiento.
+                    .map { it.copy(weight = it.weight.trim(), reps = it.reps.trim()) }
                     .dropLastWhile { it.isEmpty }
                 // El resumen del ejercicio sale de sus series: el peso más alto y las
-                // repeticiones que se hicieron con él.
-                val tope = heaviestWeight(series.map { it.weight })
-                val repsDelTope = series.firstOrNull { it.weight == tope && it.reps.isNotBlank() }?.reps
+                // repeticiones que se hicieron con él. Las de calentamiento no cuentan, como en
+                // el guiado; salvo que no haya otras, que algo hay que sugerir la próxima vez.
+                val trabajo = series.filterNot { it.warmup }.ifEmpty { series }
+                val tope = heaviestWeight(trabajo.map { it.weight })
+                val repsDelTope = trabajo.firstOrNull { it.weight == tope && it.reps.isNotBlank() }?.reps
                 entrada.copy(
                     name = entrada.name.trim(),
                     weight = tope.ifBlank { entrada.weight.trim() },
                     reps = repsDelTope
-                        ?: series.firstOrNull { it.reps.isNotBlank() }?.reps
+                        ?: trabajo.firstOrNull { it.reps.isNotBlank() }?.reps
                         ?: entrada.reps.trim(),
                     sets = series
                 )

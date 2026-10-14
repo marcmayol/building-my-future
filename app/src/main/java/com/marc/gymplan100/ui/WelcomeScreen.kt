@@ -141,7 +141,7 @@ fun WelcomeScreen(
                     if (preguntando) {
                         "No se guarda nada de esto: solo sirve para proponerte un plan."
                     } else {
-                        "Hay doce planes dentro. Puedo recomendarte uno en cuatro preguntas, " +
+                        "Hay quince planes dentro. Puedo recomendarte uno en cuatro preguntas, " +
                             "o los miras tú mismo."
                     },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
@@ -167,6 +167,9 @@ fun WelcomeScreen(
                     ) { Text("Ver los planes") }
                 }
                 item { Subrayado("Crear el mío", onCreatePlan) }
+                // Hay quien ya sabe lo que hace y no quiere plan: entra y usa el entreno libre
+                // de la portada, que no depende de ninguna rutina.
+                item { Subrayado("Solo quiero apuntar lo que entreno", onDone) }
             }
 
             if (preguntando) {
@@ -300,7 +303,7 @@ fun WelcomeScreen(
                             onClick = onSeePlans,
                             shape = CircleShape,
                             modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                        ) { Text("Ver los doce planes") }
+                        ) { Text("Ver todos los planes") }
                     }
                     item { Subrayado("Mejor me creo el mío", onCreatePlan) }
                 }
@@ -353,6 +356,7 @@ private val OBJETIVOS = listOf(
 )
 
 private val FORMA = listOf(
+    PlanAdvisor.Shape.LIMITED to "Me cuesta moverme",
     PlanAdvisor.Shape.STOPPED to "Parado hace tiempo",
     PlanAdvisor.Shape.SOMETIMES to "De vez en cuando",
     PlanAdvisor.Shape.REGULAR to "Entreno regular",

@@ -16,6 +16,12 @@ object PlanAdvisor {
 
     /** De dónde parte: es lo que evita mandar a alguien parado a un plan de intermedio. */
     enum class Shape {
+        /**
+         * Le cuesta moverse: mucho sobrepeso, años sin hacer nada o poca movilidad. Va antes
+         * que [STOPPED] porque no es lo mismo: aquí hasta el plan de arranque es demasiado.
+         */
+        LIMITED,
+
         /** Parado desde hace tiempo, o volviendo de una lesión ya recuperada. */
         STOPPED,
 
@@ -123,6 +129,17 @@ object PlanAdvisor {
         // Lo que no se puede hacer, no se propone: sin gimnasio, un plan de máquinas sobra.
         if (a.place == Place.HOME && plan.equipment == PlanEquipment.GYM) return 0
 
+        // A quien le cuesta moverse solo se le propone lo más suave, diga lo que diga el
+        // objetivo y los días: lo primero es poder hacerlo. Y si va al gimnasio, el de
+        // máquinas por delante del de casa, que también le vale.
+        if (a.shape == Shape.LIMITED) {
+            if (plan.level != PlanLevel.GENTLE) return 0
+            return 20 + if (a.place == Place.GYM && plan.equipment == PlanEquipment.GYM) 2 else 0
+        }
+        // Y a la inversa: los planes suaves se quedan cortos para quien se mueve con soltura.
+        // A quien lleva tiempo parado se le dejan como última alternativa, nunca por delante.
+        if (plan.level == PlanLevel.GENTLE) return if (a.shape == Shape.STOPPED) 1 else 0
+
         // Quien lleva tiempo parado empieza por el principio, diga lo que diga su objetivo.
         if (a.shape == Shape.STOPPED) {
             if (plan.level == PlanLevel.INTERMEDIATE) return 0
@@ -142,6 +159,7 @@ object PlanAdvisor {
         if (parientes(plan.goal, a.goal)) s += 3
 
         s += when (plan.level) {
+            PlanLevel.GENTLE -> 0
             PlanLevel.ANY -> 2
             PlanLevel.ZERO -> if (a.shape == Shape.STOPPED) 3 else 0
             PlanLevel.BEGINNER -> if (a.shape != Shape.REGULAR) 3 else 1
@@ -200,7 +218,8 @@ object PlanAdvisor {
         val extras = plans.filter { it.addOn }
         return when {
             a.goal == PlanGoal.MOBILITY -> extras.filter { it.goal == PlanGoal.MOBILITY }
-            a.shape == Shape.STOPPED -> extras.filter { it.goal == PlanGoal.MOBILITY }
+            a.shape == Shape.STOPPED || a.shape == Shape.LIMITED ->
+                extras.filter { it.goal == PlanGoal.MOBILITY }
             a.days == Days.TWO -> emptyList()   // si va justo de días, no se le carga más
             else -> extras
         }
@@ -210,6 +229,7 @@ object PlanAdvisor {
     private fun reason(plan: TrainingPlan, a: Answers): String {
         val trozos = mutableListOf<String>()
         trozos += when (a.shape) {
+            Shape.LIMITED -> "te cuesta moverte"
             Shape.STOPPED -> "vienes de estar parado"
             Shape.SOMETIMES -> "entrenas de vez en cuando"
             Shape.REGULAR -> "ya entrenas con constancia"
@@ -217,7 +237,9 @@ object PlanAdvisor {
         trozos += "${a.days.n} días por semana"
         if (a.place == Place.HOME) trozos += "sin material"
 
-        val cola = when (plan.goal) {
+        val cola = if (plan.level == PlanLevel.GENTLE) {
+            "aquí se empieza de pie o sentado, con apoyo y a tu ritmo"
+        } else when (plan.goal) {
             PlanGoal.START -> "esto es para coger el hábito sin machacarte"
             PlanGoal.LOSE_FAT -> "aquí se mueve mucho y se suda"
             PlanGoal.MUSCLE -> "el volumen está repartido para crecer"

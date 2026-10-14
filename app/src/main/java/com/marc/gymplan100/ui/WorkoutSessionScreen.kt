@@ -1126,7 +1126,7 @@ private fun FreeContent(
     SessionShell(
         tint = SessionTint.WORK,
         dark = dark,
-        stateLabel = if (s.extra) "Entrenamiento extra" else "Entrenamiento libre",
+        stateLabel = if (s.extra) "Entreno extra" else "Entreno libre",
         context = if (s.extra) "no cuenta día" else "Día ${s.dayNumber}",
         onExit = onExit,
         contextCard = {

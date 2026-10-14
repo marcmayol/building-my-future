@@ -37,6 +37,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -158,6 +159,15 @@ fun FreeSessionLog(
             }
     }
 
+    // Ni el cardio ni lo que va por tiempo tienen series de calentamiento: diez minutos de
+    // bici no se dividen en «de aproximación» y «de trabajo».
+    val sinCalentamiento = remember {
+        (PlanData.days.flatMap { it.template.exercises } + day?.template?.exercises.orEmpty())
+            .filter { it.kind == ExerciseKind.CARDIO || it.kind == ExerciseKind.TIME }
+            .map { it.name }
+            .toSet()
+    }
+
     val apuntados = filas.count { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
     val tecladoAbierto = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     // Qué fila se está escribiendo: la de al lado se atenúa para que el pulgar sepa dónde está.
@@ -233,6 +243,7 @@ fun FreeSessionLog(
                     fila = filas[i],
                     sugerencias = sugerencias,
                     kind = tipos[filas[i].name] ?: ExerciseKind.STRENGTH,
+                    conCalentamiento = filas[i].name !in sinCalentamiento,
                     // Con otra fila en marcha, esta baja de tono en vez de desaparecer.
                     atenuada = enfocada >= 0 && enfocada != i,
                     onFocus = { tiene -> if (tiene) enfocada = i else if (enfocada == i) enfocada = -1 },
@@ -337,6 +348,7 @@ private fun FilaEjercicio(
     fila: LoggedExercise,
     sugerencias: List<String>,
     kind: ExerciseKind,
+    conCalentamiento: Boolean,
     atenuada: Boolean,
     onFocus: (Boolean) -> Unit,
     onChange: (LoggedExercise) -> Unit,
@@ -414,14 +426,18 @@ private fun FilaEjercicio(
         // Dos campos cortos, no dos campos anchos: nadie escribe "ciento veinte kilos".
         // A 150 % de texto el segundo baja solo en vez de estrujarse.
         val series = fila.sets.ifEmpty { listOf(SetLog()) }
+        // Las de calentamiento se marcan aparte y no gastan número: la «1ª» es la primera de
+        // verdad, igual que en el entreno guiado. Así no cuentan para kilos ni para tu PR.
         series.forEachIndexed { i, serie ->
             fun cambiar(nueva: SetLog) =
                 onChange(fila.copy(sets = series.toMutableList().also { it[i] = nueva }))
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val deTrabajo = series.take(i + 1).count { !it.warmup }
                 Text(
-                    "${i + 1}ª",
+                    if (serie.warmup) "C" else "${deTrabajo}ª",
                     style = LocalAppTextStyles.current.tabular,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (serie.warmup) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.width(30.dp)
                 )
                 FlowRow(
@@ -446,6 +462,16 @@ private fun FilaEjercicio(
                         unidad = if (kind == ExerciseKind.TIME) "s" else "reps",
                         decimal = false
                     )
+                    if (conCalentamiento) {
+                        FilterChip(
+                            selected = serie.warmup,
+                            onClick = { cambiar(serie.copy(warmup = !serie.warmup)) },
+                            label = {
+                                Text("Calentamiento", style = MaterialTheme.typography.bodyMedium)
+                            },
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
                 }
                 // La primera serie no se puede quitar: es la fila del ejercicio.
                 if (series.size > 1) {

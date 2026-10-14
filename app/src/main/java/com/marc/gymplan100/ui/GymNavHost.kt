@@ -143,6 +143,10 @@ fun GymNavHost(
                     }
                 },
                 onOpenSpecial = { navController.navigate(Routes.SPECIAL) },
+                onFreeWorkout = {
+                    val refDay = viewModel.startExtraSession()
+                    navController.navigate(Routes.session(refDay))
+                },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenPlans = { navController.navigate(Routes.PLANS) }
             )

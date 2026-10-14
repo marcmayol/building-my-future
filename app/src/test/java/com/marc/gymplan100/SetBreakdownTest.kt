@@ -160,4 +160,9 @@ class SetBreakdownTest {
     @Test fun `un entreno libre sin nada apuntado no tiene series`() {
         assertTrue(LoggedExercise(name = "Prensa de piernas").setsOrSingle.isEmpty())
     }
+
+    @Test fun `en el resumen se ve cual era de calentamiento`() {
+        val series = listOf(SetLog("20", "10", warmup = true), SetLog("40", "8"))
+        assertEquals("20 kg × 10 (cal.) · 40 kg × 8", setsSummary(series))
+    }
 }
