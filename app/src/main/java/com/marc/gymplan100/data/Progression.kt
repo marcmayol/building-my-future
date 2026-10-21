@@ -83,6 +83,7 @@ object Progression {
             if (day == excludeDay) return@mapNotNull null
             val idx = key.substring(dash + 1).toIntOrNull() ?: return@mapNotNull null
             val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx)?.name
+                ?.let { log.nameFor(it) }
             if (name != exerciseName) return@mapNotNull null
             // Las de calentamiento no cuentan para decidir si toca subir peso.
             val series = log.workingSets

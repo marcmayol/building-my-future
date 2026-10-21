@@ -1,8 +1,8 @@
 {
-  "versionCode": 39,
-  "versionName": "2.17",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.17/building-my-future-v2.17.apk",
-  "sha256": "c4e9581faa756ad6d216f598341e5f3f300365821d0f195aa65bb1c7741c1a88",
-  "notas": "Dos planes nuevos para empezar desde cero si te cuesta moverte: Primeros pasos en casa (de pie con apoyo o sentado, sin material) y Primeros pasos en el gimnasio (todo sentado en máquinas). Entreno libre a un toque desde la portada, para apuntar lo que haces sin seguir ninguna rutina. Y en el entreno libre ya puedes marcar series de calentamiento: se apuntan, pero no cuentan para tu peso ni para tu PR.",
+  "versionCode": 40,
+  "versionName": "2.18",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.18/building-my-future-v2.18.apk",
+  "sha256": "7fe5c85aa94efc6a28f4a8e93bf724862d802c79a90be0af7b71ac88fcaef2be",
+  "notas": "Building My Future 2.18.",
   "check_horas": 24
 }

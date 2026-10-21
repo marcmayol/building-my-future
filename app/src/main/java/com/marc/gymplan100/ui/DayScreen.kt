@@ -67,6 +67,7 @@ import com.marc.gymplan100.data.MuscleLoad
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.marc.gymplan100.data.setsSummary
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.data.RestDefaults
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.setCountFromScheme
 import com.marc.gymplan100.data.contar
@@ -95,6 +96,9 @@ fun DayScreen(
     val day = PlanData.dayByNumber(dayNumber) ?: PlanData.days.first()
     val template = day.template
     val progress by viewModel.progress.collectAsState()
+    val active by viewModel.activeSession.collectAsState()
+    // Hay un entreno de este día a medias: el botón lo continúa, no empieza otro.
+    val enCurso = active?.let { it.dayNumber == day.number && !it.isRoutine && !it.extra } == true
     val completed = day.number in progress.completedDays
     // Ejercicio cuya ficha se está mostrando, o null.
     var guideFor by remember { mutableStateOf<Exercise?>(null) }
@@ -152,11 +156,12 @@ fun DayScreen(
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Spacer(Modifier.width(Space.x2))
-                    Text("Empezar entrenamiento")
+                    Text(if (enCurso) "Continuar entrenamiento" else "Empezar entrenamiento")
                 }
             }
 
-            item {
+            // Con el entreno a medias, el libre lo machacaría: no se ofrece.
+            if (!enCurso) item {
                 // Alternativa al guiado: cronómetro libre (sin series ni pesos) que SÍ cuenta
                 // como el día del plan. Para cuando entrenas a tu aire pero quieres el registro.
                 OutlinedButton(
@@ -176,6 +181,11 @@ fun DayScreen(
                 ExerciseCard(
                     exercise = exercise,
                     totalSets = totalSets,
+                    // Lo que se hizo de verdad ese día o, si no, el cambio que tienes recordado.
+                    doneAs = log?.doneAs?.takeIf { it.isNotBlank() }
+                        ?: progress.exerciseSwaps[exercise.name]?.takeIf { it.isNotBlank() },
+                    rest = if (exercise.kind == ExerciseKind.CARDIO) null
+                    else RestDefaults.between(exercise, yours = progress.yourRests).seconds,
                     // Lo apuntado serie a serie. Si el día viene de antes del desglose, el
                     // peso que hubiera se enseña como el de la primera serie.
                     sets = log?.sets?.ifEmpty { null }
@@ -242,6 +252,13 @@ fun DayScreen(
             )
         }
     }
+}
+
+/** «90 s», «2 min», «2:30 min»: como se dice en el gimnasio. */
+private fun restLabel(seconds: Int): String = when {
+    seconds < 120 -> "$seconds s"
+    seconds % 60 == 0 -> "${seconds / 60} min"
+    else -> "%d:%02d min".format(seconds / 60, seconds % 60)
 }
 
 /**
@@ -336,6 +353,9 @@ private fun fontScale(): Float = LocalDensity.current.fontScale.coerceIn(1f, 1.6
 private fun ExerciseCard(
     exercise: Exercise,
     totalSets: Int,
+    doneAs: String?,
+    /** Segundos de descanso entre series, o null si no aplica (cardio). */
+    rest: Int?,
     sets: List<SetLog>,
     hint: String,
     reps: String,
@@ -362,8 +382,21 @@ private fun ExerciseCard(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(exercise.name, style = MaterialTheme.typography.titleMedium)
+                if (doneAs != null) {
+                    Text(
+                        "Lo haces como $doneAs",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
                 Spacer(Modifier.height(2.dp))
-                Text(exercise.scheme, style = styles.tabular, color = app.warmup)
+                // El descanso, a la vista: antes no salía en ningún sitio hasta estar ya
+                // descansando, y quien lo buscaba antes de empezar no lo encontraba.
+                Text(
+                    exercise.scheme + (rest?.let { " · descanso ${restLabel(it)}" } ?: ""),
+                    style = styles.tabular,
+                    color = app.warmup
+                )
                 if (exercise.note.isNotEmpty()) {
                     Text(
                         exercise.note,

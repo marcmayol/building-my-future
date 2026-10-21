@@ -26,10 +26,17 @@ object SessionEngine {
      * no guarda ni programa alarmas; el llamante (móvil o servicio del reloj) se encarga de eso.
      * [watchControlled] marca las que arrancan desde el reloj para el cálculo de calorías.
      */
-    fun startSession(dayNumber: Int, now: Long, watchControlled: Boolean = false): ActiveSession {
+    fun startSession(
+        dayNumber: Int,
+        now: Long,
+        watchControlled: Boolean = false,
+        express: ExpressPlan? = null,
+        swaps: Map<Int, String> = emptyMap()
+    ): ActiveSession {
         val day = PlanData.dayByNumber(dayNumber)
-        val order = day?.template?.exercises?.indices?.toList() ?: listOf(0)
-        val warmupSecs = warmupSecondsFromText(day?.template?.warmup ?: "")
+        val order = express?.order?.takeIf { it.isNotEmpty() }
+            ?: day?.template?.exercises?.indices?.toList() ?: listOf(0)
+        val warmupSecs = express?.warmupSeconds ?: warmupSecondsFromText(day?.template?.warmup ?: "")
         return ActiveSession(
             dayNumber = dayNumber,
             startMillis = now,
@@ -38,7 +45,9 @@ object SessionEngine {
             phase = SessionPhase.WARMUP,
             warmupTargetSeconds = warmupSecs,
             warmupStartMillis = now,
-            watchControlled = watchControlled
+            watchControlled = watchControlled,
+            maxSets = express?.maxSets ?: 0,
+            swaps = swaps.filterKeys { it in order }
         )
     }
 
@@ -58,8 +67,7 @@ object SessionEngine {
      * acababan de escribir en el móvil (ni la serie, ni el registro del día, ni "Mis pesos").
      */
     fun weightForSet(s: ActiveSession, knownWeights: Map<String, String>): String {
-        val exercise = PlanData.dayByNumber(s.dayNumber)
-            ?.template?.exercises?.getOrNull(s.exerciseIndex) ?: return ""
+        val exercise = s.exerciseAt(s.exerciseIndex) ?: return ""
         // Ni una plancha ni el cardio llevan kilos, y una serie por tiempo tampoco los pregunta.
         if (exercise.withoutWeight || secondsPerSetFromScheme(exercise.scheme) != null) return ""
         if (s.plannedWeight.isNotBlank()) return s.plannedWeight.trim()
@@ -97,8 +105,7 @@ object SessionEngine {
      * sin repeticiones dejaría el registro a medias.
      */
     fun repsForSet(s: ActiveSession, knownReps: Map<String, String>): String {
-        val exercise = PlanData.dayByNumber(s.dayNumber)
-            ?.template?.exercises?.getOrNull(s.exerciseIndex) ?: return ""
+        val exercise = s.exerciseAt(s.exerciseIndex) ?: return ""
         // Una plancha se mide en segundos y un circuito en vueltas: ahí no hay repeticiones.
         if (repsRangeFromScheme(exercise.scheme) == null) return ""
         if (s.currentReps.isNotBlank()) return s.currentReps.trim()
@@ -115,6 +122,8 @@ object SessionEngine {
      *
      * [reps] son las repeticiones que se hicieron de verdad; va al final y con valor por defecto
      * para que quien no las tenga (una serie por tiempo) siga llamando igual que siempre.
+     * [yourRests] son los descansos que el usuario dejó puestos por ejercicio (ver
+     * [RestDefaults.between]).
      */
     fun completeSet(
         s: ActiveSession,
@@ -122,12 +131,12 @@ object SessionEngine {
         now: Long,
         reps: String = "",
         warmup: Boolean = false,
-        rir: String = ""
+        rir: String = "",
+        yourRests: Map<String, Int> = emptyMap()
     ): ActiveSession {
         if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return s
-        val day = PlanData.dayByNumber(s.dayNumber) ?: return s
-        val exercise = day.template.exercises.getOrNull(s.exerciseIndex) ?: return s
-        val totalSets = setCountFromScheme(exercise.scheme)
+        val exercise = s.exerciseAt(s.exerciseIndex) ?: return s
+        val totalSets = s.setsFor(exercise)
 
         val cleanWeight = weight.trim()
         val newSet = CompletedSet(
@@ -174,11 +183,13 @@ object SessionEngine {
             )
         } else {
             val betweenExercises = isLastSet
-            val target = if (betweenExercises) RestDefaults.BETWEEN_EXERCISES else RestDefaults.BETWEEN_SETS
+            val entreSeries = RestDefaults.between(exercise, reps, yourRests)
+            val descanso = if (betweenExercises) RestDefaults.betweenExercises(entreSeries) else entreSeries
             s.copy(
                 phase = SessionPhase.RESTING,
                 restStartMillis = now,
-                restTargetSeconds = target,
+                restTargetSeconds = descanso.seconds,
+                restSource = descanso.source.name,
                 restBetweenExercises = betweenExercises,
                 completedSets = s.completedSets + newSet,
                 occupiedSkips = 0,
@@ -222,7 +233,6 @@ object SessionEngine {
     /** Termina el descanso (guardando el tiempo real en [now]) y avanza a la siguiente serie/ejercicio. */
     fun endRest(s: ActiveSession, now: Long): ActiveSession {
         if (s.phase != SessionPhase.RESTING) return s
-        val day = PlanData.dayByNumber(s.dayNumber) ?: return s
         val real = ((now - s.restStartMillis) / 1000).toInt().coerceAtLeast(0)
 
         val sets = s.completedSets.toMutableList()
@@ -230,8 +240,8 @@ object SessionEngine {
             sets[sets.lastIndex] = sets.last().copy(restSeconds = real)
         }
 
-        val exercise = day.template.exercises[s.exerciseIndex]
-        val totalSets = setCountFromScheme(exercise.scheme)
+        val exercise = s.exerciseAt(s.exerciseIndex) ?: return s
+        val totalSets = s.setsFor(exercise)
         val order = s.orderOrDefault()
         // En superserie se descansa al final del par y se vuelve al PRIMERO para la ronda
         // siguiente; al acabar las series del grupo se sale del grupo entero.

@@ -1228,5 +1228,1040 @@
    "Pájaros con mancuernas."
   ],
   "videoQuery": "Y-T-W en banco inclinado técnica"
+ },
+ "neutral-grip-pulldown": {
+  "muscles": "Dorsal y Bíceps.",
+  "howTo": "Ajusta el asiento y la almohadilla para las piernas según tu altura. Sujeta la barra con un agarre neutral, las palmas enfrentadas. Tira de la barra hacia abajo hasta que toque la parte superior del pecho, manteniendo la espalda recta. Regresa lentamente a la posición inicial con control.",
+  "mistakes": [
+   "Echar mucho el tronco hacia atrás.",
+   "Tirar solo con los brazos sin juntar los omóplatos.",
+   "Subir soltando de golpe."
+  ],
+  "alternatives": [
+   "Jalón al pecho con agarre ancho.",
+   "Dominada asistida con agarre neutro.",
+   "Remo en polea."
+  ],
+  "videoQuery": "Jalón al pecho agarre neutro técnica"
+ },
+ "upright-row": {
+  "muscles": "Hombros, Trapecio y Bíceps.",
+  "howTo": "1. Párate con los pies al ancho de los hombros y sujeta la barra con un agarre prono, manos ligeramente más estrechas que los hombros. 2. Mantén la espalda recta y levanta la barra hacia arriba, manteniéndola cerca del cuerpo. 3. Lleva los codos hacia arriba y hacia afuera hasta que la barra llegue a la altura del pecho. 4. Baja la barra lentamente a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Subir los codos muy por encima de los hombros.",
+   "Agarrar la barra demasiado estrecho.",
+   "Dar impulso con las piernas."
+  ],
+  "alternatives": [
+   "Elevaciones laterales.",
+   "Face pull en polea.",
+   "Remo al mentón en polea con agarre ancho."
+  ],
+  "videoQuery": "Remo al mentón (elevación al cuello) técnica"
+ },
+ "dumbbell-bench-press": {
+  "muscles": "Pectoral, Hombros y Tríceps.",
+  "howTo": "Acuéstate boca arriba en un banco plano con una mancuerna en cada mano. Coloca las mancuernas a la altura del pecho con los codos doblados en un ángulo de 90 grados. Empuja las mancuernas hacia arriba hasta que los brazos estén completamente extendidos. Baja lentamente las mancuernas de vuelta a la posición inicial.",
+  "mistakes": [
+   "Chocar las mancuernas arriba y perder la tensión.",
+   "Bajar los codos por detrás de la línea del cuerpo.",
+   "Despegar los glúteos del banco."
+  ],
+  "alternatives": [
+   "Press de banca con barra.",
+   "Press de pecho en máquina.",
+   "Flexiones."
+  ],
+  "videoQuery": "Press de banca con mancuernas técnica"
+ },
+ "dumbbell-flyes": {
+  "muscles": "Pectoral y Hombros.",
+  "howTo": "Acuéstate boca arriba en un banco plano con una mancuerna en cada mano. Extiende los brazos hacia arriba, con las palmas enfrentadas y una ligera flexión en los codos. Baja las mancuernas lentamente hacia los lados en un arco amplio hasta sentir un estiramiento en el pecho. Regresa a la posición inicial apretando el pecho y repite.",
+  "mistakes": [
+   "Doblar y estirar los codos: esto no es un press.",
+   "Bajar tanto que el hombro queda forzado.",
+   "Usar mancuernas demasiado pesadas."
+  ],
+  "alternatives": [
+   "Pec deck.",
+   "Cruce de poleas.",
+   "Press de pecho con mancuernas."
+  ],
+  "videoQuery": "Aperturas con mancuernas técnica"
+ },
+ "treadmill": {
+  "muscles": "Cuádriceps, Femoral, Glúteo y Gemelos.",
+  "howTo": "Ajusta la velocidad e inclinación de la cinta a un nivel cómodo. Mantén una postura erguida y relajada mientras caminas o corres. Usa una zancada natural, aterrizando suavemente con el talón. Mantén el ritmo constante y respira de manera regular.",
+  "mistakes": [
+   "Agarrarte a los pasamanos y descargar el peso.",
+   "Mirar los pies en vez de al frente.",
+   "Poner una inclinación tan alta que acabas colgado de la máquina."
+  ],
+  "alternatives": [
+   "Caminar o correr al aire libre.",
+   "Elíptica si te molestan las rodillas.",
+   "Bicicleta estática."
+  ],
+  "videoQuery": "Cinta de correr técnica"
+ },
+ "elliptical": {
+  "muscles": "Cuádriceps, Glúteo, Femoral, Gemelos y Hombros.",
+  "howTo": "Ajusta la resistencia y la inclinación a un nivel cómodo. Coloca los pies en los pedales y agarra las manijas. Comienza a mover los pies en un movimiento elíptico, manteniendo una postura erguida. Aumenta gradualmente la velocidad y resistencia según tu nivel de condición física.",
+  "mistakes": [
+   "Apoyar todo el peso en los brazos.",
+   "Encorvar la espalda sobre la consola.",
+   "Ir tan rápido que pierdes el control del pedaleo."
+  ],
+  "alternatives": [
+   "Cinta de correr.",
+   "Bicicleta estática.",
+   "Remo si quieres implicar más la espalda."
+  ],
+  "videoQuery": "Elíptica técnica"
+ },
+ "stationary-bike": {
+  "muscles": "Cuádriceps, Femoral, Glúteo y Gemelos.",
+  "howTo": "Ajusta la altura del asiento para que tus piernas estén ligeramente dobladas al pedalear. Coloca los pies en los pedales y ajusta las correas de seguridad si es necesario. Comienza a pedalear a un ritmo cómodo, manteniendo la espalda recta y los hombros relajados.",
+  "mistakes": [
+   "Sillín demasiado bajo: la rodilla queda muy flexionada abajo.",
+   "Balancear la cadera al pedalear.",
+   "Cargar el peso en las muñecas."
+  ],
+  "alternatives": [
+   "Elíptica.",
+   "Cinta de correr.",
+   "Bicicleta de aire si quieres implicar los brazos."
+  ],
+  "videoQuery": "Bicicleta estática técnica"
+ },
+ "rowing-machine": {
+  "muscles": "Dorsal, Cuádriceps, Bíceps, Femoral, Glúteo y Antebrazo.",
+  "howTo": "Ajusta el asiento y la resistencia a tu nivel. Coloca los pies en los pedales y sujeta el mango con ambas manos. Empuja con las piernas mientras tiras del mango hacia tu pecho. Regresa a la posición inicial extendiendo los brazos y doblando las rodillas.",
+  "mistakes": [
+   "Tirar con los brazos antes de empujar con las piernas.",
+   "Redondear la espalda al ir hacia delante.",
+   "Tirar del mango hacia la cara en vez de al abdomen."
+  ],
+  "alternatives": [
+   "Máquina de esquí.",
+   "Bicicleta de aire.",
+   "Remo en polea si buscas fuerza en vez de cardio."
+  ],
+  "videoQuery": "Remo (cardio) técnica"
+ },
+ "burpees": {
+  "muscles": "Cuádriceps, Pectoral, Glúteo, Hombros, Tríceps y Abdomen.",
+  "howTo": "Comienza de pie con los pies separados al ancho de los hombros. Baja en cuclillas y coloca las manos en el suelo frente a ti. Salta con los pies hacia atrás para entrar en posición de plancha. Realiza una flexión de brazos, luego salta con los pies hacia adelante y levántate de un salto.",
+  "mistakes": [
+   "Dejar caer la cadera en la flexión.",
+   "Aterrizar con las rodillas hacia dentro.",
+   "Encadenar repeticiones sin control cuando ya estás cansado."
+  ],
+  "alternatives": [
+   "Burpee sin flexión ni salto.",
+   "Escaladores.",
+   "Jumping jacks."
+  ],
+  "videoQuery": "Burpees técnica"
+ },
+ "crunch": {
+  "muscles": "Abdomen.",
+  "howTo": "Acuéstate boca arriba con las rodillas dobladas y los pies planos en el suelo. Coloca las manos ligeramente detrás de la cabeza, sin tirar del cuello. Contrae los músculos abdominales y eleva los hombros del suelo, manteniendo la parte baja de la espalda en contacto con el suelo. Baja lentamente los hombros de nuevo al suelo y repite.",
+  "mistakes": [
+   "Tirar del cuello con las manos.",
+   "Subir todo el tronco: aquí solo despegan los omóplatos.",
+   "Coger impulso con los brazos."
+  ],
+  "alternatives": [
+   "Crunch con las piernas elevadas.",
+   "Dead bug.",
+   "Plancha."
+  ],
+  "videoQuery": "Crunch abdominal técnica"
+ },
+ "legs-up-crunch": {
+  "muscles": "Abdomen y Cuádriceps.",
+  "howTo": "Acuéstate boca arriba con las piernas elevadas y las rodillas ligeramente dobladas. Coloca las manos detrás de la cabeza, manteniendo los codos abiertos. Contrae los abdominales y levanta los hombros del suelo, acercando el pecho hacia las rodillas. Baja lentamente los hombros al suelo sin dejar caer las piernas.",
+  "mistakes": [
+   "Balancear las piernas para subir.",
+   "Tirar del cuello.",
+   "Despegar la lumbar del suelo."
+  ],
+  "alternatives": [
+   "Crunch normal.",
+   "Elevación de piernas tumbado.",
+   "Dead bug."
+  ],
+  "videoQuery": "Crunch con piernas elevadas técnica"
+ },
+ "scissor-kicks": {
+  "muscles": "Abdomen y Cuádriceps.",
+  "howTo": "Acuéstate boca arriba con las piernas extendidas. Coloca las manos debajo de los glúteos para mayor soporte. Levanta ambas piernas unos centímetros del suelo. Alterna el cruce de las piernas, una sobre la otra, manteniendo el abdomen contraído.",
+  "mistakes": [
+   "Despegar la lumbar del suelo.",
+   "Subir demasiado las piernas y perder la tensión del abdomen.",
+   "Aguantar la respiración."
+  ],
+  "alternatives": [
+   "Tijeras con las rodillas algo dobladas.",
+   "Dead bug.",
+   "Elevación de piernas tumbado."
+  ],
+  "videoQuery": "Tijeras técnica"
+ },
+ "sit-ups": {
+  "muscles": "Abdomen y Cuádriceps.",
+  "howTo": "Acuéstate boca arriba con las rodillas dobladas y los pies planos en el suelo. Coloca las manos detrás de la cabeza sin entrelazar los dedos. Levanta el torso hacia las rodillas usando los músculos abdominales, manteniendo la espalda recta. Baja lentamente a la posición inicial sin dejar caer el cuerpo.",
+  "mistakes": [
+   "Tirar del cuello con las manos.",
+   "Coger impulso con los brazos.",
+   "Anclar los pies y tirar con los flexores de cadera."
+  ],
+  "alternatives": [
+   "Crunch: menos recorrido y menos lumbar.",
+   "Dead bug.",
+   "Plancha."
+  ],
+  "videoQuery": "Sit-up técnica"
+ },
+ "russian-twist": {
+  "muscles": "Oblicuos y Abdomen.",
+  "howTo": "Siéntate en el suelo con las rodillas dobladas y los pies ligeramente elevados. Inclina el torso hacia atrás manteniendo la espalda recta, formando un ángulo de aproximadamente 45 grados. Gira el torso hacia un lado, llevando las manos o un objeto hacia el suelo, luego repite hacia el lado opuesto.",
+  "mistakes": [
+   "Girar solo los brazos y no el tronco.",
+   "Redondear la espalda.",
+   "Ir rápido perdiendo el control del peso."
+  ],
+  "alternatives": [
+   "Press Pallof.",
+   "Leñador en polea.",
+   "Plancha lateral."
+  ],
+  "videoQuery": "Russian twist técnica"
+ },
+ "side-plank-rotation": {
+  "muscles": "Oblicuos, Abdomen y Hombros.",
+  "howTo": "Colócate en posición de plancha lateral con el antebrazo en el suelo y el cuerpo alineado. Levanta la cadera para formar una línea recta desde los pies hasta la cabeza. Extiende el brazo libre hacia el techo, luego llévalo lentamente por debajo del torso mientras giras el tronco. Regresa a la posición inicial y repite antes de cambiar de lado.",
+  "mistakes": [
+   "Dejar caer la cadera al girar.",
+   "Apoyar el codo por delante del hombro.",
+   "Girar tan rápido que pierdes la línea del cuerpo."
+  ],
+  "alternatives": [
+   "Plancha lateral estática.",
+   "Plancha lateral con rodillas apoyadas.",
+   "Press Pallof."
+  ],
+  "videoQuery": "Plancha lateral con rotación técnica"
+ },
+ "superman": {
+  "muscles": "Lumbar, Glúteo y Hombros.",
+  "howTo": "Acuéstate boca abajo con los brazos extendidos frente a ti y las piernas rectas. Inhala y levanta simultáneamente los brazos, el pecho y las piernas del suelo, manteniendo el cuello alineado. Mantén la posición por unos segundos, sintiendo la contracción en la parte baja de la espalda. Exhala y baja lentamente los brazos, el pecho y las piernas al suelo.",
+  "mistakes": [
+   "Tirar la cabeza hacia atrás mirando al frente.",
+   "Subir a tirones.",
+   "Aguantar la respiración."
+  ],
+  "alternatives": [
+   "Bird dog.",
+   "Hiperextensiones en banco.",
+   "Puente de glúteo."
+  ],
+  "videoQuery": "Superman técnica"
+ },
+ "incline-barbell-bench-press": {
+  "muscles": "Pectoral, Hombros y Tríceps.",
+  "howTo": "Ajusta el banco a un ángulo de 30-45 grados. Acuéstate sobre el banco con los pies firmemente en el suelo. Sujeta la barra con un agarre ligeramente más ancho que los hombros. Baja la barra hacia la parte superior del pecho, luego empuja hacia arriba hasta extender los brazos.",
+  "mistakes": [
+   "Inclinar el banco de más y convertirlo en press de hombro.",
+   "Rebotar la barra en el pecho.",
+   "Abrir los codos en cruz."
+  ],
+  "alternatives": [
+   "Press inclinado con mancuernas.",
+   "Press inclinado en máquina.",
+   "Pec deck."
+  ],
+  "videoQuery": "Press de banca inclinado con barra técnica"
+ },
+ "front-squat": {
+  "muscles": "Cuádriceps, Glúteo, Abdomen y Dorsal.",
+  "howTo": "Coloca la barra sobre la parte frontal de tus hombros, cruzando los brazos para sostenerla. Mantén los pies al ancho de los hombros y baja lentamente doblando las rodillas, manteniendo la espalda recta. Desciende hasta que tus muslos estén paralelos al suelo, luego empuja con los talones para volver a la posición inicial.",
+  "mistakes": [
+   "Dejar caer los codos y perder la barra hacia delante.",
+   "Redondear la espalda alta.",
+   "Levantar los talones."
+  ],
+  "alternatives": [
+   "Sentadilla goblet.",
+   "Sentadilla con barra atrás.",
+   "Prensa de piernas."
+  ],
+  "videoQuery": "Sentadilla frontal técnica"
+ },
+ "step-up": {
+  "muscles": "Cuádriceps, Glúteo, Femoral y Gemelos.",
+  "howTo": "Coloca un banco estable frente a ti. Sujeta una mancuerna en cada mano, brazos a los lados. Sube un pie al banco, empuja con el talón para elevar el cuerpo. Baja controladamente y repite con la otra pierna.",
+  "mistakes": [
+   "Impulsarte con la pierna de abajo en vez de subir con la de arriba.",
+   "Usar un cajón tan alto que la rodilla se va hacia dentro.",
+   "Bajar de golpe."
+  ],
+  "alternatives": [
+   "Step-up sin peso o con cajón más bajo.",
+   "Zancadas.",
+   "Sentadilla búlgara."
+  ],
+  "videoQuery": "Step-up con peso técnica"
+ },
+ "hip-adduction": {
+  "muscles": "Aductores.",
+  "howTo": "Ajusta el asiento y las almohadillas para que se adapten a tus piernas. Siéntate y coloca las piernas en las almohadillas, asegurándote de que estén alineadas con las rodillas. Aprieta las piernas juntas lentamente, manteniendo el control durante todo el movimiento. Regresa a la posición inicial de manera controlada, sin dejar que las almohadillas se golpeen.",
+  "mistakes": [
+   "Cerrar de golpe soltando el peso.",
+   "Echar el tronco hacia atrás.",
+   "Abrir tanto al inicio que se fuerza la ingle."
+  ],
+  "alternatives": [
+   "Aductores en polea baja.",
+   "Sentadilla sumo.",
+   "Aductor tumbado de lado."
+  ],
+  "videoQuery": "Aductores en máquina técnica"
+ },
+ "t-bar-row": {
+  "muscles": "Dorsal, Bíceps, Antebrazo y Trapecio.",
+  "howTo": "Coloca el extremo de la barra en un rincón o soporte fijo. Carga el otro extremo con el peso deseado y sujétalo con ambas manos. Inclina el torso hacia adelante manteniendo la espalda recta. Tira de la barra hacia el pecho, apretando los omóplatos, luego baja lentamente.",
+  "mistakes": [
+   "Redondear la espalda al tirar.",
+   "Incorporarte con cada repetición.",
+   "Abrir mucho los codos."
+  ],
+  "alternatives": [
+   "Remo con barra.",
+   "Remo en máquina con apoyo de pecho.",
+   "Remo con mancuerna."
+  ],
+  "videoQuery": "Remo en T técnica"
+ },
+ "skull-crusher": {
+  "muscles": "Tríceps.",
+  "howTo": "Acuéstate boca arriba en un banco plano, sosteniendo una barra con las manos separadas al ancho de los hombros. Extiende los brazos hacia arriba, manteniendo los codos ligeramente flexionados. Baja lentamente la barra hacia tu frente, controlando el movimiento. Regresa a la posición inicial extendiendo los brazos sin bloquear los codos.",
+  "mistakes": [
+   "Abrir los codos hacia fuera al bajar.",
+   "Mover los hombros en vez de dejar el brazo quieto y girar solo el codo.",
+   "Bajar la barra a la frente sin control."
+  ],
+  "alternatives": [
+   "Extensión de tríceps en polea.",
+   "Extensión sobre la cabeza con mancuerna.",
+   "Press de banca cerrado."
+  ],
+  "videoQuery": "Press francés técnica"
+ },
+ "preacher-curl": {
+  "muscles": "Bíceps y Antebrazo.",
+  "howTo": "Ajusta el banco predicador a una altura cómoda y siéntate con el pecho apoyado. Sujeta la barra o mancuernas con un agarre supino, brazos extendidos. Flexiona los codos para levantar el peso hacia los hombros, manteniendo los codos fijos. Baja lentamente a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Despegar los codos del atril para dar impulso.",
+   "No estirar del todo abajo.",
+   "Dejar caer el peso en la bajada."
+  ],
+  "alternatives": [
+   "Curl inclinado con mancuerna.",
+   "Curl con barra Z de pie.",
+   "Curl en polea baja."
+  ],
+  "videoQuery": "Curl predicador técnica"
+ },
+ "ski-erg": {
+  "muscles": "Dorsal, Tríceps, Abdomen, Hombros y Cuádriceps.",
+  "howTo": "Ajusta la resistencia y sujeta las manijas con un agarre firme. Inclina ligeramente el torso hacia adelante, manteniendo la espalda recta. Tira de las manijas hacia abajo y hacia atrás, extendiendo los brazos y activando la parte superior de la espalda y los tríceps. Regresa lentamente a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Tirar solo con los brazos sin acompañar con el tronco.",
+   "Redondear la espalda al bajar.",
+   "Bloquear las rodillas rígidas todo el rato."
+  ],
+  "alternatives": [
+   "Remo (cardio).",
+   "Bicicleta de aire.",
+   "Jalón con brazos rectos en polea."
+  ],
+  "videoQuery": "Máquina de esquí técnica"
+ },
+ "air-bike": {
+  "muscles": "Cuádriceps, Femoral, Dorsal, Hombros, Bíceps, Tríceps y Abdomen.",
+  "howTo": "Ajusta la altura del asiento para que tus pies alcancen cómodamente los pedales. Coloca tus manos en los manillares y siéntate erguido. Comienza a pedalear mientras empujas y tiras de los manillares al mismo tiempo. Mantén un ritmo constante y controla tu respiración.",
+  "mistakes": [
+   "Pedalear solo con las piernas y dejar los brazos quietos.",
+   "Encorvar la espalda.",
+   "Salir a tope y morir en treinta segundos."
+  ],
+  "alternatives": [
+   "Bicicleta estática.",
+   "Remo (cardio).",
+   "Elíptica."
+  ],
+  "videoQuery": "Bicicleta de aire (assault bike) técnica"
+ },
+ "machine-hip-thrust": {
+  "muscles": "Glúteo, Femoral y Cuádriceps.",
+  "howTo": "Ajusta la máquina a tu altura y siéntate con la espalda apoyada en el respaldo. Coloca los pies firmemente en el suelo y ajusta la almohadilla sobre tus caderas. Empuja hacia arriba con las caderas, apretando los glúteos en la parte superior del movimiento. Baja lentamente las caderas a la posición inicial, manteniendo el control.",
+  "mistakes": [
+   "Arquear la lumbar arriba en vez de apretar el glúteo.",
+   "Recorrido corto.",
+   "Colocar mal la almohadilla: debe quedar sobre la cadera."
+  ],
+  "alternatives": [
+   "Hip thrust con barra.",
+   "Puente de glúteo en el suelo.",
+   "Patada de glúteo en polea."
+  ],
+  "videoQuery": "Hip thrust en máquina técnica"
+ },
+ "sled-hack-squat": {
+  "muscles": "Cuádriceps, Glúteo y Femoral.",
+  "howTo": "Coloca tus pies en la plataforma del trineo, separados al ancho de los hombros. Desbloquea el trineo y baja lentamente hasta que tus rodillas formen un ángulo de 90 grados. Empuja con los talones para volver a la posición inicial, manteniendo la espalda recta.",
+  "mistakes": [
+   "Despegar la cadera del respaldo al bajar.",
+   "Bloquear las rodillas de golpe arriba.",
+   "Poner los pies demasiado bajos."
+  ],
+  "alternatives": [
+   "Prensa de piernas.",
+   "Sentadilla hack vertical.",
+   "Sentadilla goblet."
+  ],
+  "videoQuery": "Sentadilla hack en trineo (45°) técnica"
+ },
+ "bicycle-crunch": {
+  "muscles": "Abdomen y Oblicuos.",
+  "howTo": "Acuéstate boca arriba con las manos detrás de la cabeza y las piernas levantadas. Lleva el codo derecho hacia la rodilla izquierda mientras extiendes la pierna derecha. Alterna el movimiento llevando el codo izquierdo hacia la rodilla derecha, manteniendo el ritmo.",
+  "mistakes": [
+   "Tirar del cuello con las manos.",
+   "Ir rápido y dejar de girar el tronco.",
+   "Despegar la lumbar del suelo."
+  ],
+  "alternatives": [
+   "Crunch con piernas elevadas.",
+   "Dead bug.",
+   "Plancha lateral."
+  ],
+  "videoQuery": "Bicicleta abdominal técnica"
+ },
+ "cable-crossover": {
+  "muscles": "Pectoral y Hombros.",
+  "howTo": "Ajusta las poleas a la altura de los hombros y selecciona el peso adecuado. Toma una manija en cada mano y da un paso adelante, manteniendo una ligera flexión en los codos. Cruza las manos frente a ti, apretando el pecho, y luego regresa lentamente a la posición inicial.",
+  "mistakes": [
+   "Doblar los codos para ayudarte.",
+   "Abrir demasiado atrás y forzar el hombro.",
+   "Dar impulso con el tronco."
+  ],
+  "alternatives": [
+   "Pec deck.",
+   "Aperturas con mancuernas.",
+   "Cruce de poleas de abajo arriba."
+  ],
+  "videoQuery": "Cruce de poleas técnica"
+ },
+ "chest-dips": {
+  "muscles": "Pectoral, Tríceps y Hombros.",
+  "howTo": "Agarra las barras paralelas con las palmas hacia adentro. Levanta el cuerpo hasta que los brazos estén rectos. Baja lentamente el cuerpo inclinándote ligeramente hacia adelante. Empuja hacia arriba para volver a la posición inicial.",
+  "mistakes": [
+   "Bajar más de lo que aguanta tu hombro.",
+   "Quedarte vertical: para pecho hay que inclinar el tronco hacia delante.",
+   "Encoger los hombros al bajar."
+  ],
+  "alternatives": [
+   "Fondos en máquina asistida.",
+   "Press de pecho declinado.",
+   "Flexiones con los pies elevados."
+  ],
+  "videoQuery": "Fondos en paralelas técnica"
+ },
+ "decline-bench-press": {
+  "muscles": "Pectoral y Tríceps.",
+  "howTo": "Ajusta el banco a una posición declinada y asegúrate de que esté seguro. Acuéstate en el banco con los pies firmemente en el suelo y agarra la barra con las manos un poco más anchas que los hombros. Desciende la barra lentamente hacia el pecho, manteniendo los codos en un ángulo de 45 grados. Empuja la barra hacia arriba hasta que los brazos estén completamente extendidos, sin bloquear los codos.",
+  "mistakes": [
+   "Bajar la barra demasiado alta, hacia el esternón.",
+   "Rebotar la barra.",
+   "Soltar las piernas del anclaje y resbalar."
+  ],
+  "alternatives": [
+   "Press de banca plano.",
+   "Fondos en paralelas.",
+   "Press de pecho en máquina."
+  ],
+  "videoQuery": "Press declinado con barra técnica"
+ },
+ "back-extension": {
+  "muscles": "Lumbar, Glúteo y Femoral.",
+  "howTo": "Acuéstate boca abajo en una máquina de extensión de espalda, asegurando los tobillos bajo los rodillos. Cruza los brazos sobre el pecho o colócalos detrás de la cabeza. Levanta el torso lentamente hasta que esté alineado con las piernas, manteniendo la espalda recta. Baja controladamente a la posición inicial sin arquear la espalda.",
+  "mistakes": [
+   "Subir más allá de la línea del cuerpo y arquear la lumbar.",
+   "Coger impulso.",
+   "Colocar mal el apoyo: debe quedar por debajo de la cadera."
+  ],
+  "alternatives": [
+   "Superman en el suelo.",
+   "Buenos días con barra vacía.",
+   "Peso muerto rumano ligero."
+  ],
+  "videoQuery": "Hiperextensiones técnica"
+ },
+ "dumbbell-pullover": {
+  "muscles": "Dorsal, Pectoral y Tríceps.",
+  "howTo": "Acuéstate boca arriba en un banco, con los pies firmemente en el suelo. Sujeta una mancuerna con ambas manos, extendiendo los brazos sobre el pecho. Baja lentamente la mancuerna detrás de la cabeza, manteniendo los codos ligeramente flexionados. Regresa a la posición inicial, asegurándote de controlar el movimiento.",
+  "mistakes": [
+   "Doblar los codos y convertirlo en un press.",
+   "Arquear la lumbar al llevar el peso atrás.",
+   "Bajar más de lo que aguanta tu hombro."
+  ],
+  "alternatives": [
+   "Pullover en polea.",
+   "Jalón con brazos rectos.",
+   "Jalón al pecho."
+  ],
+  "videoQuery": "Pull-over con mancuerna técnica"
+ },
+ "straight-arm-pulldown": {
+  "muscles": "Dorsal y Tríceps.",
+  "howTo": "Colócate de pie frente a una polea alta con los pies al ancho de los hombros. Agarra la barra con ambas manos, manteniendo los brazos rectos y ligeramente flexionados. Tira de la barra hacia abajo hasta que tus manos lleguen a tus muslos, manteniendo los brazos rectos. Regresa lentamente a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Doblar los codos: entonces trabaja el tríceps.",
+   "Encorvar la espalda.",
+   "Usar tanto peso que el cuerpo se balancea."
+  ],
+  "alternatives": [
+   "Pullover en polea.",
+   "Pullover con mancuerna.",
+   "Jalón al pecho."
+  ],
+  "videoQuery": "Jalón con brazos rectos técnica"
+ },
+ "barbell-shrug": {
+  "muscles": "Trapecio y Antebrazo.",
+  "howTo": "Párate derecho con los pies al ancho de los hombros. Sujeta la barra con un agarre por delante, manos ligeramente más anchas que los hombros. Levanta los hombros hacia las orejas mientras mantienes los brazos rectos. Baja los hombros lentamente a la posición inicial.",
+  "mistakes": [
+   "Girar los hombros en círculos.",
+   "Doblar los codos y convertirlo en un remo.",
+   "Recorrido corto: hay que subir hasta arriba del todo."
+  ],
+  "alternatives": [
+   "Encogimientos con mancuernas.",
+   "Encogimientos en máquina o en polea.",
+   "Face pull si buscas también el trapecio medio."
+  ],
+  "videoQuery": "Encogimientos con barra técnica"
+ },
+ "front-raise": {
+  "muscles": "Hombros.",
+  "howTo": "Párate derecho con los pies al ancho de los hombros. Sujeta una mancuerna en cada mano con los brazos extendidos frente a los muslos. Levanta las mancuernas hacia adelante hasta que tus brazos estén paralelos al suelo. Baja lentamente las mancuernas a la posición inicial.",
+  "mistakes": [
+   "Subir por encima de la línea de los ojos.",
+   "Balancear el tronco.",
+   "Encoger los hombros al subir."
+  ],
+  "alternatives": [
+   "Elevación frontal en polea.",
+   "Press de hombros.",
+   "Elevaciones laterales."
+  ],
+  "videoQuery": "Elevaciones frontales técnica"
+ },
+ "arnold-press": {
+  "muscles": "Hombros y Tríceps.",
+  "howTo": "Siéntate en un banco con respaldo, sosteniendo una mancuerna en cada mano a la altura de los hombros, con las palmas hacia el cuerpo. Gira las palmas hacia adelante mientras presionas las mancuernas hacia arriba en un movimiento de arco. Extiende completamente los brazos sin bloquear los codos y luego baja lentamente las mancuernas a la posición inicial.",
+  "mistakes": [
+   "Girar las muñecas de golpe.",
+   "Arquear la lumbar al empujar.",
+   "Bajar los codos por detrás del cuerpo."
+  ],
+  "alternatives": [
+   "Press de hombros con mancuernas.",
+   "Press de hombros en máquina.",
+   "Press militar con barra."
+  ],
+  "videoQuery": "Press Arnold técnica"
+ },
+ "concentration-curl": {
+  "muscles": "Bíceps y Antebrazo.",
+  "howTo": "Siéntate en el borde de un banco con las piernas separadas. Sujeta una mancuerna con una mano y apoya el codo en el interior del muslo. Flexiona el brazo, levantando la mancuerna hacia el hombro, manteniendo el codo fijo. Baja lentamente la mancuerna a la posición inicial y repite.",
+  "mistakes": [
+   "Balancear el brazo apoyándote en el muslo.",
+   "Girar el tronco para ayudarte.",
+   "Subir el hombro en vez de flexionar solo el codo."
+  ],
+  "alternatives": [
+   "Curl en banco predicador.",
+   "Curl alterno con mancuernas.",
+   "Curl en polea baja a un brazo."
+  ],
+  "videoQuery": "Curl concentrado técnica"
+ },
+ "cable-curl": {
+  "muscles": "Bíceps y Antebrazo.",
+  "howTo": "Ajusta la polea a la posición más baja y sujeta la barra con un agarre supino. Párate erguido con los pies al ancho de los hombros y los codos pegados al cuerpo. Flexiona los codos para levantar la barra hacia los hombros, manteniendo los codos inmóviles. Baja lentamente la barra a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Adelantar los codos al final del recorrido.",
+   "Echarte hacia atrás para subir el peso.",
+   "Soltar de golpe en la bajada."
+  ],
+  "alternatives": [
+   "Curl con barra.",
+   "Curl con mancuernas.",
+   "Curl en banco predicador."
+  ],
+  "videoQuery": "Curl en polea técnica"
+ },
+ "triceps-kickback": {
+  "muscles": "Tríceps.",
+  "howTo": "Sujeta una mancuerna en cada mano con las palmas hacia adentro. Inclina el torso hacia adelante manteniendo la espalda recta. Dobla los codos a 90 grados, luego extiende los brazos hacia atrás. Regresa lentamente a la posición inicial sin mover los hombros.",
+  "mistakes": [
+   "Bajar el codo en vez de mantener el brazo paralelo al suelo.",
+   "Girar el tronco para lanzar el peso.",
+   "Usar una mancuerna tan pesada que no puedes estirar del todo."
+  ],
+  "alternatives": [
+   "Extensión de tríceps en polea.",
+   "Extensión sobre la cabeza con mancuerna.",
+   "Fondos de tríceps en banco."
+  ],
+  "videoQuery": "Patada de tríceps técnica"
+ },
+ "close-grip-bench-press": {
+  "muscles": "Tríceps, Pectoral y Hombros.",
+  "howTo": "Acuéstate en un banco plano con los pies firmes en el suelo. Sujeta la barra con un agarre estrecho, manos separadas a la altura de los hombros. Baja la barra lentamente hacia el pecho, manteniendo los codos cerca del cuerpo. Empuja la barra hacia arriba hasta extender completamente los brazos.",
+  "mistakes": [
+   "Juntar tanto las manos que se cargan las muñecas.",
+   "Abrir los codos hacia fuera.",
+   "Rebotar la barra en el pecho."
+  ],
+  "alternatives": [
+   "Press francés.",
+   "Extensión de tríceps en polea.",
+   "Fondos en máquina."
+  ],
+  "videoQuery": "Press de banca cerrado técnica"
+ },
+ "wrist-curl": {
+  "muscles": "Antebrazo.",
+  "howTo": "Siéntate en un banco con los antebrazos apoyados en tus muslos, sosteniendo una mancuerna en cada mano con las palmas hacia arriba. Deja que las muñecas cuelguen al borde de tus rodillas, manteniendo los brazos inmóviles. Flexiona las muñecas hacia arriba, levantando las mancuernas lo más alto posible, luego baja lentamente a la posición inicial.",
+  "mistakes": [
+   "Mover el codo o el antebrazo en vez de solo la muñeca.",
+   "Cargar tanto que solo haces medio recorrido.",
+   "Soltar el peso de golpe al bajar."
+  ],
+  "alternatives": [
+   "Curl de muñeca sobre banco.",
+   "Curl de muñeca inverso.",
+   "Aguantar una mancuerna con los dedos (trabajo de agarre)."
+  ],
+  "videoQuery": "Curl de muñeca técnica"
+ },
+ "good-morning": {
+  "muscles": "Femoral, Glúteo y Lumbar.",
+  "howTo": "Coloca los pies al ancho de los hombros y mantén la espalda recta. Sujeta una barra sobre tus hombros, asegurándote de que esté equilibrada. Inclina el torso hacia adelante desde las caderas, manteniendo las piernas ligeramente flexionadas. Regresa a la posición inicial, usando los músculos de los glúteos y los isquiotibiales.",
+  "mistakes": [
+   "Doblar las rodillas como en una sentadilla.",
+   "Redondear la espalda.",
+   "Cargar demasiado peso en un ejercicio que pide poco."
+  ],
+  "alternatives": [
+   "Bisagra de cadera con palo.",
+   "Peso muerto rumano.",
+   "Hiperextensiones."
+  ],
+  "videoQuery": "Buenos días con barra técnica"
+ },
+ "sumo-deadlift": {
+  "muscles": "Glúteo, Femoral, Cuádriceps, Aductores y Lumbar.",
+  "howTo": "Coloca los pies más anchos que los hombros y apunta los dedos ligeramente hacia afuera. Agarra la barra con las manos entre las piernas, manteniendo la espalda recta. Levanta la barra extendiendo las caderas y rodillas hasta estar de pie.",
+  "mistakes": [
+   "Meter las rodillas hacia dentro.",
+   "Subir la cadera antes que el pecho.",
+   "Separar la barra del cuerpo."
+  ],
+  "alternatives": [
+   "Peso muerto convencional.",
+   "Peso muerto rumano.",
+   "Sentadilla goblet ancha."
+  ],
+  "videoQuery": "Peso muerto sumo técnica"
+ },
+ "nordic-curl": {
+  "muscles": "Femoral y Glúteo.",
+  "howTo": "Asegura tus tobillos bajo un soporte o pide a un compañero que los sujete. Comienza de rodillas, con el cuerpo recto desde las rodillas hasta la cabeza. Desciende lentamente hacia adelante, manteniendo el control, hasta que no puedas más sin caer. Usa tus manos para amortiguar la caída y empuja ligeramente para volver a la posición inicial.",
+  "mistakes": [
+   "Doblar la cadera y bajar en bloque.",
+   "Caer de golpe sin frenar.",
+   "Empezar sin ayuda cuando aún no controlas la bajada."
+  ],
+  "alternatives": [
+   "Curl nórdico ayudándote con las manos.",
+   "Curl de piernas tumbado.",
+   "Peso muerto rumano."
+  ],
+  "videoQuery": "Curl nórdico técnica"
+ },
+ "cable-glute-kickback": {
+  "muscles": "Glúteo y Femoral.",
+  "howTo": "Ajusta la polea a la altura más baja y coloca un tobillo en el accesorio. Sujétate de la máquina para mantener el equilibrio. Con la pierna recta, empuja hacia atrás hasta sentir la contracción en los glúteos. Regresa lentamente a la posición inicial sin que el peso toque la pila.",
+  "mistakes": [
+   "Arquear la lumbar para subir más la pierna.",
+   "Girar la cadera hacia fuera.",
+   "Soltar de golpe al volver."
+  ],
+  "alternatives": [
+   "Patada de glúteo a cuatro patas sin peso.",
+   "Hip thrust.",
+   "Puente a una pierna."
+  ],
+  "videoQuery": "Patada de glúteo en polea técnica"
+ },
+ "sissy-squat": {
+  "muscles": "Cuádriceps.",
+  "howTo": "Coloca los pies al ancho de los hombros y mantén el torso erguido. Inclina ligeramente el torso hacia atrás mientras doblas las rodillas. Baja el cuerpo controladamente hasta que las rodillas estén casi a 90 grados. Regresa a la posición inicial empujando con los cuádriceps.",
+  "mistakes": [
+   "Dejar caer la cadera hacia atrás: aquí las rodillas van adelante y la cadera queda alineada.",
+   "Bajar más de lo que aguanta la rodilla.",
+   "Hacerlo sin sujeción cuando aún no controlas el equilibrio."
+  ],
+  "alternatives": [
+   "Extensión de piernas en máquina.",
+   "Sentadilla sissy sujetándote a un soporte.",
+   "Sentadilla goblet."
+  ],
+  "videoQuery": "Sentadilla sissy técnica"
+ },
+ "cable-crunch": {
+  "muscles": "Abdomen.",
+  "howTo": "Ajusta la polea a una altura alta y sujeta la cuerda con ambas manos. Arrodíllate frente a la máquina, manteniendo la espalda recta. Inclina el torso hacia adelante, llevando los codos hacia las rodillas mientras contraes los abdominales. Regresa lentamente a la posición inicial, manteniendo el control.",
+  "mistakes": [
+   "Flexionar la cadera en vez de la columna: hay que enrollar el tronco.",
+   "Tirar con los brazos.",
+   "Mover las caderas adelante y atrás."
+  ],
+  "alternatives": [
+   "Crunch en el suelo.",
+   "Rueda abdominal.",
+   "Elevación de piernas colgado."
+  ],
+  "videoQuery": "Crunch en polea técnica"
+ },
+ "jump-rope": {
+  "muscles": "Gemelos, Cuádriceps y Hombros.",
+  "howTo": "1. Sostén la cuerda con ambas manos a la altura de la cadera. 2. Gira la cuerda con las muñecas, no con los brazos. 3. Salta ligeramente cuando la cuerda se acerque a tus pies. 4. Mantén un ritmo constante y aterriza suavemente sobre las puntas de los pies.",
+  "mistakes": [
+   "Saltar demasiado alto.",
+   "Girar con todo el brazo en vez de con la muñeca.",
+   "Caer con las piernas rígidas."
+  ],
+  "alternatives": [
+   "Saltos sin cuerda en el sitio.",
+   "Rodillas altas.",
+   "Jumping jacks."
+  ],
+  "videoQuery": "Comba (saltar a la cuerda) técnica"
+ },
+ "stair-climber": {
+  "muscles": "Cuádriceps, Glúteo, Femoral y Gemelos.",
+  "howTo": "Colócate frente a las escaleras con los pies separados al ancho de los hombros. Sube un escalón con el pie derecho, empujando con el talón para activar los glúteos. Lleva el pie izquierdo al mismo escalón, manteniendo el equilibrio. Baja alternando los pies y repite el movimiento.",
+  "mistakes": [
+   "Colgarte de los pasamanos.",
+   "Subir de puntillas sin apoyar el talón.",
+   "Inclinar mucho el tronco hacia delante."
+  ],
+  "alternatives": [
+   "Cinta con inclinación.",
+   "Step-up con peso.",
+   "Elíptica."
+  ],
+  "videoQuery": "Escaladora (stepmill) técnica"
+ },
+ "jumping-jacks": {
+  "muscles": "Hombros, Cuádriceps y Gemelos.",
+  "howTo": "Párate derecho con los pies juntos y los brazos a los lados. Salta abriendo las piernas al ancho de los hombros mientras levantas los brazos por encima de la cabeza. Regresa a la posición inicial juntando los pies y bajando los brazos.",
+  "mistakes": [
+   "Caer con las rodillas rígidas.",
+   "No estirar los brazos del todo arriba.",
+   "Perder el ritmo y acabar dando saltos torcidos."
+  ],
+  "alternatives": [
+   "Jumping jacks sin salto, saliendo con un pie cada vez.",
+   "Rodillas altas.",
+   "Comba."
+  ],
+  "videoQuery": "Jumping jacks técnica"
+ },
+ "high-knees": {
+  "muscles": "Cuádriceps, Abdomen y Gemelos.",
+  "howTo": "Párate derecho con los pies al ancho de los hombros. Levanta una rodilla hacia el pecho lo más alto posible. Alterna rápidamente las rodillas, moviendo los brazos en sincronía.",
+  "mistakes": [
+   "Subir poco la rodilla.",
+   "Echar el tronco hacia atrás.",
+   "Aterrizar con el talón de golpe."
+  ],
+  "alternatives": [
+   "Marcha elevando rodillas, sin correr.",
+   "Escaladores.",
+   "Comba."
+  ],
+  "videoQuery": "Rodillas altas técnica"
+ },
+ "cable-shoulder-press": {
+  "muscles": "Hombros y Tríceps.",
+  "howTo": "Ajusta la polea a la altura de los hombros y sujeta las asas con un agarre por encima. Ponte de pie con los pies al ancho de los hombros y los codos ligeramente flexionados. Empuja las asas hacia arriba hasta que los brazos estén completamente extendidos, manteniendo el control. Regresa lentamente a la posición inicial, evitando que las pesas choquen.",
+  "mistakes": [
+   "Arquear la lumbar para empujar.",
+   "Colocarte demasiado lejos de la polea y quedar inclinado.",
+   "Bloquear los codos de golpe arriba."
+  ],
+  "alternatives": [
+   "Press de hombros con mancuernas.",
+   "Press de hombros en máquina.",
+   "Press militar con barra."
+  ],
+  "videoQuery": "Press de hombros en polea técnica"
+ },
+ "cable-upright-row": {
+  "muscles": "Hombros, Trapecio y Bíceps.",
+  "howTo": "Ajusta la polea a la posición más baja y sujeta el mango con ambas manos. Párate derecho con los pies al ancho de los hombros y el núcleo contraído. Tira del mango hacia arriba, llevando los codos hacia los lados y más altos que las manos. Baja lentamente el mango a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Subir los codos muy por encima de los hombros.",
+   "Separarte de la polea y tirar en diagonal.",
+   "Encoger los hombros al final."
+  ],
+  "alternatives": [
+   "Elevaciones laterales en polea.",
+   "Face pull.",
+   "Remo al mentón con barra y agarre ancho."
+  ],
+  "videoQuery": "Remo al mentón en polea técnica"
+ },
+ "cable-squat": {
+  "muscles": "Cuádriceps, Glúteo y Femoral.",
+  "howTo": "Ajusta la polea a la altura más baja y sujeta el mango con ambas manos. Colócate de pie con los pies separados al ancho de los hombros, manteniendo la espalda recta. Desciende en una sentadilla, llevando las caderas hacia atrás y manteniendo las rodillas alineadas con los pies. Regresa a la posición inicial empujando con los talones y manteniendo el control del cable.",
+  "mistakes": [
+   "Dejar que el cable te tire hacia delante.",
+   "Levantar los talones.",
+   "Bajar solo un palmo."
+  ],
+  "alternatives": [
+   "Sentadilla goblet.",
+   "Prensa de piernas.",
+   "Sentadilla sin peso."
+  ],
+  "videoQuery": "Sentadilla en polea técnica"
+ },
+ "dumbbell-shrug": {
+  "muscles": "Trapecio y Hombros.",
+  "howTo": "Párate derecho con los pies al ancho de los hombros. Sujeta una mancuerna en cada mano con los brazos extendidos a los lados. Levanta los hombros hacia las orejas, manteniendo los brazos rectos. Baja lentamente los hombros a la posición inicial.",
+  "mistakes": [
+   "Hacer círculos con los hombros.",
+   "Doblar los codos.",
+   "No llegar arriba del todo."
+  ],
+  "alternatives": [
+   "Encogimientos con barra.",
+   "Encogimientos en polea.",
+   "Face pull."
+  ],
+  "videoQuery": "Encogimientos con mancuerna técnica"
+ },
+ "cable-chest-press": {
+  "muscles": "Pectoral, Hombros y Tríceps.",
+  "howTo": "Ajusta la altura de las poleas a nivel del pecho y selecciona el peso adecuado. Párate en el centro, agarra las manijas con las palmas hacia abajo y da un paso adelante. Con los codos ligeramente flexionados, empuja las manijas hacia adelante hasta que los brazos estén extendidos. Regresa lentamente a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Sacar mucho el hombro hacia delante al final.",
+   "Arquear la lumbar.",
+   "Colocarte tan lejos que el cable te tira hacia atrás."
+  ],
+  "alternatives": [
+   "Press de pecho en máquina.",
+   "Press con mancuernas.",
+   "Flexiones."
+  ],
+  "videoQuery": "Press de pecho en polea técnica"
+ },
+ "low-cable-fly": {
+  "muscles": "Pectoral y Hombros.",
+  "howTo": "Ajusta las poleas bajas a la posición más baja y sujeta las manijas con las palmas hacia arriba. Da un paso adelante, manteniendo una ligera inclinación hacia adelante y los pies separados a la altura de los hombros. Con los codos ligeramente flexionados, levanta las manijas hacia arriba y hacia el centro del cuerpo hasta que las manos se encuentren a la altura del pecho. Regresa lentamente a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Doblar los codos y convertirlo en un press.",
+   "Subir las manos por encima de los hombros.",
+   "Encoger los hombros al juntar."
+  ],
+  "alternatives": [
+   "Cruce de poleas clásico.",
+   "Pec deck.",
+   "Aperturas con mancuernas en banco inclinado."
+  ],
+  "videoQuery": "Cruce de poleas de abajo arriba técnica"
+ },
+ "cable-overhead-triceps-extension": {
+  "muscles": "Tríceps.",
+  "howTo": "Ajusta la polea a la posición más alta y sujeta la cuerda con ambas manos. Colócate de pie con un pie delante del otro para mayor estabilidad. Extiende los brazos hacia arriba y hacia adelante, manteniendo los codos cerca de la cabeza. Regresa lentamente a la posición inicial sin mover los codos.",
+  "mistakes": [
+   "Abrir los codos hacia fuera.",
+   "Arquear la lumbar para llevar el peso atrás.",
+   "Mover los hombros en cada repetición."
+  ],
+  "alternatives": [
+   "Extensión sobre la cabeza con mancuerna.",
+   "Extensión de tríceps en polea por delante.",
+   "Press francés."
+  ],
+  "videoQuery": "Extensión de tríceps sobre la cabeza en polea técnica"
+ },
+ "cable-front-raise": {
+  "muscles": "Hombros.",
+  "howTo": "Ajusta la polea a la posición más baja y sujeta el mango con ambas manos, palmas hacia abajo. Ponte de pie con los pies al ancho de los hombros y mantén una ligera flexión en las rodillas. Levanta el mango hacia el frente hasta que tus brazos estén paralelos al suelo, manteniendo los codos ligeramente flexionados. Baja lentamente el mango a la posición inicial, controlando el movimiento.",
+  "mistakes": [
+   "Subir por encima de la línea de los ojos.",
+   "Balancearte para dar impulso.",
+   "Doblar el codo para ayudarte."
+  ],
+  "alternatives": [
+   "Elevación frontal con mancuernas.",
+   "Press de hombros.",
+   "Elevaciones laterales en polea."
+  ],
+  "videoQuery": "Elevación frontal en polea técnica"
+ },
+ "cable-hip-abduction": {
+  "muscles": "Glúteo.",
+  "howTo": "Ajusta la polea baja a la altura de tu tobillo y coloca el brazalete en tu tobillo exterior. Párate de lado a la máquina, sosteniéndote con una mano para mantener el equilibrio. Con la pierna que lleva el brazalete, extiende hacia afuera y hacia un lado, manteniendo el tronco recto. Regresa lentamente a la posición inicial y repite.",
+  "mistakes": [
+   "Inclinar el tronco hacia el lado contrario para abrir más.",
+   "Girar la punta del pie hacia fuera.",
+   "Soltar de golpe al cerrar."
+  ],
+  "alternatives": [
+   "Abductores en máquina.",
+   "Abducción tumbado de lado.",
+   "Banda elástica por encima de las rodillas."
+  ],
+  "videoQuery": "Abducción de cadera en polea técnica"
+ },
+ "cobra-stretch": {
+  "muscles": "Lumbar y Abdomen.",
+  "howTo": "Acuéstate boca abajo en el suelo con las piernas extendidas. Coloca las palmas de las manos en el suelo a la altura de los hombros. Inhala y levanta lentamente el pecho, manteniendo las caderas en el suelo. Mantén la posición durante 15-30 segundos, luego baja suavemente.",
+  "mistakes": [
+   "Empujar con los brazos hasta forzar la lumbar.",
+   "Encoger los hombros hacia las orejas.",
+   "Despegar la cadera del suelo."
+  ],
+  "alternatives": [
+   "Extensión sobre los antebrazos (esfinge).",
+   "Gato-vaca.",
+   "Extensión torácica sobre banco."
+  ],
+  "videoQuery": "Estiramiento de cobra técnica"
+ },
+ "cat-cow": {
+  "muscles": "Lumbar y Abdomen.",
+  "howTo": "Colócate en posición de cuatro patas, con las manos alineadas con los hombros y las rodillas con las caderas. Inhala profundamente mientras arqueas la espalda hacia abajo, levantando la cabeza y el coxis hacia el techo, entrando en la posición de 'vaca'. Exhala mientras redondeas la espalda hacia arriba, llevando el mentón hacia el pecho y el coxis hacia abajo, entrando en la posición de 'gato'. Repite el ciclo de movimientos de manera fluida, coordinando la respiración con cada cambio de posición.",
+  "mistakes": [
+   "Mover solo la lumbar en vez de toda la columna.",
+   "Ir a tirones.",
+   "Bloquear los codos con fuerza."
+  ],
+  "alternatives": [
+   "Rotación torácica en cuadrupedia.",
+   "Extensión torácica sobre banco.",
+   "Estiramiento de cobra."
+  ],
+  "videoQuery": "Gato-vaca técnica"
+ },
+ "dragon-flag": {
+  "muscles": "Abdomen, Oblicuos y Lumbar.",
+  "howTo": "Acuéstate boca arriba en un banco, agarrando el borde con las manos. Levanta las piernas y la cadera hacia arriba, manteniendo el cuerpo recto. Baja lentamente el cuerpo sin tocar el banco, controlando el movimiento.",
+  "mistakes": [
+   "Doblar la cadera y convertirlo en una elevación de piernas.",
+   "Dejar caer el cuerpo de golpe al bajar.",
+   "Cargar el cuello en vez de agarrarte bien al banco."
+  ],
+  "alternatives": [
+   "Bandera del dragón con las rodillas dobladas.",
+   "Elevación de piernas tumbado.",
+   "Hollow hold."
+  ],
+  "videoQuery": "Bandera del dragón técnica"
+ },
+ "seated-barbell-wrist-curl": {
+  "muscles": "Antebrazo.",
+  "howTo": "Siéntate en un banco con los pies firmemente en el suelo. Sujeta la barra con las palmas hacia arriba y los antebrazos apoyados en los muslos. Flexiona las muñecas hacia arriba, levantando la barra lo más alto posible. Baja lentamente la barra a la posición inicial, manteniendo el control.",
+  "mistakes": [
+   "Despegar los antebrazos de los muslos.",
+   "Hacer medio recorrido: hay que abrir la mano abajo y cerrar arriba.",
+   "Poner tanto peso que se cargan los codos."
+  ],
+  "alternatives": [
+   "Curl de muñeca con mancuernas.",
+   "Curl de muñeca sobre un banco.",
+   "Curl de muñeca con barra tras la espalda."
+  ],
+  "videoQuery": "Curl de muñeca sentado con barra técnica"
+ },
+ "behind-the-back-barbell-wrist-curl": {
+  "muscles": "Antebrazo.",
+  "howTo": "Colócate de pie con los pies separados al ancho de los hombros y sujeta la barra detrás de ti con las palmas hacia atrás. Mantén los brazos rectos y levanta la barra flexionando solo las muñecas hacia arriba. Baja lentamente la barra a la posición inicial controlando el movimiento.",
+  "mistakes": [
+   "Doblar los codos para ayudarte.",
+   "Separar la barra de los glúteos.",
+   "Encoger los hombros."
+  ],
+  "alternatives": [
+   "Curl de muñeca sentado con barra.",
+   "Curl de muñeca con mancuernas.",
+   "Curl de muñeca sobre banco."
+  ],
+  "videoQuery": "Curl de muñeca con barra tras la espalda técnica"
+ },
+ "dumbbell-wrist-curl-over-bench": {
+  "muscles": "Antebrazo.",
+  "howTo": "Arrodíllate detrás de un banco plano y apoya los dos antebrazos a lo largo del banco, con las manos por fuera del borde. Sujeta una mancuerna en cada mano con las palmas hacia arriba y deja caer las muñecas. Flexiona las muñecas hacia arriba sin despegar los antebrazos del banco. Baja las mancuernas despacio hasta la posición inicial y repite.",
+  "mistakes": [
+   "Levantar los antebrazos del banco.",
+   "Recorrido corto, sin dejar que la mancuerna ruede hacia los dedos.",
+   "Cargar demasiado y tirar con el codo."
+  ],
+  "alternatives": [
+   "Curl de muñeca sentado con barra.",
+   "Curl de muñeca con barra sobre banco.",
+   "Curl de muñeca inverso."
+  ],
+  "videoQuery": "Curl de muñeca con mancuernas sobre banco técnica"
+ },
+ "barbell-wrist-curl-over-bench": {
+  "muscles": "Antebrazo.",
+  "howTo": "Arrodíllate detrás de un banco plano y apoya los dos antebrazos a lo largo del banco, con las manos por fuera del borde. Agarra la barra con las palmas hacia arriba, a la anchura de los hombros, y deja caer las muñecas. Sube la barra flexionando solo las muñecas, con los antebrazos siempre pegados al banco. Baja la barra despacio hasta la posición inicial y repite.",
+  "mistakes": [
+   "Levantar los antebrazos del banco.",
+   "Agarrar la barra con las muñecas rígidas y no dejarla bajar.",
+   "Poner tanto peso que se carga el codo."
+  ],
+  "alternatives": [
+   "Curl de muñeca con mancuernas sobre banco.",
+   "Curl de muñeca sentado.",
+   "Curl de muñeca inverso de pie."
+  ],
+  "videoQuery": "Curl de muñeca con barra sobre banco técnica"
+ },
+ "standing-barbell-reverse-wrist-curl": {
+  "muscles": "Antebrazo.",
+  "howTo": "De pie, sujeta la barra por delante de los muslos con las palmas hacia atrás (agarre prono) y las manos al ancho de los hombros. Mantén los codos estirados y pegados al cuerpo: solo se mueven las muñecas. Sube los nudillos hacia el antebrazo extendiendo las muñecas y aguanta un instante arriba. Baja la barra despacio hasta dejar las muñecas relajadas y repite.",
+  "mistakes": [
+   "Cambiar el agarre a supino sin darte cuenta: aquí las palmas miran hacia atrás.",
+   "Doblar los codos para ayudarte.",
+   "Cargar demasiado: aquí se mueve muy poco peso."
+  ],
+  "alternatives": [
+   "Curl de muñeca inverso apoyado en un banco.",
+   "Curl de muñeca normal.",
+   "Curl martillo para el antebrazo."
+  ],
+  "videoQuery": "Curl de muñeca inverso de pie con barra técnica"
  }
 }

@@ -369,7 +369,9 @@ class SkipActionReceiver : BroadcastReceiver() {
                         com.marc.gymplan100.data.SpecialSessionEngine.skipFromNotification(data, session, now)
                     } else when (session.phase) {
                         SessionPhase.WARMUP -> SessionEngine.endWarmup(session)
-                        SessionPhase.TIMED_SET -> SessionEngine.completeSet(session, "", now)
+                        SessionPhase.TIMED_SET -> SessionEngine.completeSet(
+                            session, "", now, yourRests = repo.progress.first().yourRests
+                        )
                         SessionPhase.RESTING -> SessionEngine.endRest(session, now)
                         else -> session
                     }

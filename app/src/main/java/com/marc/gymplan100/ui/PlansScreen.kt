@@ -59,6 +59,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.PlanGoal
 import com.marc.gymplan100.data.PlanImport
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.PlanSource
@@ -298,6 +299,17 @@ fun PlansScreen(
     }
 }
 
+/** El objetivo del plan en dos palabras, con lo que lo distingue cuando no es obvio. */
+private fun goalLabel(goal: PlanGoal?): String? = when (goal) {
+    PlanGoal.STRENGTH -> "Fuerza (3-5 reps)"
+    PlanGoal.MUSCLE -> "Músculo (8-12 reps)"
+    PlanGoal.LOSE_FAT -> "Perder grasa"
+    PlanGoal.MAINTAIN -> "Mantenimiento"
+    PlanGoal.MOBILITY -> "Movilidad"
+    PlanGoal.START -> "Para empezar"
+    null -> null
+}
+
 @Composable
 private fun PlanCard(
     plan: TrainingPlan,
@@ -397,6 +409,9 @@ private fun PlanCard(
         Spacer(Modifier.height(Space.x2))
         Text(
             buildString {
+                // El objetivo delante: «fuerza» y «músculo» se entrenan distinto (pocas
+                // repeticiones y descansos largos frente a 8-12), y es lo primero que se elige.
+                goalLabel(plan.goal)?.let { append("$it · ") }
                 append("${plan.totalDays} días · ")
                 append(if (plan.phases.size == 1) "1 fase" else "${plan.phases.size} fases")
                 // Sin empezar no se cuentan ceros: un "0 completados" es ruido, no información.

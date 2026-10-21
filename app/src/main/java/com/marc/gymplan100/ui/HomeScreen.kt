@@ -180,14 +180,28 @@ fun HomeScreen(
 
         item {
             // El plan y la fase, en una línea: con planes propios saber cuál sigues importa.
-            Text(
-                buildString {
-                    append(if (activePlan.builtin) "PLAN DE $total DÍAS" else activePlan.name.uppercase())
-                    currentPhase?.let { append(" · FASE ${it.number} ${it.name.uppercase()}") }
-                },
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Y debajo, la puerta a los demás: había quien pedía «un plan de fuerza, no de
+            // hipertrofia» sin saber que existe, porque la lista vivía dentro de Ajustes.
+            Column {
+                Text(
+                    buildString {
+                        append(if (activePlan.builtin) "PLAN DE $total DÍAS" else activePlan.name.uppercase())
+                        currentPhase?.let { append(" · FASE ${it.number} ${it.name.uppercase()}") }
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                // Debajo y no al lado: a la derecha partía el nombre de la fase con el texto
+                // del sistema grande.
+                Text(
+                    "Ver otros planes (fuerza, músculo, en casa…)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .clickable(onClick = onOpenPlans)
+                        .padding(vertical = Space.x2)
+                )
+            }
         }
 
         // El aviso de version nueva. En la variante de Play no pinta nada: alli avisa la

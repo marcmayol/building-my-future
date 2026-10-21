@@ -332,7 +332,9 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
             day.template.exercises.forEachIndexed { index, exercise ->
                 val log = progress.logs["$dayNumber-$index"]
                 ExerciseResultRow(
-                    name = exercise.name,
+                    // Lo que se hizo de verdad, con el del plan entre paréntesis para no perderse.
+                    name = log?.doneAs?.takeIf { it.isNotBlank() }
+                        ?.let { "$it (en lugar de ${exercise.name})" } ?: exercise.name,
                     weight = log?.weight.orEmpty(),
                     sets = log?.filledSets.orEmpty(),
                     conReps = false

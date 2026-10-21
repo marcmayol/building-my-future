@@ -76,7 +76,16 @@ fun ExerciseGuideSheet(
      * Guarda a que ejercicio del catalogo se parece este (null lo desvincula). Si no se pasa,
      * la ficha es de solo lectura: hay sitios donde ensenarla sin poder tocar nada.
      */
-    onAlias: ((String?) -> Unit)? = null
+    onAlias: ((String?) -> Unit)? = null,
+    /**
+     * Desde la serie en curso: hacer una de las alternativas en lugar del ejercicio (o volver
+     * al del plan con null). Sin esto, las alternativas solo se leen.
+     */
+    onSwap: ((name: String?, remember: Boolean) -> Unit)? = null,
+    /** El nombre que trae el plan, si hoy se está haciendo otro ([exerciseName]). */
+    planName: String = exerciseName,
+    /** El cambio de hoy está recordado para los próximos días. */
+    swapRemembered: Boolean = false
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val guide = ExerciseGuides.forName(LocalContext.current, exerciseName)
@@ -136,6 +145,12 @@ fun ExerciseGuideSheet(
                     )
                 }
                 Unit
+            }
+
+            // Hecho otro en lugar del del plan, y sin ficha (escrito a mano): lo primero que se
+            // necesita es poder volver, no un texto sobre el catálogo.
+            if (guide == null && onSwap != null && planName != exerciseName) {
+                SwapSection(planName, exerciseName, emptyList(), swapRemembered, onSwap)
             }
 
             if (guide == null) {
@@ -247,7 +262,13 @@ fun ExerciseGuideSheet(
                 }
             }
 
-            if (guide.alternatives.isNotEmpty()) {
+            if (onSwap != null) {
+                // En mitad del entreno esta es la sección que se busca: va abierta, y cada
+                // alternativa conocida se puede hacer con un toque.
+                CollapsibleSection("Si está ocupada o no la tienes", startOpen = true) {
+                    SwapSection(planName, exerciseName, guide.alternatives, swapRemembered, onSwap)
+                }
+            } else if (guide.alternatives.isNotEmpty()) {
                 CollapsibleSection("Si está ocupada o no la tienes") {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         guide.alternatives.forEach { Bullet(it) }
@@ -265,8 +286,12 @@ fun ExerciseGuideSheet(
 
 /** Sección plegable: el título siempre visible y el contenido a un toque. */
 @Composable
-private fun CollapsibleSection(title: String, content: @Composable () -> Unit) {
-    var open by remember { mutableStateOf(false) }
+private fun CollapsibleSection(
+    title: String,
+    startOpen: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    var open by remember { mutableStateOf(startOpen) }
     Column {
         Row(
             modifier = Modifier

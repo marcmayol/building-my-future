@@ -43,8 +43,17 @@ data class ExerciseLog(
      * día —el MÁS ALTO de sus series—, que es lo que mira "Mis pesos" y lo que se sugiere la
      * próxima vez.
      */
-    val sets: List<SetLog> = emptyList()
+    val sets: List<SetLog> = emptyList(),
+    /**
+     * Si ese día se hizo otro ejercicio en lugar del del plan (aperturas con mancuernas en vez
+     * de pec deck), cuál. Vacío = el del plan. Los kilos de este registro son de ESTE
+     * ejercicio, y así se leen en Mis pesos, la progresión y las estadísticas.
+     */
+    val doneAs: String = ""
 ) {
+    /** El nombre de lo que se hizo de verdad, sabiendo que el plan lo llama [planName]. */
+    fun nameFor(planName: String): String = doneAs.trim().ifBlank { planName }
+
     /** Series con algo apuntado; las de relleno (vacías del todo) no cuentan. */
     val filledSets: List<SetLog> get() = sets.filter { !it.isEmpty }
 
@@ -128,6 +137,20 @@ data class ProgressState(
      * que reimportar el plan corregido no se lo lleve por delante.
      */
     val exerciseAliases: Map<String, String> = emptyMap(),
+    /**
+     * «Este ejercicio del plan yo lo hago así» (clave: el nombre del plan; valor: lo que haces).
+     *
+     * A diferencia de [exerciseAliases] —que dice a qué se PARECE un ejercicio que la app no
+     * conoce—, esto es un cambio de ejercicio de verdad: quien no tiene pec deck en casa hace
+     * aperturas con mancuernas, y sus kilos no son los de la máquina. Se recuerda para que no
+     * haya que cambiarlo cada día, y se deshace desde el mismo sitio.
+     */
+    val exerciseSwaps: Map<String, String> = emptyMap(),
+    /**
+     * El descanso entre series que dejaste puesto en cada ejercicio (segundos, por nombre).
+     * Si una vez lo alargas a 3 minutos, la próxima ya empieza en 3 minutos.
+     */
+    val yourRests: Map<String, Int> = emptyMap(),
     // En Resultados, el día más reciente arriba (con 30+ días completados, bajar hasta
     // el último era un scroll interminable).
     val resultsNewestFirst: Boolean = true,
@@ -177,7 +200,11 @@ data class ProgressState(
      * series solo sobrevivía la última, y con ella la idea falsa de que el ejercicio se hizo
      * con un único peso.
      */
-    fun withFinishedDay(dayNumber: Int, completedSets: List<CompletedSet>): ProgressState {
+    fun withFinishedDay(
+        dayNumber: Int,
+        completedSets: List<CompletedSet>,
+        swaps: Map<Int, String> = emptyMap()
+    ): ProgressState {
         val nuevosLogs = logs.toMutableMap()
         val nuevosPesos = exerciseWeights.toMutableMap()
         val nuevasReps = exerciseReps.toMutableMap()
@@ -201,12 +228,17 @@ data class ProgressState(
                         rir = it.rir.trim()
                     )
                 }
+            val otro = swaps[idx]?.trim().orEmpty()
             nuevosLogs[clave] = previo.copy(
                 weight = pesoTope ?: previo.weight,
                 done = true,
-                sets = if (desglose.any { !it.isEmpty }) desglose else previo.sets
+                sets = if (desglose.any { !it.isEmpty }) desglose else previo.sets,
+                doneAs = otro
             )
-            val nombre = PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(idx)?.name
+            // Los kilos van a lo que se hizo: los de unas aperturas con mancuernas no son
+            // los del pec deck, y mezclarlos le propondría a la máquina un peso imposible.
+            val nombre = otro.ifBlank { null }
+                ?: PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(idx)?.name
             if (pesoTope != null && !nombre.isNullOrBlank()) nuevosPesos[nombre] = pesoTope
             val repsDeArranque = desglose.firstOrNull { !it.warmup && it.reps.isNotBlank() }?.reps
             if (repsDeArranque != null && !nombre.isNullOrBlank()) nuevasReps[nombre] = repsDeArranque

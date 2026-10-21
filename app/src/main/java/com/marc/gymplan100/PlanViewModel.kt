@@ -8,6 +8,9 @@ import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.Celebration
 import com.marc.gymplan100.data.ExerciseLog
+import com.marc.gymplan100.data.Express
+import com.marc.gymplan100.data.ExpressPlan
+import com.marc.gymplan100.data.RestDefaults
 import com.marc.gymplan100.data.LoggedExercise
 import com.marc.gymplan100.data.Motivation
 import com.marc.gymplan100.data.DiaDto
@@ -619,6 +622,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             weight = tope.ifBlank { "" }
         )
         val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(exerciseIndex)?.name
+            ?.let { current.nameFor(it) }
         val weights = if (tope.isNotBlank() && !name.isNullOrBlank()) {
             state.exerciseWeights + (name to tope)
         } else state.exerciseWeights
@@ -649,6 +653,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val arranque = sets.firstOrNull { it.reps.isNotBlank() }?.reps.orEmpty()
         val updated = current.copy(sets = sets, reps = arranque)
         val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(exerciseIndex)?.name
+            ?.let { current.nameFor(it) }
         val repsPorEjercicio = if (arranque.isNotBlank() && !name.isNullOrBlank()) {
             state.exerciseReps + (name to arranque)
         } else state.exerciseReps
@@ -687,11 +692,16 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { repo.saveActiveSession(session) }
     }
 
-    /** Inicia una sesión nueva para el día indicado (descarta cualquier otra en curso). */
-    fun startSession(dayNumber: Int) {
+    /**
+     * Inicia una sesión nueva para el día indicado (descarta cualquier otra en curso).
+     *
+     * Con [express] se hace la versión recortada (ver [Express.plan]). Los ejercicios que
+     * cambiaste por otro y pediste recordar ya arrancan cambiados.
+     */
+    fun startSession(dayNumber: Int, express: ExpressPlan? = null) {
         RestReminder.cancel(getApplication())
         val now = System.currentTimeMillis()
-        val session = SessionEngine.startSession(dayNumber, now)
+        val session = SessionEngine.startSession(dayNumber, now, express = express, swaps = rememberedSwaps(dayNumber))
         // El calentamiento arranca en marcha; programamos el aviso de su fin.
         RestReminder.schedule(
             getApplication(),
@@ -701,6 +711,65 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         )
         saveActive(session)
     }
+
+    /** Los cambios recordados que afectan a [dayNumber], por índice del ejercicio en el día. */
+    private fun rememberedSwaps(dayNumber: Int): Map<Int, String> {
+        val recordados = _progress.value.exerciseSwaps
+        if (recordados.isEmpty()) return emptyMap()
+        val ejercicios = PlanData.dayByNumber(dayNumber)?.template?.exercises ?: return emptyMap()
+        return ejercicios.withIndex()
+            .mapNotNull { (i, ex) -> recordados[ex.name]?.takeIf { it.isNotBlank() }?.let { i to it } }
+            .toMap()
+    }
+
+    /** Cuánto dura [dayNumber] entero, en minutos, con lo que suele tardar este usuario. */
+    fun estimatedMinutes(dayNumber: Int): Int? {
+        val day = PlanData.dayByNumber(dayNumber) ?: return null
+        val segundos = Express.estimateSeconds(
+            day, yourRests = _progress.value.yourRests, scale = Express.scaleFrom(_history.value)
+        )
+        return (segundos + 59) / 60
+    }
+
+    /** El día recortado a [minutes] minutos, o null si entero ya cabe. */
+    fun expressPlan(dayNumber: Int, minutes: Int): ExpressPlan? {
+        val day = PlanData.dayByNumber(dayNumber) ?: return null
+        return Express.plan(
+            day, minutes * 60, _progress.value.yourRests, Express.scaleFrom(_history.value)
+        )
+    }
+
+    /**
+     * Hoy el ejercicio [index] del día se hace con [name] en vez de con el del plan, o se
+     * vuelve al del plan con null. Con [remember] queda así también los próximos días.
+     *
+     * Vale en la serie (el que se está haciendo) y en el descanso (el que viene, que es
+     * cuando se ve que la máquina está cogida). El peso preparado y las repeticiones se
+     * limpian: eran de la otra máquina.
+     */
+    fun swapExercise(index: Int, name: String?, remember: Boolean) {
+        val s = _active.value ?: return
+        if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.RESTING) return
+        val delPlan = s.planNameAt(index) ?: return
+        val limpio = name?.trim().orEmpty().takeIf { it.isNotEmpty() && it != delPlan }
+        val swaps = if (limpio == null) s.swaps - index else s.swaps + (index to limpio)
+        saveActive(
+            if (s.phase == SessionPhase.WORKING) s.copy(swaps = swaps, plannedWeight = "", currentReps = "")
+            else s.copy(swaps = swaps, plannedWeight = "")
+        )
+        if (remember || limpio == null) {
+            update { st ->
+                st.copy(
+                    exerciseSwaps = if (limpio == null) st.exerciseSwaps - delPlan
+                    else st.exerciseSwaps + (delPlan to limpio)
+                )
+            }
+        }
+    }
+
+    /** Si el ejercicio [planName] tiene un cambio recordado para los próximos días. */
+    fun isSwapRemembered(planName: String): Boolean =
+        _progress.value.exerciseSwaps[planName]?.isNotBlank() == true
 
     /**
      * Inicia un entrenamiento ESPECIAL/libre para el día indicado (descarta cualquier otro en curso).
@@ -944,8 +1013,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * levantando hoy, no lo que dice el historial. Null cuando no hay nada que proponer.
      */
     fun progressionFor(session: ActiveSession): Progression.Suggestion? {
-        val exercise = PlanData.dayByNumber(session.dayNumber)
-            ?.template?.exercises?.getOrNull(session.exerciseIndex) ?: return null
+        val exercise = session.exerciseAt(session.exerciseIndex) ?: return null
         if (session.completedSets.any { it.exerciseIndex == session.exerciseIndex }) return null
         return Progression.suggest(
             exercise.scheme,
@@ -982,8 +1050,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun plannedWeightSuggestion(session: ActiveSession): String {
         val day = PlanData.dayByNumber(session.dayNumber) ?: return ""
-        val exercise = day.template.exercises.getOrNull(session.exerciseIndex) ?: return ""
-        val totalSets = com.marc.gymplan100.data.setCountFromScheme(exercise.scheme)
+        val exercise = session.exerciseAt(session.exerciseIndex) ?: return ""
+        val totalSets = session.setsFor(exercise)
         if (session.setNumber < totalSets) {
             // Misma máquina: el peso que acabas de levantar en la última serie hecha.
             session.completedSets
@@ -995,7 +1063,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val order = session.order.ifEmpty { day.template.exercises.indices.toList() }
         val pos = order.indexOf(session.exerciseIndex)
         val nextIdx = order.getOrNull(pos + 1) ?: return ""
-        val nextName = day.template.exercises.getOrNull(nextIdx)?.name ?: return ""
+        val nextName = session.exerciseAt(nextIdx)?.name ?: return ""
         return _progress.value.exerciseWeights[nextName] ?: ""
     }
 
@@ -1111,8 +1179,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     ) {
         val s = _active.value ?: return
         if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return
-        val day = PlanData.dayByNumber(s.dayNumber) ?: return
-        val exercise = day.template.exercises.getOrNull(s.exerciseIndex) ?: return
+        val exercise = s.exerciseAt(s.exerciseIndex) ?: return
 
         // El peso de referencia es un efecto propio del ViewModel; la transición de fase la
         // calcula SessionEngine (compartida con la notificación) para no divergir.
@@ -1132,7 +1199,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         }
         val repsFinales = reps.trim().ifBlank { SessionEngine.repsForSet(s, _progress.value.exerciseReps) }
         val next = SessionEngine.completeSet(
-            s, weight, System.currentTimeMillis(), repsFinales, warmup, rir
+            s, weight, System.currentTimeMillis(), repsFinales, warmup, rir,
+            yourRests = _progress.value.yourRests
         )
         // Encadenando una superserie no hay descanso que programar, y el aviso del ejercicio
         // que se acaba de cerrar hay que quitarlo: si no, sonaria en mitad del siguiente.
@@ -1175,7 +1243,14 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val kind = if (s.restBetweenExercises) RestReminder.KIND_BETWEEN_EXERCISES
         else RestReminder.KIND_BETWEEN_SETS
         RestReminder.schedule(getApplication(), s.restStartMillis + newTarget * 1000L, kind, s.dayNumber)
-        saveActive(s.copy(restTargetSeconds = newTarget))
+        saveActive(s.copy(restTargetSeconds = newTarget, restSource = RestDefaults.Source.YOURS.name))
+        // Entre series, lo que pones se queda para ese ejercicio: si hoy has necesitado 3
+        // minutos, la próxima vez la cuenta atrás ya empieza en 3. Entre ejercicios no, que
+        // ahí lo que se tarda depende de dónde esté la siguiente máquina.
+        if (!s.restBetweenExercises) {
+            val nombre = s.exerciseAt(s.exerciseIndex)?.name
+            if (!nombre.isNullOrBlank()) update { it.copy(yourRests = it.yourRests + (nombre to newTarget)) }
+        }
     }
 
     /** Termina el descanso, guarda el tiempo real descansado y avanza a la siguiente serie/ejercicio. */
@@ -1308,7 +1383,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
         val before = _progress.value
         val wasCompleted = s.dayNumber in before.completedDays
-        val after = before.withFinishedDay(s.dayNumber, s.completedSets)
+        val after = before.withFinishedDay(s.dayNumber, s.completedSets, s.swaps)
         _progress.value = after
         viewModelScope.launch { repo.save(after) }
 
@@ -1386,7 +1461,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             sb.append("Sesión libre guiada.\n")
         } else {
             val byExercise = session.completedSets.groupBy { it.exerciseIndex }
-            day.template.exercises.forEachIndexed { idx, ex ->
+            day.template.exercises.forEachIndexed { idx, delPlan ->
+                val ex = session.exerciseAt(idx) ?: delPlan
                 val sets = byExercise[idx].orEmpty()
                 val detail = if (sets.isEmpty()) "—"
                 else sets.joinToString(", ") { s ->

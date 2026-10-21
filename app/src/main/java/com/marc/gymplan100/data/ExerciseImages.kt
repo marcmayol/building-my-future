@@ -288,7 +288,9 @@ object ExerciseImages {
     fun forName(context: Context, rawName: String, female: Boolean): Int? {
         // Un ejercicio de un plan propio puede tener un alias: "se parece a este del catalogo".
         val name = ExerciseAliases.resolve(rawName)
-        nameToSlug[name]?.let { slug ->
+        // Lo que el plan nombra manda; si no, el catálogo, que es de donde salen los
+        // ejercicios que se eligen en lugar del del plan.
+        (nameToSlug[name] ?: ExerciseCatalog.forName(name)?.slug)?.let { slug ->
             val id = drawableFor(context, slug, female)
             if (id != 0) return id
         }
@@ -325,12 +327,14 @@ object ExerciseImages {
 
     /** ¿Sabemos con qué ilustrar este ejercicio? Slug propio o movimientos de un compuesto. */
     fun hasVisual(name: String): Boolean = ExerciseAliases.resolve(name).let {
-        nameToSlug.containsKey(it) || nameToCompoundMoves.containsKey(it)
+        nameToSlug.containsKey(it) || nameToCompoundMoves.containsKey(it) ||
+            ExerciseCatalog.forName(it) != null
     }
 
     /** Los nombres del catalogo, ordenados, para poder elegir a cual se parece el tuyo. */
     fun catalogNames(): List<String> =
-        (nameToSlug.keys + nameToCompoundMoves.keys).distinct().sorted()
+        (nameToSlug.keys + nameToCompoundMoves.keys + ExerciseCatalog.all.map { it.nombre })
+            .distinct().sorted()
 
     /**
      * Slug del catálogo al que corresponde este nombre, o el del primer movimiento si es un
@@ -338,4 +342,5 @@ object ExerciseImages {
      */
     fun slugFor(name: String): String? =
         nameToSlug[name] ?: nameToCompoundMoves[name]?.firstOrNull()?.slug
+            ?: ExerciseCatalog.forName(name)?.slug
 }

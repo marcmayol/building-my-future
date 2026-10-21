@@ -95,7 +95,8 @@ object Statistics {
             if (dash <= 0) continue
             val day = key.substring(0, dash).toIntOrNull() ?: continue
             val idx = key.substring(dash + 1).toIntOrNull() ?: continue
-            val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx)?.name ?: continue
+            val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx)?.name
+                ?.let { log.nameFor(it) } ?: continue
             out.getOrPut(name) { mutableListOf() }.add(WeightPoint(day, w))
         }
         return out.mapValues { (_, v) -> v.sortedBy { it.day } }
@@ -152,7 +153,8 @@ object Statistics {
             if (dash <= 0) continue
             val day = key.substring(0, dash).toIntOrNull() ?: continue
             val idx = key.substring(dash + 1).toIntOrNull() ?: continue
-            val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx)?.name ?: continue
+            val name = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx)?.name
+                ?.let { log.nameFor(it) } ?: continue
             out.getOrPut(name) { mutableListOf() }.add(WeightPoint(day, best))
         }
         return out.mapValues { (_, v) -> v.sortedBy { it.day } }

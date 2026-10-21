@@ -87,8 +87,9 @@ fun DayPlanSheet(
             Spacer(Modifier.height(2.dp))
 
             order.forEachIndexed { pos, exIndex ->
-                val ex = day.template.exercises.getOrNull(exIndex) ?: return@forEachIndexed
-                val total = setCountFromScheme(ex.scheme)
+                // El de hoy: si se cambió por otro, la lista dice el que se está haciendo.
+                val ex = session.exerciseAt(exIndex) ?: return@forEachIndexed
+                val total = session.setsFor(ex)
                 val doneSets = session.completedSets.count { it.exerciseIndex == exIndex }
                 PlanRow(
                     position = pos + 1,

@@ -94,5 +94,12 @@ object MuscleTargets {
         "Finisher: press de pecho ligero al fallo" to chestPress,
     )
 
-    fun forName(name: String): MuscleTarget? = map[ExerciseAliases.resolve(name)]
+    fun forName(name: String): MuscleTarget? {
+        val nombre = ExerciseAliases.resolve(name)
+        map[nombre]?.let { return it }
+        // Un ejercicio del catálogo que ningún plan nombra (el que se hace en lugar de otro):
+        // sus músculos vienen con él.
+        return ExerciseCatalog.forName(nombre)?.takeIf { it.principales.isNotEmpty() }
+            ?.let { MuscleTarget(it.principales.toSet(), it.secundarios.toSet()) }
+    }
 }

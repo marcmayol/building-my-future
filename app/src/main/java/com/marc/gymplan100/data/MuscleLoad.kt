@@ -39,7 +39,8 @@ object MuscleLoad {
             val day = key.substring(0, dash).toIntOrNull() ?: continue
             if (day !in days) continue
             val idx = key.substring(dash + 1).toIntOrNull() ?: continue
-            val exercise = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx) ?: continue
+            val exercise = PlanData.dayByNumber(day)?.template?.exercises?.getOrNull(idx)
+                ?.let { it.copy(name = log.nameFor(it.name)) } ?: continue
             val target = MuscleTargets.forName(exercise.name) ?: continue
             val series = seriesOf(log, exercise)
             if (series <= 0f) continue

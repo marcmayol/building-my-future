@@ -6,7 +6,6 @@ import com.google.android.gms.wearable.Wearable
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SessionPhase
-import com.marc.gymplan100.data.setCountFromScheme
 
 /**
  * Puente con el reloj (Wear OS / Google Pixel Watch).
@@ -79,13 +78,13 @@ object WearBridge {
             map.putInt(KEY_NEXT_DAY, nextDay)
         } else {
             val now = System.currentTimeMillis()
-            val day = PlanData.dayByNumber(session.dayNumber)
-            val exercise = day?.template?.exercises?.getOrNull(session.exerciseIndex)
+            // El ejercicio de hoy: si se cambió por otro, el reloj enseña el que se hace.
+            val exercise = session.exerciseAt(session.exerciseIndex)
             // En cronómetro libre no se sigue el plan: el ejercicio y las series del día no
             // dicen nada (el reloj llegó a anunciar "Prensa de piernas · Serie 1 de 3" durante
             // un entreno libre). Ahí lo honesto es el nombre de la sesión y el tiempo corriendo.
             val libre = session.phase == SessionPhase.FREE
-            val total = if (libre) 0 else exercise?.scheme?.let { setCountFromScheme(it) } ?: 0
+            val total = if (libre) 0 else exercise?.let { session.setsFor(it) } ?: 0
 
             map.putBoolean(KEY_ACTIVE, true)
             map.putString(KEY_PHASE, session.phase.name)

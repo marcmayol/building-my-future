@@ -1,0 +1,1867 @@
+[
+ {
+  "slug": "seated-chest-press",
+  "nombre": "Press de pecho en máquina",
+  "grupo": "chest",
+  "material": "machine",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "incline-chest-press-machine",
+  "nombre": "Press de pecho inclinado en máquina",
+  "grupo": "chest",
+  "material": "machine",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "butterflies",
+  "nombre": "Aperturas en máquina (pec deck)",
+  "grupo": "chest",
+  "material": "machine",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "chest-pulldown",
+  "nombre": "Jalón al pecho",
+  "grupo": "back",
+  "material": "machine",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "biceps"
+  ]
+ },
+ {
+  "slug": "close-grip-chest-pulldown",
+  "nombre": "Jalón al pecho agarre estrecho",
+  "grupo": "back",
+  "material": "machine",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "biceps"
+  ]
+ },
+ {
+  "slug": "seated-row-machine",
+  "nombre": "Remo sentado en máquina",
+  "grupo": "back",
+  "material": "machine",
+  "principales": [
+   "upper-back",
+   "trapezius"
+  ],
+  "secundarios": [
+   "biceps"
+  ]
+ },
+ {
+  "slug": "seated-cable-back-rows",
+  "nombre": "Remo en polea sentado",
+  "grupo": "back",
+  "material": "cable",
+  "principales": [
+   "upper-back",
+   "trapezius"
+  ],
+  "secundarios": [
+   "biceps"
+  ]
+ },
+ {
+  "slug": "seated-dumbbell-overhead-shoulder-press",
+  "nombre": "Press de hombros con mancuernas",
+  "grupo": "shoulders",
+  "material": "dumbbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "triceps"
+  ]
+ },
+ {
+  "slug": "machine-shoulder-press",
+  "nombre": "Press de hombros en máquina",
+  "grupo": "shoulders",
+  "material": "machine",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "triceps"
+  ]
+ },
+ {
+  "slug": "dumbbell-lateral-raises",
+  "nombre": "Elevaciones laterales con mancuernas",
+  "grupo": "shoulders",
+  "material": "dumbbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "face-pull",
+  "nombre": "Face pull",
+  "grupo": "shoulders",
+  "material": "cable",
+  "principales": [
+   "deltoids",
+   "trapezius"
+  ],
+  "secundarios": [
+   "upper-back"
+  ]
+ },
+ {
+  "slug": "alternating-dumbbell-biceps-curl",
+  "nombre": "Curl de bíceps alterno con mancuernas",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "biceps"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "dumbbell-hammer-biceps-curl",
+  "nombre": "Curl martillo con mancuernas",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "biceps"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "triceps-pushdown",
+  "nombre": "Extensión de tríceps en polea",
+  "grupo": "arms",
+  "material": "cable",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "dips-machine",
+  "nombre": "Fondos en máquina",
+  "grupo": "arms",
+  "material": "machine",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": [
+   "chest",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "leg-press",
+  "nombre": "Prensa de piernas",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "calves"
+  ]
+ },
+ {
+  "slug": "seated-leg-curl",
+  "nombre": "Curl de piernas sentado",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "hamstring"
+  ],
+  "secundarios": [
+   "gluteal"
+  ]
+ },
+ {
+  "slug": "lying-leg-curls",
+  "nombre": "Curl de piernas tumbado",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "hamstring"
+  ],
+  "secundarios": [
+   "gluteal"
+  ]
+ },
+ {
+  "slug": "seated-leg-extensions",
+  "nombre": "Extensión de piernas",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "barbell-hip-thrust",
+  "nombre": "Hip thrust con barra",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "box-squat",
+  "nombre": "Sentadilla al cajón",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "goblet-squats",
+  "nombre": "Sentadilla goblet",
+  "grupo": "legs",
+  "material": "dumbbell",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "abs",
+   "adductors"
+  ]
+ },
+ {
+  "slug": "seated-calf-raises",
+  "nombre": "Elevación de gemelos sentado",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "calves"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "plank",
+  "nombre": "Plancha",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "obliques",
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "side-plank",
+  "nombre": "Plancha lateral",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "obliques"
+  ],
+  "secundarios": [
+   "abs"
+  ]
+ },
+ {
+  "slug": "dead-bug",
+  "nombre": "Dead bug",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "neutral-grip-pulldown",
+  "nombre": "Jalón al pecho agarre neutro",
+  "grupo": "back",
+  "material": "machine",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "biceps"
+  ]
+ },
+ {
+  "slug": "upright-row",
+  "nombre": "Remo al mentón (elevación al cuello)",
+  "grupo": "shoulders",
+  "material": "barbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "trapezius",
+   "biceps"
+  ]
+ },
+ {
+  "slug": "barbell-squat",
+  "nombre": "Sentadilla con barra",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "calves"
+  ]
+ },
+ {
+  "slug": "bulgarian-split-squat",
+  "nombre": "Sentadilla búlgara",
+  "grupo": "legs",
+  "material": "dumbbell",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "barbell-bench-press",
+  "nombre": "Press de banca",
+  "grupo": "chest",
+  "material": "barbell",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "dumbbell-bench-press",
+  "nombre": "Press de banca con mancuernas",
+  "grupo": "chest",
+  "material": "dumbbell",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "incline-dumbbell-press",
+  "nombre": "Press inclinado con mancuernas",
+  "grupo": "chest",
+  "material": "dumbbell",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "dumbbell-flyes",
+  "nombre": "Aperturas con mancuernas",
+  "grupo": "chest",
+  "material": "dumbbell",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "barbell-row",
+  "nombre": "Remo con barra",
+  "grupo": "back",
+  "material": "barbell",
+  "principales": [
+   "upper-back",
+   "trapezius"
+  ],
+  "secundarios": [
+   "biceps"
+  ]
+ },
+ {
+  "slug": "dumbbell-row",
+  "nombre": "Remo con mancuerna",
+  "grupo": "back",
+  "material": "dumbbell",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "biceps"
+  ]
+ },
+ {
+  "slug": "barbell-overhead-press",
+  "nombre": "Press militar con barra",
+  "grupo": "shoulders",
+  "material": "barbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "triceps"
+  ]
+ },
+ {
+  "slug": "cable-lateral-raises",
+  "nombre": "Elevaciones laterales en polea",
+  "grupo": "shoulders",
+  "material": "cable",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "barbell-biceps-curl",
+  "nombre": "Curl de bíceps con barra",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "biceps"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "overhead-triceps-extension",
+  "nombre": "Extensión de tríceps sobre la cabeza",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "standing-calf-raises",
+  "nombre": "Elevación de gemelos de pie",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "calves"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "bodyweight-squat",
+  "nombre": "Sentadilla sin peso",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "calves",
+   "adductors"
+  ]
+ },
+ {
+  "slug": "hack-squat",
+  "nombre": "Sentadilla hack vertical",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "deadlift",
+  "nombre": "Peso muerto",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "gluteal",
+   "hamstring",
+   "lower-back"
+  ],
+  "secundarios": [
+   "quadriceps",
+   "trapezius",
+   "upper-back",
+   "forearm"
+  ]
+ },
+ {
+  "slug": "pull-ups",
+  "nombre": "Dominadas",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "biceps",
+   "forearm"
+  ]
+ },
+ {
+  "slug": "treadmill",
+  "nombre": "Cinta de correr",
+  "grupo": "cardio",
+  "material": "cardio",
+  "principales": [
+   "quadriceps",
+   "hamstring",
+   "gluteal",
+   "calves"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "elliptical",
+  "nombre": "Elíptica",
+  "grupo": "cardio",
+  "material": "cardio",
+  "principales": [
+   "quadriceps",
+   "gluteal",
+   "hamstring"
+  ],
+  "secundarios": [
+   "calves",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "stationary-bike",
+  "nombre": "Bicicleta estática",
+  "grupo": "cardio",
+  "material": "cardio",
+  "principales": [
+   "quadriceps",
+   "hamstring"
+  ],
+  "secundarios": [
+   "gluteal",
+   "calves"
+  ]
+ },
+ {
+  "slug": "rowing-machine",
+  "nombre": "Remo (cardio)",
+  "grupo": "cardio",
+  "material": "cardio",
+  "principales": [
+   "upper-back",
+   "quadriceps"
+  ],
+  "secundarios": [
+   "biceps",
+   "hamstring",
+   "gluteal",
+   "forearm"
+  ]
+ },
+ {
+  "slug": "burpees",
+  "nombre": "Burpees",
+  "grupo": "cardio",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps",
+   "chest"
+  ],
+  "secundarios": [
+   "gluteal",
+   "deltoids",
+   "triceps",
+   "abs"
+  ]
+ },
+ {
+  "slug": "crunch",
+  "nombre": "Crunch abdominal",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "legs-up-crunch",
+  "nombre": "Crunch con piernas elevadas",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "quadriceps"
+  ]
+ },
+ {
+  "slug": "scissor-kicks",
+  "nombre": "Tijeras",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "quadriceps"
+  ]
+ },
+ {
+  "slug": "sit-ups",
+  "nombre": "Sit-up",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "quadriceps"
+  ]
+ },
+ {
+  "slug": "russian-twist",
+  "nombre": "Russian twist",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "obliques",
+   "abs"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "glute-bridge",
+  "nombre": "Puente de glúteo",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "abs"
+  ]
+ },
+ {
+  "slug": "side-plank-rotation",
+  "nombre": "Plancha lateral con rotación",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "obliques",
+   "abs"
+  ],
+  "secundarios": [
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "superman",
+  "nombre": "Superman",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "lower-back"
+  ],
+  "secundarios": [
+   "gluteal",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "incline-barbell-bench-press",
+  "nombre": "Press de banca inclinado con barra",
+  "grupo": "chest",
+  "material": "barbell",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "romanian-deadlift",
+  "nombre": "Peso muerto rumano",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "hamstring",
+   "gluteal"
+  ],
+  "secundarios": [
+   "lower-back",
+   "forearm"
+  ]
+ },
+ {
+  "slug": "front-squat",
+  "nombre": "Sentadilla frontal",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "abs",
+   "upper-back"
+  ]
+ },
+ {
+  "slug": "step-up",
+  "nombre": "Step-up con peso",
+  "grupo": "legs",
+  "material": "dumbbell",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "calves"
+  ]
+ },
+ {
+  "slug": "dumbbell-lunges",
+  "nombre": "Zancadas con mancuernas",
+  "grupo": "legs",
+  "material": "dumbbell",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "calves",
+   "adductors"
+  ]
+ },
+ {
+  "slug": "hip-abduction",
+  "nombre": "Abductores en máquina",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "hip-adduction",
+  "nombre": "Aductores en máquina",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "adductors"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "t-bar-row",
+  "nombre": "Remo en T",
+  "grupo": "back",
+  "material": "barbell",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "biceps",
+   "forearm",
+   "trapezius"
+  ]
+ },
+ {
+  "slug": "skull-crusher",
+  "nombre": "Press francés",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "preacher-curl",
+  "nombre": "Curl predicador",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "biceps"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "ski-erg",
+  "nombre": "Máquina de esquí",
+  "grupo": "cardio",
+  "material": "cardio",
+  "principales": [
+   "upper-back",
+   "triceps"
+  ],
+  "secundarios": [
+   "abs",
+   "deltoids",
+   "quadriceps"
+  ]
+ },
+ {
+  "slug": "air-bike",
+  "nombre": "Bicicleta de aire (assault bike)",
+  "grupo": "cardio",
+  "material": "cardio",
+  "principales": [
+   "quadriceps",
+   "hamstring",
+   "upper-back"
+  ],
+  "secundarios": [
+   "deltoids",
+   "biceps",
+   "triceps",
+   "abs"
+  ]
+ },
+ {
+  "slug": "machine-hip-thrust",
+  "nombre": "Hip thrust en máquina",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "quadriceps"
+  ]
+ },
+ {
+  "slug": "sled-hack-squat",
+  "nombre": "Sentadilla hack en trineo (45°)",
+  "grupo": "legs",
+  "material": "machine",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "bicycle-crunch",
+  "nombre": "Bicicleta abdominal",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs",
+   "obliques"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "push-ups",
+  "nombre": "Flexiones",
+  "grupo": "chest",
+  "material": "bodyweight",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "cable-crossover",
+  "nombre": "Cruce de poleas",
+  "grupo": "chest",
+  "material": "cable",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "chest-dips",
+  "nombre": "Fondos en paralelas",
+  "grupo": "chest",
+  "material": "bodyweight",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "triceps",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "decline-bench-press",
+  "nombre": "Press declinado con barra",
+  "grupo": "chest",
+  "material": "barbell",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "triceps"
+  ]
+ },
+ {
+  "slug": "back-extension",
+  "nombre": "Hiperextensiones",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "lower-back"
+  ],
+  "secundarios": [
+   "gluteal",
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "dumbbell-pullover",
+  "nombre": "Pull-over con mancuerna",
+  "grupo": "back",
+  "material": "dumbbell",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "chest",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "straight-arm-pulldown",
+  "nombre": "Jalón con brazos rectos",
+  "grupo": "back",
+  "material": "cable",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "triceps"
+  ]
+ },
+ {
+  "slug": "inverted-row",
+  "nombre": "Remo invertido",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "biceps",
+   "forearm"
+  ]
+ },
+ {
+  "slug": "barbell-shrug",
+  "nombre": "Encogimientos con barra",
+  "grupo": "shoulders",
+  "material": "barbell",
+  "principales": [
+   "trapezius"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "reverse-fly",
+  "nombre": "Pájaros (deltoides posterior)",
+  "grupo": "shoulders",
+  "material": "dumbbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "upper-back",
+   "trapezius"
+  ]
+ },
+ {
+  "slug": "front-raise",
+  "nombre": "Elevaciones frontales",
+  "grupo": "shoulders",
+  "material": "dumbbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "arnold-press",
+  "nombre": "Press Arnold",
+  "grupo": "shoulders",
+  "material": "dumbbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "triceps"
+  ]
+ },
+ {
+  "slug": "concentration-curl",
+  "nombre": "Curl concentrado",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "biceps"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "cable-curl",
+  "nombre": "Curl en polea",
+  "grupo": "arms",
+  "material": "cable",
+  "principales": [
+   "biceps"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "triceps-kickback",
+  "nombre": "Patada de tríceps",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "close-grip-bench-press",
+  "nombre": "Press de banca cerrado",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": [
+   "chest",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "wrist-curl",
+  "nombre": "Curl de muñeca",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "forearm"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "good-morning",
+  "nombre": "Buenos días con barra",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "hamstring"
+  ],
+  "secundarios": [
+   "gluteal",
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "sumo-deadlift",
+  "nombre": "Peso muerto sumo",
+  "grupo": "legs",
+  "material": "barbell",
+  "principales": [
+   "gluteal",
+   "hamstring"
+  ],
+  "secundarios": [
+   "quadriceps",
+   "adductors",
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "nordic-curl",
+  "nombre": "Curl nórdico",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "hamstring"
+  ],
+  "secundarios": [
+   "gluteal"
+  ]
+ },
+ {
+  "slug": "cable-glute-kickback",
+  "nombre": "Patada de glúteo en polea",
+  "grupo": "legs",
+  "material": "cable",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "sissy-squat",
+  "nombre": "Sentadilla sissy",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "hanging-leg-raise",
+  "nombre": "Elevación de piernas colgado",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "forearm",
+   "obliques"
+  ]
+ },
+ {
+  "slug": "cable-crunch",
+  "nombre": "Crunch en polea",
+  "grupo": "core",
+  "material": "cable",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "mountain-climbers",
+  "nombre": "Escaladores",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "quadriceps",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "ab-wheel-rollout",
+  "nombre": "Rueda abdominal",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "obliques"
+  ]
+ },
+ {
+  "slug": "cable-woodchopper",
+  "nombre": "Leñador en polea",
+  "grupo": "core",
+  "material": "cable",
+  "principales": [
+   "obliques"
+  ],
+  "secundarios": [
+   "abs"
+  ]
+ },
+ {
+  "slug": "jump-rope",
+  "nombre": "Comba (saltar a la cuerda)",
+  "grupo": "cardio",
+  "material": "bodyweight",
+  "principales": [
+   "calves"
+  ],
+  "secundarios": [
+   "quadriceps",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "stair-climber",
+  "nombre": "Escaladora (stepmill)",
+  "grupo": "cardio",
+  "material": "cardio",
+  "principales": [
+   "quadriceps",
+   "gluteal"
+  ],
+  "secundarios": [
+   "hamstring",
+   "calves"
+  ]
+ },
+ {
+  "slug": "jumping-jacks",
+  "nombre": "Jumping jacks",
+  "grupo": "cardio",
+  "material": "bodyweight",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "quadriceps",
+   "calves"
+  ]
+ },
+ {
+  "slug": "high-knees",
+  "nombre": "Rodillas altas",
+  "grupo": "cardio",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": [
+   "abs",
+   "calves"
+  ]
+ },
+ {
+  "slug": "cable-shoulder-press",
+  "nombre": "Press de hombros en polea",
+  "grupo": "shoulders",
+  "material": "cable",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "triceps"
+  ]
+ },
+ {
+  "slug": "cable-upright-row",
+  "nombre": "Remo al mentón en polea",
+  "grupo": "shoulders",
+  "material": "cable",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "trapezius",
+   "biceps"
+  ]
+ },
+ {
+  "slug": "cable-squat",
+  "nombre": "Sentadilla en polea",
+  "grupo": "legs",
+  "material": "cable",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": [
+   "gluteal",
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "bench-dips",
+  "nombre": "Fondos de tríceps en banco",
+  "grupo": "arms",
+  "material": "bodyweight",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": [
+   "deltoids",
+   "chest"
+  ]
+ },
+ {
+  "slug": "incline-dumbbell-curl",
+  "nombre": "Curl inclinado con mancuerna",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "biceps"
+  ],
+  "secundarios": [
+   "forearm"
+  ]
+ },
+ {
+  "slug": "dumbbell-shrug",
+  "nombre": "Encogimientos con mancuerna",
+  "grupo": "shoulders",
+  "material": "dumbbell",
+  "principales": [
+   "trapezius"
+  ],
+  "secundarios": [
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "cable-chest-press",
+  "nombre": "Press de pecho en polea",
+  "grupo": "chest",
+  "material": "cable",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "low-cable-fly",
+  "nombre": "Cruce de poleas de abajo arriba",
+  "grupo": "chest",
+  "material": "cable",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "cable-overhead-triceps-extension",
+  "nombre": "Extensión de tríceps sobre la cabeza en polea",
+  "grupo": "arms",
+  "material": "cable",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "cable-front-raise",
+  "nombre": "Elevación frontal en polea",
+  "grupo": "shoulders",
+  "material": "cable",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "cable-hip-abduction",
+  "nombre": "Abducción de cadera en polea",
+  "grupo": "legs",
+  "material": "cable",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "cable-pullover",
+  "nombre": "Pullover en polea",
+  "grupo": "back",
+  "material": "cable",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "chest",
+   "triceps"
+  ]
+ },
+ {
+  "slug": "wall-angels",
+  "nombre": "Ángeles de pared",
+  "grupo": "shoulders",
+  "material": "bodyweight",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "upper-back",
+   "trapezius"
+  ]
+ },
+ {
+  "slug": "cobra-stretch",
+  "nombre": "Estiramiento de cobra",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "lower-back"
+  ],
+  "secundarios": [
+   "abs"
+  ]
+ },
+ {
+  "slug": "dead-hang",
+  "nombre": "Colgarse de la barra (dead hang)",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "forearm",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "cat-cow",
+  "nombre": "Gato-vaca",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "lower-back"
+  ],
+  "secundarios": [
+   "abs"
+  ]
+ },
+ {
+  "slug": "dragon-flag",
+  "nombre": "Bandera del dragón",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "obliques",
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "seated-barbell-wrist-curl",
+  "nombre": "Curl de muñeca sentado con barra",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "forearm"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "behind-the-back-barbell-wrist-curl",
+  "nombre": "Curl de muñeca con barra tras la espalda",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "forearm"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "dumbbell-wrist-curl-over-bench",
+  "nombre": "Curl de muñeca con mancuernas sobre banco",
+  "grupo": "arms",
+  "material": "dumbbell",
+  "principales": [
+   "forearm"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "barbell-wrist-curl-over-bench",
+  "nombre": "Curl de muñeca con barra sobre banco",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "forearm"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "standing-barbell-reverse-wrist-curl",
+  "nombre": "Curl de muñeca inverso de pie con barra",
+  "grupo": "arms",
+  "material": "barbell",
+  "principales": [
+   "forearm"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "bird-dog",
+  "nombre": "Bird dog",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "lower-back",
+   "gluteal"
+  ]
+ },
+ {
+  "slug": "hollow-hold",
+  "nombre": "Hollow hold",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "quadriceps"
+  ]
+ },
+ {
+  "slug": "hollow-rock",
+  "nombre": "Hollow rock",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "obliques"
+  ]
+ },
+ {
+  "slug": "pallof-press",
+  "nombre": "Press Pallof",
+  "grupo": "core",
+  "material": "cable",
+  "principales": [
+   "obliques"
+  ],
+  "secundarios": [
+   "abs",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "farmers-walk",
+  "nombre": "Paseo del granjero",
+  "grupo": "core",
+  "material": "dumbbell",
+  "principales": [
+   "obliques"
+  ],
+  "secundarios": [
+   "trapezius",
+   "forearm"
+  ]
+ },
+ {
+  "slug": "diamond-push-up",
+  "nombre": "Flexión en diamante",
+  "grupo": "chest",
+  "material": "bodyweight",
+  "principales": [
+   "triceps"
+  ],
+  "secundarios": [
+   "chest",
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "wall-handstand",
+  "nombre": "Pino contra la pared",
+  "grupo": "shoulders",
+  "material": "bodyweight",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "triceps",
+   "trapezius"
+  ]
+ },
+ {
+  "slug": "y-t-w-raise",
+  "nombre": "Y-T-W en banco inclinado",
+  "grupo": "shoulders",
+  "material": "dumbbell",
+  "principales": [
+   "deltoids"
+  ],
+  "secundarios": [
+   "upper-back",
+   "trapezius"
+  ]
+ },
+ {
+  "slug": "chin-tuck",
+  "nombre": "Retracción de barbilla (chin tuck)",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "trapezius"
+  ],
+  "secundarios": [
+   "upper-back"
+  ]
+ },
+ {
+  "slug": "assisted-pistol-squat",
+  "nombre": "Sentadilla a una pierna asistida",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": [
+   "gluteal",
+   "hamstring"
+  ]
+ },
+ {
+  "slug": "deep-squat-hold",
+  "nombre": "Sentadilla profunda mantenida",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": [
+   "gluteal",
+   "adductors"
+  ]
+ },
+ {
+  "slug": "hip-hinge-dowel",
+  "nombre": "Bisagra de cadera con palo",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "hamstring"
+  ],
+  "secundarios": [
+   "gluteal",
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "hip-flexor-stretch",
+  "nombre": "Estiramiento de flexores de cadera",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": [
+   "gluteal"
+  ]
+ },
+ {
+  "slug": "low-lunge-rotation",
+  "nombre": "Zancada baja con rotación",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "quadriceps"
+  ],
+  "secundarios": [
+   "gluteal",
+   "obliques"
+  ]
+ },
+ {
+  "slug": "figure-4-stretch",
+  "nombre": "Estiramiento de glúteo (figura 4)",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": [
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "supine-hamstring-stretch",
+  "nombre": "Estiramiento de isquios tumbado",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "hamstring"
+  ],
+  "secundarios": [
+   "calves"
+  ]
+ },
+ {
+  "slug": "seated-forward-fold",
+  "nombre": "Flexión adelante sentado",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "hamstring"
+  ],
+  "secundarios": [
+   "lower-back"
+  ]
+ },
+ {
+  "slug": "hip-90-90",
+  "nombre": "Postura 90/90 de cadera",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "gluteal"
+  ],
+  "secundarios": [
+   "adductors"
+  ]
+ },
+ {
+  "slug": "calf-stretch-wall",
+  "nombre": "Estiramiento de gemelos en pared",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "calves"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "ankle-dorsiflexion-wall",
+  "nombre": "Dorsiflexión de tobillo en pared",
+  "grupo": "legs",
+  "material": "bodyweight",
+  "principales": [
+   "calves"
+  ],
+  "secundarios": []
+ },
+ {
+  "slug": "thoracic-extension-bench",
+  "nombre": "Extensión torácica sobre banco",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "chest"
+  ]
+ },
+ {
+  "slug": "quadruped-thoracic-rotation",
+  "nombre": "Rotación torácica en cuadrupedia",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "obliques"
+  ]
+ },
+ {
+  "slug": "open-book-stretch",
+  "nombre": "Apertura de pecho tumbado (libro abierto)",
+  "grupo": "back",
+  "material": "bodyweight",
+  "principales": [
+   "upper-back"
+  ],
+  "secundarios": [
+   "chest",
+   "obliques"
+  ]
+ },
+ {
+  "slug": "doorway-chest-stretch",
+  "nombre": "Estiramiento de pecho en marco de puerta",
+  "grupo": "chest",
+  "material": "bodyweight",
+  "principales": [
+   "chest"
+  ],
+  "secundarios": [
+   "deltoids"
+  ]
+ },
+ {
+  "slug": "lying-leg-raise",
+  "nombre": "Elevación de piernas tumbado",
+  "grupo": "core",
+  "material": "bodyweight",
+  "principales": [
+   "abs"
+  ],
+  "secundarios": [
+   "obliques",
+   "quadriceps"
+  ]
+ }
+]

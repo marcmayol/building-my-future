@@ -67,11 +67,14 @@ class WearCommandListenerService : WearableListenerService() {
                             session,
                             SessionEngine.weightForSet(session, progreso.exerciseWeights),
                             now,
-                            SessionEngine.repsForSet(session, progreso.exerciseReps)
+                            SessionEngine.repsForSet(session, progreso.exerciseReps),
+                            yourRests = progreso.yourRests
                         )
                     }
                     // Una serie por tiempo (planchas) no lleva kilos.
-                    SessionPhase.TIMED_SET -> SessionEngine.completeSet(session, "", now)
+                    SessionPhase.TIMED_SET -> SessionEngine.completeSet(
+                        session, "", now, yourRests = repo.progress.first().yourRests
+                    )
                     SessionPhase.RESTING -> SessionEngine.endRest(session, now)
                     else -> session
                 }

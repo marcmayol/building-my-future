@@ -66,6 +66,8 @@ data class ActiveSession(
     val restStartMillis: Long = 0L,
     val restTargetSeconds: Int = 0,
     val restBetweenExercises: Boolean = false,
+    /** De dónde sale el descanso en curso ([RestDefaults.Source], por nombre), para explicarlo. */
+    val restSource: String = "",
     /**
      * Peso (kg) preparado durante el descanso para la próxima serie: permite dejar la máquina
      * lista antes de continuar. Si no está en blanco, precarga el campo de peso de la siguiente
@@ -126,7 +128,21 @@ data class ActiveSession(
      * sesión (y no en la pantalla) para que sobreviva a que Android mate la app entre serie y
      * serie; al finalizar se enseña para repasarlo en vez de pedirlo todo de memoria.
      */
-    val freeLog: List<LoggedExercise> = emptyList()
+    val freeLog: List<LoggedExercise> = emptyList(),
+    /**
+     * Lo que se hizo de verdad en lugar del ejercicio del plan (clave: índice en el día).
+     *
+     * Sin esto, quien no tiene pec deck y hace aperturas con mancuernas no tenía forma de
+     * apuntarlo: la serie quedaba registrada como pec deck, con sus kilos mezclados con los de
+     * una máquina que no ha tocado. El cambio manda en todo lo que lee el nombre: dibujo, ficha,
+     * pesos y progresión.
+     */
+    val swaps: Map<Int, String> = emptyMap(),
+    /**
+     * Tope de series por ejercicio del entreno exprés (0 = las del plan). Lo que se quita del
+     * todo va fuera de [order]; esto solo recorta.
+     */
+    val maxSets: Int = 0
 ) {
     /** Hay al menos un ejercicio apuntado con alguna serie en el entreno libre. */
     val hasFreeLog: Boolean
@@ -134,6 +150,31 @@ data class ActiveSession(
 
     /** Es una rutina especial (militar o quema grasa), no una sesión del plan de 100 días. */
     val isRoutine: Boolean get() = routineId != null
+
+    /** Es un entreno exprés: con menos ejercicios o menos series que el día del plan. */
+    val isExpress: Boolean
+        get() = maxSets > 0 ||
+            (order.isNotEmpty() && order.size < (PlanData.dayByNumber(dayNumber)?.template?.exercises?.size ?: 0))
+
+    /**
+     * El ejercicio [index] del día tal y como se está haciendo HOY: el del plan, o el que se
+     * eligió en su lugar. Todo lo que dependa del nombre (pesos, ficha, dibujo) pasa por aquí.
+     */
+    fun exerciseAt(index: Int): Exercise? {
+        val delPlan = PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(index) ?: return null
+        val otro = swaps[index]?.trim().orEmpty()
+        return if (otro.isEmpty()) delPlan else delPlan.copy(name = otro)
+    }
+
+    /** El nombre que trae el plan para [index], aunque hoy se esté haciendo otro. */
+    fun planNameAt(index: Int): String? =
+        PlanData.dayByNumber(dayNumber)?.template?.exercises?.getOrNull(index)?.name
+
+    /** Series que tocan hoy en [exercise]: las del plan, recortadas si es exprés. */
+    fun setsFor(exercise: Exercise): Int {
+        val delPlan = setCountFromScheme(exercise.scheme)
+        return if (maxSets > 0) minOf(delPlan, maxSets) else delPlan
+    }
     /** Segundos de calentamiento transcurridos en el instante [now]. */
     fun warmupElapsed(now: Long): Int =
         if (warmupPaused) warmupElapsedBeforePause
@@ -226,10 +267,91 @@ fun formatKg(value: Double): String {
 fun heaviestWeight(weights: List<String>): String =
     weights.filter { parseKg(it) != null }.maxByOrNull { parseKg(it)!! }?.trim().orEmpty()
 
-/** Objetivos de descanso por defecto (segundos). */
+/**
+ * Cuánto se descansa entre series, y por qué.
+ *
+ * Hasta la 2.17 eran 90 s para todo: una sentadilla a 5 repeticiones descansaba lo mismo que un
+ * curl a 15, y el plan de fuerza escribía «3 min de descanso» en la nota mientras la cuenta
+ * atrás sonaba al minuto y medio. Ahora el descanso sale, por este orden, de:
+ *
+ * 1. lo que tú pusiste la última vez en ese ejercicio (si lo alargaste, es que lo necesitas);
+ * 2. lo que diga la nota del plan («3 min de descanso», «descansa 90 s»);
+ * 3. las repeticiones: a pocas repeticiones —fuerza— el músculo tarda más en recuperarse, y
+ *    menos de 3 minutos en un básico pesado es quedarse corto en la serie siguiente.
+ */
 object RestDefaults {
     const val BETWEEN_SETS = 90
     const val BETWEEN_EXERCISES = 120
+
+    /** Descanso largo de fuerza: básicos a pocas repeticiones. */
+    const val HEAVY = 180
+
+    /** Descanso intermedio: aislados a pocas repeticiones. */
+    const val MEDIUM = 120
+
+    /** De dónde sale el descanso, para poder decirlo en pantalla. */
+    enum class Source { YOURS, PLAN, HEAVY, DEFAULT }
+
+    data class Rest(val seconds: Int, val source: Source)
+
+    /**
+     * Descanso entre series de [exercise]. [repsDone] son las repeticiones de la serie que se
+     * acaba de cerrar (manda sobre el esquema: si el plan dice 12 y hoy has hecho 6 con más
+     * peso, descansas como en una serie de 6). [yours] son los descansos que el usuario dejó
+     * puestos, por nombre de ejercicio.
+     */
+    fun between(exercise: Exercise, repsDone: String = "", yours: Map<String, Int> = emptyMap()): Rest {
+        yours[exercise.name]?.takeIf { it > 0 }?.let { return Rest(it, Source.YOURS) }
+        fromNote(exercise.note)?.let { return Rest(it, Source.PLAN) }
+        if (exercise.kind != ExerciseKind.STRENGTH || isBodyweightScheme(exercise.scheme) ||
+            secondsPerSetFromScheme(exercise.scheme) != null
+        ) return Rest(BETWEEN_SETS, Source.DEFAULT)
+        val reps = parseReps(repsDone) ?: repsRangeFromScheme(exercise.scheme)?.last
+            ?: return Rest(BETWEEN_SETS, Source.DEFAULT)
+        return when {
+            reps <= 5 -> Rest(HEAVY, Source.HEAVY)
+            reps <= 8 -> if (isBigLift(exercise.name)) Rest(HEAVY, Source.HEAVY) else Rest(MEDIUM, Source.HEAVY)
+            else -> Rest(BETWEEN_SETS, Source.DEFAULT)
+        }
+    }
+
+    /** Entre un ejercicio y el siguiente: como poco lo de siempre, y nunca menos que entre series. */
+    fun betweenExercises(between: Rest): Rest =
+        if (between.seconds > BETWEEN_EXERCISES) between else Rest(BETWEEN_EXERCISES, between.source)
+
+    /**
+     * Los segundos de descanso que pide una nota del plan, o null si no habla de descanso.
+     * «3 min de descanso» -> 180, «3-4 min de descanso» -> 180 (el suelo: el resto lo decides
+     * tú con +30 s), «descansa 90 s» -> 90.
+     */
+    fun fromNote(note: String): Int? {
+        val t = note.lowercase()
+        if (!t.contains("descans")) return null
+        Regex("""(\d+(?:[.,]\d+)?)\s*(?:-\s*\d+(?:[.,]\d+)?\s*)?min""").find(t)?.let {
+            val min = it.groupValues[1].replace(',', '.').toDoubleOrNull() ?: return@let
+            return (min * 60).toInt().coerceIn(15, 600)
+        }
+        Regex("""(\d+)\s*(?:-\s*\d+\s*)?(?:s|seg|segundos)\b""").find(t)?.let {
+            return it.groupValues[1].toInt().coerceIn(15, 600)
+        }
+        return null
+    }
+
+    /**
+     * Un básico que mueve mucho músculo: sentadillas, pesos muertos, prensas, presses, remos,
+     * jalones y dominadas. Lo contrario son los aislados (curl, extensión, apertura,
+     * elevación), que a las mismas repeticiones se recuperan antes.
+     */
+    fun isBigLift(name: String): Boolean {
+        val n = java.text.Normalizer.normalize(name.lowercase(), java.text.Normalizer.Form.NFD)
+            .replace(Regex("""\p{Mn}+"""), "")
+        val aislado = listOf("curl", "extension", "apertura", "elevacion", "pec deck", "patada",
+            "pajaro", "face pull", "gemelo", "abduc", "aduc", "encogimiento", "frances")
+        if (aislado.any { n.contains(it) }) return false
+        val basico = listOf("sentadilla", "peso muerto", "prensa", "press", "remo", "jalon",
+            "dominada", "hip thrust", "zancada", "fondo", "buenos dias", "hack")
+        return basico.any { n.contains(it) }
+    }
 }
 
 /**

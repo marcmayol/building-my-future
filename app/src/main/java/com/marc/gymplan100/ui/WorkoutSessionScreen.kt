@@ -2,6 +2,8 @@
 
 package com.marc.gymplan100.ui
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -66,6 +68,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.ActiveSession
+import com.marc.gymplan100.data.ExpressPlan
+import com.marc.gymplan100.data.RestDefaults
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.MuscleTargets
 import com.marc.gymplan100.data.PlanData
@@ -123,11 +127,27 @@ fun WorkoutSessionScreen(
     if (s == null || s.dayNumber != dayNumber) {
         StartPrompt(
             day = day,
-            onStart = { viewModel.startSession(dayNumber) },
+            other = s,
+            estimatedMinutes = remember(dayNumber) { viewModel.estimatedMinutes(dayNumber) },
+            expressFor = { minutos -> viewModel.expressPlan(dayNumber, minutos) },
+            onStart = { express -> viewModel.startSession(dayNumber, express) },
             onStartSpecial = { viewModel.startSpecialSession(dayNumber) },
             onExit = onExit
         )
         return
+    }
+
+    // El botón de atrás del sistema NO tira el entreno: se sale a Inicio con todo guardado y
+    // se dice, porque al volver a la ficha del día los pesos de hoy todavía no están (se
+    // apuntan al terminar) y parecía que se había borrado todo. El apunte del entreno libre
+    // tiene su propio atrás, que gana a este por estar más adentro.
+    BackHandler {
+        Toast.makeText(
+            context,
+            "El entreno sigue en marcha. Lo retomas desde Inicio.",
+            Toast.LENGTH_LONG
+        ).show()
+        onExit()
     }
 
     val order = s.order.ifEmpty { day.template.exercises.indices.toList() }
@@ -248,7 +268,9 @@ private fun WarmupContent(
     val elapsed = s.warmupElapsed(now)
     val remaining = s.warmupTargetSeconds - elapsed
     val done = remaining <= 0
-    val totalSets = day.template.exercises.sumOf { setCountFromScheme(it.scheme) }
+    val order = s.order.ifEmpty { day.template.exercises.indices.toList() }
+    val deHoy = order.mapNotNull { s.exerciseAt(it) }
+    val totalSets = deHoy.sumOf { s.setsFor(it) }
 
     SessionShell(
         tint = SessionTint.WARMUP,
@@ -273,7 +295,8 @@ private fun WarmupContent(
                 )
                 Spacer(Modifier.height(Space.x1))
                 Text(
-                    contar(day.template.exercises.size, "ejercicio", "ejercicios") + " · " +
+                    (if (s.isExpress) "Exprés · " else "") +
+                        contar(deHoy.size, "ejercicio", "ejercicios") + " · " +
                         contar(totalSets, "serie", "series"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -292,7 +315,7 @@ private fun WarmupContent(
     ) {
         // El calentamiento no tiene dibujo propio (es "6 min de lo que quieras"), así que el
         // hueco lo llena con qué se empieza: da tiempo a ir buscando la máquina.
-        day.template.exercises.firstOrNull()?.let {
+        deHoy.firstOrNull()?.let {
             SessionIllustration(it.name, label = "Empezamos con ${it.name.lowercase()}")
         }
         Countdown(
@@ -348,8 +371,10 @@ private fun WorkingContent(
     viewModel: PlanViewModel,
     onExit: () -> Unit
 ) {
-    val exercise = day.template.exercises[s.exerciseIndex]
-    val totalSets = setCountFromScheme(exercise.scheme)
+    // El de hoy: si se cambió por otro, manda el que se está haciendo (nombre, dibujo, pesos).
+    val exercise = s.exerciseAt(s.exerciseIndex) ?: day.template.exercises[s.exerciseIndex]
+    val delPlan = s.planNameAt(s.exerciseIndex) ?: exercise.name
+    val totalSets = s.setsFor(exercise)
     val order = s.order.ifEmpty { day.template.exercises.indices.toList() }
     val pos = order.indexOf(s.exerciseIndex).coerceAtLeast(0)
     val hasNext = pos < order.lastIndex
@@ -393,7 +418,7 @@ private fun WorkingContent(
     val posEnGrupo = grupo.indexOf(s.exerciseIndex)
     val enSuperserie = grupo.size > 1
     val siguienteDelGrupo = if (enSuperserie && posEnGrupo < grupo.lastIndex) {
-        day.template.exercises.getOrNull(grupo[posEnGrupo + 1])?.name
+        s.exerciseAt(grupo[posEnGrupo + 1])?.name
     } else null
 
     // Qué toca hoy y por qué. Un número que sube solo sin explicación se lee como un fallo de
@@ -524,6 +549,14 @@ private fun WorkingContent(
             style = MaterialTheme.typography.bodyLarge,
             color = tintAccent(SessionTint.WORK)
         )
+        if (delPlan != exercise.name) {
+            Spacer(Modifier.height(Space.x1))
+            Text(
+                "En lugar de ${ExerciseImages.headlineName(delPlan)}",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
         if (enSuperserie) {
             Spacer(Modifier.height(Space.x1))
             Text(
@@ -558,7 +591,15 @@ private fun WorkingContent(
         ExerciseGuideSheet(
             exerciseName = exercise.name,
             scheme = exercise.scheme,
-            onDismiss = { showGuide = false }
+            onDismiss = { showGuide = false },
+            // Desde la serie, las alternativas se pueden hacer: con un toque el ejercicio de
+            // hoy pasa a ser ese, con su dibujo y sus pesos.
+            onSwap = { nombre, recordar ->
+                viewModel.swapExercise(s.exerciseIndex, nombre, recordar)
+                showGuide = false
+            },
+            planName = delPlan,
+            swapRemembered = viewModel.isSwapRemembered(delPlan)
         )
     }
     if (showDayPlan) {
@@ -791,8 +832,8 @@ private fun TimedSetContent(
     viewModel: PlanViewModel,
     onExit: () -> Unit
 ) {
-    val exercise = day.template.exercises[s.exerciseIndex]
-    val totalSets = setCountFromScheme(exercise.scheme)
+    val exercise = s.exerciseAt(s.exerciseIndex) ?: day.template.exercises[s.exerciseIndex]
+    val totalSets = s.setsFor(exercise)
     val elapsed = s.timedElapsed(now)
     val remaining = s.timedTargetSeconds - elapsed
     val done = remaining <= 0
@@ -880,19 +921,20 @@ private fun RestingContent(
     val remaining = s.restTargetSeconds - elapsed
     val done = remaining <= 0
 
-    val exercise = day.template.exercises[s.exerciseIndex]
-    val totalSets = setCountFromScheme(exercise.scheme)
+    val exercise = s.exerciseAt(s.exerciseIndex) ?: day.template.exercises[s.exerciseIndex]
+    val totalSets = s.setsFor(exercise)
     val order = s.order.ifEmpty { day.template.exercises.indices.toList() }
-    val nextExercise = if (s.setNumber < totalSets) exercise else {
+    val nextIndex = if (s.setNumber < totalSets) s.exerciseIndex else {
         val pos = order.indexOf(s.exerciseIndex)
-        order.getOrNull(pos + 1)?.let { day.template.exercises.getOrNull(it) }
+        order.getOrNull(pos + 1)
     }
+    val nextExercise = if (nextIndex == s.exerciseIndex) exercise else nextIndex?.let { s.exerciseAt(it) }
     val nextIsNewExercise = nextExercise != null && nextExercise !== exercise
     // Igual que en el motor: una aproximacion se apunta pero no avanza el plan, asi que la
     // serie que viene sale de contar el trabajo hecho y no de sumarle uno al contador.
     val trabajoHecho = s.completedSets.count { it.exerciseIndex == s.exerciseIndex && !it.warmup }
     val nextSetNumber = if (trabajoHecho < totalSets) trabajoHecho + 1 else 1
-    val nextTotalSets = nextExercise?.let { setCountFromScheme(it.scheme) } ?: 0
+    val nextTotalSets = nextExercise?.let { s.setsFor(it) } ?: 0
 
     val nextIsTimed = nextExercise != null && secondsPerSetFromScheme(nextExercise.scheme) != null
     val nextIsBodyweight = nextExercise != null && nextExercise.withoutWeight
@@ -1070,9 +1112,17 @@ private fun RestingContent(
                 }
             }
         }
+        // De dónde sale el descanso, en pocas palabras: tres minutos sin explicación parecen
+        // un fallo de la cuenta atrás, y noventa segundos tras una serie de cinco, también.
+        val motivo = when (s.restSource) {
+            RestDefaults.Source.YOURS.name -> " · el tuyo"
+            RestDefaults.Source.PLAN.name -> " · lo pide el plan"
+            RestDefaults.Source.HEAVY.name -> " · serie pesada"
+            else -> ""
+        }
         Countdown(
             text = if (remaining >= 0) formatSecs(remaining) else "+${formatSecs(-remaining)}",
-            caption = if (remaining >= 0) "restante de ${s.restTargetSeconds} s"
+            caption = if (remaining >= 0) "restante de ${formatSecs(s.restTargetSeconds)}$motivo"
             else "de más · cuando quieras",
             captionColor = tintAccent(SessionTint.REST)
         )
@@ -1085,11 +1135,19 @@ private fun RestingContent(
     }
 
     if (showNextGuide && nextExercise != null) {
+        val delPlanSiguiente = nextIndex?.let { s.planNameAt(it) } ?: nextExercise.name
         ExerciseGuideSheet(
             exerciseName = nextExercise.name,
             scheme = nextExercise.scheme,
             onDismiss = { showNextGuide = false },
-            onAlias = { viewModel.setExerciseAlias(nextExercise.name, it) }
+            onAlias = { viewModel.setExerciseAlias(nextExercise.name, it) },
+            // Buscando la máquina es cuando se ve que está cogida: se puede cambiar ya.
+            onSwap = if (nextIndex == null) null else { nombre, recordar ->
+                viewModel.swapExercise(nextIndex, nombre, recordar)
+                showNextGuide = false
+            },
+            planName = delPlanSiguiente,
+            swapRemembered = viewModel.isSwapRemembered(delPlanSiguiente)
         )
     }
     if (showDayPlan) {
@@ -1218,7 +1276,7 @@ private fun FinishedContent(
         .filter { it.weight.isNotBlank() || it.reps.isNotBlank() }
         .groupBy { it.exerciseIndex }
         .map { (idx, seriesDelEjercicio) ->
-            val nombre = day.template.exercises.getOrNull(idx)?.name ?: "Ejercicio"
+            val nombre = s.exerciseAt(idx)?.name ?: "Ejercicio"
             nombre to setsSummary(
                 seriesDelEjercicio.sortedBy { it.setNumber }.map { SetLog(it.weight, it.reps) }
             )
@@ -1374,18 +1432,33 @@ private fun ResultTile(
 
 // ─── Antes de empezar ─────────────────────────────────────────────────────────
 
+/**
+ * Antes de empezar: qué toca, cuánto dura y, si no da tiempo, la versión exprés.
+ *
+ * [other] es la sesión de OTRO día que haya a medias: empezar esta la descarta, y se avisa
+ * antes. [expressFor] recorta el día a los minutos que se le pasen (null = entero ya cabe).
+ */
 @Composable
 private fun StartPrompt(
     day: TrainingDay,
-    onStart: () -> Unit,
+    other: ActiveSession?,
+    estimatedMinutes: Int?,
+    expressFor: (Int) -> ExpressPlan?,
+    onStart: (ExpressPlan?) -> Unit,
     onStartSpecial: () -> Unit,
     onExit: () -> Unit
 ) {
     var showSpecialConfirm by remember { mutableStateOf(false) }
+    // Minutos elegidos para el exprés; null = el día entero.
+    var minutos by rememberSaveable(day.number) { mutableStateOf<Int?>(null) }
+    // Solo se ofrecen los tiempos que de verdad recortan algo.
+    val opciones = listOf(45, 30).filter { estimatedMinutes != null && it < estimatedMinutes }
+    val express = remember(minutos, day.number) { minutos?.let(expressFor) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(Space.screen),
         verticalArrangement = Arrangement.Center
     ) {
@@ -1402,17 +1475,65 @@ private fun StartPrompt(
         )
         Spacer(Modifier.height(Space.x2))
         Text(
-            "${day.template.exercises.size} ejercicios · calentamiento: ${day.template.warmup}",
+            contar(day.template.exercises.size, "ejercicio", "ejercicios") +
+                (estimatedMinutes?.let { " · unos $it min" } ?: "") +
+                // Hay planes que ya escriben «6 min de calentamiento»: no se repite la palabra.
+                " · " + day.template.warmup.let {
+                    if (it.contains("calentamiento", ignoreCase = true)) it else "calentamiento: $it"
+                },
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        if (opciones.isNotEmpty()) {
+            Spacer(Modifier.height(Space.block))
+            Text(
+                "¿VAS JUSTO DE TIEMPO?",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(Space.x2))
+            Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
+                FilterChip(
+                    selected = minutos == null,
+                    onClick = { minutos = null },
+                    label = { Text("Entero", maxLines = 1) }
+                )
+                opciones.forEach { m ->
+                    FilterChip(
+                        selected = minutos == m,
+                        onClick = { minutos = m },
+                        label = { Text("$m min", maxLines = 1) }
+                    )
+                }
+            }
+            val m = minutos
+            if (m != null) {
+                Spacer(Modifier.height(Space.x2))
+                Text(
+                    describeExpress(day, express, m),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        if (other != null) {
+            Spacer(Modifier.height(Space.x3))
+            Text(
+                "Tienes el día ${other.dayNumber} a medias: si empiezas este, aquel se descarta.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+
         Spacer(Modifier.height(Space.block))
         Button(
-            onClick = onStart,
+            onClick = { onStart(express) },
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = Touch.primary)
-        ) { Text("Empezar entrenamiento") }
+        ) { Text(if (express != null) "Empezar exprés" else "Empezar entrenamiento") }
         Spacer(Modifier.height(Space.x3))
         OutlinedButton(
             onClick = { showSpecialConfirm = true },
@@ -1453,6 +1574,21 @@ private fun StartPrompt(
             }
         )
     }
+}
+
+/**
+ * El exprés en una frase: qué se hace, qué se queda fuera y cuánto dura. Si se queda fuera
+ * algo, se nombra: «te quito dos ejercicios» sin decir cuáles obliga a ir a mirarlo.
+ */
+private fun describeExpress(day: TrainingDay, plan: ExpressPlan?, minutos: Int): String {
+    if (plan == null) return "Entero ya cabe en $minutos minutos."
+    val total = day.template.exercises.size
+    val hechos = plan.order.size
+    val cuantos = if (hechos == total) "Todos los ejercicios" else "$hechos de $total ejercicios"
+    val fuera = if (plan.dropped.isEmpty()) "" else
+        " Se quedan fuera: " + plan.dropped.joinToString(", ") { ExerciseImages.headlineName(it) } + "."
+    return "$cuantos, a ${plan.maxSets} series y con ${plan.warmupSeconds / 60} min de calentamiento: " +
+        "unos ${(plan.estimatedSeconds + 59) / 60} min.$fuera"
 }
 
 // ─── Utilidades ───────────────────────────────────────────────────────────────
