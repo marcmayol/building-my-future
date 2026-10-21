@@ -63,7 +63,8 @@ private val SECCIONES = listOf(
         "Lo que te toca hoy y cómo vas.",
         R.drawable.ayuda_inicio,
         listOf(
-            "Arriba, el plan que sigues y la fase. «Ver otros planes» lleva a la lista: hay planes de fuerza, de músculo, para casa, para empezar desde cero…",
+            "Arriba a la derecha, ⓘ abre esta ayuda (también está en Ajustes y en la cabecera del entreno) y el engranaje, los ajustes.",
+            "Debajo, el plan que sigues y la fase. «Ver otros planes» lleva a la lista: hay planes de fuerza, de músculo, para casa, para empezar desde cero…",
             "El bloque grande es el día que toca. «Empezar día» arranca el entreno guiado; «Ver el día antes de empezar» enseña los ejercicios sin empezar nada.",
             "Si tienes un entreno a medias, ese bloque dice «En curso» y el botón lo reanuda donde lo dejaste.",
             "«Entreno libre» es para apuntar lo que hagas sin seguir el plan. Los «Entrenamientos especiales» son rutinas sueltas que no cuentan como día.",
