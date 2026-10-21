@@ -1,8 +1,8 @@
 {
-  "versionCode": 41,
-  "versionName": "2.19",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.19/building-my-future-v2.19.apk",
-  "sha256": "3617bb0cd5d97cdbd86ddcda7676f9c1f746e72cd0798eff89512b4ca941cf2f",
-  "notas": "Ayuda de toda la app con capturas (desde Inicio, Ajustes y el propio entreno, sin tocar el progreso), el cuestionario pregunta cuánto tiempo tienes cada día, imágenes más ligeras y barra de estado legible en tema oscuro.",
+  "versionCode": 42,
+  "versionName": "2.19.1",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.19.1/building-my-future-v2.19.1.apk",
+  "sha256": "bf5b09a04bb177ea47b3a352cc78eb64464cd4beec8dc1e1e51f5f6e5f156224",
+  "notas": "Las capturas de la ayuda, rehechas con la app tal como es ahora.",
   "check_horas": 24
 }
