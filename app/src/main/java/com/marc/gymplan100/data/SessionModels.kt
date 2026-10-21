@@ -360,6 +360,9 @@ object RestDefaults {
  * Ej: "5-8 min bici" -> 8 min, "6 min de calentamiento" -> 6 min. Por defecto 6 min.
  */
 fun warmupSecondsFromText(warmup: String): Int {
+    // Sin la palabra "min" los números no son minutos: «gato-vaca 10 repeticiones» ponía un
+    // calentamiento de diez minutos.
+    if (!warmup.contains("min", ignoreCase = true)) return 6 * 60
     val head = warmup.substringBefore("min", warmup)
     val minutes = Regex("""\d+""").findAll(head)
         .map { it.value.toInt() }

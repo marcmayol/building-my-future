@@ -53,6 +53,7 @@ object Routes {
     const val FATBURN = "fatburn"
     const val FATBURN_EX = "fatburn/{id}"
     const val ROUTINE = "routine"
+    const val HELP = "help"
     fun phase(n: Int) = "phase/$n"
     fun day(n: Int) = "day/$n"
     fun session(n: Int) = "session/$n"
@@ -125,6 +126,9 @@ fun GymNavHost(
             if (conBarra) BarraInferior(navController, rutaActual)
         }
     ) { inner ->
+    // La ayuda se abre desde cualquier pantalla (también desde el entreno) sin pasar el
+    // navegador de mano en mano.
+    CompositionLocalProvider(LocalOpenHelp provides { navController.navigate(Routes.HELP) }) {
     NavHost(
         navController = navController,
         startDestination = Routes.HOME,
@@ -157,6 +161,11 @@ fun GymNavHost(
                 onBack = { navController.popBackStack() },
                 onOpenPlans = { navController.navigate(Routes.PLANS) }
             )
+        }
+        // La ayuda va encima de lo que haya, sin tocarlo: volver deja todo como estaba,
+        // también un entreno a medias.
+        composable(Routes.HELP) {
+            HelpScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.PLANS) {
             PlansScreen(
@@ -266,6 +275,7 @@ fun GymNavHost(
                 onExit = { navController.popBackStack(Routes.HOME, inclusive = false) }
             )
         }
+    }
     }
     }
 

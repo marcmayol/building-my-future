@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -162,6 +163,22 @@ fun HomeScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f)
                 )
+                LocalOpenHelp.current?.let { abrir ->
+                    IconButton(
+                        onClick = abrir,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Filled.Info,
+                            contentDescription = "Ayuda",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(Modifier.size(Space.x2))
+                }
                 IconButton(
                     onClick = onOpenSettings,
                     modifier = Modifier

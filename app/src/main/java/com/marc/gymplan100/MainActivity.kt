@@ -7,7 +7,10 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import android.graphics.Color
+import androidx.compose.runtime.DisposableEffect
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -50,7 +53,16 @@ class MainActivity : ComponentActivity() {
         maybeRequestNotificationPermission()
         readSessionExtra(intent)
         setContent {
-            GymPlanTheme(darkTheme = AppTheme.isDark()) {
+            val oscuro = AppTheme.isDark()
+            // Los iconos de la hora, la batería y el wifi siguen al tema de la APP, no al del
+            // móvil: con el móvil en claro y la app en oscuro salían negros sobre negro.
+            DisposableEffect(oscuro) {
+                val estilo = if (oscuro) SystemBarStyle.dark(Color.TRANSPARENT)
+                else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                enableEdgeToEdge(statusBarStyle = estilo, navigationBarStyle = estilo)
+                onDispose {}
+            }
+            GymPlanTheme(darkTheme = oscuro) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

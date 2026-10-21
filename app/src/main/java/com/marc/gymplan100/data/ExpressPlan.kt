@@ -53,14 +53,29 @@ object Express {
         var total = 0
         order.forEachIndexed { pos, idx ->
             val ex = day.template.exercises.getOrNull(idx) ?: return@forEachIndexed
+            // Un bloque de cardio se mide en minutos, no en series: «20 min» son veinte minutos.
+            cardioMinutes(ex)?.let { min ->
+                total += min * 60
+                if (pos < order.lastIndex) total += CHANGE_SECONDS
+                return@forEachIndexed
+            }
             val delPlan = setCountFromScheme(ex.scheme)
             val sets = if (maxSets > 0) minOf(delPlan, maxSets) else delPlan
-            val work = secondsPerSetFromScheme(ex.scheme) ?: WORK_SECONDS
+            // «por lado» es la serie dos veces.
+            val lados = if (ex.scheme.contains("por lado", ignoreCase = true)) 2 else 1
+            val work = (secondsPerSetFromScheme(ex.scheme.replace(Regex("""(?i)\s*por lado"""), "")) ?: WORK_SECONDS) * lados
             val rest = RestDefaults.between(ex, yours = yourRests).seconds
             total += sets * work + (sets - 1).coerceAtLeast(0) * rest
             if (pos < order.lastIndex) total += RestDefaults.betweenExercises(RestDefaults.between(ex, yours = yourRests)).seconds + CHANGE_SECONDS
         }
         return warmupSeconds + (total * scale).toInt()
+    }
+
+    /** Los minutos de un bloque de cardio («20 min», «15-20 min»: el mayor), o null si no lo es. */
+    private fun cardioMinutes(ex: Exercise): Int? {
+        if (ex.kind != ExerciseKind.CARDIO) return null
+        val m = Regex("""(\d+)\s*(?:-\s*(\d+)\s*)?min""").find(ex.scheme.lowercase()) ?: return null
+        return (m.groupValues[2].toIntOrNull() ?: m.groupValues[1].toInt()).coerceIn(1, 180)
     }
 
     /**

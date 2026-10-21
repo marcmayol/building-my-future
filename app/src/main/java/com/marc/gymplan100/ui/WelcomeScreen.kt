@@ -59,7 +59,7 @@ import com.marc.gymplan100.ui.theme.Touch
 /**
  * Bienvenida: ayuda a elegir plan la primera vez que se abre la app.
  *
- * Cuatro preguntas **en una sola pantalla** (cuatro toques no justifican cuatro transiciones)
+ * Cinco preguntas **en una sola pantalla** (cinco toques no justifican cinco transiciones)
  * y una recomendación con su porqué. Las respuestas **no se guardan en ninguna parte**: entran
  * en [PlanAdvisor], sale una propuesta y se olvidan. Se dice aquí mismo, en un bloque y no en
  * letra pequeña, porque es verdad.
@@ -81,17 +81,18 @@ fun WelcomeScreen(
     var shape by remember { mutableStateOf<PlanAdvisor.Shape?>(null) }
     var days by remember { mutableStateOf<PlanAdvisor.Days?>(null) }
     var place by remember { mutableStateOf<PlanAdvisor.Place?>(null) }
+    var time by remember { mutableStateOf<PlanAdvisor.SessionTime?>(null) }
     var preguntando by remember { mutableStateOf(false) }
 
-    val completas = goal != null && shape != null && days != null && place != null
+    val completas = goal != null && shape != null && days != null && place != null && time != null
     val resultado = if (completas) {
-        PlanAdvisor.recommend(plans, PlanAdvisor.Answers(goal!!, shape!!, days!!, place!!))
+        PlanAdvisor.recommend(plans, PlanAdvisor.Answers(goal!!, shape!!, days!!, place!!, time))
     } else null
 
     val lista = rememberLazyListState()
     // Al contestar la cuarta, el resultado se busca solo: nadie tiene que adivinar que hay
     // algo más abajo. Se para justo en la versalita del resultado (cabecera, privacidad y las
-    // cuatro preguntas van antes), no al final de todo: bajar hasta el fondo dejaba la
+    // cinco preguntas van antes), no al final de todo: bajar hasta el fondo dejaba la
     // propuesta cortada por arriba.
     LaunchedEffect(completas) { if (completas) lista.animateScrollToItem(PRIMER_RESULTADO) }
 
@@ -133,7 +134,7 @@ fun WelcomeScreen(
                 }
                 Spacer(Modifier.height(Space.block))
                 Text(
-                    if (preguntando) "Cuéntame cuatro cosas" else "Vamos a elegir tu plan",
+                    if (preguntando) "Cuéntame cinco cosas" else "Vamos a elegir tu plan",
                     style = MaterialTheme.typography.displaySmall.copy(fontSize = 38.sp)
                 )
                 Spacer(Modifier.height(Space.x3))
@@ -141,7 +142,7 @@ fun WelcomeScreen(
                     if (preguntando) {
                         "No se guarda nada de esto: solo sirve para proponerte un plan."
                     } else {
-                        "Hay quince planes dentro. Puedo recomendarte uno en cuatro preguntas, " +
+                        "Hay quince planes dentro. Puedo recomendarte uno en cinco preguntas, " +
                             "o los miras tú mismo."
                     },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
@@ -201,6 +202,16 @@ fun WelcomeScreen(
                         onSelect = { etiqueta ->
                             days = PlanAdvisor.Days.entries.first { "${it.n} días" == etiqueta }
                         }
+                    )
+                }
+                item {
+                    // El rato que hay cada día pesa tanto como los días: un plan de una hora
+                    // no le sirve a quien tiene cuarenta minutos antes de ir a trabajar.
+                    AnswerGroup(
+                        question = "¿Cuánto tiempo tienes cada día?",
+                        options = TIEMPO.map { it.second },
+                        selected = TIEMPO.firstOrNull { it.first == time }?.second,
+                        onSelect = { etiqueta -> time = TIEMPO.first { it.second == etiqueta }.first }
                     )
                 }
                 item {
@@ -317,8 +328,11 @@ fun WelcomeScreen(
                 goal == null -> "qué buscas"
                 shape == null -> "cómo estás ahora"
                 days == null -> "cuántos días"
+                time == null -> "cuánto tiempo tienes"
                 else -> "dónde entrenas"
             }
+            // «Te falta una» solo si de verdad es una; con varias, se cuentan.
+            val cuantas = listOf(goal, shape, days, time, place).count { it == null }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -334,7 +348,7 @@ fun WelcomeScreen(
                 ) { Text("Ver qué me propones") }
                 Spacer(Modifier.height(Space.x2))
                 Text(
-                    "Te falta una: $falta.",
+                    if (cuantas == 1) "Te falta una: $falta." else "Te faltan $cuantas; la siguiente: $falta.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth()
@@ -344,8 +358,8 @@ fun WelcomeScreen(
     }
 }
 
-/** Cabecera, bloque de privacidad y las cuatro preguntas: el resultado empieza en el sexto. */
-private const val PRIMER_RESULTADO = 6
+/** Cabecera, bloque de privacidad y las cinco preguntas: el resultado empieza en el séptimo. */
+private const val PRIMER_RESULTADO = 7
 
 private val OBJETIVOS = listOf(
     PlanGoal.LOSE_FAT to "Perder grasa",
@@ -360,6 +374,13 @@ private val FORMA = listOf(
     PlanAdvisor.Shape.STOPPED to "Parado hace tiempo",
     PlanAdvisor.Shape.SOMETIMES to "De vez en cuando",
     PlanAdvisor.Shape.REGULAR to "Entreno regular",
+)
+
+private val TIEMPO = listOf(
+    PlanAdvisor.SessionTime.MIN30 to "Media hora",
+    PlanAdvisor.SessionTime.MIN45 to "45 minutos",
+    PlanAdvisor.SessionTime.MIN60 to "Una hora",
+    PlanAdvisor.SessionTime.MIN90 to "Más de una hora",
 )
 
 private val LUGAR = listOf(

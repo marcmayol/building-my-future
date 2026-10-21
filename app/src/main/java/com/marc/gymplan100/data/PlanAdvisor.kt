@@ -7,7 +7,7 @@ package com.marc.gymplan100.data
  * recomendación y se olvidan. Lo único que queda es el plan que se acabe activando.
  *
  * La recomendación no obliga a nada: al lado siempre están el catálogo entero y el editor.
- * Por eso el criterio es "acertar el 80 % de las veces con cuatro preguntas", no ser exacto.
+ * Por eso el criterio es "acertar el 80 % de las veces con cinco preguntas", no ser exacto.
  */
 object PlanAdvisor {
 
@@ -35,12 +35,33 @@ object PlanAdvisor {
     /** Dónde va a entrenar. */
     enum class Place { GYM, HOME }
 
+    /**
+     * Cuánto rato hay por sesión. Quien entrena de 6:30 a 7:10 antes de trabajar no puede con
+     * un plan de seis ejercicios por día, y descubrirlo en el gimnasio es tarde.
+     */
+    enum class SessionTime(val minutes: Int) { MIN30(30), MIN45(45), MIN60(60), MIN90(90) }
+
     data class Answers(
         val goal: PlanGoal,
         val shape: Shape,
         val days: Days,
-        val place: Place
+        val place: Place,
+        /** Null = no lo ha dicho (o viene de antes de que se preguntara): no cuenta. */
+        val time: SessionTime? = null
     )
+
+    /**
+     * Lo que dura una sesión típica del plan, en minutos: la mediana de sus días con el mismo
+     * cálculo que la pantalla de antes de empezar. Sin los ajustes de cada uno, que aquí aún
+     * no hay historial del que sacarlos.
+     */
+    fun typicalMinutes(plan: TrainingPlan): Int {
+        val minutos = plan.days.map { Express.estimateSeconds(it) / 60 }.sorted()
+        return if (minutos.isEmpty()) 0 else minutos[minutos.size / 2]
+    }
+
+    /** Lo que se le perdona a un plan por pasarse del tiempo: ahí entra el exprés. */
+    private const val MARGEN_MIN = 10
 
     /**
      * Un plan propuesto y **por qué**. El motivo se enseña tal cual: una recomendación sin
@@ -176,6 +197,18 @@ object PlanAdvisor {
             else -> return 0        // dos o más: no cuadra
         }
 
+        // El tiempo, igual que los días: si cabe suma; si se pasa poco, el exprés lo salva y
+        // no resta; si se pasa mucho, ese plan no es para esa persona.
+        a.time?.let { t ->
+            val dura = typicalMinutes(plan)
+            when {
+                dura == 0 -> Unit
+                dura <= t.minutes -> s += 2
+                dura <= t.minutes + MARGEN_MIN -> Unit
+                else -> return 0
+            }
+        }
+
         return s.coerceAtLeast(0)
     }
 
@@ -189,6 +222,10 @@ object PlanAdvisor {
         }
         if (plan.goal != a.goal && !parientes(plan.goal, a.goal)) {
             add("va a otra cosa: es ${deQue(plan.goal)}")
+        }
+        a.time?.let { t ->
+            val dura = typicalMinutes(plan)
+            if (dura > t.minutes + MARGEN_MIN) add("sus sesiones son de unos $dura minutos")
         }
     }
 
@@ -236,6 +273,11 @@ object PlanAdvisor {
         }
         trozos += "${a.days.n} días por semana"
         if (a.place == Place.HOME) trozos += "sin material"
+        a.time?.let { t ->
+            val dura = typicalMinutes(plan)
+            trozos += if (dura > t.minutes) "sesiones de unos $dura min (con el exprés caben en ${t.minutes})"
+            else "sesiones de unos $dura min"
+        }
 
         val cola = if (plan.level == PlanLevel.GENTLE) {
             "aquí se empieza de pie o sentado, con apoyo y a tu ritmo"

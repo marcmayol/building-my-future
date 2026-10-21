@@ -155,6 +155,17 @@ fun SettingsScreen(
                             .fillMaxWidth()
                             .heightIn(min = Touch.primary)
                     ) { Text("Mis planes") }
+                    // La ayuda también aquí, que es donde se busca primero.
+                    LocalOpenHelp.current?.let { abrir ->
+                        Spacer(Modifier.size(Space.x2))
+                        OutlinedButton(
+                            onClick = abrir,
+                            shape = CircleShape,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = Touch.primary)
+                        ) { Text("Ayuda: cómo funciona la app") }
+                    }
                 }
             }
 

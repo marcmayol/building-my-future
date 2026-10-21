@@ -34,6 +34,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -164,6 +165,16 @@ fun SessionShell(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+                // La ayuda, a mano también entrenando: se abre encima y el entreno sigue igual.
+                LocalOpenHelp.current?.let { abrir ->
+                    IconButton(onClick = abrir, modifier = Modifier.size(40.dp)) {
+                        Icon(
+                            Icons.Filled.Info,
+                            contentDescription = "Ayuda",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
                 IconButton(onClick = onExit, modifier = Modifier.size(40.dp)) {
                     Icon(
