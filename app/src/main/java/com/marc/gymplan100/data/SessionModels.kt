@@ -89,6 +89,11 @@ data class ActiveSession(
      * Se pone a 0 al completar una serie (ya conseguiste máquina).
      */
     val occupiedSkips: Int = 0,
+    /**
+     * Ejercicios que hoy no se hacen («No lo hago hoy»): salen de [order] y se apuntan aquí
+     * para que el plan del día los enseñe tachados en vez de hacerlos desaparecer sin más.
+     */
+    val skipped: List<Int> = emptyList(),
     // --- Calentamiento (fase WARMUP) ---
     /** Duración objetivo del calentamiento (segundos), deducida del plan y ajustable. */
     val warmupTargetSeconds: Int = 0,
@@ -295,29 +300,57 @@ object RestDefaults {
     data class Rest(val seconds: Int, val source: Source)
 
     /**
+     * Tus descansos por defecto, los de Ajustes: lo que se descansa cuando ni tú, ni el plan,
+     * ni las repeticiones dicen otra cosa. Sin tocar nada siguen siendo 90 s y 2 min.
+     */
+    @Serializable
+    data class Base(val sets: Int = BETWEEN_SETS, val exercises: Int = BETWEEN_EXERCISES)
+
+    /**
+     * Lo que se alarga el descanso según cómo ha ido la serie (el [CompletedSet.rir] que se
+     * marca en la pantalla del descanso): fácil, lo de siempre; justo, medio minuto más; al
+     * fallo, un minuto más. Se suma al descanso en marcha y no se guarda como «el tuyo»: si
+     * se guardara, cada fallo se sumaría al anterior y los descansos crecerían sin fin.
+     */
+    fun forEffort(rir: String): Int = when (rir.trim()) {
+        "1" -> 30
+        "0" -> 60
+        else -> 0
+    }
+
+    /**
      * Descanso entre series de [exercise]. [repsDone] son las repeticiones de la serie que se
      * acaba de cerrar (manda sobre el esquema: si el plan dice 12 y hoy has hecho 6 con más
      * peso, descansas como en una serie de 6). [yours] son los descansos que el usuario dejó
      * puestos, por nombre de ejercicio.
      */
-    fun between(exercise: Exercise, repsDone: String = "", yours: Map<String, Int> = emptyMap()): Rest {
+    fun between(
+        exercise: Exercise,
+        repsDone: String = "",
+        yours: Map<String, Int> = emptyMap(),
+        base: Base = Base()
+    ): Rest {
         yours[exercise.name]?.takeIf { it > 0 }?.let { return Rest(it, Source.YOURS) }
         fromNote(exercise.note)?.let { return Rest(it, Source.PLAN) }
         if (exercise.kind != ExerciseKind.STRENGTH || isBodyweightScheme(exercise.scheme) ||
             secondsPerSetFromScheme(exercise.scheme) != null
-        ) return Rest(BETWEEN_SETS, Source.DEFAULT)
+        ) return Rest(base.sets, Source.DEFAULT)
         val reps = parseReps(repsDone) ?: repsRangeFromScheme(exercise.scheme)?.last
-            ?: return Rest(BETWEEN_SETS, Source.DEFAULT)
+            ?: return Rest(base.sets, Source.DEFAULT)
+        // Una serie pesada pide como poco su descanso largo, pero si tu descanso de siempre ya
+        // es más largo, manda el tuyo: la serie pesada no puede dejarte descansar MENOS.
+        fun pesada(segundos: Int) =
+            if (base.sets >= segundos) Rest(base.sets, Source.DEFAULT) else Rest(segundos, Source.HEAVY)
         return when {
-            reps <= 5 -> Rest(HEAVY, Source.HEAVY)
-            reps <= 8 -> if (isBigLift(exercise.name)) Rest(HEAVY, Source.HEAVY) else Rest(MEDIUM, Source.HEAVY)
-            else -> Rest(BETWEEN_SETS, Source.DEFAULT)
+            reps <= 5 -> pesada(HEAVY)
+            reps <= 8 -> pesada(if (isBigLift(exercise.name)) HEAVY else MEDIUM)
+            else -> Rest(base.sets, Source.DEFAULT)
         }
     }
 
     /** Entre un ejercicio y el siguiente: como poco lo de siempre, y nunca menos que entre series. */
-    fun betweenExercises(between: Rest): Rest =
-        if (between.seconds > BETWEEN_EXERCISES) between else Rest(BETWEEN_EXERCISES, between.source)
+    fun betweenExercises(between: Rest, base: Base = Base()): Rest =
+        if (between.seconds > base.exercises) between else Rest(base.exercises, between.source)
 
     /**
      * Los segundos de descanso que pide una nota del plan, o null si no habla de descanso.

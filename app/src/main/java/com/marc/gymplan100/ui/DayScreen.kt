@@ -96,6 +96,7 @@ fun DayScreen(
     val day = PlanData.dayByNumber(dayNumber) ?: PlanData.days.first()
     val template = day.template
     val progress by viewModel.progress.collectAsState()
+    val restBase = viewModel.profile.collectAsState().value.restBase
     val active by viewModel.activeSession.collectAsState()
     // Hay un entreno de este día a medias: el botón lo continúa, no empieza otro.
     val enCurso = active?.let { it.dayNumber == day.number && !it.isRoutine && !it.extra } == true
@@ -185,7 +186,7 @@ fun DayScreen(
                     doneAs = log?.doneAs?.takeIf { it.isNotBlank() }
                         ?: progress.exerciseSwaps[exercise.name]?.takeIf { it.isNotBlank() },
                     rest = if (exercise.kind == ExerciseKind.CARDIO) null
-                    else RestDefaults.between(exercise, yours = progress.yourRests).seconds,
+                    else RestDefaults.between(exercise, yours = progress.yourRests, base = restBase).seconds,
                     // Lo apuntado serie a serie. Si el día viene de antes del desglose, el
                     // peso que hubiera se enseña como el de la primera serie.
                     sets = log?.sets?.ifEmpty { null }

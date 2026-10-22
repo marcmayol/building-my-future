@@ -726,7 +726,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     fun estimatedMinutes(dayNumber: Int): Int? {
         val day = PlanData.dayByNumber(dayNumber) ?: return null
         val segundos = Express.estimateSeconds(
-            day, yourRests = _progress.value.yourRests, scale = Express.scaleFrom(_history.value)
+            day, yourRests = _progress.value.yourRests, scale = Express.scaleFrom(_history.value),
+            restBase = _profile.value.restBase
         )
         return (segundos + 59) / 60
     }
@@ -735,7 +736,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     fun expressPlan(dayNumber: Int, minutes: Int): ExpressPlan? {
         val day = PlanData.dayByNumber(dayNumber) ?: return null
         return Express.plan(
-            day, minutes * 60, _progress.value.yourRests, Express.scaleFrom(_history.value)
+            day, minutes * 60, _progress.value.yourRests, Express.scaleFrom(_history.value),
+            _profile.value.restBase
         )
     }
 
@@ -1000,6 +1002,21 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
+     * No lo hago hoy: tacha el ejercicio actual y sigue con el siguiente. Si era el último,
+     * el día se cierra con lo hecho, igual que al acabar la última serie.
+     */
+    fun dropExercise() {
+        val s = _active.value ?: return
+        val next = SessionEngine.dropExercise(s)
+        if (next !== s) saveActive(next)
+    }
+
+    /** Cambia tus descansos por defecto (Ajustes). Valen desde el próximo descanso. */
+    fun setRestBase(base: RestDefaults.Base) {
+        updateProfile(_profile.value.copy(restBase = base))
+    }
+
+    /**
      * Peso sugerido para la serie actual: el preparado en el descanso, si no el de la serie
      * anterior de la misma máquina, y si no el último peso conocido del ejercicio.
      *
@@ -1200,7 +1217,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val repsFinales = reps.trim().ifBlank { SessionEngine.repsForSet(s, _progress.value.exerciseReps) }
         val next = SessionEngine.completeSet(
             s, weight, System.currentTimeMillis(), repsFinales, warmup, rir,
-            yourRests = _progress.value.yourRests
+            yourRests = _progress.value.yourRests,
+            restBase = _profile.value.restBase
         )
         // Encadenando una superserie no hay descanso que programar, y el aviso del ejercicio
         // que se acaba de cerrar hay que quitarlo: si no, sonaria en mitad del siguiente.
@@ -1230,9 +1248,22 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val s = _active.value ?: return
         val sets = s.completedSets
         if (sets.isEmpty()) return
+        val antes = sets.last().rir
         val actualizada = sets.toMutableList()
         actualizada[actualizada.lastIndex] = actualizada.last().copy(rir = rir.trim())
-        saveActive(s.copy(completedSets = actualizada))
+        // Cómo ha ido la serie alarga el descanso en marcha: se suma lo que pide el nuevo y se
+        // quita lo que había sumado el anterior, así cambiar de «Fallo» a «Justo» resta medio
+        // minuto en vez de sumar otro.
+        val delta = RestDefaults.forEffort(rir) - RestDefaults.forEffort(antes)
+        if (s.phase != SessionPhase.RESTING || delta == 0) {
+            saveActive(s.copy(completedSets = actualizada))
+            return
+        }
+        val newTarget = (s.restTargetSeconds + delta).coerceIn(0, 600)
+        val kind = if (s.restBetweenExercises) RestReminder.KIND_BETWEEN_EXERCISES
+        else RestReminder.KIND_BETWEEN_SETS
+        RestReminder.schedule(getApplication(), s.restStartMillis + newTarget * 1000L, kind, s.dayNumber)
+        saveActive(s.copy(completedSets = actualizada, restTargetSeconds = newTarget))
     }
 
     /** Ajusta el objetivo de descanso (±segundos) durante un descanso. */
@@ -1249,7 +1280,10 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         // ahí lo que se tarda depende de dónde esté la siguiente máquina.
         if (!s.restBetweenExercises) {
             val nombre = s.exerciseAt(s.exerciseIndex)?.name
-            if (!nombre.isNullOrBlank()) update { it.copy(yourRests = it.yourRests + (nombre to newTarget)) }
+            // Sin lo que sumó el esfuerzo de hoy: eso es de esta serie, no de tu descanso.
+            val porEsfuerzo = s.completedSets.lastOrNull()?.let { RestDefaults.forEffort(it.rir) } ?: 0
+            val tuyo = (newTarget - porEsfuerzo).coerceAtLeast(0)
+            if (!nombre.isNullOrBlank()) update { it.copy(yourRests = it.yourRests + (nombre to tuyo)) }
         }
     }
 

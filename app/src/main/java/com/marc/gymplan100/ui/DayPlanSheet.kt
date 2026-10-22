@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.Exercise
@@ -86,7 +88,7 @@ fun DayPlanSheet(
 
             Spacer(Modifier.height(2.dp))
 
-            order.forEachIndexed { pos, exIndex ->
+            order.filter { it !in session.skipped }.forEachIndexed { pos, exIndex ->
                 // El de hoy: si se cambió por otro, la lista dice el que se está haciendo.
                 val ex = session.exerciseAt(exIndex) ?: return@forEachIndexed
                 val total = session.setsFor(ex)
@@ -98,6 +100,20 @@ fun DayPlanSheet(
                     totalSets = total,
                     isCurrent = exIndex == session.exerciseIndex,
                     isDone = doneSets >= total,
+                    onClick = { onExerciseClick(ex) }
+                )
+            }
+            // Los tachados, al final y tachados: siguen en la hoja como en la de papel.
+            session.skipped.forEach { exIndex ->
+                val ex = session.exerciseAt(exIndex) ?: return@forEach
+                PlanRow(
+                    position = 0,
+                    exercise = ex,
+                    doneSets = session.completedSets.count { it.exerciseIndex == exIndex && !it.warmup },
+                    totalSets = session.setsFor(ex),
+                    isCurrent = false,
+                    isDone = false,
+                    isSkipped = true,
                     onClick = { onExerciseClick(ex) }
                 )
             }
@@ -128,6 +144,7 @@ private fun PlanRow(
     totalSets: Int,
     isCurrent: Boolean,
     isDone: Boolean,
+    isSkipped: Boolean = false,
     onClick: () -> Unit
 ) {
     // Mismo código de color que la sesión: naranja = lo que estás haciendo ahora.
@@ -186,6 +203,12 @@ private fun PlanRow(
                         tint = bubbleContent,
                         modifier = Modifier.size(16.dp)
                     )
+                    isSkipped -> Icon(
+                        Icons.Filled.Close,
+                        contentDescription = "Saltado",
+                        tint = bubbleContent,
+                        modifier = Modifier.size(16.dp)
+                    )
                     isDone -> Icon(
                         Icons.Filled.Check,
                         contentDescription = "Hecho",
@@ -205,11 +228,13 @@ private fun PlanRow(
                 exercise.name,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
-                color = if (isDone && !isCurrent) MaterialTheme.colorScheme.onSurfaceVariant
+                textDecoration = if (isSkipped) TextDecoration.LineThrough else null,
+                color = if ((isDone || isSkipped) && !isCurrent) MaterialTheme.colorScheme.onSurfaceVariant
                 else MaterialTheme.colorScheme.onSurface
             )
             Text(
-                "${exercise.scheme}  ·  $doneSets/$totalSets series",
+                if (isSkipped) "Saltado hoy  ·  $doneSets/$totalSets series"
+                else "${exercise.scheme}  ·  $doneSets/$totalSets series",
                 style = MaterialTheme.typography.bodySmall,
                 color = if (isCurrent) accent else MaterialTheme.colorScheme.onSurfaceVariant
             )

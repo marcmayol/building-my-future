@@ -123,7 +123,7 @@ object SessionEngine {
      * [reps] son las repeticiones que se hicieron de verdad; va al final y con valor por defecto
      * para que quien no las tenga (una serie por tiempo) siga llamando igual que siempre.
      * [yourRests] son los descansos que el usuario dejó puestos por ejercicio (ver
-     * [RestDefaults.between]).
+     * [RestDefaults.between]) y [restBase], los de siempre que se ponen en Ajustes.
      */
     fun completeSet(
         s: ActiveSession,
@@ -132,7 +132,8 @@ object SessionEngine {
         reps: String = "",
         warmup: Boolean = false,
         rir: String = "",
-        yourRests: Map<String, Int> = emptyMap()
+        yourRests: Map<String, Int> = emptyMap(),
+        restBase: RestDefaults.Base = RestDefaults.Base()
     ): ActiveSession {
         if (s.phase != SessionPhase.WORKING && s.phase != SessionPhase.TIMED_SET) return s
         val exercise = s.exerciseAt(s.exerciseIndex) ?: return s
@@ -183,8 +184,9 @@ object SessionEngine {
             )
         } else {
             val betweenExercises = isLastSet
-            val entreSeries = RestDefaults.between(exercise, reps, yourRests)
-            val descanso = if (betweenExercises) RestDefaults.betweenExercises(entreSeries) else entreSeries
+            val entreSeries = RestDefaults.between(exercise, reps, yourRests, restBase)
+            val descanso = if (betweenExercises) RestDefaults.betweenExercises(entreSeries, restBase)
+            else entreSeries
             s.copy(
                 phase = SessionPhase.RESTING,
                 restStartMillis = now,
@@ -225,6 +227,46 @@ object SessionEngine {
             phase = SessionPhase.WORKING,
             occupiedSkips = s.occupiedSkips + 1,
             // El peso preparado era para la máquina que dejamos: ya no aplica.
+            plannedWeight = "",
+            currentReps = ""
+        )
+    }
+
+    /**
+     * «No lo hago hoy»: tacha el ejercicio actual (con su superserie entera) y pasa al
+     * siguiente pendiente. Es lo que se haría con un boli en la hoja del plan cuando no tienes
+     * la máquina, o cuando con las series hechas ya has tenido bastante: lo que se haya hecho
+     * se queda apuntado, y lo que no, no cuenta como hecho.
+     *
+     * Antes la única salida era «Máquina ocupada», que lo mandaba al final, y quien no lo iba
+     * a hacer acababa marcando series que no había hecho para poder seguir.
+     */
+    fun dropExercise(s: ActiveSession): ActiveSession {
+        if (s.phase != SessionPhase.WORKING) return s
+        val order = s.orderOrDefault()
+        val grupo = supersetMembers(s.dayNumber, s.exerciseIndex)
+        val pos = order.indexOf(grupo.first())
+        if (pos < 0) return s
+        val newOrder = order - grupo.toSet()
+        val skipped = s.skipped + grupo.filter { it !in s.skipped }
+        val nextEx = newOrder.getOrNull(pos)
+            // Era el último: el día se cierra con lo que se haya hecho. El orden se deja como
+            // estaba, que vacío significa «todos los del día».
+            ?: return s.copy(
+                phase = SessionPhase.FINISHED,
+                order = newOrder.ifEmpty { order },
+                skipped = skipped,
+                occupiedSkips = 0,
+                plannedWeight = "",
+                currentReps = ""
+            )
+        return s.copy(
+            order = newOrder,
+            skipped = skipped,
+            exerciseIndex = nextEx,
+            setNumber = s.completedSets.count { it.exerciseIndex == nextEx && !it.warmup } + 1,
+            phase = SessionPhase.WORKING,
+            occupiedSkips = 0,
             plannedWeight = "",
             currentReps = ""
         )

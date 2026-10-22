@@ -370,7 +370,8 @@ class SkipActionReceiver : BroadcastReceiver() {
                     } else when (session.phase) {
                         SessionPhase.WARMUP -> SessionEngine.endWarmup(session)
                         SessionPhase.TIMED_SET -> SessionEngine.completeSet(
-                            session, "", now, yourRests = repo.progress.first().yourRests
+                            session, "", now, yourRests = repo.progress.first().yourRests,
+                            restBase = repo.profile.first().restBase
                         )
                         SessionPhase.RESTING -> SessionEngine.endRest(session, now)
                         else -> session

@@ -283,6 +283,7 @@ data class ProgressState(
  *  - [weightKg] estima las calorías activas del entreno (fórmula MET) para Google Health.
  *  - [gender] elige si las ilustraciones de los ejercicios son masculinas o femeninas.
  *  - [usesWatch] decide si estimamos calorías o dejamos que las ponga el pulso del reloj.
+ *  - [restBase] son tus descansos de siempre, los que se usan cuando nada dice otra cosa.
  *
  * Hubo también una altura: se pedía "para las calorías" pero no entraba en ningún cálculo,
  * así que se quitó en la v2.2. El perfil guardado que aún la traiga se lee igual, porque el
@@ -296,7 +297,9 @@ data class UserProfile(
     val gender: String = "",
     // El usuario lleva reloj/pulsómetro (Wear OS): Google Health ya obtiene calorías reales
     // de su pulso, así que NO escribimos la estimación MET para no contar el doble.
-    val usesWatch: Boolean = false
+    val usesWatch: Boolean = false,
+    /** Tus descansos por defecto (Ajustes → Descansos). */
+    val restBase: RestDefaults.Base = RestDefaults.Base()
 ) {
     val isWeightSet: Boolean get() = weightKg > 0
 }

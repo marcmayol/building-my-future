@@ -46,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -74,6 +75,7 @@ import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.UserProfile
+import com.marc.gymplan100.data.RestDefaults
 import kotlinx.coroutines.launch
 
 private val WEIGHTS = (30..200).toList()      // kg
@@ -258,6 +260,8 @@ fun SettingsScreen(
                 }
             }
 
+            item { SeccionDescansos(profile.restBase) { viewModel.setRestBase(it) } }
+
             item { SeccionRecordatorios() }
 
             item {
@@ -365,6 +369,72 @@ fun SettingsScreen(
  * Restaurar sobrescribe: por eso se lee y se comprueba el archivo ANTES de tocar nada, y se
  * dice cuantos dias trae y con que se van a sustituir.
  */
+/**
+ * Tus descansos de siempre: los que pone la cuenta atrás cuando nada dice otra cosa.
+ *
+ * Lo que dice el plan (una nota de «3 min de descanso»), lo que tú hayas puesto con ±30 s en un
+ * ejercicio y el descanso largo de las series pesadas siguen mandando por encima: esto es el
+ * suelo, no un tope. Pasos de 15 s, que es lo que se distingue con el reloj en la mano.
+ */
+@Composable
+private fun SeccionDescansos(base: RestDefaults.Base, onChange: (RestDefaults.Base) -> Unit) {
+    Bloque {
+        Text("Descansos", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.size(Space.x1))
+        Text(
+            "Lo que dura la cuenta atrás si el plan no pide otra cosa. Después de cada serie " +
+                "puedes decir cómo ha ido: «Justo» suma 30 s y «Fallo», un minuto.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.size(Space.x3))
+        FilaDescanso("Entre series", base.sets) { onChange(base.copy(sets = it)) }
+        Spacer(Modifier.size(Space.x2))
+        FilaDescanso("Entre ejercicios", base.exercises) { onChange(base.copy(exercises = it)) }
+        if (base != RestDefaults.Base()) {
+            Spacer(Modifier.size(Space.x1))
+            TextButton(onClick = { onChange(RestDefaults.Base()) }) {
+                Text("Volver a 1:30 y 2:00", maxLines = 1)
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilaDescanso(titulo: String, segundos: Int, onChange: (Int) -> Unit) {
+    // La etiqueta encima y no al lado: «Entre ejercicios» y dos botones no caben en una fila
+    // con el texto del sistema grande.
+    Text(titulo, style = MaterialTheme.typography.bodyLarge)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedButton(
+            onClick = { onChange((segundos - REST_STEP).coerceAtLeast(REST_MIN)) },
+            enabled = segundos > REST_MIN,
+            shape = CircleShape,
+            modifier = Modifier.heightIn(min = Touch.min)
+        ) { Text("−15 s", maxLines = 1) }
+        Text(
+            "%d:%02d".format(segundos / 60, segundos % 60),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(1f)
+        )
+        OutlinedButton(
+            onClick = { onChange((segundos + REST_STEP).coerceAtMost(REST_MAX)) },
+            enabled = segundos < REST_MAX,
+            shape = CircleShape,
+            modifier = Modifier.heightIn(min = Touch.min)
+        ) { Text("+15 s", maxLines = 1) }
+    }
+}
+
+private const val REST_STEP = 15
+private const val REST_MIN = 30
+private const val REST_MAX = 300
+
 /**
  * Los días y la hora a la que la app te recuerda que toca gimnasio.
  *

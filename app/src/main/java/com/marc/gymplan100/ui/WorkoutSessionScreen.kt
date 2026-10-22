@@ -456,6 +456,7 @@ private fun WorkingContent(
     }
     var showGuide by remember { mutableStateOf(false) }
     var showDayPlan by remember { mutableStateOf(false) }
+    var showSkip by remember { mutableStateOf(false) }
     var guideFromPlan by remember { mutableStateOf<com.marc.gymplan100.data.Exercise?>(null) }
 
     val context = LocalContext.current
@@ -469,13 +470,9 @@ private fun WorkingContent(
         context = dayContext,
         onExit = onExit,
         secondaries = {
-            if (hasNext) {
-                // Tras un cambio, el rótulo deja claro que se puede seguir saltando.
-                SessionSecondary(
-                    if (s.occupiedSkips > 0) "Otra ocupada" else "Máquina ocupada",
-                    { viewModel.skipExercise() }
-                )
-            }
+            // «Saltar» y no «Máquina ocupada»: hay más razones para no hacer un ejercicio
+            // ahora (no tienes la máquina, ya has tenido bastante) y todas se eligen ahí.
+            SessionSecondary("Saltar", { showSkip = true })
             SessionSecondary("Cómo se hace", { showGuide = true })
             // "Plan" y no "Ejercicios": con el texto del sistema grande la palabra larga no
             // cabía en su tercio y se partía a media palabra ("Ejercicio/s").
@@ -600,6 +597,17 @@ private fun WorkingContent(
             },
             planName = delPlan,
             swapRemembered = viewModel.isSwapRemembered(delPlan)
+        )
+    }
+    if (showSkip) {
+        SkipExerciseSheet(
+            exerciseName = exercise.name,
+            doneSets = s.completedSets.count { it.exerciseIndex == s.exerciseIndex && !it.warmup },
+            canPostpone = hasNext,
+            onPostpone = { viewModel.skipExercise() },
+            onSwap = { showGuide = true },
+            onDrop = { viewModel.dropExercise() },
+            onDismiss = { showSkip = false }
         )
     }
     if (showDayPlan) {
@@ -1118,6 +1126,11 @@ private fun RestingContent(
             RestDefaults.Source.YOURS.name -> " · el tuyo"
             RestDefaults.Source.PLAN.name -> " · lo pide el plan"
             RestDefaults.Source.HEAVY.name -> " · serie pesada"
+            else -> ""
+        } + when (RestDefaults.forEffort(s.completedSets.lastOrNull()?.rir.orEmpty())) {
+            // Lo que ha sumado «¿Cómo ha ido?»: si no se dice, el tiempo cambia sin motivo.
+            30 -> " · +30 s, justo"
+            60 -> " · +1 min, al fallo"
             else -> ""
         }
         Countdown(

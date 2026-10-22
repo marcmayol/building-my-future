@@ -48,7 +48,8 @@ object Express {
         maxSets: Int = 0,
         warmupSeconds: Int = warmupSecondsFromText(day.template.warmup),
         yourRests: Map<String, Int> = emptyMap(),
-        scale: Double = 1.0
+        scale: Double = 1.0,
+        restBase: RestDefaults.Base = RestDefaults.Base()
     ): Int {
         var total = 0
         order.forEachIndexed { pos, idx ->
@@ -64,9 +65,9 @@ object Express {
             // «por lado» es la serie dos veces.
             val lados = if (ex.scheme.contains("por lado", ignoreCase = true)) 2 else 1
             val work = (secondsPerSetFromScheme(ex.scheme.replace(Regex("""(?i)\s*por lado"""), "")) ?: WORK_SECONDS) * lados
-            val rest = RestDefaults.between(ex, yours = yourRests).seconds
-            total += sets * work + (sets - 1).coerceAtLeast(0) * rest
-            if (pos < order.lastIndex) total += RestDefaults.betweenExercises(RestDefaults.between(ex, yours = yourRests)).seconds + CHANGE_SECONDS
+            val entreSeries = RestDefaults.between(ex, yours = yourRests, base = restBase)
+            total += sets * work + (sets - 1).coerceAtLeast(0) * entreSeries.seconds
+            if (pos < order.lastIndex) total += RestDefaults.betweenExercises(entreSeries, restBase).seconds + CHANGE_SECONDS
         }
         return warmupSeconds + (total * scale).toInt()
     }
@@ -112,14 +113,15 @@ object Express {
         day: TrainingDay,
         budgetSeconds: Int,
         yourRests: Map<String, Int> = emptyMap(),
-        scale: Double = 1.0
+        scale: Double = 1.0,
+        restBase: RestDefaults.Base = RestDefaults.Base()
     ): ExpressPlan? {
         val todos = day.template.exercises.indices.toList()
-        if (estimateSeconds(day, todos, yourRests = yourRests, scale = scale) <= budgetSeconds) return null
+        if (estimateSeconds(day, todos, yourRests = yourRests, scale = scale, restBase = restBase) <= budgetSeconds) return null
 
         val warmup = minOf(warmupSecondsFromText(day.template.warmup), EXPRESS_WARMUP)
         fun estimar(order: List<Int>) =
-            estimateSeconds(day, order, EXPRESS_SETS, warmup, yourRests, scale)
+            estimateSeconds(day, order, EXPRESS_SETS, warmup, yourRests, scale, restBase)
 
         // Bloques que no se parten: un ejercicio suelto o una superserie entera.
         val bloques = mutableListOf<List<Int>>()

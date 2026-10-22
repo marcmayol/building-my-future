@@ -100,7 +100,8 @@ private val SECCIONES = listOf(
             "Pon el peso con − y + (de medio en medio kilo; manteniendo pulsado corre), con «Rueda» o tocando la cifra para escribirla.",
             "Las repeticiones vienen puestas con las del plan: tócalas solo si hoy han salido otras.",
             "«Serie de calentamiento» apunta una serie de aproximación sin gastar serie del plan.",
-            "«Máquina ocupada» deja ese ejercicio para el final y pasa al siguiente. «Plan» enseña todo el día y por dónde vas.",
+            "«Saltar» es para cuando ese ejercicio no toca ahora: «Máquina ocupada» lo deja para el final, «Hacer otro en su lugar» lo cambia por una alternativa y «No lo hago hoy» lo tacha (lo hecho queda apuntado; lo que no, no cuenta).",
+            "«Plan» enseña todo el día y por dónde vas, con los saltados tachados al final.",
             "Cuando acabes, «Serie hecha»."
         )
     ),
@@ -109,10 +110,10 @@ private val SECCIONES = listOf(
         "La cuenta atrás entre series.",
         R.drawable.ayuda_descanso,
         listOf(
-            "El descanso depende del ejercicio: 1:30 en series normales, 3 minutos en series pesadas (8 repeticiones o menos en un básico) o lo que diga el plan. Debajo de la cifra pone de dónde sale.",
+            "El descanso depende del ejercicio: el tuyo de siempre en series normales (1:30 si no lo cambias en Ajustes), 3 minutos en series pesadas (8 repeticiones o menos en un básico) o lo que diga el plan. Debajo de la cifra pone de dónde sale.",
             "−30 s y +30 s lo ajustan. Si lo cambias entre series, la próxima vez ese ejercicio ya empieza con tu descanso.",
             "Suena y vibra al acabar aunque tengas la pantalla apagada (y el reloj, si lo usas).",
-            "«¿Cómo ha ido?» apunta si la serie fue fácil, justa o al fallo. En «Después» puedes dejar preparado el peso de la siguiente."
+            "«¿Cómo ha ido?» apunta si la serie fue fácil, justa o al fallo, y alarga el descanso: «Justo» suma 30 s y «Fallo», un minuto. En «Después» puedes dejar preparado el peso de la siguiente."
         )
     ),
     HelpSection(
@@ -120,7 +121,7 @@ private val SECCIONES = listOf(
         "Hacer otro ejercicio y que quede apuntado como lo que fue.",
         R.drawable.ayuda_ficha,
         listOf(
-            "En la serie, toca «Cómo se hace» y baja a «Si está ocupada o no la tienes».",
+            "En la serie, toca «Saltar» → «Hacer otro en su lugar» (o «Cómo se hace» y baja a «Si está ocupada o no la tienes»).",
             "Las alternativas que la app conoce salen con su dibujo: toca «La hago» y el ejercicio de hoy pasa a ser ese, con sus propios pesos.",
             "«He hecho otro ejercicio…» busca entre 151 ejercicios o deja escribir el tuyo.",
             "Con «Recordarlo para los próximos días» marcado, los días siguientes ya empiezan con el cambio. «Volver al del plan» lo deshace."
@@ -176,10 +177,11 @@ private val SECCIONES = listOf(
     ),
     HelpSection(
         "Ajustes",
-        "Tus datos, avisos, tema y copia de seguridad.",
+        "Tus datos, descansos, avisos, tema y copia de seguridad.",
         R.drawable.ayuda_ajustes,
         listOf(
             "Peso (para estimar calorías), género de los dibujos y si usas reloj.",
+            "Descansos: cuánto duran por defecto entre series y entre ejercicios.",
             "Recordatorios: elige días y hora y la app te avisa de que toca entrenar.",
             "Tema claro u oscuro, y copia de seguridad para llevarte el progreso a otro móvil."
         )
