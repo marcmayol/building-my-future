@@ -19,6 +19,8 @@ import androidx.core.app.NotificationCompat
 import com.marc.gymplan100.MainActivity
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.ActiveSession
+import com.marc.gymplan100.data.FreeSessionEngine
+import com.marc.gymplan100.data.FreeStep
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.data.SessionPhase
@@ -173,6 +175,18 @@ object RestReminder {
             SessionPhase.RESTING -> {
                 val kind = if (session.restBetweenExercises) KIND_BETWEEN_EXERCISES else KIND_BETWEEN_SETS
                 schedule(context, session.restStartMillis + session.restTargetSeconds * 1000L, kind, session.dayNumber)
+            }
+            // El libre guiado calienta y descansa igual que el del plan, con sus mismos avisos.
+            SessionPhase.FREE -> when (session.freeStep) {
+                FreeStep.WARMUP -> schedule(
+                    context, session.warmupStartMillis + session.warmupTargetSeconds * 1000L,
+                    KIND_WARMUP, session.dayNumber
+                )
+                FreeStep.REST -> {
+                    val kind = if (session.restBetweenExercises) KIND_BETWEEN_EXERCISES else KIND_BETWEEN_SETS
+                    schedule(context, session.restStartMillis + session.restTargetSeconds * 1000L, kind, session.dayNumber)
+                }
+                FreeStep.WORK -> cancel(context)
             }
             else -> cancel(context)
         }
@@ -374,6 +388,12 @@ class SkipActionReceiver : BroadcastReceiver() {
                             restBase = repo.profile.first().restBase
                         )
                         SessionPhase.RESTING -> SessionEngine.endRest(session, now)
+                        // El libre: «Empezar ya» acaba el calentamiento y «Saltar descanso», el descanso.
+                        SessionPhase.FREE -> when (session.freeStep) {
+                            FreeStep.WARMUP -> FreeSessionEngine.endWarmup(session)
+                            FreeStep.REST -> FreeSessionEngine.endRest(session)
+                            FreeStep.WORK -> session
+                        }
                         else -> session
                     }
                     if (next !== session) {

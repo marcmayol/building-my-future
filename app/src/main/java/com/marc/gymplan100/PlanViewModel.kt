@@ -10,6 +10,7 @@ import com.marc.gymplan100.data.Celebration
 import com.marc.gymplan100.data.ExerciseLog
 import com.marc.gymplan100.data.Express
 import com.marc.gymplan100.data.ExpressPlan
+import com.marc.gymplan100.data.FreeSessionEngine
 import com.marc.gymplan100.data.RestDefaults
 import com.marc.gymplan100.data.LoggedExercise
 import com.marc.gymplan100.data.Motivation
@@ -28,6 +29,7 @@ import com.marc.gymplan100.data.PlanImport
 import com.marc.gymplan100.data.PlanMarkdownParser
 import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.warmupSecondsFromText
 import com.marc.gymplan100.data.Progression
 import com.marc.gymplan100.data.ExerciseAliases
 import com.marc.gymplan100.data.ProgressRepository
@@ -775,19 +777,11 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
     /**
      * Inicia un entrenamiento ESPECIAL/libre para el día indicado (descarta cualquier otro en curso).
-     * No hay series, pesos ni descansos: solo un cronómetro que corre hasta pulsar "Finalizar".
+     * Sin plan, pero guiado: calentamiento, serie, descanso (ver [FreeSessionEngine]).
      */
     fun startSpecialSession(dayNumber: Int) {
-        RestReminder.cancel(getApplication())
-        val now = System.currentTimeMillis()
-        saveActive(
-            ActiveSession(
-                dayNumber = dayNumber,
-                startMillis = now,
-                phase = SessionPhase.FREE,
-                special = true
-            )
-        )
+        val warmup = warmupSecondsFromText(PlanData.dayByNumber(dayNumber)?.template?.warmup.orEmpty())
+        saveFree(FreeSessionEngine.start(dayNumber, System.currentTimeMillis(), warmupSeconds = warmup))
     }
 
     /**
@@ -796,19 +790,71 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * Devuelve el día de referencia para poder abrir la pantalla de sesión.
      */
     fun startExtraSession(): Int {
-        RestReminder.cancel(getApplication())
-        val now = System.currentTimeMillis()
         val refDay = nextDay()
-        saveActive(
-            ActiveSession(
-                dayNumber = refDay,
-                startMillis = now,
-                phase = SessionPhase.FREE,
-                special = true,
-                extra = true
+        saveFree(
+            FreeSessionEngine.start(
+                refDay, System.currentTimeMillis(), extra = true, warmupSeconds = warmupSecondsFromText("")
             )
         )
         return refDay
+    }
+
+    // --- Entreno libre guiado (ver FreeSessionEngine) -----------------------------
+
+    /** Guarda el libre y deja la cuenta atrás de la notificación a juego con él. */
+    private fun saveFree(next: ActiveSession) {
+        saveActive(next)
+        RestReminder.syncForSession(getApplication(), next)
+    }
+
+    private inline fun free(step: (ActiveSession) -> ActiveSession) {
+        val s = _active.value ?: return
+        val next = step(s)
+        if (next !== s) saveFree(next)
+    }
+
+    fun freeEndWarmup() = free { FreeSessionEngine.endWarmup(it) }
+
+    fun freeAdjustWarmup(deltaSeconds: Int) = free { FreeSessionEngine.adjustWarmup(it, deltaSeconds) }
+
+    fun freeSetDone() = free {
+        val p = _progress.value
+        FreeSessionEngine.setDone(
+            it, System.currentTimeMillis(), _profile.value.restBase, p.yourRests, p.exerciseWeights, p.exerciseReps
+        )
+    }
+
+    fun freeFinishExercise() = free {
+        FreeSessionEngine.finishExercise(it, System.currentTimeMillis(), _profile.value.restBase)
+    }
+
+    fun freeEndRest() = free { FreeSessionEngine.endRest(it) }
+
+    fun freeAdjustRest(deltaSeconds: Int) = free { FreeSessionEngine.adjustRest(it, deltaSeconds) }
+
+    fun freeSetLastRir(rir: String) = free { FreeSessionEngine.setLastRir(it, rir) }
+
+    fun freeNameCurrent(name: String) = free {
+        val p = _progress.value
+        FreeSessionEngine.nameCurrent(it, name, p.exerciseWeights, p.exerciseReps)
+    }
+
+    /** Los kilos y repeticiones de la serie recién hecha. Sin alarmas: no cambian el descanso. */
+    fun freeEditLastSet(weight: String, reps: String) {
+        val s = _active.value ?: return
+        val next = FreeSessionEngine.editLastSet(s, weight, reps)
+        if (next !== s) saveActive(next)
+    }
+
+    /**
+     * Qué ejercicios proponer al preguntar «¿qué ejercicio era?»: los del día que aún no se han
+     * hecho, los ya hechos hoy (para volver a uno) y los que más se usan, sin repetir.
+     */
+    fun freeSuggestions(s: ActiveSession): List<String> {
+        val hoy = s.freeLog.map { it.name }.filter { it.isNotBlank() }
+        val delDia = PlanData.dayByNumber(s.dayNumber)?.template?.exercises?.map { it.name }.orEmpty()
+        val tuyos = _progress.value.exerciseWeights.keys.toList()
+        return (delDia.filter { it !in hoy } + hoy + tuyos).distinct()
     }
 
     // --- Entrenamientos especiales (Rutina Militar / Quema Grasa) ----------
@@ -1305,7 +1351,15 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val borrador = entries
             .map { it.copy(name = it.name.trim()) }
             .filter { it.name.isNotEmpty() || it.setsOrSingle.isNotEmpty() }
-        saveActive(s.copy(freeLog = borrador))
+        // El ejercicio en curso se sigue por su nombre: editar la lista puede moverlo o quitar
+        // otros de delante, y el índice viejo apuntaría a otro ejercicio.
+        val enCurso = s.freeLog.getOrNull(s.freeCurrent)?.name
+        val nuevoActual = when {
+            enCurso == null -> -1
+            enCurso.isNotBlank() -> borrador.indexOfFirst { it.name == enCurso.trim() }
+            else -> borrador.indexOfLast { it.name.isBlank() }
+        }
+        saveActive(s.copy(freeLog = borrador, freeCurrent = nuevoActual))
     }
 
     /**

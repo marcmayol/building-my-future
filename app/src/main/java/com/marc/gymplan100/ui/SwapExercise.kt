@@ -161,7 +161,7 @@ private fun AlternativeRow(title: String, entry: CatalogEntry, onPick: () -> Uni
  * grupo muscular, que es casi siempre lo que se busca: si no hay pec deck, otro de pecho.
  */
 @Composable
-private fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
+internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
     var texto by remember { mutableStateOf("") }
     val grupo = remember(currentName) {
         ExerciseImages.slugFor(currentName)?.let { ExerciseCatalog.forSlug(it)?.grupo }

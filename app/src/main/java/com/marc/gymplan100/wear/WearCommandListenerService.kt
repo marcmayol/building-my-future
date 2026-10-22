@@ -2,6 +2,8 @@ package com.marc.gymplan100.wear
 
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
+import com.marc.gymplan100.data.FreeSessionEngine
+import com.marc.gymplan100.data.FreeStep
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.data.SessionPhase
@@ -78,6 +80,19 @@ class WearCommandListenerService : WearableListenerService() {
                         restBase = repo.profile.first().restBase
                     )
                     SessionPhase.RESTING -> SessionEngine.endRest(session, now)
+                    // El libre guiado: lo mismo que su botón grande en el móvil. Qué ejercicio
+                    // era se pregunta en el móvil, que es donde se puede escribir.
+                    SessionPhase.FREE -> when (session.freeStep) {
+                        FreeStep.WARMUP -> FreeSessionEngine.endWarmup(session)
+                        FreeStep.REST -> FreeSessionEngine.endRest(session)
+                        FreeStep.WORK -> {
+                            val progreso = repo.progress.first()
+                            FreeSessionEngine.setDone(
+                                session, now, repo.profile.first().restBase, progreso.yourRests,
+                                progreso.exerciseWeights, progreso.exerciseReps
+                            )
+                        }
+                    }
                     else -> session
                 }
                 WearBridge.CMD_SWAP -> SessionEngine.skipExercise(session)

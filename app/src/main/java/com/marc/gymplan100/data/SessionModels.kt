@@ -45,6 +45,10 @@ data class CompletedSet(
     val rir: String = ""
 )
 
+/** Los tres momentos del entreno libre guiado. */
+@Serializable
+enum class FreeStep { WARMUP, WORK, REST }
+
 /** Sesión de entrenamiento en curso. Se persiste para poder reanudarla. */
 @Serializable
 data class ActiveSession(
@@ -94,6 +98,14 @@ data class ActiveSession(
      * para que el plan del día los enseñe tachados en vez de hacerlos desaparecer sin más.
      */
     val skipped: List<Int> = emptyList(),
+    /**
+     * Entreno libre guiado: en qué punto está (calentando, en la serie o descansando). Vale
+     * [FreeStep.WORK] por defecto para que un libre empezado con una versión anterior siga
+     * donde estaba, con su cronómetro.
+     */
+    val freeStep: FreeStep = FreeStep.WORK,
+    /** Entreno libre: el ejercicio en curso, como índice en [freeLog]; -1 si no hay ninguno. */
+    val freeCurrent: Int = -1,
     // --- Calentamiento (fase WARMUP) ---
     /** Duración objetivo del calentamiento (segundos), deducida del plan y ajustable. */
     val warmupTargetSeconds: Int = 0,

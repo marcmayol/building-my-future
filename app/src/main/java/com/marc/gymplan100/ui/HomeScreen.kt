@@ -588,7 +588,7 @@ private fun ProgresoDelPlan(done: Int, total: Int) {
 }
 
 /**
- * Entreno libre directo: arranca el cronómetro y apuntas lo que hagas, sin plan ni rutina.
+ * Entreno libre directo: sin plan ni rutina, pero guiado (calentamiento, serie y descanso).
  * Con borde de color para que se distinga de los especiales, que van justo debajo.
  */
 @Composable

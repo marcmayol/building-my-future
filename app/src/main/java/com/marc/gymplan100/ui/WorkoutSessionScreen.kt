@@ -6,12 +6,15 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +43,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -71,6 +75,7 @@ import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.ExpressPlan
 import com.marc.gymplan100.data.RestDefaults
 import com.marc.gymplan100.data.ExerciseImages
+import com.marc.gymplan100.data.FreeStep
 import com.marc.gymplan100.data.MuscleTargets
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.review.Valoracion
@@ -162,14 +167,23 @@ fun WorkoutSessionScreen(
         SessionPhase.FREE -> when (val modo = apuntando) {
             // Entrenando libre se puede ir apuntando sobre la marcha (borrador en la sesión) y,
             // al finalizar, se repasa lo apuntado o, si no hay nada, se pide entonces.
-            null -> FreeContent(
-                s = s, day = day, now = now, dark = dark,
-                onLog = { apuntando = ModoApunte.DURANTE },
-                // El cronómetro se para al pulsar finalizar: lo que se enseña mientras se
-                // apunta es el tiempo entrenado, no el rato que se ha tardado en escribirlo.
-                onFinish = { tiempoLibre = now - s.startMillis; apuntando = ModoApunte.AL_TERMINAR },
-                onExit = { showQuitDialog = true }
-            )
+            // Sin plan pero guiado: calentar, serie, descanso (ver FreeSessionEngine).
+            null -> when (s.freeStep) {
+                FreeStep.WARMUP -> FreeWarmupContent(s, day, now, dark, viewModel) { showQuitDialog = true }
+                FreeStep.REST -> FreeRestContent(
+                    s = s, now = now, dark = dark, viewModel = viewModel,
+                    onLog = { apuntando = ModoApunte.DURANTE },
+                    onExit = { showQuitDialog = true }
+                )
+                FreeStep.WORK -> FreeContent(
+                    s = s, now = now, dark = dark, viewModel = viewModel,
+                    onLog = { apuntando = ModoApunte.DURANTE },
+                    // El cronómetro se para al pulsar finalizar: lo que se enseña mientras se
+                    // apunta es el tiempo entrenado, no el rato que se ha tardado en escribirlo.
+                    onFinish = { tiempoLibre = now - s.startMillis; apuntando = ModoApunte.AL_TERMINAR },
+                    onExit = { showQuitDialog = true }
+                )
+            }
             else -> FreeSessionLog(
                 day = day,
                 elapsedMs = tiempoLibre,
@@ -701,7 +715,8 @@ private fun WeightBlock(
      */
     hint: String,
     warmup: Boolean = false,
-    onWarmup: (Boolean) -> Unit = {},
+    /** Sin él no sale la casilla de calentamiento (el libre apunta la serie ya hecha). */
+    onWarmup: ((Boolean) -> Unit)? = null,
 ) {
     val styles = LocalAppTextStyles.current
     var showWheel by remember { mutableStateOf(false) }
@@ -761,7 +776,7 @@ private fun WeightBlock(
         // Aproximar antes de la serie buena es normal y hasta ahora no había dónde apuntarlo:
         // o se contaba como serie de trabajo (y ensuciaba los kilos movidos y la progresión)
         // o se perdía. Marcada aquí, se guarda pero no cuenta.
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        if (onWarmup != null) Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(checked = warmup, onCheckedChange = onWarmup)
             Text(
                 "Serie de calentamiento",
@@ -1183,84 +1198,335 @@ private fun RestingContent(
 
 // ─── Sesión libre / extra ─────────────────────────────────────────────────────
 
+/** Lo apuntado en un libre, a la vista y en el orden en que se hizo (los últimos cuatro). */
 @Composable
-private fun FreeContent(
+private fun FreeLoggedCard(s: ActiveSession, dark: Boolean) {
+    val apuntados = s.freeLog.filter { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
+    if (apuntados.isEmpty()) return
+    SessionCard(label = "Apuntado · ${contar(apuntados.size, "ejercicio", "ejercicios")}", dark = dark) {
+        if (apuntados.size > 4) {
+            Text(
+                "y ${contar(apuntados.size - 4, "anterior", "anteriores")}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        apuntados.takeLast(4).forEach { e ->
+            Row(modifier = Modifier.fillMaxWidth().padding(top = Space.x1)) {
+                Text(
+                    e.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(Space.x2))
+                Text(
+                    setsSummary(e.setsOrSingle),
+                    style = LocalAppTextStyles.current.tabular,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+/** Libre: el calentamiento, con su cuenta atrás y un «Ya he calentado» para saltarlo. */
+@Composable
+private fun FreeWarmupContent(
     s: ActiveSession,
     day: TrainingDay,
     now: Long,
     dark: Boolean,
+    viewModel: PlanViewModel,
+    onExit: () -> Unit
+) {
+    val remaining = s.warmupTargetSeconds - s.warmupElapsed(now)
+    val done = remaining <= 0
+    // En un extra no hay día del plan que mirar: el calentamiento es el de cada uno.
+    val queCalentar = if (s.extra) "a tu manera" else day.template.warmup.ifBlank { "a tu manera" }
+    SessionShell(
+        tint = SessionTint.WARMUP,
+        dark = dark,
+        stateLabel = "Calentamiento",
+        // Corto: con el texto grande, uno largo partía el estado («DESCANS/O»).
+        context = if (s.extra) "Extra" else "Día ${s.dayNumber}",
+        onExit = onExit,
+        secondaries = {
+            SessionSecondary("−1 min", { viewModel.freeAdjustWarmup(-60) })
+            SessionSecondary("+1 min", { viewModel.freeAdjustWarmup(60) })
+        },
+        primary = {
+            SessionPrimary(
+                text = "Ya he calentado",
+                onClick = { viewModel.freeEndWarmup() },
+                dark = dark,
+                tint = SessionTint.WARMUP,
+                alert = done
+            )
+        }
+    ) {
+        Text(
+            "Haz tus series a tu aire. Al terminar cada una, pulsa «Serie terminada»: el " +
+                "descanso arranca solo y, mientras, apuntas qué era.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(Space.block))
+        Countdown(
+            text = if (!done) formatSecs(remaining) else "+${formatSecs(-remaining)}",
+            caption = if (!done) "restante · calienta $queCalentar" else "de más · cuando quieras, empezamos",
+            captionColor = tintAccent(SessionTint.WARMUP)
+        )
+    }
+}
+
+/** Libre: la serie. Un botón grande y el cronómetro total; lo demás se pregunta descansando. */
+@Composable
+private fun FreeContent(
+    s: ActiveSession,
+    now: Long,
+    dark: Boolean,
+    viewModel: PlanViewModel,
     onLog: () -> Unit,
     onFinish: () -> Unit,
     onExit: () -> Unit
 ) {
-    val apuntados = s.freeLog.filter { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
+    val actual = s.freeLog.getOrNull(s.freeCurrent)
+    val hechas = actual?.sets?.count { !it.warmup } ?: 0
     SessionShell(
         tint = SessionTint.WORK,
         dark = dark,
-        stateLabel = if (s.extra) "Entreno extra" else "Entreno libre",
+        stateLabel = when {
+            actual != null -> "Serie ${hechas + 1}"
+            s.extra -> "Entreno extra"
+            else -> "Entreno libre"
+        },
         context = if (s.extra) "no cuenta día" else "Día ${s.dayNumber}",
         onExit = onExit,
-        contextCard = {
-            // Lo apuntado, a la vista y en el orden en que se hizo. Solo los últimos cuatro:
-            // el resto se ve (y se edita) al abrir la lista.
-            if (apuntados.isNotEmpty()) {
-                SessionCard(label = "Apuntado · ${contar(apuntados.size, "ejercicio", "ejercicios")}", dark = dark) {
-                    if (apuntados.size > 4) {
-                        Text(
-                            "y ${contar(apuntados.size - 4, "anterior", "anteriores")}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    apuntados.takeLast(4).forEach { e ->
-                        Row(modifier = Modifier.fillMaxWidth().padding(top = Space.x1)) {
-                            Text(
-                                e.name,
-                                style = MaterialTheme.typography.bodyMedium,
-                                maxLines = 1,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Spacer(Modifier.width(Space.x2))
-                            Text(
-                                setsSummary(e.setsOrSingle),
-                                style = LocalAppTextStyles.current.tabular,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-            }
-        },
+        contextCard = { FreeLoggedCard(s, dark) },
         secondaries = {
-            SessionSecondary(
-                if (apuntados.isEmpty()) "Apuntar ejercicio" else "Apuntar o editar",
-                onLog
-            )
+            if (actual != null) SessionSecondary("Terminar ejercicio", { viewModel.freeFinishExercise() })
+            SessionSecondary("Apuntar o editar", onLog)
+            SessionSecondary("Finalizar", onFinish)
         },
         primary = {
             SessionPrimary(
-                text = "Finalizar y guardar",
-                onClick = onFinish,
+                text = "Serie terminada",
+                onClick = { viewModel.freeSetDone() },
                 dark = dark,
                 tint = SessionTint.WORK
             )
         }
     ) {
+        if (actual != null && actual.name.isNotBlank()) {
+            SessionIllustration(actual.name)
+            Text(
+                ExerciseImages.headlineName(actual.name),
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            actual.sets.lastOrNull()?.let { ultima ->
+                Text(
+                    "La anterior: " + setsSummary(listOf(ultima)),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = tintAccent(SessionTint.WORK)
+                )
+            }
+            Spacer(Modifier.height(Space.block))
+        }
         Countdown(
             text = formatClock(now - s.startMillis),
-            caption = "en marcha",
+            caption = "entrenando",
             captionColor = tintAccent(SessionTint.WORK)
         )
-        Spacer(Modifier.height(Space.block))
-        Text(
-            if (s.extra)
-                "Un bonus: se guarda en tu historial pero no cuenta como día del plan."
-            else
-                "Sesión libre del día ${day.number}. El tiempo corre hasta que pulses finalizar.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+        if (actual == null) {
+            Spacer(Modifier.height(Space.x3))
+            Text(
+                if (s.freeLog.none { it.name.isNotBlank() })
+                    "Haz tu primera serie. Al terminarla te pregunto qué ejercicio era."
+                else "Siguiente ejercicio: haz la serie y luego me dices cuál es.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * Libre: el descanso. La cuenta atrás va sola y, mientras, se apunta la serie: qué ejercicio
+ * era (solo en la primera), cómo ha ido y sus kilos y repeticiones, que ya vienen escritos con
+ * los de la anterior.
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+private fun FreeRestContent(
+    s: ActiveSession,
+    now: Long,
+    dark: Boolean,
+    viewModel: PlanViewModel,
+    onLog: () -> Unit,
+    onExit: () -> Unit
+) {
+    val elapsed = ((now - s.restStartMillis) / 1000).toInt().coerceAtLeast(0)
+    val remaining = s.restTargetSeconds - elapsed
+    val done = remaining <= 0
+    val actual = s.freeLog.getOrNull(s.freeCurrent)
+    val ultima = actual?.sets?.lastOrNull()
+    val sinNombre = actual != null && actual.name.isBlank()
+    var buscando by remember { mutableStateOf(false) }
+
+    // Kilos y repeticiones de la serie recién hecha: se ven al instante y bajan a disco medio
+    // segundo después del último toque, como en el guiado. Al ponerle nombre al ejercicio se
+    // rellenan con los de la última vez, y por eso dependen también del nombre.
+    var weight by remember(s.freeCurrent, actual?.sets?.size, actual?.name) {
+        mutableStateOf(ultima?.weight.orEmpty())
+    }
+    var reps by remember(s.freeCurrent, actual?.sets?.size, actual?.name) {
+        mutableStateOf(ultima?.reps.orEmpty())
+    }
+    LaunchedEffect(weight, reps) {
+        if (ultima == null || (weight == ultima.weight && reps == ultima.reps)) return@LaunchedEffect
+        delay(500)
+        viewModel.freeEditLastSet(weight, reps)
+    }
+
+    val porEsfuerzo = when (RestDefaults.forEffort(ultima?.rir.orEmpty())) {
+        30 -> " · +30 s, justo"
+        60 -> " · +1 min, al fallo"
+        else -> ""
+    }
+    SessionShell(
+        tint = SessionTint.REST,
+        dark = dark,
+        stateLabel = if (s.restBetweenExercises) "Descanso · cambio de ejercicio" else "Descanso",
+        // Corto: con el texto grande, uno largo partía el estado («DESCANS/O»).
+        context = if (s.extra) "Extra" else "Día ${s.dayNumber}",
+        onExit = onExit,
+        secondaries = {
+            SessionSecondary("−30 s", { viewModel.freeAdjustRest(-30) })
+            if (actual != null && !s.restBetweenExercises) {
+                SessionSecondary("Terminar ejercicio", { viewModel.freeFinishExercise() })
+            } else {
+                SessionSecondary("Apuntar o editar", onLog)
+            }
+            SessionSecondary("+30 s", { viewModel.freeAdjustRest(30) })
+        },
+        contextCard = {
+            when {
+                sinNombre -> SessionCard(label = "¿Qué ejercicio era?", dark = dark) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                        verticalArrangement = Arrangement.spacedBy(Space.x1)
+                    ) {
+                        // Cuatro y no más: con el texto grande cada uno ocupa una línea entera.
+                        viewModel.freeSuggestions(s).take(4).forEach { nombre ->
+                            // Una píldora propia y no un FilterChip: el chip tiene alto fijo y
+                            // con el texto grande cortaba el nombre a media palabra.
+                            Box(
+                                contentAlignment = Alignment.CenterStart,
+                                modifier = Modifier
+                                    .heightIn(min = Touch.min)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                                    .clickable { viewModel.freeNameCurrent(nombre) }
+                                    .padding(horizontal = Space.x3, vertical = Space.x2)
+                            ) {
+                                Text(
+                                    nombre,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
+                    TextButton(onClick = { buscando = true }) { Text("Buscar otro…", maxLines = 1) }
+                }
+                actual != null && !s.restBetweenExercises -> {
+                    SessionCard(label = "¿Cómo ha ido?", dark = dark) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
+                            listOf("Fácil" to "3", "Justo" to "1", "Fallo" to "0").forEach { (etiqueta, valor) ->
+                                FilterChip(
+                                    selected = ultima?.rir == valor,
+                                    onClick = { viewModel.freeSetLastRir(if (ultima?.rir == valor) "" else valor) },
+                                    label = { Text(etiqueta, maxLines = 1) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(Space.x2))
+                    WeightBlock(
+                        value = weight,
+                        onValue = { weight = it },
+                        dark = dark,
+                        reps = reps,
+                        onReps = { reps = it },
+                        hint = when {
+                            (actual.sets.size) > 1 -> "Lo de la serie anterior: cámbialo si no fue así."
+                            weight.isNotBlank() || reps.isNotBlank() -> "Lo de la última vez: cámbialo si no fue así."
+                            else -> "Apunta lo que has movido."
+                        }
+                    )
+                }
+                else -> FreeLoggedCard(s, dark)
+            }
+        },
+        primary = {
+            SessionPrimary(
+                text = if (s.restBetweenExercises) "Siguiente ejercicio" else "Siguiente serie",
+                onClick = { viewModel.freeEndRest() },
+                dark = dark,
+                tint = SessionTint.REST,
+                alert = done
+            )
+        }
+    ) {
+        if (actual != null && !sinNombre && !s.restBetweenExercises) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    actual.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                // Por si se eligió mal: se vuelve a preguntar.
+                TextButton(onClick = { buscando = true }) { Text("Cambiar", maxLines = 1) }
+            }
+            Spacer(Modifier.height(Space.x2))
+        }
+        Countdown(
+            text = if (remaining >= 0) formatSecs(remaining) else "+${formatSecs(-remaining)}",
+            caption = if (remaining >= 0) "restante de ${formatSecs(s.restTargetSeconds)}$porEsfuerzo"
+            else "de más · cuando quieras",
+            captionColor = tintAccent(SessionTint.REST)
         )
+        Spacer(Modifier.height(Space.x4))
+        SessionProgress(
+            fraction = if (s.restTargetSeconds <= 0) 1f else elapsed.toFloat() / s.restTargetSeconds,
+            tint = SessionTint.REST
+        )
+    }
+
+    if (buscando) {
+        ModalBottomSheet(
+            onDismissRequest = { buscando = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 20.dp, end = 20.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(Space.x2)
+            ) {
+                Text("¿Qué ejercicio era?", style = MaterialTheme.typography.headlineSmall)
+                SwapSearch(currentName = actual?.name.orEmpty()) { nombre ->
+                    viewModel.freeNameCurrent(nombre)
+                    buscando = false
+                }
+            }
+        }
     }
 }
 

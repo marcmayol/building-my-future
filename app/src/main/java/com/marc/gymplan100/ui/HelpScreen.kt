@@ -67,7 +67,7 @@ private val SECCIONES = listOf(
             "Debajo, el plan que sigues y la fase. «Ver otros planes» lleva a la lista: hay planes de fuerza, de músculo, para casa, para empezar desde cero…",
             "El bloque grande es el día que toca. «Empezar día» arranca el entreno guiado; «Ver el día antes de empezar» enseña los ejercicios sin empezar nada.",
             "Si tienes un entreno a medias, ese bloque dice «En curso» y el botón lo reanuda donde lo dejaste.",
-            "«Entreno libre» es para apuntar lo que hagas sin seguir el plan. Los «Entrenamientos especiales» son rutinas sueltas que no cuentan como día.",
+            "«Entreno libre» es para entrenar sin seguir el plan, con descansos y apuntando sobre la marcha. Los «Entrenamientos especiales» son rutinas sueltas que no cuentan como día.",
             "Abajo, la barra: Logros, Mis pesos, Resultados y Estadísticas."
         )
     ),
@@ -125,6 +125,18 @@ private val SECCIONES = listOf(
             "Las alternativas que la app conoce salen con su dibujo: toca «La hago» y el ejercicio de hoy pasa a ser ese, con sus propios pesos.",
             "«He hecho otro ejercicio…» busca entre 151 ejercicios o deja escribir el tuyo.",
             "Con «Recordarlo para los próximos días» marcado, los días siguientes ya empiezan con el cambio. «Volver al del plan» lo deshace."
+        )
+    ),
+    HelpSection(
+        "El entreno libre",
+        "Sin plan, pero con descansos y todo apuntado sobre la marcha.",
+        R.drawable.ayuda_libre,
+        listOf(
+            "Empieza con el calentamiento: «Ya he calentado» lo salta.",
+            "Haz tu serie y pulsa «Serie terminada». El descanso arranca en el acto y, mientras corre, eliges qué ejercicio era (solo la primera vez) y apuntas kilos y repeticiones.",
+            "Las siguientes series del mismo ejercicio vienen con lo de la anterior: solo tocas lo que cambie. «¿Cómo ha ido?» alarga el descanso igual que en el guiado.",
+            "«Terminar ejercicio» da el descanso entre ejercicios; la siguiente serie vuelve a preguntar cuál es.",
+            "«Finalizar» enseña todo lo apuntado para repasarlo antes de guardar."
         )
     ),
     HelpSection(
