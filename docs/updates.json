@@ -1,8 +1,8 @@
 {
-  "versionCode": 42,
-  "versionName": "2.19.1",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.19.1/building-my-future-v2.19.1.apk",
-  "sha256": "bf5b09a04bb177ea47b3a352cc78eb64464cd4beec8dc1e1e51f5f6e5f156224",
-  "notas": "Las capturas de la ayuda, rehechas con la app tal como es ahora.",
+  "versionCode": 43,
+  "versionName": "2.20",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.20/building-my-future-v2.20.apk",
+  "sha256": "18d674aeadfa1beb2f0d64b57e5c9d18ca6e5cb1e88d9ca1e3660ed94ecaafd9",
+  "notas": "Descansos a tu medida: en Ajustes eliges cuánto descansas entre series y entre ejercicios. Al decir cómo ha ido la serie, «Justo» suma 30 s al descanso y «Fallo», un minuto. Y el nuevo botón «Saltar»: dejar el ejercicio para el final si la máquina está ocupada, hacer otro en su lugar o tacharlo si hoy no lo vas a hacer.",
   "check_horas": 24
 }
