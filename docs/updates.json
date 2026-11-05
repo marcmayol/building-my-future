@@ -1,8 +1,8 @@
 {
-  "versionCode": 44,
-  "versionName": "2.20.1",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.20.1/building-my-future-v2.20.1.apk",
-  "sha256": "f1762e66be4c417276a94810a1c8864b965154bf61f94c02fbb6e465de5fbd29",
-  "notas": "La ayuda enseña ya la app tal como es en la 2.20: el botón «Saltar», el descanso que se alarga al marcar «Justo» o «Fallo», y la sección Descansos de Ajustes.",
+  "versionCode": 45,
+  "versionName": "2.21",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.21/building-my-future-v2.21.apk",
+  "sha256": "efe92332950c165e7dc57811aab7077260506ac85d644b47818702b4c6a7392f",
+  "notas": "El entreno libre ahora te guía. Calientas, pulsas «Serie terminada» y el descanso arranca al momento; mientras corre, dices qué ejercicio era y apuntas kilos y repeticiones. Los ejercicios con tu peso se marcan «Peso corporal, sin kilos» y solo piden repeticiones. Y si escribes uno que la app no conoce, como «Remo en TRX», queda guardado en el móvil y te lo ofrece en tus planes propios: en el buscador, en las sugerencias y al montar el plan.",
   "check_horas": 24
 }
