@@ -377,10 +377,11 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         // los consultan el catalogo de imagenes, las fichas y los objetivos musculares, que son
         // objetos puros. Se mantiene una ventana global al dia, igual que con el plan activo.
         viewModelScope.launch {
-            _progress.collect {
-                ExerciseAliases.set(it.exerciseAliases)
-                MyExercises.set(it.customExercises, it.bodyweightExercises)
-            }
+            _progress.collect { ExerciseAliases.set(it.exerciseAliases) }
+        }
+        // Tus ejercicios y los de peso corporal van en el perfil: son del móvil, no de un plan.
+        viewModelScope.launch {
+            _profile.collect { MyExercises.set(it.customExercises, it.bodyweightExercises) }
         }
         // Observa la sesión activa de forma continua: así los cambios hechos desde la
         // notificación persistente (SkipActionReceiver, en segundo plano) se reflejan al
@@ -832,7 +833,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Los kilos de la última vez, sin los ejercicios de peso corporal: a esos no se les ponen. */
     private fun weightsToSuggest(p: ProgressState): Map<String, String> =
-        p.exerciseWeights - p.bodyweightExercises
+        p.exerciseWeights - _profile.value.bodyweightExercises
 
     // --- Tus ejercicios y los de peso corporal (ver MyExercises) -----------------
 
@@ -841,16 +842,20 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         ExerciseCatalog.forName(name) != null ||
             PlanData.active.exerciseNames.any { it.equals(name, ignoreCase = true) }
 
+    /**
+     * Guarda como tuyos los que la app no conoce. Se guardan desde cualquier plan (hay que
+     * registrarlos siempre), aunque solo se ofrezcan con un plan propio activo.
+     */
     private fun rememberMyExercises(names: List<String>) {
-        val p = _progress.value
+        val p = _profile.value
         val next = MyExercises.remember(p, names, ::knownExercise)
-        if (next !== p) update { next }
+        if (next !== p) updateProfile(next)
     }
 
     /** Quita [name] de tus ejercicios. Lo ya apuntado en el historial se queda. */
-    fun forgetMyExercise(name: String) = update { MyExercises.forget(it, name) }
+    fun forgetMyExercise(name: String) = updateProfile(MyExercises.forget(_profile.value, name))
 
-    fun isBodyweight(name: String): Boolean = name.trim() in _progress.value.bodyweightExercises
+    fun isBodyweight(name: String): Boolean = name.trim() in _profile.value.bodyweightExercises
 
     /**
      * Marca o desmarca [name] como «peso corporal». Si es el ejercicio del descanso en curso,
@@ -858,7 +863,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun setBodyweight(name: String, on: Boolean) {
         if (name.isBlank()) return
-        update { MyExercises.setBodyweight(it, name, on) }
+        updateProfile(MyExercises.setBodyweight(_profile.value, name, on))
         val s = _active.value ?: return
         val actual = s.freeLog.getOrNull(s.freeCurrent) ?: return
         if (on && actual.name.equals(name.trim(), ignoreCase = true)) {
@@ -902,8 +907,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val delDia = PlanData.dayByNumber(s.dayNumber)?.template?.exercises?.map { it.name }.orEmpty()
         val p = _progress.value
         // Los que te inventaste van antes que los de «Mis pesos»: los de peso corporal no
-        // tienen kilos y sin esto no saldrían nunca.
-        val tuyos = p.customExercises + p.exerciseWeights.keys
+        // tienen kilos y sin esto no saldrían nunca. Solo con un plan propio activo.
+        val tuyos = MyExercises.names + p.exerciseWeights.keys
         return (delDia.filter { it !in hoy } + hoy + tuyos).distinct()
     }
 
@@ -1421,7 +1426,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * registro de ese día del plan.
      */
     fun finishFreeSession(entries: List<LoggedExercise>) {
-        val conTuPeso = _progress.value.bodyweightExercises
+        val conTuPeso = _profile.value.bodyweightExercises
         val limpias = entries
             .map { entrada ->
                 // Con tu peso no hay kilos: si quedó alguno escrito de antes de marcarlo, fuera.
@@ -1451,7 +1456,8 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             val dia = PlanData.dayByNumber(_active.value?.dayNumber ?: 0)
             // Lo que la app no conocía pasa a ser tuyo: la próxima vez sale en las sugerencias
             // y en el buscador, también si no lleva kilos.
-            var estado = MyExercises.remember(_progress.value, limpias.map { it.name }, ::knownExercise)
+            rememberMyExercises(limpias.map { it.name })
+            var estado = _progress.value
             limpias.forEach { entrada ->
                 if (entrada.weight.isNotEmpty()) {
                     estado = estado.copy(

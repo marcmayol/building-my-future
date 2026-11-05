@@ -177,14 +177,7 @@ data class ProgressState(
      * Vueltas ya terminadas. Mantenimiento y Movilidad están pensados para darlas: al
      * empezar otra, los días se vacían pero esto sube y el historial de entrenos se queda.
      */
-    val rounds: Int = 0,
-    /**
-     * Los ejercicios que apuntaste y la app no conocía (ni catálogo ni plan), del último usado
-     * al primero. Ver [MyExercises].
-     */
-    val customExercises: List<String> = emptyList(),
-    /** Los que marcaste «peso corporal»: se apuntan sin kilos, solo repeticiones. */
-    val bodyweightExercises: Set<String> = emptySet()
+    val rounds: Int = 0
 ) {
     fun completedInPhase(phaseNumber: Int): Int =
         PlanData.daysOfPhase(phaseNumber).count { it.number in completedDays }
@@ -306,7 +299,15 @@ data class UserProfile(
     // de su pulso, así que NO escribimos la estimación MET para no contar el doble.
     val usesWatch: Boolean = false,
     /** Tus descansos por defecto (Ajustes → Descansos). */
-    val restBase: RestDefaults.Base = RestDefaults.Base()
+    val restBase: RestDefaults.Base = RestDefaults.Base(),
+    /**
+     * Los ejercicios que apuntaste y la app no conocía (ni catálogo ni plan), del último usado
+     * al primero. Van en el perfil y no en el progreso de un plan: son del móvil y valen para
+     * todos tus planes propios. Ver [MyExercises].
+     */
+    val customExercises: List<String> = emptyList(),
+    /** Los que marcaste «peso corporal»: se apuntan sin kilos, solo repeticiones. */
+    val bodyweightExercises: Set<String> = emptySet()
 ) {
     val isWeightSet: Boolean get() = weightKg > 0
 }

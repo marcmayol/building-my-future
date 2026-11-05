@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.ExerciseGroup
 import com.marc.gymplan100.data.ExerciseGroups
+import com.marc.gymplan100.data.MyExercises
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.Statistics
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -69,7 +70,9 @@ fun ExerciseWeightsScreen(
     val progress by viewModel.progress.collectAsState()
     // Los del plan y los tuyos (los que te inventaste en un entreno libre), como uno más. Los de
     // peso corporal no: aquí solo hay kilos.
-    val tuyos = progress.customExercises.filterNot { it in progress.bodyweightExercises }
+    // Solo con un plan propio activo (ver MyExercises.names).
+    val profile by viewModel.profile.collectAsState()
+    val tuyos = MyExercises.names.filterNot { it in profile.bodyweightExercises }
     val grupos = remember(PlanData.exerciseNames, tuyos) {
         (PlanData.exerciseNames + tuyos).distinct().groupBy { ExerciseGroups.of(it) }.toSortedMap()
     }

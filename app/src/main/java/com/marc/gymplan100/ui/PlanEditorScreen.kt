@@ -8,6 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,6 +40,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -62,6 +65,7 @@ import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.DiaDto
 import com.marc.gymplan100.data.EjercicioDto
 import com.marc.gymplan100.data.FaseDto
+import com.marc.gymplan100.data.MyExercises
 import com.marc.gymplan100.data.PlanDto
 import com.marc.gymplan100.data.PlanImport
 import com.marc.gymplan100.ui.theme.LocalAppColors
@@ -707,6 +711,7 @@ private fun DayLevel(
  * Si el esquema no encaja en ese patrón (un circuito "3 vueltas", por ejemplo) se edita como
  * texto libre: el formato admite cualquier cosa y no vamos a destruir lo que ya funciona.
  */
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun ExerciseSheet(
     ejercicio: EjercicioDto,
@@ -733,6 +738,23 @@ private fun ExerciseSheet(
                 placeholder = "Press de banca",
                 onValue = { onChange(ejercicio.copy(nombre = it)) }
             )
+            // Los que registraste en entrenos libres: tu plan es el sitio donde valen.
+            val tuyos = remember(ejercicio.nombre) {
+                MyExercises.search(ejercicio.nombre, 6, MyExercises.all)
+                    .filterNot { it.equals(ejercicio.nombre.trim(), ignoreCase = true) }
+            }
+            if (tuyos.isNotEmpty()) {
+                Spacer(Modifier.height(Space.x2))
+                LabelCaps("TUS EJERCICIOS")
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
+                    tuyos.forEach { nombre ->
+                        SuggestionChip(
+                            onClick = { onChange(ejercicio.copy(nombre = nombre)) },
+                            label = { Text(nombre, style = MaterialTheme.typography.bodyMedium, maxLines = 2) }
+                        )
+                    }
+                }
+            }
             if (ejercicio.nombre.isNotBlank()) {
                 Spacer(Modifier.height(Space.x2))
                 Text(

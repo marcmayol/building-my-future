@@ -199,7 +199,7 @@ fun WorkoutSessionScreen(
                 onBack = { apuntado -> viewModel.saveFreeLog(apuntado); apuntando = null },
                 onDraft = { apuntado -> viewModel.saveFreeLog(apuntado) },
                 onSkip = { viewModel.finishSession(); cierraElEntreno() },
-                pesoCorporal = viewModel.progress.collectAsState().value.bodyweightExercises,
+                pesoCorporal = viewModel.profile.collectAsState().value.bodyweightExercises,
                 onPesoCorporal = { nombre, on -> viewModel.setBodyweight(nombre, on) }
             )
         }
@@ -1385,7 +1385,8 @@ private fun FreeRestContent(
             .flatMap { it.template.exercises }
             .firstOrNull { it.name == nombre }?.withoutWeight == true
     }
-    val conTuPeso = pesoCorporalDelPlan || actual?.name?.trim() in progress.bodyweightExercises
+    val perfil by viewModel.profile.collectAsState()
+    val conTuPeso = pesoCorporalDelPlan || actual?.name?.trim() in perfil.bodyweightExercises
 
     // Kilos y repeticiones de la serie recién hecha: se ven al instante y bajan a disco medio
     // segundo después del último toque, como en el guiado. Al ponerle nombre al ejercicio se

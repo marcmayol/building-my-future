@@ -14,8 +14,12 @@ package com.marc.gymplan100.data
  * repeticiones. Vale también para los del catálogo, porque unas sentadillas pueden ir con
  * barra o sin nada y eso solo lo sabe quien las hace.
  *
+ * Se guardan en el perfil, una sola lista para todo el móvil, pero **solo se ofrecen con un
+ * plan propio activo** (uno creado o importado por ti): decisión de Marc (5-nov-2026). En los
+ * planes de serie se pueden seguir apuntando, y quedan guardados para cuando estés en uno tuyo.
+ *
  * Vive como ventana global, igual que [ExerciseAliases]: el buscador de ejercicios es un
- * componente suelto y no tiene de dónde sacar el progreso.
+ * componente suelto y no tiene de dónde sacar el perfil.
  */
 object MyExercises {
 
@@ -31,16 +35,22 @@ object MyExercises {
         conTuPeso = bodyweight
     }
 
-    /** Los tuyos, del último que usaste al primero. */
-    val names: List<String> get() = propios
+    /** ¿Se ofrecen ahora? Solo con un plan propio activo. */
+    val offered: Boolean get() = !PlanData.active.builtin
+
+    /** Los tuyos, del último que usaste al primero; vacía si el plan activo es de serie. */
+    val names: List<String> get() = if (offered) propios else emptyList()
+
+    /** Todos los guardados, sin mirar el plan activo: para el editor, que siempre es de uno tuyo. */
+    val all: List<String> get() = propios
 
     fun isBodyweight(name: String): Boolean = name.trim() in conTuPeso
 
     /** Los tuyos que casan con lo escrito, con la misma búsqueda por palabras que el catálogo. */
-    fun search(text: String, limit: Int = 8): List<String> {
+    fun search(text: String, limit: Int = 8, from: List<String> = names): List<String> {
         val q = ExerciseCatalog.tokens(text)
-        if (q.isEmpty()) return propios.take(limit)
-        return propios.filter { nombre ->
+        if (q.isEmpty()) return from.take(limit)
+        return from.filter { nombre ->
             val t = ExerciseCatalog.tokens(nombre)
             q.all { p -> t.any { it.startsWith(p) } }
         }.take(limit)
@@ -51,7 +61,7 @@ object MyExercises {
      * catálogo y el plan). Los ya guardados suben al principio, para que lo que usas ahora
      * salga antes que lo de hace meses. Sin cambios devuelve el mismo estado.
      */
-    fun remember(state: ProgressState, names: List<String>, isKnown: (String) -> Boolean): ProgressState {
+    fun remember(state: UserProfile, names: List<String>, isKnown: (String) -> Boolean): UserProfile {
         val nuevos = names.map { it.trim() }
             .filter { it.isNotEmpty() && !isKnown(it) }
             .distinctBy { it.lowercase() }
@@ -62,13 +72,13 @@ object MyExercises {
     }
 
     /** Lo quita de los tuyos (y de «peso corporal»). */
-    fun forget(state: ProgressState, name: String): ProgressState = state.copy(
+    fun forget(state: UserProfile, name: String): UserProfile = state.copy(
         customExercises = state.customExercises.filterNot { it.equals(name.trim(), ignoreCase = true) },
         bodyweightExercises = state.bodyweightExercises - name.trim()
     )
 
     /** Marca o desmarca [name] como ejercicio de peso corporal. */
-    fun setBodyweight(state: ProgressState, name: String, on: Boolean): ProgressState {
+    fun setBodyweight(state: UserProfile, name: String, on: Boolean): UserProfile {
         val nombre = name.trim()
         if (nombre.isEmpty()) return state
         return state.copy(

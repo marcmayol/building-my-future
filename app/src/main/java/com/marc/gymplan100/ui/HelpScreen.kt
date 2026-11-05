@@ -135,6 +135,8 @@ private val SECCIONES = listOf(
             "Empieza con el calentamiento: «Ya he calentado» lo salta.",
             "Haz tu serie y pulsa «Serie terminada». El descanso arranca en el acto y, mientras corre, eliges qué ejercicio era (solo la primera vez) y apuntas kilos y repeticiones.",
             "Las siguientes series del mismo ejercicio vienen con lo de la anterior: solo tocas lo que cambie. «¿Cómo ha ido?» alarga el descanso igual que en el guiado.",
+            "Si lo haces con tu peso, marca «Peso corporal, sin kilos»: solo te pedirá repeticiones, y se acuerda para la próxima vez.",
+            "Si escribes uno que la app no conoce, como «Remo en TRX», se guarda en el móvil como tuyo, sin dibujo ni mapa de músculos. Te lo ofrece solo con un plan creado por ti: en el buscador, en las sugerencias y al montar el plan.",
             "«Terminar ejercicio» da el descanso entre ejercicios; la siguiente serie vuelve a preguntar cuál es.",
             "«Finalizar» enseña todo lo apuntado para repasarlo antes de guardar."
         )
