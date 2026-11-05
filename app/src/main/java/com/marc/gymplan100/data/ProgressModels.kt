@@ -177,7 +177,14 @@ data class ProgressState(
      * Vueltas ya terminadas. Mantenimiento y Movilidad están pensados para darlas: al
      * empezar otra, los días se vacían pero esto sube y el historial de entrenos se queda.
      */
-    val rounds: Int = 0
+    val rounds: Int = 0,
+    /**
+     * Los ejercicios que apuntaste y la app no conocía (ni catálogo ni plan), del último usado
+     * al primero. Ver [MyExercises].
+     */
+    val customExercises: List<String> = emptyList(),
+    /** Los que marcaste «peso corporal»: se apuntan sin kilos, solo repeticiones. */
+    val bodyweightExercises: Set<String> = emptySet()
 ) {
     fun completedInPhase(phaseNumber: Int): Int =
         PlanData.daysOfPhase(phaseNumber).count { it.number in completedDays }

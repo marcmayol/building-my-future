@@ -32,6 +32,8 @@ import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.warmupSecondsFromText
 import com.marc.gymplan100.data.Progression
 import com.marc.gymplan100.data.ExerciseAliases
+import com.marc.gymplan100.data.ExerciseCatalog
+import com.marc.gymplan100.data.MyExercises
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.EjercicioCatalogo
@@ -375,7 +377,10 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         // los consultan el catalogo de imagenes, las fichas y los objetivos musculares, que son
         // objetos puros. Se mantiene una ventana global al dia, igual que con el plan activo.
         viewModelScope.launch {
-            _progress.collect { ExerciseAliases.set(it.exerciseAliases) }
+            _progress.collect {
+                ExerciseAliases.set(it.exerciseAliases)
+                MyExercises.set(it.customExercises, it.bodyweightExercises)
+            }
         }
         // Observa la sesión activa de forma continua: así los cambios hechos desde la
         // notificación persistente (SkipActionReceiver, en segundo plano) se reflejan al
@@ -761,6 +766,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             if (s.phase == SessionPhase.WORKING) s.copy(swaps = swaps, plannedWeight = "", currentReps = "")
             else s.copy(swaps = swaps, plannedWeight = "")
         )
+        if (limpio != null) rememberMyExercises(listOf(limpio))
         if (remember || limpio == null) {
             update { st ->
                 st.copy(
@@ -820,8 +826,45 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     fun freeSetDone() = free {
         val p = _progress.value
         FreeSessionEngine.setDone(
-            it, System.currentTimeMillis(), _profile.value.restBase, p.yourRests, p.exerciseWeights, p.exerciseReps
+            it, System.currentTimeMillis(), _profile.value.restBase, p.yourRests, weightsToSuggest(p), p.exerciseReps
         )
+    }
+
+    /** Los kilos de la última vez, sin los ejercicios de peso corporal: a esos no se les ponen. */
+    private fun weightsToSuggest(p: ProgressState): Map<String, String> =
+        p.exerciseWeights - p.bodyweightExercises
+
+    // --- Tus ejercicios y los de peso corporal (ver MyExercises) -----------------
+
+    /** La app ya lo conoce: está en el catálogo o en el plan activo. */
+    private fun knownExercise(name: String): Boolean =
+        ExerciseCatalog.forName(name) != null ||
+            PlanData.active.exerciseNames.any { it.equals(name, ignoreCase = true) }
+
+    private fun rememberMyExercises(names: List<String>) {
+        val p = _progress.value
+        val next = MyExercises.remember(p, names, ::knownExercise)
+        if (next !== p) update { next }
+    }
+
+    /** Quita [name] de tus ejercicios. Lo ya apuntado en el historial se queda. */
+    fun forgetMyExercise(name: String) = update { MyExercises.forget(it, name) }
+
+    fun isBodyweight(name: String): Boolean = name.trim() in _progress.value.bodyweightExercises
+
+    /**
+     * Marca o desmarca [name] como «peso corporal». Si es el ejercicio del descanso en curso,
+     * su última serie pierde los kilos: con tu peso no hay kilos que apuntar.
+     */
+    fun setBodyweight(name: String, on: Boolean) {
+        if (name.isBlank()) return
+        update { MyExercises.setBodyweight(it, name, on) }
+        val s = _active.value ?: return
+        val actual = s.freeLog.getOrNull(s.freeCurrent) ?: return
+        if (on && actual.name.equals(name.trim(), ignoreCase = true)) {
+            val ultima = actual.sets.lastOrNull() ?: return
+            if (ultima.weight.isNotBlank()) freeEditLastSet("", ultima.reps)
+        }
     }
 
     fun freeFinishExercise() = free {
@@ -834,9 +877,13 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
     fun freeSetLastRir(rir: String) = free { FreeSessionEngine.setLastRir(it, rir) }
 
-    fun freeNameCurrent(name: String) = free {
-        val p = _progress.value
-        FreeSessionEngine.nameCurrent(it, name, p.exerciseWeights, p.exerciseReps)
+    fun freeNameCurrent(name: String) {
+        // Si es uno tuyo, se guarda ya: aunque luego se descarte el entreno, el nombre queda.
+        rememberMyExercises(listOf(name))
+        free {
+            val p = _progress.value
+            FreeSessionEngine.nameCurrent(it, name, weightsToSuggest(p), p.exerciseReps)
+        }
     }
 
     /** Los kilos y repeticiones de la serie recién hecha. Sin alarmas: no cambian el descanso. */
@@ -853,7 +900,10 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     fun freeSuggestions(s: ActiveSession): List<String> {
         val hoy = s.freeLog.map { it.name }.filter { it.isNotBlank() }
         val delDia = PlanData.dayByNumber(s.dayNumber)?.template?.exercises?.map { it.name }.orEmpty()
-        val tuyos = _progress.value.exerciseWeights.keys.toList()
+        val p = _progress.value
+        // Los que te inventaste van antes que los de «Mis pesos»: los de peso corporal no
+        // tienen kilos y sin esto no saldrían nunca.
+        val tuyos = p.customExercises + p.exerciseWeights.keys
         return (delDia.filter { it !in hoy } + hoy + tuyos).distinct()
     }
 
@@ -1371,11 +1421,14 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
      * registro de ese día del plan.
      */
     fun finishFreeSession(entries: List<LoggedExercise>) {
+        val conTuPeso = _progress.value.bodyweightExercises
         val limpias = entries
             .map { entrada ->
+                // Con tu peso no hay kilos: si quedó alguno escrito de antes de marcarlo, fuera.
+                val sinKilos = entrada.name.trim() in conTuPeso
                 val series = entrada.sets
                     // copy y no un SetLog nuevo: así no se pierde si era de calentamiento.
-                    .map { it.copy(weight = it.weight.trim(), reps = it.reps.trim()) }
+                    .map { it.copy(weight = if (sinKilos) "" else it.weight.trim(), reps = it.reps.trim()) }
                     .dropLastWhile { it.isEmpty }
                 // El resumen del ejercicio sale de sus series: el peso más alto y las
                 // repeticiones que se hicieron con él. Las de calentamiento no cuentan, como en
@@ -1385,7 +1438,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
                 val repsDelTope = trabajo.firstOrNull { it.weight == tope && it.reps.isNotBlank() }?.reps
                 entrada.copy(
                     name = entrada.name.trim(),
-                    weight = tope.ifBlank { entrada.weight.trim() },
+                    weight = if (sinKilos) "" else tope.ifBlank { entrada.weight.trim() },
                     reps = repsDelTope
                         ?: trabajo.firstOrNull { it.reps.isNotBlank() }?.reps
                         ?: entrada.reps.trim(),
@@ -1396,12 +1449,20 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
 
         if (limpias.isNotEmpty()) {
             val dia = PlanData.dayByNumber(_active.value?.dayNumber ?: 0)
-            var estado = _progress.value
+            // Lo que la app no conocía pasa a ser tuyo: la próxima vez sale en las sugerencias
+            // y en el buscador, también si no lleva kilos.
+            var estado = MyExercises.remember(_progress.value, limpias.map { it.name }, ::knownExercise)
             limpias.forEach { entrada ->
                 if (entrada.weight.isNotEmpty()) {
                     estado = estado.copy(
                         exerciseWeights = estado.exerciseWeights + (entrada.name to entrada.weight)
                     )
+                }
+                // Las repeticiones con las que arrancaste, como en el guiado: es lo único que
+                // se le puede proponer la próxima vez a un ejercicio sin kilos.
+                val arranque = entrada.sets.firstOrNull { !it.warmup && it.reps.isNotBlank() }?.reps
+                if (arranque != null) {
+                    estado = estado.copy(exerciseReps = estado.exerciseReps + (entrada.name to arranque))
                 }
                 // Si coincide con un ejercicio del día, queda también en su ficha del plan.
                 val indice = dia?.template?.exercises?.indexOfFirst { it.name == entrada.name } ?: -1

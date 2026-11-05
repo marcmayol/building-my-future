@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.LoggedExercise
+import com.marc.gymplan100.data.MyExercises
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.TrainingDay
@@ -108,7 +109,10 @@ fun FreeSessionLog(
     onSave: (List<LoggedExercise>) -> Unit,
     onBack: (List<LoggedExercise>) -> Unit,
     onDraft: (List<LoggedExercise>) -> Unit,
-    onSkip: () -> Unit
+    onSkip: () -> Unit,
+    /** Los que marcaste «peso corporal» (ver [MyExercises]). */
+    pesoCorporal: Set<String> = emptySet(),
+    onPesoCorporal: (name: String, on: Boolean) -> Unit = { _, _ -> }
 ) {
     val repaso = modo == ModoApunte.AL_TERMINAR &&
         inicial.any { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
@@ -139,10 +143,11 @@ fun FreeSessionLog(
             .collectLatest { delay(600); onDraft(it) }
     }
 
-    // Para el desplegable: los del día primero y el resto del plan después, sin repetir.
+    // Para el desplegable: los del día primero, luego los que te inventaste otros días y el
+    // resto del plan después, sin repetir.
     val sugerencias = remember {
         val delDia = day?.template?.exercises.orEmpty().map { it.name }
-        (delDia + PlanData.active.exerciseNames).distinct()
+        (delDia + MyExercises.names + PlanData.active.exerciseNames).distinct()
     }
 
     // Qué unidad pide cada ejercicio conocido: a una plancha se le apuntan segundos, y a una
@@ -239,10 +244,23 @@ fun FreeSessionLog(
             }
 
             items(filas.size) { i ->
+                val nombre = filas[i].name.trim()
+                val delPlan = tipos[nombre]
+                // El plan manda en los suyos (una plancha va por segundos); en el resto, y en
+                // los de fuerza, decides tú si llevan kilos.
+                val marcable = nombre.isNotEmpty() && (delPlan == null || delPlan == ExerciseKind.STRENGTH)
+                val sinKilos = marcable && nombre in pesoCorporal
                 FilaEjercicio(
                     fila = filas[i],
                     sugerencias = sugerencias,
-                    kind = tipos[filas[i].name] ?: ExerciseKind.STRENGTH,
+                    kind = if (sinKilos) ExerciseKind.BODYWEIGHT else delPlan ?: ExerciseKind.STRENGTH,
+                    pesoCorporal = if (marcable) sinKilos else null,
+                    onPesoCorporal = { on ->
+                        // Al pasar a peso corporal los kilos escritos sobran: fuera, para que
+                        // no acaben en el resumen sin verse.
+                        if (on) filas[i] = filas[i].copy(sets = filas[i].sets.map { it.copy(weight = "") })
+                        onPesoCorporal(nombre, on)
+                    },
                     conCalentamiento = filas[i].name !in sinCalentamiento,
                     // Con otra fila en marcha, esta baja de tono en vez de desaparecer.
                     atenuada = enfocada >= 0 && enfocada != i,
@@ -348,6 +366,9 @@ private fun FilaEjercicio(
     fila: LoggedExercise,
     sugerencias: List<String>,
     kind: ExerciseKind,
+    /** null = no se puede cambiar (lo dice el plan, o aún no tiene nombre). */
+    pesoCorporal: Boolean?,
+    onPesoCorporal: (Boolean) -> Unit,
     conCalentamiento: Boolean,
     atenuada: Boolean,
     onFocus: (Boolean) -> Unit,
@@ -419,6 +440,13 @@ private fun FilaEjercicio(
                     modifier = Modifier.size(20.dp)
                 )
             }
+        }
+        if (pesoCorporal != null) {
+            FilterChip(
+                selected = pesoCorporal,
+                onClick = { onPesoCorporal(!pesoCorporal) },
+                label = { Text("Peso corporal, sin kilos", style = MaterialTheme.typography.bodyMedium) }
+            )
         }
         Spacer(Modifier.height(Space.x3))
         // Una línea por serie: entrenando a tu aire la primera sale con 10, la segunda con 12

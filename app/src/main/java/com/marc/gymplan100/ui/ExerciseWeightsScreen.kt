@@ -67,8 +67,11 @@ fun ExerciseWeightsScreen(
     viewModel: PlanViewModel
 ) {
     val progress by viewModel.progress.collectAsState()
-    val grupos = remember(PlanData.exerciseNames) {
-        PlanData.exerciseNames.groupBy { ExerciseGroups.of(it) }.toSortedMap()
+    // Los del plan y los tuyos (los que te inventaste en un entreno libre), como uno más. Los de
+    // peso corporal no: aquí solo hay kilos.
+    val tuyos = progress.customExercises.filterNot { it in progress.bodyweightExercises }
+    val grupos = remember(PlanData.exerciseNames, tuyos) {
+        (PlanData.exerciseNames + tuyos).distinct().groupBy { ExerciseGroups.of(it) }.toSortedMap()
     }
     val prs = remember(progress) {
         Statistics.personalRecords(progress).associate { it.exercise to it.weight }

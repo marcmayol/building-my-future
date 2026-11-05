@@ -198,7 +198,9 @@ fun WorkoutSessionScreen(
                 },
                 onBack = { apuntado -> viewModel.saveFreeLog(apuntado); apuntando = null },
                 onDraft = { apuntado -> viewModel.saveFreeLog(apuntado) },
-                onSkip = { viewModel.finishSession(); cierraElEntreno() }
+                onSkip = { viewModel.finishSession(); cierraElEntreno() },
+                pesoCorporal = viewModel.progress.collectAsState().value.bodyweightExercises,
+                onPesoCorporal = { nombre, on -> viewModel.setBodyweight(nombre, on) }
             )
         }
         SessionPhase.FINISHED -> FinishedContent(
@@ -1375,6 +1377,15 @@ private fun FreeRestContent(
     val ultima = actual?.sets?.lastOrNull()
     val sinNombre = actual != null && actual.name.isBlank()
     var buscando by remember { mutableStateOf(false) }
+    // Peso corporal: o lo dice el plan (unas dominadas) o lo has marcado tú.
+    val progress by viewModel.progress.collectAsState()
+    val pesoCorporalDelPlan = remember(actual?.name) {
+        val nombre = actual?.name.orEmpty()
+        nombre.isNotBlank() && PlanData.days.asSequence()
+            .flatMap { it.template.exercises }
+            .firstOrNull { it.name == nombre }?.withoutWeight == true
+    }
+    val conTuPeso = pesoCorporalDelPlan || actual?.name?.trim() in progress.bodyweightExercises
 
     // Kilos y repeticiones de la serie recién hecha: se ven al instante y bajan a disco medio
     // segundo después del último toque, como en el guiado. Al ponerle nombre al ejercicio se
@@ -1456,18 +1467,38 @@ private fun FreeRestContent(
                         }
                     }
                     Spacer(Modifier.height(Space.x2))
-                    WeightBlock(
-                        value = weight,
-                        onValue = { weight = it },
-                        dark = dark,
-                        reps = reps,
-                        onReps = { reps = it },
-                        hint = when {
-                            (actual.sets.size) > 1 -> "Lo de la serie anterior: cámbialo si no fue así."
-                            weight.isNotBlank() || reps.isNotBlank() -> "Lo de la última vez: cámbialo si no fue así."
-                            else -> "Apunta lo que has movido."
+                    val hint = when {
+                        (actual.sets.size) > 1 -> "Lo de la serie anterior: cámbialo si no fue así."
+                        weight.isNotBlank() || reps.isNotBlank() -> "Lo de la última vez: cámbialo si no fue así."
+                        else -> if (conTuPeso) "Apunta cuántas has hecho." else "Apunta lo que has movido."
+                    }
+                    if (conTuPeso) {
+                        // Con tu peso no hay kilos que apuntar: solo las repeticiones.
+                        SessionCard(label = "Esta serie · peso corporal", dark = dark) {
+                            RepsRow(value = reps, onValue = { reps = it }, hint = hint)
                         }
-                    )
+                    } else {
+                        WeightBlock(
+                            value = weight,
+                            onValue = { weight = it },
+                            dark = dark,
+                            reps = reps,
+                            onReps = { reps = it },
+                            hint = hint
+                        )
+                    }
+                    // Los del plan ya saben si llevan kilos; el resto lo decides tú, y se recuerda.
+                    if (!pesoCorporalDelPlan) {
+                        Spacer(Modifier.height(Space.x1))
+                        FilterChip(
+                            selected = conTuPeso,
+                            onClick = {
+                                if (!conTuPeso) weight = ""
+                                viewModel.setBodyweight(actual.name, !conTuPeso)
+                            },
+                            label = { Text("Peso corporal, sin kilos", maxLines = 2) }
+                        )
+                    }
                 }
                 else -> FreeLoggedCard(s, dark)
             }

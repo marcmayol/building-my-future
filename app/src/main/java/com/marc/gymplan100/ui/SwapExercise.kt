@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.CatalogEntry
 import com.marc.gymplan100.data.ExerciseCatalog
 import com.marc.gymplan100.data.ExerciseImages
+import com.marc.gymplan100.data.MyExercises
 import com.marc.gymplan100.ui.theme.Space
 import com.marc.gymplan100.ui.theme.Touch
 
@@ -118,11 +119,15 @@ fun SwapSection(
     }
 }
 
-/** Una alternativa del catálogo: su dibujo, lo que dice la ficha y el botón para hacerla. */
+/**
+ * Una alternativa: su dibujo, lo que dice la ficha y el botón para hacerla. Sin [entry] es uno
+ * de los tuyos, que no tiene dibujo propio (salvo que le hayas dicho a cuál se parece).
+ */
 @Composable
-private fun AlternativeRow(title: String, entry: CatalogEntry, onPick: () -> Unit) {
+private fun AlternativeRow(title: String, entry: CatalogEntry?, onPick: () -> Unit) {
     val context = LocalContext.current
-    val dibujo = ExerciseImages.forName(context, entry.nombre, LocalIsFemale.current)
+    val nombre = entry?.nombre ?: title
+    val dibujo = ExerciseImages.forName(context, nombre, LocalIsFemale.current)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -135,13 +140,28 @@ private fun AlternativeRow(title: String, entry: CatalogEntry, onPick: () -> Uni
         if (dibujo != null) {
             Image(
                 painter = painterResource(dibujo),
-                contentDescription = entry.nombre,
+                contentDescription = nombre,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(width = 84.dp, height = 56.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.White)
             )
+        } else if (entry == null) {
+            // Uno tuyo sin dibujo: en vez de un hueco, una etiqueta que dice de dónde sale.
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(width = 84.dp, height = 56.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Text(
+                    "Tuyo",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         } else {
             Box(Modifier.size(width = 84.dp, height = 56.dp))
         }
@@ -175,6 +195,10 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
                 .take(20)
         }
     }
+    // Los que te inventaste, primero: si ya lo escribiste un día, no hay que volver a hacerlo.
+    val tuyos = remember(texto) {
+        MyExercises.search(texto, if (texto.isBlank()) 6 else 8).filter { it != currentName }
+    }
     Column(verticalArrangement = Arrangement.spacedBy(Space.x1)) {
         OutlinedTextField(
             value = texto,
@@ -183,6 +207,16 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
+        if (tuyos.isNotEmpty()) {
+            Text(
+                "Tus ejercicios",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            tuyos.forEach { nombre ->
+                AlternativeRow(title = nombre, entry = null, onPick = { onPick(nombre) })
+            }
+        }
         if (texto.isBlank() && grupo != null && resultados.isNotEmpty()) {
             Text(
                 "Otros de ${ExerciseCatalog.groupLabel(grupo).lowercase()}",
@@ -194,9 +228,13 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
             AlternativeRow(title = e.nombre, entry = e, onPick = { onPick(e.nombre) })
         }
         val escrito = texto.trim()
-        if (escrito.isNotEmpty() && resultados.none { it.nombre.equals(escrito, ignoreCase = true) }) {
+        if (escrito.isNotEmpty() &&
+            resultados.none { it.nombre.equals(escrito, ignoreCase = true) } &&
+            tuyos.none { it.equals(escrito, ignoreCase = true) }
+        ) {
             // Lo que no está en el catálogo también vale: se apunta con su nombre, solo que
-            // sin dibujo ni ficha (la ficha ofrecerá buscarlo en vídeo).
+            // sin dibujo ni ficha (la ficha ofrecerá buscarlo en vídeo). Y se queda guardado
+            // entre tus ejercicios para la próxima vez.
             TextButton(onClick = { onPick(escrito) }) {
                 Text("Apuntarlo como «$escrito»", maxLines = 2)
             }
