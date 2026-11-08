@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="idioma_titulo">Language</string>
+    <string name="idioma_explicacion">By default the app follows your phone: Spanish if the phone is in Spanish, English otherwise. You can also pick one.</string>
+    <string name="idioma_sistema">Automatic</string>
+    <!-- Cada idioma se escribe en su propio idioma, como en los ajustes de Android. -->
+    <string name="idioma_es" translatable="false">Español</string>
+    <string name="idioma_en" translatable="false">English</string>
+</resources>

@@ -1,6 +1,7 @@
 package com.marc.gymplan100.data
 
 import android.content.Context
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.AppTheme
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -84,7 +85,7 @@ object Backup {
                 version = version,
                 progreso = repo.exportAll(),
                 planes = PlanStore.exportAll(context),
-                ajustes = AppTheme.export()
+                ajustes = AppTheme.export() + AppLanguage.export(context)
             )
         )
     }
@@ -120,7 +121,10 @@ object Backup {
     suspend fun restore(context: Context, file: BackupFile) {
         PlanStore.importAll(context, file.planes)
         ProgressRepository(context).importAll(file.progreso)
-        if (file.ajustes.isNotEmpty()) AppTheme.import(context, file.ajustes)
+        if (file.ajustes.isNotEmpty()) {
+            AppTheme.import(context, file.ajustes)
+            AppLanguage.import(context, file.ajustes)
+        }
         // El plan activo puede haber cambiado: la ventana que mira toda la app se reabre.
         PlanStore.load(context)
     }

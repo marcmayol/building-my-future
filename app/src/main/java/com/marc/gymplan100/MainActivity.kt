@@ -1,6 +1,7 @@
 package com.marc.gymplan100
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.marc.gymplan100.ui.GymNavHost
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.AppTheme
 import com.marc.gymplan100.ui.theme.GymPlanTheme
 import com.marc.gymplan100.update.Updates
@@ -40,6 +42,11 @@ class MainActivity : ComponentActivity() {
 
     /** Día a abrir solicitado por la notificación; lo consume GymNavHost al navegar. */
     private var openSessionDay by mutableStateOf<Int?>(null)
+
+    // El idioma elegido en Ajustes se aplica aquí, antes de que nada pida un texto.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLanguage.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

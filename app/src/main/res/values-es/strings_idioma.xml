@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="idioma_titulo">Idioma</string>
+    <string name="idioma_explicacion">Por defecto sigue al móvil: español si el móvil está en español y, si no, inglés. También puedes fijar uno.</string>
+    <string name="idioma_sistema">Automático</string>
+</resources>

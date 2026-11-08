@@ -43,6 +43,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,7 +65,9 @@ import com.marc.gymplan100.data.Backup
 import com.marc.gymplan100.data.BackupFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.AppTheme
+import com.marc.gymplan100.ui.theme.LanguageMode
 import com.marc.gymplan100.ui.theme.ThemeMode
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.marc.gymplan100.notify.TrainingReminder
@@ -281,6 +285,45 @@ fun SettingsScreen(
                                 selected = AppTheme.mode == modo,
                                 onClick = { AppTheme.set(context, modo) },
                                 label = { Text(modo.label, maxLines = 1) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            item {
+                val context = LocalContext.current
+                val actual = remember { AppLanguage.mode(context) }
+                WheelCard(
+                    title = stringResource(R.string.idioma_titulo),
+                    explicacion = stringResource(R.string.idioma_explicacion)
+                ) {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                        verticalArrangement = Arrangement.spacedBy(Space.x2)
+                    ) {
+                        LanguageMode.entries.forEach { modo ->
+                            FilterChip(
+                                selected = actual == modo,
+                                onClick = {
+                                    if (modo != actual) {
+                                        AppLanguage.set(context, modo)
+                                        // Recrear la actividad vuelve a pasar por
+                                        // attachBaseContext, que es donde se aplica.
+                                        context.findActivity()?.recreate()
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        when (modo) {
+                                            LanguageMode.SISTEMA -> stringResource(R.string.idioma_sistema)
+                                            LanguageMode.ES -> stringResource(R.string.idioma_es)
+                                            LanguageMode.EN -> stringResource(R.string.idioma_en)
+                                        },
+                                        maxLines = 1
+                                    )
+                                }
                             )
                         }
                     }
@@ -752,4 +795,11 @@ private fun CarrilDeScroll(content: @Composable () -> Unit) {
     ) {
         Box(modifier = Modifier.width(200.dp)) { content() }
     }
+}
+
+/** La actividad que hay debajo de un contexto de Compose (puede venir envuelto). */
+private tailrec fun android.content.Context.findActivity(): android.app.Activity? = when (this) {
+    is android.app.Activity -> this
+    is android.content.ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
