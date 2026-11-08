@@ -20,8 +20,8 @@
     <string name="ayu_logro_phase_title">%1$s cleared</string>
     <string name="ayu_logro_phase_desc">Finish phase %1$d.</string>
 
-    <string name="ayu_logros_titulo">Achievements</string>
-    <string name="ayu_logros_nota">Achievements are based on the plan you\'re following, so they change if you switch plans.</string>
+    <string name="ayu_logros_titulo">Badges</string>
+    <string name="ayu_logros_nota">Badges are based on the plan you\'re following, so they change if you switch plans.</string>
     <plurals name="ayu_logros_de_total">
         <item quantity="one">of %1$d achievement</item>
         <item quantity="other">of %1$d achievements</item>
@@ -85,7 +85,7 @@
     <string name="ayu_tour_3_donde">During the workout, and the history in “My weights”, in the bottom bar.</string>
     <string name="ayu_tour_4_titulo">Your numbers, not just a list</string>
     <string name="ayu_tour_4_texto">Weight lifted, estimated strength, streaks and a muscle map showing what each muscle got this week. That\'s what warns you you\'ve skipped legs for three weeks.</string>
-    <string name="ayu_tour_4_donde">In the bottom bar: “Stats”, “Results” and “Achievements”.</string>
+    <string name="ayu_tour_4_donde">In the bottom bar: “Stats”, “Results” and “Badges”.</string>
     <string name="ayu_tour_5_titulo">The plan is yours. So is the data</string>
     <string name="ayu_tour_5_texto">Fifteen plans are included, but you can bring your own or build one in the app. No account, no server: everything stays on your phone, so backups are up to you.</string>
     <string name="ayu_tour_5_donde">“My plans” on the home screen, and backup in Settings (the gear at the top).</string>
@@ -162,7 +162,7 @@
         <item>The big block is today\'s day. “Start day” begins the guided workout; “See the day before starting” shows the exercises without starting anything.</item>
         <item>If you have a workout half done, that block says “In progress” and the button picks it up where you left off.</item>
         <item>“Free workout” is for training without the plan, with rest timers and logging as you go. “Special workouts” are one-off routines that don\'t count as a day.</item>
-        <item>At the bottom, the bar: Achievements, My weights, Results and Stats.</item>
+        <item>At the bottom, the bar: Badges, My weights, Results and Stats.</item>
     </string-array>
 
     <string name="ayu_help_dia_title">The day sheet</string>

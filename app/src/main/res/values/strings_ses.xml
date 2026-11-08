@@ -229,4 +229,13 @@
         <item quantity="one">%1$d of %2$d exercise</item>
         <item quantity="other">%1$d of %2$d exercises</item>
     </plurals>
+    <!-- Grupos del catálogo (ExerciseCatalog.groupLabelRes) -->
+    <string name="ses_group_chest">Chest</string>
+    <string name="ses_group_back">Back</string>
+    <string name="ses_group_shoulders">Shoulders</string>
+    <string name="ses_group_arms">Arms</string>
+    <string name="ses_group_legs">Legs</string>
+    <string name="ses_group_core">Core</string>
+    <string name="ses_group_cardio">Cardio</string>
+    <string name="ses_group_other">Other</string>
 </resources>

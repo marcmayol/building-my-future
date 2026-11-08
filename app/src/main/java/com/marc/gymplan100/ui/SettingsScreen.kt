@@ -734,11 +734,14 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
                     val file = copia
                     porRestaurar = null
                     scope.launch {
+                        val idiomaAntes = AppLanguage.mode(context)
                         mensaje = runCatching {
                             Backup.restore(context, file)
                             viewModel.reloadAfterRestore()
                             R.string.ini_backup_restored
                         }.getOrElse { R.string.ini_backup_restore_failed }
+                        // La copia puede traer otro idioma: solo se ve al recrear la actividad.
+                        if (AppLanguage.mode(context) != idiomaAntes) context.findActivity()?.recreate()
                     }
                 }) { Text(stringResource(R.string.ini_backup_restore)) }
             },

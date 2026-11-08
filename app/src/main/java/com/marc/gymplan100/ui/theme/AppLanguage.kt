@@ -3,6 +3,7 @@ package com.marc.gymplan100.ui.theme
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
+import com.marc.gymplan100.R
 import java.util.Locale
 
 /** En qué idioma se ve la app: el del móvil, o uno fijo. */
@@ -21,7 +22,9 @@ enum class LanguageMode(val id: String, val tag: String?) {
  *
  * Los textos viven en `res/values` (inglés, el que sale por defecto) y `res/values-es`
  * (español). En automático manda el móvil: cualquier variante de español ve la app en
- * español y cualquier otro idioma (catalán incluido) en inglés, que es lo que pidió Marc.
+ * español y cualquier otro idioma en inglés, que es lo que pidió Marc. Ojo: Android mira
+ * toda la lista de idiomas del móvil, así que uno en catalán con el español de segundo
+ * idioma ve la app en español; con solo catalán, en inglés.
  *
  * Elegir uno fijo no pasa por las APIs de idioma por app de Android 13 ni por AppCompat: la
  * actividad es una ComponentActivity y la app arranca en Android 8. Se guarda en
@@ -59,8 +62,21 @@ object AppLanguage {
         return context.createConfigurationContext(config)
     }
 
-    /** El idioma con el que se está pintando: para fechas y números escritos. */
-    fun locale(context: Context): Locale = context.resources.configuration.locales[0]
+    /**
+     * El idioma con el que se está pintando, para fechas y números escritos. En automático,
+     * con el móvil en un idioma que la app no tiene (alemán, catalán…), los textos salen en
+     * inglés y las fechas tienen que salir en inglés también, no «März 8».
+     */
+    fun locale(context: Context): Locale {
+        // El idioma que han resuelto los recursos (values o values-es), no el primero del
+        // móvil: con [catalán, español] Android pinta en español.
+        val idioma = context.getString(R.string.idioma_codigo)
+        val locales = context.resources.configuration.locales
+        for (i in 0 until locales.size()) {
+            if (locales[i].language == idioma) return locales[i] // conserva la región (es-MX…)
+        }
+        return Locale.forLanguageTag(idioma)
+    }
 
     /** El idioma elegido, para la copia de seguridad. */
     fun export(context: Context): Map<String, String> = mapOf(KEY to mode(context).id)

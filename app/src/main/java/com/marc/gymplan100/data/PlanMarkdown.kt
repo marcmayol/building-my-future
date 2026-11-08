@@ -47,7 +47,7 @@ object PlanMarkdownParser {
 
     /** Un esquema al final de la línea cuando no hay separador: "Press de banca 4 x 8". */
     private val TRAILING_SCHEME = Regex(
-        """\s+(\d+\s*[x×]\s*\d+.*|\d+\s*(?:vueltas?|series?|rondas?).*)$""",
+        """\s+(\d+\s*[x×]\s*\d+.*|\d+\s*(?:vueltas?|series?|rondas?|rounds?|sets?).*)$""",
         RegexOption.IGNORE_CASE
     )
 

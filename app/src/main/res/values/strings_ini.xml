@@ -23,7 +23,7 @@
 
     <!-- Pestañas -->
     <string name="ini_tab_home">Home</string>
-    <string name="ini_tab_achievements">Achievements</string>
+    <string name="ini_tab_achievements">Badges</string>
     <string name="ini_tab_weights">My weights</string>
     <string name="ini_tab_results">Results</string>
     <string name="ini_tab_stats">Stats</string>

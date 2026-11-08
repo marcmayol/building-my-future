@@ -56,7 +56,20 @@ object ExerciseCatalog {
 
     fun forSlug(slug: String): CatalogEntry? = entries.firstOrNull { it.slug == slug }
 
-    /** Nombre del grupo en español, para los títulos de sección. */
+    /** Nombre del grupo en el idioma de la app, para los títulos de sección. */
+    @androidx.annotation.StringRes
+    fun groupLabelRes(grupo: String): Int = when (grupo) {
+        "chest" -> com.marc.gymplan100.R.string.ses_group_chest
+        "back" -> com.marc.gymplan100.R.string.ses_group_back
+        "shoulders" -> com.marc.gymplan100.R.string.ses_group_shoulders
+        "arms" -> com.marc.gymplan100.R.string.ses_group_arms
+        "legs" -> com.marc.gymplan100.R.string.ses_group_legs
+        "core" -> com.marc.gymplan100.R.string.ses_group_core
+        "cardio" -> com.marc.gymplan100.R.string.ses_group_cardio
+        else -> com.marc.gymplan100.R.string.ses_group_other
+    }
+
+    /** Nombre del grupo en español (sin Context; lo que se pinta usa [groupLabelRes]). */
     fun groupLabel(grupo: String): String = when (grupo) {
         "chest" -> "Pecho"
         "back" -> "Espalda"

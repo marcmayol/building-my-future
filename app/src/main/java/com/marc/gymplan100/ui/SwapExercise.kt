@@ -221,7 +221,7 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
         }
         if (texto.isBlank() && grupo != null && resultados.isNotEmpty()) {
             Text(
-                stringResource(R.string.ses_swap_others_of, ExerciseCatalog.groupLabel(grupo).lowercase()),
+                stringResource(R.string.ses_swap_others_of, stringResource(ExerciseCatalog.groupLabelRes(grupo)).lowercase()),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -57,7 +57,9 @@ class MainActivity : ComponentActivity() {
         // vuelve a dejar puesta la proxima, que sale barato y evita quedarse sin aviso.
         com.marc.gymplan100.notify.TrainingReminder.reschedule(this)
         enableEdgeToEdge()
-        maybeRequestNotificationPermission()
+        // Solo en un arranque de verdad: al cambiar de idioma la actividad se recrea y
+        // volvería a preguntar a quien ya dijo que no.
+        if (savedInstanceState == null) maybeRequestNotificationPermission()
         readSessionExtra(intent)
         setContent {
             val oscuro = AppTheme.isDark()

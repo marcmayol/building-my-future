@@ -418,11 +418,12 @@ fun warmupSecondsFromText(warmup: String): Int {
 /**
  * Deduce el número de series de un esquema textual.
  * Ej: "3 x 12" -> 3, "4 x 8-10" -> 4, "3 vueltas" -> 3, "1 serie" -> 1.
+ * También en inglés ("3 rounds", "2 sets"), que es como lo sugiere la app en ese idioma.
  */
 fun setCountFromScheme(scheme: String): Int {
     val s = scheme.lowercase()
-    Regex("""(\d+)\s*vuelta""").find(s)?.let { return it.groupValues[1].toInt() }
-    Regex("""(\d+)\s*serie""").find(s)?.let { return it.groupValues[1].toInt() }
+    Regex("""(\d+)\s*(?:vuelta|ronda|round)""").find(s)?.let { return it.groupValues[1].toInt() }
+    Regex("""(\d+)\s*(?:serie|sets?\b)""").find(s)?.let { return it.groupValues[1].toInt() }
     Regex("""(\d+)\s*x""").find(s)?.let { return it.groupValues[1].toInt() }
     return 3
 }
@@ -446,7 +447,7 @@ fun secondsPerSetFromScheme(scheme: String): Int? {
  * no tiene sentido pedir kilos. Ej: "3 vueltas" -> true, "3 x 12" -> false.
  */
 fun isBodyweightScheme(scheme: String): Boolean =
-    Regex("""\d+\s*vuelta""").containsMatchIn(scheme.lowercase())
+    Regex("""\d+\s*(?:vuelta|round)""").containsMatchIn(scheme.lowercase())
 
 /**
  * Repeticiones objetivo indicadas en el esquema, para usarlas por defecto.
