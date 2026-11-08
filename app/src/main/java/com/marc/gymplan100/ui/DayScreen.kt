@@ -55,6 +55,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
@@ -70,8 +73,6 @@ import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.RestDefaults
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.setCountFromScheme
-import com.marc.gymplan100.data.contar
-import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.repsFromScheme
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -107,10 +108,10 @@ fun DayScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Día ${day.number}", style = MaterialTheme.typography.headlineSmall) },
+                title = { Text(stringResource(R.string.ini_day_n, day.number), style = MaterialTheme.typography.headlineSmall) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ini_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -133,7 +134,7 @@ fun DayScreen(
         ) {
             item {
                 Text(
-                    "FASE ${day.phase.number} · ${day.phase.name.uppercase()}",
+                    stringResource(R.string.ini_day_phase, day.phase.number, day.phase.name.uppercase()),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -141,7 +142,7 @@ fun DayScreen(
                 Text(template.title, style = MaterialTheme.typography.headlineLarge)
                 Spacer(Modifier.height(Space.x1))
                 Text(
-                    contar(template.exercises.size, "ejercicio", "ejercicios"),
+                    pluralStringResource(R.plurals.ini_exercises, template.exercises.size, template.exercises.size),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -157,7 +158,7 @@ fun DayScreen(
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Spacer(Modifier.width(Space.x2))
-                    Text(if (enCurso) "Continuar entrenamiento" else "Empezar entrenamiento")
+                    Text(stringResource(if (enCurso) R.string.ini_day_continue else R.string.ini_day_start))
                 }
             }
 
@@ -171,10 +172,10 @@ fun DayScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = Touch.primary)
-                ) { Text("Entrenar libre · cuenta como día") }
+                ) { Text(stringResource(R.string.ini_day_free)) }
             }
 
-            item { SectionBlock("CALENTAMIENTO", template.warmup) }
+            item { SectionBlock(stringResource(R.string.ini_day_warmup), template.warmup) }
 
             itemsIndexed(template.exercises) { index, exercise ->
                 val log = progress.logs["${day.number}-$index"]
@@ -207,7 +208,7 @@ fun DayScreen(
                 )
             }
 
-            item { SectionBlock("VUELTA A LA CALMA", template.cooldown) }
+            item { SectionBlock(stringResource(R.string.ini_day_cooldown), template.cooldown) }
 
             item { DayMuscleCard(template.exercises) }
 
@@ -223,7 +224,7 @@ fun DayScreen(
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = null)
                         Spacer(Modifier.width(Space.x2))
-                        Text("Día hecho · deshacer")
+                        Text(stringResource(R.string.ini_day_done_undo))
                     }
                 } else {
                     Button(
@@ -237,7 +238,7 @@ fun DayScreen(
                         Spacer(Modifier.width(Space.x2))
                         // Etiqueta corta a propósito: con el texto del sistema al 130 % la
                         // frase larga se partía en dos líneas y el ✓ quedaba descolgado.
-                        Text("Marcar día hecho")
+                        Text(stringResource(R.string.ini_day_mark_done))
                     }
                 }
             }
@@ -284,14 +285,14 @@ private fun DayMuscleCard(exercises: List<Exercise>) {
             .padding(Space.x4)
     ) {
         Text(
-            "HOY TRABAJAS",
+            stringResource(R.string.ini_day_you_work),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(Space.x2))
         // Los tres que más se llevan; el resto ya se ve en el dibujo.
         Text(
-            cargas.take(3).joinToString(" · ") { MuscleLoad.label(it.group) },
+            LocalContext.current.let { ctx -> cargas.take(3).joinToString(" · ") { MuscleLoad.label(ctx, it.group) } },
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -311,14 +312,14 @@ private fun DayMuscleCard(exercises: List<Exercise>) {
         }
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                "Frente",
+                stringResource(R.string.ini_day_front),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "Espalda",
+                stringResource(R.string.ini_day_rear),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelMedium,
@@ -385,7 +386,7 @@ private fun ExerciseCard(
                 Text(exercise.name, style = MaterialTheme.typography.titleMedium)
                 if (doneAs != null) {
                     Text(
-                        "Lo haces como $doneAs",
+                        stringResource(R.string.ini_day_done_as, doneAs),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -394,7 +395,8 @@ private fun ExerciseCard(
                 // El descanso, a la vista: antes no salía en ningún sitio hasta estar ya
                 // descansando, y quien lo buscaba antes de empezar no lo encontraba.
                 Text(
-                    exercise.scheme + (rest?.let { " · descanso ${restLabel(it)}" } ?: ""),
+                    rest?.let { stringResource(R.string.ini_day_scheme_rest, exercise.scheme, restLabel(it)) }
+                        ?: exercise.scheme,
                     style = styles.tabular,
                     color = app.warmup
                 )
@@ -425,7 +427,10 @@ private fun ExerciseCard(
         if (apuntado.isNotEmpty() && !apuntandoAMano) {
             Spacer(Modifier.height(Space.x2))
             Text(
-                setsSummary(apuntado),
+                setsSummary(
+                    apuntado,
+                    androidx.compose.ui.res.stringResource(com.marc.gymplan100.R.string.mot_warmup_short)
+                ),
                 style = styles.tabular,
                 color = app.work
             )
@@ -437,7 +442,9 @@ private fun ExerciseCard(
             // repeticiones eran un \u00fanico campo suelto al final: adem\u00e1s de dejar cajas hu\u00e9rfanas
             // cuando las series no llenaban la fila, contaba que cada serie llev\u00f3 un peso distinto
             // y todas las mismas repeticiones, que es justo lo que no pasa.
-            val etiquetaReps = if (exercise.kind == ExerciseKind.TIME) "seg" else "reps"
+            val etiquetaReps = stringResource(
+                if (exercise.kind == ExerciseKind.TIME) R.string.ini_day_unit_sec else R.string.ini_day_unit_reps
+            )
             repeat(maxOf(totalSets, sets.size)) { i ->
                 if (i > 0) Spacer(Modifier.height(Space.x2))
                 Row(
@@ -448,7 +455,7 @@ private fun ExerciseCard(
                         OutlinedTextField(
                             value = sets.getOrNull(i)?.weight.orEmpty(),
                             onValueChange = { onSetWeight(i, it) },
-                            label = { Text("${i + 1}\u00aa") },
+                            label = { Text(stringResource(R.string.ini_day_set_n, i + 1)) },
                             // La pista es el \u00faltimo peso conocido de esa m\u00e1quina: orienta sin
                             // dar por hecho que hoy vas a mover lo mismo.
                             placeholder = if (hint.isBlank()) null else {
@@ -491,7 +498,7 @@ private fun ExerciseCard(
                             label = {
                                 Text(
                                     if (pidePeso) etiquetaReps
-                                    else "${i + 1}\u00aa \u00b7 $etiquetaReps"
+                                    else stringResource(R.string.ini_day_set_n_unit, i + 1, etiquetaReps)
                                 )
                             },
                             placeholder = if (reps.isBlank()) null else {
@@ -524,16 +531,18 @@ private fun ExerciseCard(
             if (pidePeso || pideReps) {
                 TextButton(onClick = { apuntandoAMano = !apuntandoAMano }) {
                     Text(
-                        when {
-                            apuntandoAMano -> "Listo"
-                            apuntado.isNotEmpty() -> "Editar"
-                            else -> "Apuntar a mano"
-                        },
+                        stringResource(
+                            when {
+                                apuntandoAMano -> R.string.ini_day_ready
+                                apuntado.isNotEmpty() -> R.string.ini_day_edit
+                                else -> R.string.ini_day_log_by_hand
+                            }
+                        ),
                         maxLines = 1
                     )
                 }
             }
-            TextButton(onClick = onShowGuide) { Text("Cómo se hace", maxLines = 1) }
+            TextButton(onClick = onShowGuide) { Text(stringResource(R.string.ini_day_how_to), maxLines = 1) }
         }
     }
 }

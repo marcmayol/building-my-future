@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,47 +69,37 @@ fun TourScreen(onDone: () -> Unit) {
     val app = LocalAppColors.current
     val pasos = listOf(
         PasoDelTour(
-            titulo = "Te lleva la sesión",
-            texto = "Abres el día que toca y la app va delante: calentamiento, serie a serie " +
-                "con su peso y sus repeticiones, y el descanso contando solo. No tienes que " +
-                "acordarte de en cuál ibas.",
-            donde = "En la portada, el bloque de arriba: «Hoy te toca».",
+            titulo = stringResource(R.string.ayu_tour_1_titulo),
+            texto = stringResource(R.string.ayu_tour_1_texto),
+            donde = stringResource(R.string.ayu_tour_1_donde),
             icono = null,
             color = app.warmup
         ),
         PasoDelTour(
-            titulo = "El descanso suena con el móvil guardado",
-            texto = "Avisa aunque tengas la pantalla apagada y la app cerrada. Y desde la " +
-                "pantalla de bloqueo pasas a la siguiente serie sin desbloquear el móvil.",
-            donde = "Sale solo al terminar cada serie. Si no suena, la portada te avisa de " +
-                "qué permiso falta.",
+            titulo = stringResource(R.string.ayu_tour_2_titulo),
+            texto = stringResource(R.string.ayu_tour_2_texto),
+            donde = stringResource(R.string.ayu_tour_2_donde),
             icono = null,
             color = app.rest
         ),
         PasoDelTour(
-            titulo = "Te dice cuándo subir el peso",
-            texto = "Cuando cierras todas las series arriba del rango, te propone más carga —" +
-                "con el salto que de verdad existe en la máquina— y te escribe el motivo " +
-                "debajo. Si llevas tres sesiones atascado, te propone bajar para volver a subir.",
-            donde = "Durante el entreno, y el histórico en «Mis pesos», en la barra de abajo.",
+            titulo = stringResource(R.string.ayu_tour_3_titulo),
+            texto = stringResource(R.string.ayu_tour_3_texto),
+            donde = stringResource(R.string.ayu_tour_3_donde),
             icono = R.drawable.ic_pesos,
             color = app.work
         ),
         PasoDelTour(
-            titulo = "Tus números, no solo la lista",
-            texto = "Kilos movidos, fuerza estimada, rachas y un mapa muscular que dice qué se " +
-                "ha llevado cada músculo esta semana. Eso es lo que avisa de que llevas tres " +
-                "semanas sin tocar pierna.",
-            donde = "En la barra de abajo: «Estadísticas», «Resultados» y «Logros».",
+            titulo = stringResource(R.string.ayu_tour_4_titulo),
+            texto = stringResource(R.string.ayu_tour_4_texto),
+            donde = stringResource(R.string.ayu_tour_4_donde),
             icono = R.drawable.ic_estadisticas,
             color = app.streak
         ),
         PasoDelTour(
-            titulo = "El plan es tuyo. Los datos, también",
-            texto = "Vienen quince planes, pero puedes traerte el tuyo o crearlo dentro. No hay " +
-                "cuenta ni servidor: todo se queda en el móvil, así que la copia de seguridad " +
-                "la guardas tú.",
-            donde = "«Mis planes» en la portada, y la copia en Ajustes (la rueda de arriba).",
+            titulo = stringResource(R.string.ayu_tour_5_titulo),
+            texto = stringResource(R.string.ayu_tour_5_texto),
+            donde = stringResource(R.string.ayu_tour_5_donde),
             icono = R.drawable.ic_logros,
             color = app.special
         )
@@ -143,12 +134,12 @@ fun TourScreen(onDone: () -> Unit) {
             )
             Spacer(Modifier.size(Space.x2))
             Text(
-                "CÓMO FUNCIONA",
+                stringResource(R.string.ayu_tour_cabecera),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.weight(1f))
-            TextButton(onClick = onDone) { Text("Saltar", maxLines = 1) }
+            TextButton(onClick = onDone) { Text(stringResource(R.string.ayu_tour_saltar), maxLines = 1) }
         }
 
         HorizontalPager(
@@ -198,7 +189,9 @@ fun TourScreen(onDone: () -> Unit) {
                 .fillMaxWidth()
                 .padding(horizontal = Space.screen)
                 .heightIn(min = Touch.primary)
-        ) { Text(if (ultimo) "Empezar" else "Siguiente") }
+        ) { Text(
+            stringResource(if (ultimo) R.string.ayu_tour_empezar else R.string.ayu_tour_siguiente)
+        ) }
 
         Spacer(Modifier.height(Space.block))
     }
@@ -263,7 +256,7 @@ private fun Paso(paso: PasoDelTour) {
                 .padding(Space.x4)
         ) {
             Text(
-                "DÓNDE",
+                stringResource(R.string.ayu_tour_donde),
                 style = MaterialTheme.typography.labelMedium,
                 color = paso.color,
                 fontWeight = FontWeight.Bold

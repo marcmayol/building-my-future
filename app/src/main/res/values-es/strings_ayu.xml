@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logros (data/Achievements.kt, ui/AchievementsScreen.kt) -->
+    <string name="ayu_logro_first_title">Primer paso</string>
+    <string name="ayu_logro_first_desc">Completa tu primer día.</string>
+    <string name="ayu_logro_week_title">Primera semana</string>
+    <string name="ayu_logro_ten_title">Cogiendo ritmo</string>
+    <string name="ayu_logro_quarter_title">Un cuarto del plan</string>
+    <string name="ayu_logro_half_title">Mitad del camino</string>
+    <string name="ayu_logro_threequarter_title">Recta final</string>
+    <string name="ayu_logro_complete_title">¡Plan completado!</string>
+    <plurals name="ayu_logro_desc_days">
+        <item quantity="one">Completa %1$d día.</item>
+        <item quantity="other">Completa %1$d días.</item>
+    </plurals>
+    <plurals name="ayu_logro_complete_desc">
+        <item quantity="one">Completa el día del plan.</item>
+        <item quantity="other">Completa los %1$d días.</item>
+    </plurals>
+    <string name="ayu_logro_phase_title">%1$s superada</string>
+    <string name="ayu_logro_phase_desc">Termina la fase %1$d.</string>
+
+    <string name="ayu_logros_titulo">Logros</string>
+    <string name="ayu_logros_nota">Los logros se calculan sobre el plan que sigues, así que cambian si cambias de plan.</string>
+    <plurals name="ayu_logros_de_total">
+        <item quantity="one">de %1$d logro</item>
+        <item quantity="other">de %1$d logros</item>
+    </plurals>
+    <plurals name="ayu_logros_siguiente_en">
+        <item quantity="one">El siguiente cae en %1$d día: %2$s.</item>
+        <item quantity="other">El siguiente cae en %1$d días: %2$s.</item>
+    </plurals>
+    <string name="ayu_logros_siguiente_un_entreno">El siguiente está a un entreno: %1$s.</string>
+    <string name="ayu_logros_todos">Los tienes todos. Poca broma.</string>
+    <plurals name="ayu_logros_te_faltan">
+        <item quantity="one">Te falta %1$d día.</item>
+        <item quantity="other">Te faltan %1$d días.</item>
+    </plurals>
+
+    <!-- Frases de enhorabuena (Motivation) -->
+    <string name="ayu_motiv_g0">¡Un día más cerca de tu objetivo!</string>
+    <string name="ayu_motiv_g1">Tu yo del futuro te lo agradece.</string>
+    <string name="ayu_motiv_g2">La constancia es tu superpoder.</string>
+    <string name="ayu_motiv_g3">Hoy has elegido ser mejor. 💪</string>
+    <string name="ayu_motiv_g4">Ladrillo a ladrillo, estás construyendo tu futuro.</string>
+    <string name="ayu_motiv_g5">Cada sesión cuenta. ¡Sigue así!</string>
+    <string name="ayu_motiv_g6">El esfuerzo de hoy es el orgullo de mañana.</string>
+    <string name="ayu_motiv_g7">Has aparecido y lo has hecho. Eso es lo que gana.</string>
+    <string name="ayu_motiv_first">¡Has empezado! El primer paso es el más importante.</string>
+    <string name="ayu_motiv_quarter">Un cuarto del plan hecho. Vas en serio.</string>
+    <string name="ayu_motiv_half">¡Mitad del camino! Ya no hay vuelta atrás.</string>
+    <string name="ayu_motiv_threequarter">Recta final. Lo que viene es para nota.</string>
+    <plurals name="ayu_motiv_final">
+        <item quantity="one">¡LO HAS LOGRADO! %1$d día. Eres otra persona.</item>
+        <item quantity="other">¡LO HAS LOGRADO! %1$d días. Eres otra persona.</item>
+    </plurals>
+
+    <!-- Celebración -->
+    <string name="ayu_celeb_dia_completado">¡Día %1$d completado!</string>
+    <plurals name="ayu_celeb_marcador">
+        <item quantity="one">%1$d de %2$d día</item>
+        <item quantity="other">%1$d de %2$d días</item>
+    </plurals>
+    <plurals name="ayu_celeb_logros_desbloqueados">
+        <item quantity="one">LOGRO DESBLOQUEADO</item>
+        <item quantity="other">LOGROS DESBLOQUEADOS</item>
+    </plurals>
+    <string name="ayu_celeb_cerrar">Cerrar</string>
+    <string name="ayu_celeb_seguir">¡Seguir!</string>
+
+    <!-- Recorrido -->
+    <string name="ayu_tour_cabecera">CÓMO FUNCIONA</string>
+    <string name="ayu_tour_saltar">Saltar</string>
+    <string name="ayu_tour_empezar">Empezar</string>
+    <string name="ayu_tour_siguiente">Siguiente</string>
+    <string name="ayu_tour_donde">DÓNDE</string>
+    <string name="ayu_tour_1_titulo">Te lleva la sesión</string>
+    <string name="ayu_tour_1_texto">Abres el día que toca y la app va delante: calentamiento, serie a serie con su peso y sus repeticiones, y el descanso contando solo. No tienes que acordarte de en cuál ibas.</string>
+    <string name="ayu_tour_1_donde">En la portada, el bloque de arriba: «Hoy te toca».</string>
+    <string name="ayu_tour_2_titulo">El descanso suena con el móvil guardado</string>
+    <string name="ayu_tour_2_texto">Avisa aunque tengas la pantalla apagada y la app cerrada. Y desde la pantalla de bloqueo pasas a la siguiente serie sin desbloquear el móvil.</string>
+    <string name="ayu_tour_2_donde">Sale solo al terminar cada serie. Si no suena, la portada te avisa de qué permiso falta.</string>
+    <string name="ayu_tour_3_titulo">Te dice cuándo subir el peso</string>
+    <string name="ayu_tour_3_texto">Cuando cierras todas las series arriba del rango, te propone más carga —con el salto que de verdad existe en la máquina— y te escribe el motivo debajo. Si llevas tres sesiones atascado, te propone bajar para volver a subir.</string>
+    <string name="ayu_tour_3_donde">Durante el entreno, y el histórico en «Mis pesos», en la barra de abajo.</string>
+    <string name="ayu_tour_4_titulo">Tus números, no solo la lista</string>
+    <string name="ayu_tour_4_texto">Kilos movidos, fuerza estimada, rachas y un mapa muscular que dice qué se ha llevado cada músculo esta semana. Eso es lo que avisa de que llevas tres semanas sin tocar pierna.</string>
+    <string name="ayu_tour_4_donde">En la barra de abajo: «Estadísticas», «Resultados» y «Logros».</string>
+    <string name="ayu_tour_5_titulo">El plan es tuyo. Los datos, también</string>
+    <string name="ayu_tour_5_texto">Vienen quince planes, pero puedes traerte el tuyo o crearlo dentro. No hay cuenta ni servidor: todo se queda en el móvil, así que la copia de seguridad la guardas tú.</string>
+    <string name="ayu_tour_5_donde">«Mis planes» en la portada, y la copia en Ajustes (la rueda de arriba).</string>
+
+    <!-- Bienvenida -->
+    <string name="ayu_welcome_titulo_preguntando">Cuéntame cinco cosas</string>
+    <string name="ayu_welcome_titulo">Vamos a elegir tu plan</string>
+    <string name="ayu_welcome_sub_preguntando">No se guarda nada de esto: solo sirve para proponerte un plan.</string>
+    <string name="ayu_welcome_sub">Hay quince planes dentro. Puedo recomendarte uno en cinco preguntas, o los miras tú mismo.</string>
+    <string name="ayu_welcome_ayudame">Ayúdame a elegir</string>
+    <string name="ayu_welcome_ver_planes">Ver los planes</string>
+    <string name="ayu_welcome_crear">Crear el mío</string>
+    <string name="ayu_welcome_solo_apuntar">Solo quiero apuntar lo que entreno</string>
+    <string name="ayu_welcome_q_objetivo">¿Qué buscas?</string>
+    <string name="ayu_welcome_q_forma">¿Cómo estás ahora?</string>
+    <string name="ayu_welcome_q_dias">¿Cuántos días por semana?</string>
+    <string name="ayu_welcome_q_tiempo">¿Cuánto tiempo tienes cada día?</string>
+    <string name="ayu_welcome_q_lugar">¿Dónde entrenas?</string>
+    <plurals name="ayu_welcome_n_dias">
+        <item quantity="one">%1$d día</item>
+        <item quantity="other">%1$d días</item>
+    </plurals>
+    <string name="ayu_welcome_te_propongo">TE PROPONGO</string>
+    <string name="ayu_welcome_meta">%1$s · %2$d por semana</string>
+    <string name="ayu_welcome_empezar_con_este">Empezar con este</string>
+    <string name="ayu_welcome_tambien">TAMBIÉN TE PEGAN</string>
+    <string name="ayu_welcome_addons">Y si te sobra un día, encima de cualquiera de estos puedes montar %1$s.</string>
+    <string name="ayu_welcome_o">" o "</string>
+    <string name="ayu_welcome_lo_que_si">LO QUE SÍ TENGO DE ESTO</string>
+    <string name="ayu_welcome_bloque_corto">Es un bloque corto: se hace solo o encima de cualquier plan, sin que te cambie la semana.</string>
+    <string name="ayu_welcome_ver_todos">Ver todos los planes</string>
+    <string name="ayu_welcome_mejor_creo">Mejor me creo el mío</string>
+    <string name="ayu_welcome_falta_objetivo">qué buscas</string>
+    <string name="ayu_welcome_falta_forma">cómo estás ahora</string>
+    <string name="ayu_welcome_falta_dias">cuántos días</string>
+    <string name="ayu_welcome_falta_tiempo">cuánto tiempo tienes</string>
+    <string name="ayu_welcome_falta_lugar">dónde entrenas</string>
+    <string name="ayu_welcome_ver_propuesta">Ver qué me propones</string>
+    <plurals name="ayu_welcome_te_faltan">
+        <item quantity="one">Te falta una: %2$s.</item>
+        <item quantity="other">Te faltan %1$d; la siguiente: %2$s.</item>
+    </plurals>
+    <string name="ayu_welcome_obj_perder">Perder grasa</string>
+    <string name="ayu_welcome_obj_musculo">Ganar músculo</string>
+    <string name="ayu_welcome_obj_fuerza">Levantar más</string>
+    <string name="ayu_welcome_obj_mantener">Mantenerme</string>
+    <string name="ayu_welcome_obj_movilidad">Moverme mejor</string>
+    <string name="ayu_welcome_forma_limitado">Me cuesta moverme</string>
+    <string name="ayu_welcome_forma_parado">Parado hace tiempo</string>
+    <string name="ayu_welcome_forma_aveces">De vez en cuando</string>
+    <string name="ayu_welcome_forma_regular">Entreno regular</string>
+    <string name="ayu_welcome_tiempo_30">Media hora</string>
+    <string name="ayu_welcome_tiempo_45">45 minutos</string>
+    <string name="ayu_welcome_tiempo_60">Una hora</string>
+    <string name="ayu_welcome_tiempo_90">Más de una hora</string>
+    <string name="ayu_welcome_lugar_gym">En el gimnasio</string>
+    <string name="ayu_welcome_lugar_casa">En casa, sin material</string>
+    <string name="ayu_welcome_privacidad">Se calcula en el móvil y se descarta. No hay cuentas ni servidor.</string>
+    <string name="ayu_welcome_nada_encaja">NO TENGO NADA QUE ENCAJE</string>
+    <string name="ayu_welcome_lo_mas_cercano">LO MÁS CERCANO</string>
+
+    <!-- Ayuda -->
+    <string name="ayu_help_titulo">Ayuda</string>
+    <string name="ayu_help_volver">Volver</string>
+    <string name="ayu_help_intro">Toca un apartado para verlo. Mirar la ayuda no cambia nada: si tienes un entreno en marcha, sigue exactamente igual al volver.</string>
+    <string name="ayu_help_captura">Captura: %1$s</string>
+    <string name="ayu_help_captura_ampliada">Captura ampliada. Toca para cerrar.</string>
+
+    <string name="ayu_help_inicio_title">Inicio</string>
+    <string name="ayu_help_inicio_summary">Lo que te toca hoy y cómo vas.</string>
+    <string-array name="ayu_help_inicio_steps">
+        <item>Arriba a la derecha, ⓘ abre esta ayuda (también está en Ajustes y en la cabecera del entreno) y el engranaje, los ajustes.</item>
+        <item>Debajo, el plan que sigues y la fase. «Ver otros planes» lleva a la lista: hay planes de fuerza, de músculo, para casa, para empezar desde cero…</item>
+        <item>El bloque grande es el día que toca. «Empezar día» arranca el entreno guiado; «Ver el día antes de empezar» enseña los ejercicios sin empezar nada.</item>
+        <item>Si tienes un entreno a medias, ese bloque dice «En curso» y el botón lo reanuda donde lo dejaste.</item>
+        <item>«Entreno libre» es para entrenar sin seguir el plan, con descansos y apuntando sobre la marcha. Los «Entrenamientos especiales» son rutinas sueltas que no cuentan como día.</item>
+        <item>Abajo, la barra: Logros, Mis pesos, Resultados y Estadísticas.</item>
+    </string-array>
+
+    <string name="ayu_help_dia_title">La ficha del día</string>
+    <string name="ayu_help_dia_summary">Los ejercicios de un día, antes o después de hacerlo.</string>
+    <string-array name="ayu_help_dia_steps">
+        <item>Cada ejercicio con su dibujo, las series y repeticiones («3 x 12») y el descanso entre series.</item>
+        <item>«Cómo se hace» abre la ficha: músculos, técnica, errores típicos, alternativas y un vídeo.</item>
+        <item>«Apuntar a mano» sirve para anotar un día que entrenaste sin la app. Lo hecho con el entreno guiado se apunta solo al terminar.</item>
+        <item>Si tienes el entreno de ese día a medias, el botón dice «Continuar entrenamiento».</item>
+    </string-array>
+
+    <string name="ayu_help_expres_title">Antes de empezar: el exprés</string>
+    <string name="ayu_help_expres_summary">Cuánto dura el día y cómo recortarlo si vas justo.</string>
+    <string-array name="ayu_help_expres_steps">
+        <item>Al empezar ves cuánto suele durar el día. La cuenta aprende de lo que tú tardas de verdad.</item>
+        <item>Si vas justo, elige 45 o 30 minutos: todos los ejercicios bajan a 2 series y, si aún no cabe, se quitan los del final. La app te dice cuáles.</item>
+        <item>Un exprés cuenta como día hecho igual que uno entero.</item>
+    </string-array>
+
+    <string name="ayu_help_serie_title">La serie</string>
+    <string name="ayu_help_serie_summary">Lo que haces con la máquina delante.</string>
+    <string-array name="ayu_help_serie_steps">
+        <item>Pon el peso con − y + (de medio en medio kilo; manteniendo pulsado corre), con «Rueda» o tocando la cifra para escribirla.</item>
+        <item>Las repeticiones vienen puestas con las del plan: tócalas solo si hoy han salido otras.</item>
+        <item>«Serie de calentamiento» apunta una serie de aproximación sin gastar serie del plan.</item>
+        <item>«Saltar» es para cuando ese ejercicio no toca ahora: «Máquina ocupada» lo deja para el final, «Hacer otro en su lugar» lo cambia por una alternativa y «No lo hago hoy» lo tacha (lo hecho queda apuntado; lo que no, no cuenta).</item>
+        <item>«Plan» enseña todo el día y por dónde vas, con los saltados tachados al final.</item>
+        <item>Cuando acabes, «Serie hecha».</item>
+    </string-array>
+
+    <string name="ayu_help_descanso_title">El descanso</string>
+    <string name="ayu_help_descanso_summary">La cuenta atrás entre series.</string>
+    <string-array name="ayu_help_descanso_steps">
+        <item>El descanso depende del ejercicio: el tuyo de siempre en series normales (1:30 si no lo cambias en Ajustes), 3 minutos en series pesadas (8 repeticiones o menos en un básico) o lo que diga el plan. Debajo de la cifra pone de dónde sale.</item>
+        <item>−30 s y +30 s lo ajustan. Si lo cambias entre series, la próxima vez ese ejercicio ya empieza con tu descanso.</item>
+        <item>Suena y vibra al acabar aunque tengas la pantalla apagada (y el reloj, si lo usas).</item>
+        <item>«¿Cómo ha ido?» apunta si la serie fue fácil, justa o al fallo, y alarga el descanso: «Justo» suma 30 s y «Fallo», un minuto. En «Después» puedes dejar preparado el peso de la siguiente.</item>
+    </string-array>
+
+    <string name="ayu_help_maquina_title">Si no tienes la máquina</string>
+    <string name="ayu_help_maquina_summary">Hacer otro ejercicio y que quede apuntado como lo que fue.</string>
+    <string-array name="ayu_help_maquina_steps">
+        <item>En la serie, toca «Saltar» → «Hacer otro en su lugar» (o «Cómo se hace» y baja a «Si está ocupada o no la tienes»).</item>
+        <item>Las alternativas que la app conoce salen con su dibujo: toca «La hago» y el ejercicio de hoy pasa a ser ese, con sus propios pesos.</item>
+        <item>«He hecho otro ejercicio…» busca entre 151 ejercicios o deja escribir el tuyo.</item>
+        <item>Con «Recordarlo para los próximos días» marcado, los días siguientes ya empiezan con el cambio. «Volver al del plan» lo deshace.</item>
+    </string-array>
+
+    <string name="ayu_help_libre_title">El entreno libre</string>
+    <string name="ayu_help_libre_summary">Sin plan, pero con descansos y todo apuntado sobre la marcha.</string>
+    <string-array name="ayu_help_libre_steps">
+        <item>Empieza con el calentamiento: «Ya he calentado» lo salta.</item>
+        <item>Haz tu serie y pulsa «Serie terminada». El descanso arranca en el acto y, mientras corre, eliges qué ejercicio era (solo la primera vez) y apuntas kilos y repeticiones.</item>
+        <item>Las siguientes series del mismo ejercicio vienen con lo de la anterior: solo tocas lo que cambie. «¿Cómo ha ido?» alarga el descanso igual que en el guiado.</item>
+        <item>Si lo haces con tu peso, marca «Peso corporal, sin kilos»: solo te pedirá repeticiones, y se acuerda para la próxima vez.</item>
+        <item>Si escribes uno que la app no conoce, como «Remo en TRX», se guarda en el móvil como tuyo, sin dibujo ni mapa de músculos. Te lo ofrece solo con un plan creado por ti: en el buscador, en las sugerencias y al montar el plan.</item>
+        <item>«Terminar ejercicio» da el descanso entre ejercicios; la siguiente serie vuelve a preguntar cuál es.</item>
+        <item>«Finalizar» enseña todo lo apuntado para repasarlo antes de guardar.</item>
+    </string-array>
+
+    <string name="ayu_help_salir_title">Salir sin perder nada</string>
+    <string name="ayu_help_salir_summary">El entreno se guarda solo mientras lo haces.</string>
+    <string-array name="ayu_help_salir_steps">
+        <item>El botón atrás del móvil te lleva a Inicio con el entreno en marcha: lo reanudas desde el bloque «En curso».</item>
+        <item>La X de arriba pregunta qué quieres: «Terminar y guardar» da el día por hecho con lo que lleves, «Reanudar luego» lo deja como está y «Descartar» lo borra.</item>
+        <item>Mirar esta ayuda, la ficha o el plan nunca toca el entreno.</item>
+    </string-array>
+
+    <string name="ayu_help_resultados_title">Resultados</string>
+    <string name="ayu_help_resultados_summary">Lo que hiciste cada día.</string>
+    <string-array name="ayu_help_resultados_steps">
+        <item>Cada entreno con su duración y, por ejercicio, los kilos de cada serie.</item>
+        <item>«Recientes / Antiguos» cambia el orden.</item>
+        <item>Si hiciste otro ejercicio en lugar del del plan, sale con su nombre y «en lugar de…».</item>
+    </string-array>
+
+    <string name="ayu_help_estadisticas_title">Estadísticas</string>
+    <string name="ayu_help_estadisticas_summary">Tu racha, tus números y tu progreso.</string>
+    <string-array name="ayu_help_estadisticas_steps">
+        <item>Resumen: racha, días hechos, tiempo total, series y kilos movidos.</item>
+        <item>Pesos: cómo ha subido cada ejercicio. Músculos: qué has trabajado los últimos días. Constancia: qué días entrenas.</item>
+    </string-array>
+
+    <string name="ayu_help_pesos_title">Mis pesos</string>
+    <string name="ayu_help_pesos_summary">El peso con el que trabajas en cada ejercicio.</string>
+    <string-array name="ayu_help_pesos_steps">
+        <item>Agrupados por músculo. Se rellenan solos al entrenar y los puedes corregir.</item>
+        <item>Es el peso de tu última sesión; tu récord (PR) sale debajo de cada ejercicio.</item>
+    </string-array>
+
+    <string name="ayu_help_planes_title">Planes</string>
+    <string name="ayu_help_planes_summary">Cambiar de plan, importar uno o crear el tuyo.</string>
+    <string-array name="ayu_help_planes_steps">
+        <item>Cada plan guarda su propio progreso: cambiar de plan no borra nada.</item>
+        <item>Debajo de cada uno: su objetivo (fuerza, músculo…), los días y cuántos llevas.</item>
+        <item>«Crear un plan» abre el editor; «Importar» trae uno en JSON o Markdown.</item>
+    </string-array>
+
+    <string name="ayu_help_ajustes_title">Ajustes</string>
+    <string name="ayu_help_ajustes_summary">Tus datos, descansos, avisos, tema y copia de seguridad.</string>
+    <string-array name="ayu_help_ajustes_steps">
+        <item>Peso (para estimar calorías), género de los dibujos y si usas reloj.</item>
+        <item>Descansos: cuánto duran por defecto entre series y entre ejercicios.</item>
+        <item>Recordatorios: elige días y hora y la app te avisa de que toca entrenar.</item>
+        <item>Tema claro u oscuro, y copia de seguridad para llevarte el progreso a otro móvil.</item>
+    </string-array>
+
+    <string name="ayu_help_reloj_title">Con el reloj</string>
+    <string name="ayu_help_reloj_summary">Si tienes un reloj con Wear OS.</string>
+    <string-array name="ayu_help_reloj_steps">
+        <item>Instala la app del reloj y el reloj hará de mando: «Serie hecha», saltar el descanso o cambiar de máquina sin sacar el móvil.</item>
+        <item>El reloj vibra al acabar cada descanso y, mientras entrenas, enseña en la esfera el tiempo que queda.</item>
+    </string-array>
+</resources>

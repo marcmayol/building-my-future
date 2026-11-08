@@ -18,6 +18,7 @@ import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.SessionEngine
+import com.marc.gymplan100.ui.theme.AppLanguage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -121,14 +122,16 @@ object TrainingReminder {
     private fun ensureChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val mgr = context.getSystemService(NotificationManager::class.java)
-        if (mgr.getNotificationChannel(CHANNEL_ID) != null) return
+        // Se crea siempre, aunque ya exista: con un canal existente Android solo actualiza el
+        // nombre y la descripción, y así siguen el idioma elegido en la app.
+        val textos = AppLanguage.wrap(context)
         mgr.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID,
-                "Recordatorio de entrenamiento",
+                textos.getString(R.string.ini_reminder_channel),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "El aviso de los días que has dicho que vas al gimnasio."
+                description = textos.getString(R.string.ini_reminder_channel_desc)
             }
         )
     }
@@ -143,11 +146,14 @@ object TrainingReminder {
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        // El contexto del receiver no sabe el idioma elegido en la app: se le pide a AppLanguage.
+        val textos = AppLanguage.wrap(context)
+        val cuerpo = textos.getString(R.string.ini_day_n_title, dayNumber, title)
         val notif = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Hoy toca gimnasio")
-            .setContentText("Día $dayNumber · $title")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("Día $dayNumber · $title"))
+            .setContentTitle(textos.getString(R.string.ini_reminder_title))
+            .setContentText(cuerpo)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(cuerpo))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(Notification.CATEGORY_REMINDER)
             .setAutoCancel(true)
@@ -202,15 +208,15 @@ class BootReceiver : BroadcastReceiver() {
     }
 }
 
-/** Lunes a domingo, para pintar los chips. */
-val WEEKDAY_LABELS: List<Pair<Int, String>> = DayOfWeek.entries.map { d ->
+/** Lunes a domingo, para pintar los chips: el número del día y el recurso de su inicial. */
+val WEEKDAY_LABELS: List<Pair<Int, Int>> = DayOfWeek.entries.map { d ->
     d.value to when (d) {
-        DayOfWeek.MONDAY -> "L"
-        DayOfWeek.TUESDAY -> "M"
-        DayOfWeek.WEDNESDAY -> "X"
-        DayOfWeek.THURSDAY -> "J"
-        DayOfWeek.FRIDAY -> "V"
-        DayOfWeek.SATURDAY -> "S"
-        DayOfWeek.SUNDAY -> "D"
+        DayOfWeek.MONDAY -> R.string.ini_weekday_mon
+        DayOfWeek.TUESDAY -> R.string.ini_weekday_tue
+        DayOfWeek.WEDNESDAY -> R.string.ini_weekday_wed
+        DayOfWeek.THURSDAY -> R.string.ini_weekday_thu
+        DayOfWeek.FRIDAY -> R.string.ini_weekday_fri
+        DayOfWeek.SATURDAY -> R.string.ini_weekday_sat
+        DayOfWeek.SUNDAY -> R.string.ini_weekday_sun
     }
 }

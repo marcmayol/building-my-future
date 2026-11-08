@@ -10,7 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.BuildConfig
+import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.Space
 
 /**
@@ -46,16 +48,16 @@ object Updates {
     @Composable
     fun SettingsSection() {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Text("Actualizaciones", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ini_updates_title), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.size(Space.x1))
             Text(
-                "Las actualizaciones llegan por Google Play, como en cualquier otra app.",
+                stringResource(R.string.ini_upd_play_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.size(Space.x2))
             Text(
-                "Versión ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                stringResource(R.string.ini_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

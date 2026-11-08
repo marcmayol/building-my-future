@@ -1,5 +1,6 @@
 package com.marc.gymplan100.health
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,7 +16,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.marc.gymplan100.R
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.GymPlanTheme
 
 /**
@@ -23,6 +27,12 @@ import com.marc.gymplan100.ui.theme.GymPlanTheme
  * "¿Por qué se necesita este permiso?". Explica qué datos escribimos y por qué.
  */
 class PermissionsRationaleActivity : ComponentActivity() {
+    // La abre Health Connect, no la app: sin esto saldría en el idioma del móvil y no en el
+    // elegido en Ajustes.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLanguage.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,30 +59,26 @@ private fun RationaleContent() {
             .padding(24.dp)
     ) {
         Text(
-            "Building My Future y Health Connect",
+            stringResource(R.string.ini_health_title),
             style = MaterialTheme.typography.headlineSmall
         )
         Text(
-            "Cuando terminas un entrenamiento en la app, guardamos esa sesión en Health Connect " +
-                "(la plataforma de Google Health) para que tus entrenos aparezcan junto al resto " +
-                "de tu actividad física.",
+            stringResource(R.string.ini_health_intro),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 16.dp)
         )
         Text(
-            "Qué escribimos",
+            stringResource(R.string.ini_health_what),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(top = 20.dp)
         )
         Text(
-            "• La sesión de ejercicio (tipo fuerza) con su fecha y duración.\n" +
-                "• El detalle de cada ejercicio y los pesos usados, en las notas de la sesión.",
+            stringResource(R.string.ini_health_what_body),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 8.dp)
         )
         Text(
-            "La app solo escribe estos datos: nunca lee tu información de salud. Puedes revocar " +
-                "el permiso en cualquier momento desde los ajustes de Health Connect.",
+            stringResource(R.string.ini_health_only_write),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 20.dp)
         )

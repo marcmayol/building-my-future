@@ -61,7 +61,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.R
 import com.marc.gymplan100.data.DiaDto
 import com.marc.gymplan100.data.EjercicioDto
 import com.marc.gymplan100.data.FaseDto
@@ -99,43 +103,78 @@ private fun <T> List<T>.moved(index: Int, delta: Int): List<T> {
  * pintarlo donde el usuario lo va a mirar. Las reglas son las mismas.
  */
 private data class EditorErrors(
-    val byExercise: Map<Triple<Int, Int, Int>, String> = emptyMap(),
-    val byDay: Map<Pair<Int, Int>, String> = emptyMap(),
-    val byPhase: Map<Int, String> = emptyMap(),
+    val byExercise: Map<Triple<Int, Int, Int>, EditorProblem> = emptyMap(),
+    val byDay: Map<Pair<Int, Int>, EditorProblem> = emptyMap(),
+    val byPhase: Map<Int, EditorProblem> = emptyMap(),
 ) {
     val isEmpty: Boolean get() = byExercise.isEmpty() && byDay.isEmpty() && byPhase.isEmpty()
 }
 
+/**
+ * Lo que falla en una fila, sin escribir aún el texto: el mensaje sale de los recursos al
+ * pintarlo ([EditorProblem.text]), en el idioma de la app. Las etiquetas que llevan dentro
+ * son las que ha escrito el usuario, o null si la fila no tiene nombre y hay que numerarla.
+ */
+private sealed interface EditorProblem {
+    data class PhaseWithoutDays(val phase: String?, val phaseNumber: Int) : EditorProblem
+    data class DayWithoutExercises(val day: String?, val dayNumber: Int) : EditorProblem
+    data object ExerciseWithoutName : EditorProblem
+    data object ExerciseWithoutScheme : EditorProblem
+    data class ExerciseWithoutNameIn(val day: String?, val dayNumber: Int) : EditorProblem
+    data class ExerciseWithoutSchemeIn(val exercise: String, val day: String?, val dayNumber: Int) : EditorProblem
+}
+
+/** El nombre del día, o "Día N" si no lo tiene. */
+@Composable
+private fun dayLabel(day: String?, n: Int): String = day ?: stringResource(R.string.plan_day_n, n)
+
+@Composable
+private fun EditorProblem.text(): String {
+    return when (this) {
+        is EditorProblem.PhaseWithoutDays -> stringResource(
+            R.string.plan_editor_phase_no_days,
+            phase ?: stringResource(R.string.plan_phase_n, phaseNumber)
+        )
+        is EditorProblem.DayWithoutExercises ->
+            stringResource(R.string.plan_editor_day_no_exercises, dayLabel(day, dayNumber))
+        EditorProblem.ExerciseWithoutName -> stringResource(R.string.plan_editor_exercise_no_name)
+        EditorProblem.ExerciseWithoutScheme -> stringResource(R.string.plan_editor_exercise_no_scheme)
+        is EditorProblem.ExerciseWithoutNameIn ->
+            stringResource(R.string.plan_editor_exercise_no_name_in, dayLabel(day, dayNumber))
+        is EditorProblem.ExerciseWithoutSchemeIn ->
+            stringResource(R.string.plan_editor_exercise_no_scheme_short, exercise, dayLabel(day, dayNumber))
+    }
+}
+
 private fun problemsOf(dto: PlanDto): EditorErrors {
-    val exercises = mutableMapOf<Triple<Int, Int, Int>, String>()
-    val days = mutableMapOf<Pair<Int, Int>, String>()
-    val phases = mutableMapOf<Int, String>()
+    val exercises = mutableMapOf<Triple<Int, Int, Int>, EditorProblem>()
+    val days = mutableMapOf<Pair<Int, Int>, EditorProblem>()
+    val phases = mutableMapOf<Int, EditorProblem>()
 
     dto.fases.forEachIndexed { p, fase ->
-        val phaseLabel = fase.nombre.trim().ifEmpty { "Fase ${p + 1}" }
+        val phaseLabel = fase.nombre.trim().ifEmpty { null }
         if (fase.dias.isEmpty()) {
-            phases[p] = "«$phaseLabel» no tiene ningún día."
+            phases[p] = EditorProblem.PhaseWithoutDays(phaseLabel, p + 1)
             return@forEachIndexed
         }
         fase.dias.forEachIndexed { d, dia ->
-            val dayLabel = dia.dia.trim().ifEmpty { dia.titulo.trim().ifEmpty { "Día ${d + 1}" } }
+            val dayLabel = dia.dia.trim().ifEmpty { dia.titulo.trim() }.ifEmpty { null }
             if (dia.ejercicios.isEmpty()) {
-                days[p to d] = "«$dayLabel» no tiene ejercicios."
-                phases.putIfAbsent(p, "«$dayLabel» no tiene ejercicios.")
+                days[p to d] = EditorProblem.DayWithoutExercises(dayLabel, d + 1)
+                phases.putIfAbsent(p, EditorProblem.DayWithoutExercises(dayLabel, d + 1))
                 return@forEachIndexed
             }
             dia.ejercicios.forEachIndexed { e, ej ->
                 val name = ej.nombre.trim()
                 val problem = when {
-                    name.isEmpty() -> "Este ejercicio no tiene nombre."
-                    ej.esquema.trim().isEmpty() ->
-                        "Dime las repeticiones: 4 x 8, por ejemplo."
+                    name.isEmpty() -> EditorProblem.ExerciseWithoutName
+                    ej.esquema.trim().isEmpty() -> EditorProblem.ExerciseWithoutScheme
                     else -> null
                 }
                 if (problem != null) {
                     exercises[Triple(p, d, e)] = problem
-                    val short = if (name.isEmpty()) "Hay un ejercicio sin nombre en «$dayLabel»"
-                    else "«$name» ($dayLabel) no dice las series"
+                    val short = if (name.isEmpty()) EditorProblem.ExerciseWithoutNameIn(dayLabel, d + 1)
+                    else EditorProblem.ExerciseWithoutSchemeIn(name, dayLabel, d + 1)
                     days.putIfAbsent(p to d, problem)
                     phases.putIfAbsent(p, short)
                 }
@@ -169,6 +208,7 @@ fun PlanEditorScreen(
     val draft by viewModel.draft.collectAsState()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var level by remember { mutableStateOf<EditorLevel>(EditorLevel.Plan) }
     var editingExercise by remember { mutableStateOf<Triple<Int, Int, Int>?>(null) }
 
@@ -195,12 +235,12 @@ fun PlanEditorScreen(
             when (val l = level) {
                 EditorLevel.Plan -> EditorTopBar(
                     overline = null,
-                    title = if (plan.id == null) "Nuevo plan" else "Editar plan",
+                    title = stringResource(if (plan.id == null) R.string.plan_editor_new else R.string.plan_editor_edit),
                     onBack = { viewModel.discardDraft() }
                 )
                 is EditorLevel.Phase -> EditorTopBar(
-                    overline = "FASE ${l.phase + 1} DE ${plan.fases.size}",
-                    title = plan.fases[l.phase].nombre.ifBlank { "Fase ${l.phase + 1}" },
+                    overline = stringResource(R.string.plan_editor_phase_overline, l.phase + 1, plan.fases.size),
+                    title = plan.fases[l.phase].nombre.ifBlank { stringResource(R.string.plan_phase_n, l.phase + 1) },
                     onBack = { level = EditorLevel.Plan }
                 )
                 is EditorLevel.Day -> {
@@ -208,9 +248,12 @@ fun PlanEditorScreen(
                     val dia = fase.dias[l.day]
                     EditorTopBar(
                         // Sin repetir "FASE" cuando la fase ya se llama "Fase 1".
-                        overline = "DÍA ${l.day + 1} · ${fase.nombre.ifBlank { "FASE ${l.phase + 1}" }}"
-                            .uppercase(),
-                        title = dia.titulo.ifBlank { dia.dia.ifBlank { "Día ${l.day + 1}" } },
+                        overline = stringResource(
+                            R.string.plan_editor_day_overline,
+                            l.day + 1,
+                            fase.nombre.ifBlank { stringResource(R.string.plan_phase_n, l.phase + 1) }
+                        ).uppercase(),
+                        title = dia.titulo.ifBlank { dia.dia.ifBlank { stringResource(R.string.plan_day_n, l.day + 1) } },
                         onBack = { level = EditorLevel.Phase(l.phase) }
                     )
                 }
@@ -234,7 +277,7 @@ fun PlanEditorScreen(
                 onSave = {
                     viewModel.saveDraft { result ->
                         if (result is PlanImport.Error) {
-                            scope.launch { snackbar.showSnackbar(result.message) }
+                            scope.launch { snackbar.showSnackbar(result.problem.text(context)) }
                         }
                     }
                 }
@@ -323,6 +366,7 @@ private fun PlanLevel(
     onSave: () -> Unit,
 ) {
     val styles = LocalAppTextStyles.current
+    val context = LocalContext.current
     val totalDays = plan.fases.sumOf { it.dias.size * it.semanas.coerceAtLeast(1) }
 
     LazyColumn(
@@ -343,13 +387,13 @@ private fun PlanLevel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Con lo escrito salen",
+                    stringResource(R.string.plan_editor_total),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    if (totalDays == 1) "1 día" else "$totalDays días",
+                    pluralStringResource(R.plurals.plan_days_count, totalDays, totalDays),
                     style = styles.tabular.copy(fontSize = MaterialTheme.typography.titleLarge.fontSize),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -358,33 +402,33 @@ private fun PlanLevel(
 
         item {
             EditorField(
-                label = "NOMBRE DEL PLAN",
+                label = stringResource(R.string.plan_editor_name_label),
                 value = plan.nombre,
-                placeholder = "Mi vuelta al gimnasio",
+                placeholder = stringResource(R.string.plan_editor_name_placeholder),
                 onValue = { v -> onEdit { it.copy(nombre = v) } }
             )
         }
         item {
             EditorField(
-                label = "DESCRIPCIÓN · OPCIONAL",
+                label = stringResource(R.string.plan_editor_description_label),
                 value = plan.descripcion,
-                placeholder = "Para qué es este plan",
+                placeholder = stringResource(R.string.plan_editor_description_placeholder),
                 singleLine = false,
                 onValue = { v -> onEdit { it.copy(descripcion = v) } }
             )
         }
 
         item {
-            LabelCaps("FASES · ${plan.fases.size}", top = Space.x3)
+            LabelCaps(stringResource(R.string.plan_editor_phases_label, plan.fases.size), top = Space.x3)
         }
 
         itemsIndexedCompat(plan.fases) { index, fase ->
             NavRow(
                 leading = "${index + 1}",
-                title = fase.nombre.ifBlank { "Fase ${index + 1}" },
-                subtitle = "${fase.semanas} ${if (fase.semanas == 1) "semana" else "semanas"} · " +
-                    "${fase.dias.size} ${if (fase.dias.size == 1) "día" else "días"}",
-                error = errors.byPhase[index],
+                title = fase.nombre.ifBlank { stringResource(R.string.plan_phase_n, index + 1) },
+                subtitle = pluralStringResource(R.plurals.plan_weeks_count, fase.semanas, fase.semanas) + " · " +
+                    pluralStringResource(R.plurals.plan_days_count, fase.dias.size, fase.dias.size),
+                error = errors.byPhase[index]?.text(),
                 canUp = index > 0,
                 canDown = index < plan.fases.lastIndex,
                 onMove = { delta -> onEdit { it.copy(fases = it.fases.moved(index, delta)) } },
@@ -393,11 +437,13 @@ private fun PlanLevel(
         }
 
         item {
-            DashedAddButton("+ Añadir una fase") {
+            DashedAddButton(stringResource(R.string.plan_editor_add_phase)) {
                 onEdit {
                     it.copy(
                         fases = it.fases + FaseDto(
-                            nombre = "Fase ${it.fases.size + 1}",
+                            // Nombre propuesto en el idioma de la app; se guarda tal cual, como
+                            // si lo hubiera escrito el usuario.
+                            nombre = context.getString(R.string.plan_phase_n, it.fases.size + 1),
                             semanas = 4,
                             dias = listOf(DiaDto(ejercicios = listOf(EjercicioDto())))
                         )
@@ -413,11 +459,10 @@ private fun PlanLevel(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = Touch.primary)
-            ) { Text("Guardar el plan") }
+            ) { Text(stringResource(R.string.plan_editor_save)) }
             Spacer(Modifier.height(Space.x2))
             Text(
-                if (errors.isEmpty) "Todo listo: se guarda y ya puedes seguirlo."
-                else "Arregla lo que está marcado en rojo y vuelve a guardar.",
+                stringResource(if (errors.isEmpty) R.string.plan_editor_all_set else R.string.plan_editor_fix_red),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
@@ -454,15 +499,15 @@ private fun PhaseLevel(
     ) {
         item {
             EditorField(
-                label = "NOMBRE",
+                label = stringResource(R.string.plan_editor_phase_name_label),
                 value = fase.nombre,
-                placeholder = "Base, Carga, Descarga…",
+                placeholder = stringResource(R.string.plan_editor_phase_name_placeholder),
                 onValue = { v -> editPhase { it.copy(nombre = v) } }
             )
         }
 
         item {
-            LabelCaps("SEMANAS")
+            LabelCaps(stringResource(R.string.plan_editor_weeks_label))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -497,8 +542,7 @@ private fun PhaseLevel(
             }
             Spacer(Modifier.height(Space.x1))
             Text(
-                "Los días de esta fase se repiten ${fase.semanas} " +
-                    if (fase.semanas == 1) "semana." else "semanas.",
+                pluralStringResource(R.plurals.plan_editor_weeks_repeat, fase.semanas, fase.semanas),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -506,26 +550,24 @@ private fun PhaseLevel(
 
         item {
             EditorField(
-                label = "PROGRESIÓN · CÓMO SUBIR",
+                label = stringResource(R.string.plan_editor_progression_label),
                 value = fase.progresion,
-                placeholder = "Sube 2,5 kg cuando acabes las 4 series sin fallar.",
+                placeholder = stringResource(R.string.plan_editor_progression_placeholder),
                 singleLine = false,
                 onValue = { v -> editPhase { it.copy(progresion = v) } }
             )
         }
 
-        item { LabelCaps("DÍAS DE LA FASE · ${fase.dias.size}", top = Space.x3) }
+        item { LabelCaps(stringResource(R.string.plan_editor_phase_days_label, fase.dias.size), top = Space.x3) }
 
         itemsIndexedCompat(fase.dias) { index, dia ->
             NavRow(
                 leading = "${index + 1}",
-                title = dia.titulo.ifBlank { dia.dia.ifBlank { "Día ${index + 1}" } },
-                subtitle = buildString {
-                    append("${dia.ejercicios.size} ")
-                    append(if (dia.ejercicios.size == 1) "ejercicio" else "ejercicios")
-                    if (dia.calentamiento.isNotBlank()) append(" · ${dia.calentamiento}")
-                },
-                error = errors.byDay[phaseIndex to index],
+                title = dia.titulo.ifBlank { dia.dia.ifBlank { stringResource(R.string.plan_day_n, index + 1) } },
+                subtitle = pluralStringResource(
+                    R.plurals.plan_exercises_count, dia.ejercicios.size, dia.ejercicios.size
+                ) + if (dia.calentamiento.isNotBlank()) " · ${dia.calentamiento}" else "",
+                error = errors.byDay[phaseIndex to index]?.text(),
                 canUp = index > 0,
                 canDown = index < fase.dias.lastIndex,
                 onMove = { delta -> editPhase { it.copy(dias = it.dias.moved(index, delta)) } },
@@ -534,7 +576,7 @@ private fun PhaseLevel(
         }
 
         item {
-            DashedAddButton("+ Añadir un día") {
+            DashedAddButton(stringResource(R.string.plan_editor_add_day)) {
                 editPhase { it.copy(dias = it.dias + DiaDto(ejercicios = listOf(EjercicioDto()))) }
             }
         }
@@ -548,18 +590,18 @@ private fun PhaseLevel(
                     modifier = Modifier
                         .weight(1f)
                         .heightIn(min = Touch.primary)
-                ) { Text("Borrar fase") }
+                ) { Text(stringResource(R.string.plan_editor_delete_phase)) }
                 Button(
                     onClick = onDone,
                     modifier = Modifier
                         .weight(1f)
                         .heightIn(min = Touch.primary)
-                ) { Text("Hecho") }
+                ) { Text(stringResource(R.string.plan_done)) }
             }
             if (plan.fases.size == 1) {
                 Spacer(Modifier.height(Space.x2))
                 Text(
-                    "No se puede borrar: un plan necesita al menos una fase.",
+                    stringResource(R.string.plan_editor_cannot_delete_phase),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -603,33 +645,33 @@ private fun DayLevel(
     ) {
         item {
             EditorField(
-                label = "DÍA DE LA SEMANA",
+                label = stringResource(R.string.plan_editor_weekday_label),
                 value = dia.dia,
-                placeholder = "Lunes",
+                placeholder = stringResource(R.string.plan_editor_weekday_placeholder),
                 onValue = { v -> editDay { it.copy(dia = v) } }
             )
         }
         item {
             EditorField(
-                label = "TÍTULO DEL ENTRENO",
+                label = stringResource(R.string.plan_editor_title_label),
                 value = dia.titulo,
-                placeholder = "Empuje · pecho y hombro",
+                placeholder = stringResource(R.string.plan_editor_title_placeholder),
                 onValue = { v -> editDay { it.copy(titulo = v) } }
             )
         }
         item {
             EditorField(
-                label = "CALENTAMIENTO",
+                label = stringResource(R.string.plan_editor_warmup_label),
                 value = dia.calentamiento,
-                placeholder = "5 min de bici suave",
+                placeholder = stringResource(R.string.plan_editor_warmup_placeholder),
                 onValue = { v -> editDay { it.copy(calentamiento = v) } }
             )
         }
 
-        item { LabelCaps("EJERCICIOS · ${dia.ejercicios.size}", top = Space.x3) }
+        item { LabelCaps(stringResource(R.string.plan_editor_exercises_label, dia.ejercicios.size), top = Space.x3) }
 
         itemsIndexedCompat(dia.ejercicios) { index, ejercicio ->
-            val problem = errors.byExercise[Triple(phaseIndex, dayIndex, index)]
+            val problem = errors.byExercise[Triple(phaseIndex, dayIndex, index)]?.text()
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -650,7 +692,7 @@ private fun DayLevel(
                     )
                     Spacer(Modifier.size(Space.x3))
                     Text(
-                        ejercicio.nombre.ifBlank { "Ejercicio sin nombre" },
+                        ejercicio.nombre.ifBlank { stringResource(R.string.plan_editor_unnamed_exercise) },
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (ejercicio.nombre.isBlank())
                             MaterialTheme.colorScheme.onSurfaceVariant
@@ -664,14 +706,14 @@ private fun DayLevel(
                         },
                         enabled = index > 0,
                         modifier = Modifier.size(32.dp)
-                    ) { Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Subir") }
+                    ) { Icon(Icons.Filled.KeyboardArrowUp, contentDescription = stringResource(R.string.plan_move_up)) }
                     IconButton(
                         onClick = {
                             editDay { it.copy(ejercicios = it.ejercicios.moved(index, 1)) }
                         },
                         enabled = index < dia.ejercicios.lastIndex,
                         modifier = Modifier.size(32.dp)
-                    ) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Bajar") }
+                    ) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = stringResource(R.string.plan_move_down)) }
                 }
                 if (problem != null) {
                     Spacer(Modifier.height(Space.x1))
@@ -686,7 +728,7 @@ private fun DayLevel(
         }
 
         item {
-            DashedAddButton("+ Añadir ejercicio") {
+            DashedAddButton(stringResource(R.string.plan_editor_add_exercise)) {
                 editDay { it.copy(ejercicios = it.ejercicios + EjercicioDto()) }
             }
         }
@@ -698,7 +740,7 @@ private fun DayLevel(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = Touch.primary)
-            ) { Text("Hecho") }
+            ) { Text(stringResource(R.string.plan_done)) }
         }
     }
 }
@@ -733,9 +775,9 @@ private fun ExerciseSheet(
                 .padding(bottom = Space.block)
         ) {
             EditorField(
-                label = "EJERCICIO",
+                label = stringResource(R.string.plan_editor_exercise_label),
                 value = ejercicio.nombre,
-                placeholder = "Press de banca",
+                placeholder = stringResource(R.string.plan_editor_exercise_placeholder),
                 onValue = { onChange(ejercicio.copy(nombre = it)) }
             )
             // Los que registraste en entrenos libres: tu plan es el sitio donde valen.
@@ -745,7 +787,7 @@ private fun ExerciseSheet(
             }
             if (tuyos.isNotEmpty()) {
                 Spacer(Modifier.height(Space.x2))
-                LabelCaps("TUS EJERCICIOS")
+                LabelCaps(stringResource(R.string.plan_editor_your_exercises))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                     tuyos.forEach { nombre ->
                         SuggestionChip(
@@ -758,8 +800,7 @@ private fun ExerciseSheet(
             if (ejercicio.nombre.isNotBlank()) {
                 Spacer(Modifier.height(Space.x2))
                 Text(
-                    if (inCatalog) "Está en el catálogo: usará su ilustración y su ficha."
-                    else "No está en el catálogo: no tendrá ilustración ni ficha, solo el vídeo.",
+                    stringResource(if (inCatalog) R.string.plan_editor_in_catalog else R.string.plan_editor_not_in_catalog),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -768,14 +809,14 @@ private fun ExerciseSheet(
             Spacer(Modifier.height(Space.x4))
             if (freeForm) {
                 EditorField(
-                    label = "SERIES",
+                    label = stringResource(R.string.plan_editor_sets_label),
                     value = ejercicio.esquema,
-                    placeholder = "3 vueltas",
+                    placeholder = stringResource(R.string.plan_editor_sets_placeholder),
                     onValue = { onChange(ejercicio.copy(esquema = it)) }
                 )
                 Spacer(Modifier.height(Space.x2))
                 Text(
-                    "Escríbelo como quieras: \"4 x 8\", \"3 x 30 s\", \"3 vueltas\".",
+                    stringResource(R.string.plan_editor_sets_free_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -783,13 +824,15 @@ private fun ExerciseSheet(
                 val scheme = parsed!!
                 Row(horizontalArrangement = Arrangement.spacedBy(Space.x4)) {
                     NumberStepper(
-                        label = "SERIES",
+                        label = stringResource(R.string.plan_editor_sets_label),
                         value = scheme.sets,
                         onValue = { onChange(ejercicio.copy(esquema = scheme.copy(sets = it).text())) },
                         modifier = Modifier.weight(1f)
                     )
                     NumberStepper(
-                        label = if (scheme.seconds) "SEGUNDOS" else "REPS",
+                        label = stringResource(
+                            if (scheme.seconds) R.string.plan_editor_seconds_label else R.string.plan_editor_reps_label
+                        ),
                         value = scheme.reps,
                         onValue = { onChange(ejercicio.copy(esquema = scheme.copy(reps = it).text())) },
                         modifier = Modifier.weight(1f)
@@ -802,20 +845,20 @@ private fun ExerciseSheet(
                         onClick = {
                             onChange(ejercicio.copy(esquema = scheme.copy(seconds = false).text()))
                         },
-                        label = { Text("Reps") }
+                        label = { Text(stringResource(R.string.plan_editor_reps_chip)) }
                     )
                     FilterChip(
                         selected = scheme.seconds,
                         onClick = {
                             onChange(ejercicio.copy(esquema = scheme.copy(seconds = true).text()))
                         },
-                        label = { Text("Segundos") }
+                        label = { Text(stringResource(R.string.plan_editor_seconds_chip)) }
                     )
                 }
             }
             Spacer(Modifier.height(Space.x2))
             Text(
-                if (freeForm) "Usar series y repeticiones" else "Escribir las series a mano",
+                stringResource(if (freeForm) R.string.plan_editor_use_sets_reps else R.string.plan_editor_type_sets),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 textDecoration = TextDecoration.Underline,
@@ -831,9 +874,9 @@ private fun ExerciseSheet(
 
             Spacer(Modifier.height(Space.x4))
             EditorField(
-                label = "NOTA · OPCIONAL",
+                label = stringResource(R.string.plan_editor_note_label),
                 value = ejercicio.nota,
-                placeholder = "Controla la bajada",
+                placeholder = stringResource(R.string.plan_editor_note_placeholder),
                 onValue = { onChange(ejercicio.copy(nota = it)) }
             )
 
@@ -844,13 +887,13 @@ private fun ExerciseSheet(
                     modifier = Modifier
                         .weight(1f)
                         .heightIn(min = Touch.primary)
-                ) { Text("Quitar") }
+                ) { Text(stringResource(R.string.plan_editor_remove)) }
                 Button(
                     onClick = onDismiss,
                     modifier = Modifier
                         .weight(1f)
                         .heightIn(min = Touch.primary)
-                ) { Text("Hecho") }
+                ) { Text(stringResource(R.string.plan_done)) }
             }
         }
     }
@@ -890,7 +933,7 @@ private fun EditorTopBar(overline: String?, title: String, onBack: () -> Unit) {
         },
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.plan_back))
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -976,10 +1019,10 @@ private fun NavRow(
                 }
             }
             IconButton(onClick = { onMove(-1) }, enabled = canUp, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Subir")
+                Icon(Icons.Filled.KeyboardArrowUp, contentDescription = stringResource(R.string.plan_move_up))
             }
             IconButton(onClick = { onMove(1) }, enabled = canDown, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Bajar")
+                Icon(Icons.Filled.KeyboardArrowDown, contentDescription = stringResource(R.string.plan_move_down))
             }
             Icon(
                 Icons.AutoMirrored.Filled.KeyboardArrowRight,

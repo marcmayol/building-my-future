@@ -28,7 +28,8 @@ import com.marc.gymplan100.data.PlanDto
 import com.marc.gymplan100.data.PlanImport
 import com.marc.gymplan100.data.PlanMarkdownParser
 import com.marc.gymplan100.data.PlanStore
-import com.marc.gymplan100.data.contar
+import com.marc.gymplan100.data.frase
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.data.warmupSecondsFromText
 import com.marc.gymplan100.data.Progression
 import com.marc.gymplan100.data.ExerciseAliases
@@ -233,9 +234,9 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
                     }
                 }.getOrNull()
                 when {
-                    text == null -> PlanImport.Error("No se pudo abrir el archivo.")
+                    text == null -> PlanImport.Error(textos().getString(R.string.mot_import_cant_open))
                     !PlanCodec.isProbablyText(text) -> PlanImport.Error(
-                        "Ese archivo no es un plan: elige un .md o un .json."
+                        textos().getString(R.string.mot_import_not_plan)
                     )
                     // El formato se deduce del contenido y no de la extensión: los archivos
                     // llegan del selector del sistema y muchos gestores no conservan el .md.
@@ -306,9 +307,14 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
                 nombre = "",
                 fases = listOf(
                     FaseDto(
-                        nombre = "Fase 1",
+                        nombre = textos().getString(R.string.mot_draft_phase),
                         semanas = 4,
-                        dias = listOf(DiaDto(dia = "Lunes", ejercicios = listOf(EjercicioDto())))
+                        dias = listOf(
+                            DiaDto(
+                                dia = textos().getString(R.string.mot_draft_day),
+                                ejercicios = listOf(EjercicioDto())
+                            )
+                        )
                     )
                 ),
                 origen = "editor"
@@ -526,10 +532,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         if (terminado.level == PlanLevel.GENTLE) {
             val siguiente = if (terminado.equipment == PlanEquipment.GYM) "arranque" else "en-casa"
             return _plans.value.firstOrNull { it.id == siguiente }?.let {
-                PlanAdvisor.Suggestion(
-                    it,
-                    "Ya te mueves con soltura: toca un poco más de trabajo, con el mismo cuidado."
-                )
+                PlanAdvisor.Suggestion(it, frase(R.string.mot_next_after_gentle))
             }
         }
         val objetivo = when (terminado.goal) {
@@ -1557,14 +1560,22 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
     private fun syncToHealthConnect(session: ActiveSession, record: SessionRecord) {
         if (!healthConnect.isAvailable) return
         val day = PlanData.dayByNumber(session.dayNumber)
+        val t = textos()
         val title = when {
-            session.routineId == SpecialWorkoutsLoader.MILITAR_ID -> "Rutina Militar"
+            session.routineId == SpecialWorkoutsLoader.MILITAR_ID -> t.getString(R.string.mot_hc_military)
             session.routineId != null -> {
                 val exName = specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre
-                "Quema grasa · ${exName ?: "ejercicio"}"
+                t.getString(
+                    R.string.mot_hc_fatburn_exercise,
+                    exName ?: t.getString(R.string.mot_hc_exercise_fallback)
+                )
             }
-            session.extra -> "Entrenamiento extra"
-            else -> "Día ${session.dayNumber} · ${day?.template?.title ?: "Entrenamiento"}"
+            session.extra -> t.getString(R.string.mot_hc_extra)
+            else -> t.getString(
+                R.string.mot_hc_day,
+                session.dayNumber,
+                day?.template?.title ?: t.getString(R.string.mot_hc_workout)
+            )
         }
         val notes = buildWorkoutNotes(session, record, day)
         // El reloj manda: si la sesión se controló desde él (automático) o el interruptor manual
@@ -1607,13 +1618,14 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         record: SessionRecord,
         day: TrainingDay?
     ): String {
+        val t = textos()
         val sb = StringBuilder()
         if (session.isRoutine) {
-            val name = if (session.routineId == SpecialWorkoutsLoader.MILITAR_ID) "Rutina Militar"
-            else specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre ?: "Quema grasa"
+            val name = if (session.routineId == SpecialWorkoutsLoader.MILITAR_ID) t.getString(R.string.mot_hc_military)
+            else specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre ?: t.getString(R.string.mot_hc_fatburn)
             sb.append("$name.\n")
         } else if (session.special || day == null) {
-            sb.append("Sesión libre guiada.\n")
+            sb.append(t.getString(R.string.mot_hc_free_guided) + "\n")
         } else {
             val byExercise = session.completedSets.groupBy { it.exerciseIndex }
             day.template.exercises.forEachIndexed { idx, delPlan ->
@@ -1627,9 +1639,16 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
         val mins = record.durationSeconds / 60
-        sb.append("Duración: $mins min · " + contar(record.totalSets, "serie", "series"))
+        val series = t.resources.getQuantityString(R.plurals.mot_sets, record.totalSets, record.totalSets)
+        sb.append(t.getString(R.string.mot_hc_duration, mins, series))
         return sb.toString().trim()
     }
+
+    /**
+     * Los recursos en el idioma elegido en Ajustes: el contexto de la aplicación no se entera
+     * del cambio hasta que muere el proceso.
+     */
+    private fun textos(): android.content.Context = AppLanguage.wrap(getApplication())
 
     /** Descarta la sesión en curso sin guardar nada. */
     fun cancelSession() {

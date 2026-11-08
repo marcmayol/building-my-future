@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.CatalogEntry
 import com.marc.gymplan100.data.ExerciseCatalog
@@ -66,13 +68,13 @@ fun SwapSection(
     Column(verticalArrangement = Arrangement.spacedBy(Space.x2)) {
         if (cambiado) {
             Text(
-                "Hoy haces «$currentName» en lugar de «$planName»" +
-                    if (remembered) ", y así seguirá los próximos días." else ".",
+                if (remembered) stringResource(R.string.ses_swap_doing_remembered, currentName, planName)
+                else stringResource(R.string.ses_swap_doing, currentName, planName),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
             OutlinedButton(onClick = { onSwap(null, false) }, shape = CircleShape) {
-                Text("Volver al del plan", maxLines = 1)
+                Text(stringResource(R.string.ses_swap_back_to_plan), maxLines = 1)
             }
         }
 
@@ -99,7 +101,7 @@ fun SwapSection(
         }
 
         TextButton(onClick = { buscando = !buscando }) {
-            Text(if (buscando) "Cerrar el buscador" else "He hecho otro ejercicio…", maxLines = 1)
+            Text(if (buscando) stringResource(R.string.ses_swap_close_search) else stringResource(R.string.ses_swap_did_other), maxLines = 1)
         }
         if (buscando) {
             SwapSearch(currentName = currentName, onPick = { onSwap(it, recordar) })
@@ -111,7 +113,7 @@ fun SwapSection(
         ) {
             Checkbox(checked = recordar, onCheckedChange = { recordar = it })
             Text(
-                "Recordarlo para los próximos días",
+                stringResource(R.string.ses_swap_remember),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -157,7 +159,7 @@ private fun AlternativeRow(title: String, entry: CatalogEntry?, onPick: () -> Un
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Text(
-                    "Tuyo",
+                    stringResource(R.string.ses_swap_yours),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -171,7 +173,7 @@ private fun AlternativeRow(title: String, entry: CatalogEntry?, onPick: () -> Un
             modifier = Modifier.weight(1f)
         )
         TextButton(onClick = onPick, modifier = Modifier.heightIn(min = Touch.min)) {
-            Text("La hago", maxLines = 1)
+            Text(stringResource(R.string.ses_swap_do_it), maxLines = 1)
         }
     }
 }
@@ -203,13 +205,13 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
         OutlinedTextField(
             value = texto,
             onValueChange = { texto = it },
-            label = { Text("Buscar o escribir el ejercicio") },
+            label = { Text(stringResource(R.string.ses_swap_search_label)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         if (tuyos.isNotEmpty()) {
             Text(
-                "Tus ejercicios",
+                stringResource(R.string.ses_swap_your_exercises),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -219,7 +221,7 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
         }
         if (texto.isBlank() && grupo != null && resultados.isNotEmpty()) {
             Text(
-                "Otros de ${ExerciseCatalog.groupLabel(grupo).lowercase()}",
+                stringResource(R.string.ses_swap_others_of, ExerciseCatalog.groupLabel(grupo).lowercase()),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -236,7 +238,7 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
             // sin dibujo ni ficha (la ficha ofrecerá buscarlo en vídeo). Y se queda guardado
             // entre tus ejercicios para la próxima vez.
             TextButton(onClick = { onPick(escrito) }) {
-                Text("Apuntarlo como «$escrito»", maxLines = 2)
+                Text(stringResource(R.string.ses_swap_log_as, escrito), maxLines = 2)
             }
         }
     }

@@ -43,6 +43,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.R
 import androidx.compose.runtime.rememberCoroutineScope
@@ -77,13 +78,18 @@ import androidx.compose.foundation.clickable
 import com.marc.gymplan100.BuildConfig
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
-import com.marc.gymplan100.data.contar
 import com.marc.gymplan100.data.UserProfile
 import com.marc.gymplan100.data.RestDefaults
 import kotlinx.coroutines.launch
 
 private val WEIGHTS = (30..200).toList()      // kg
-private val GENDERS = listOf("Hombre", "Mujer", "Otro")
+// El valor se guarda en el perfil y se compara («Mujer» elige las ilustraciones): no se
+// traduce. Lo que se enseña es la etiqueta de al lado.
+private val GENDERS = listOf(
+    "Hombre" to R.string.ini_gender_male,
+    "Mujer" to R.string.ini_gender_female,
+    "Otro" to R.string.ini_gender_other
+)
 
 @Composable
 fun SettingsScreen(
@@ -108,8 +114,10 @@ fun SettingsScreen(
         viewModel.importProfileFromHealth { imported ->
             scope.launch {
                 snackbar.showSnackbar(
-                    if (imported) "Peso importado desde Google Health"
-                    else "Google Health no tiene ningún peso guardado"
+                    context.getString(
+                        if (imported) R.string.ini_set_weight_imported
+                        else R.string.ini_set_weight_none
+                    )
                 )
             }
         }
@@ -118,10 +126,10 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ajustes", style = MaterialTheme.typography.headlineSmall) },
+                title = { Text(stringResource(R.string.ini_set_title), style = MaterialTheme.typography.headlineSmall) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ini_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -143,13 +151,14 @@ fun SettingsScreen(
         ) {
             item {
                 Bloque {
-                    Text("Plan de entrenamiento", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.ini_set_plan_title), style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        "Sigues «${activePlan.name}» · " +
-                            contar(activePlan.totalDays, "día", "días") + ". " +
-                            "Puedes traerte tu propio plan y alternar entre ellos sin " +
-                            "perder el progreso de ninguno.",
+                        stringResource(
+                            R.string.ini_set_plan_body,
+                            activePlan.name,
+                            pluralStringResource(R.plurals.ini_days, activePlan.totalDays, activePlan.totalDays)
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -160,7 +169,7 @@ fun SettingsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = Touch.primary)
-                    ) { Text("Mis planes") }
+                    ) { Text(stringResource(R.string.ini_set_my_plans)) }
                     // La ayuda también aquí, que es donde se busca primero.
                     LocalOpenHelp.current?.let { abrir ->
                         Spacer(Modifier.size(Space.x2))
@@ -170,21 +179,21 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(min = Touch.primary)
-                        ) { Text("Ayuda: cómo funciona la app") }
+                        ) { Text(stringResource(R.string.ini_set_help)) }
                     }
                 }
             }
 
             item {
                 Text(
-                    "TUS DATOS",
+                    stringResource(R.string.ini_set_your_data),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = Space.x2)
                 )
                 Spacer(Modifier.size(Space.x1))
                 Text(
-                    "Solo se guarda lo que la app usa de verdad. Cada uno dice para qué sirve.",
+                    stringResource(R.string.ini_set_your_data_body),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -192,9 +201,8 @@ fun SettingsScreen(
 
             item {
                 WheelCard(
-                    title = "Peso",
-                    explicacion = "Con él se estiman las calorías de cada entreno, que es lo " +
-                        "que Google Health necesita para contarlo en tus objetivos."
+                    title = stringResource(R.string.ini_set_weight),
+                    explicacion = stringResource(R.string.ini_set_weight_body)
                 ) {
                     CarrilDeScroll {
                         WheelPicker(
@@ -211,9 +219,8 @@ fun SettingsScreen(
 
             item {
                 WheelCard(
-                    title = "Género",
-                    explicacion = "Elige si las ilustraciones de los ejercicios son de hombre " +
-                        "o de mujer. No entra en ningún cálculo."
+                    title = stringResource(R.string.ini_set_gender),
+                    explicacion = stringResource(R.string.ini_set_gender_body)
                 ) {
                     // Cada chip ocupa lo que necesita y salta de línea si no cabe: repartidos
                     // a tercios, "Hombre" se partía por la mitad con el texto del sistema grande.
@@ -222,11 +229,11 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(Space.x2),
                         verticalArrangement = Arrangement.spacedBy(Space.x2)
                     ) {
-                        GENDERS.forEach { g ->
+                        GENDERS.forEach { (g, etiqueta) ->
                             FilterChip(
                                 selected = profile.gender == g,
                                 onClick = { viewModel.updateProfile(profile.copy(gender = g)) },
-                                label = { Text(g, maxLines = 1) }
+                                label = { Text(stringResource(etiqueta), maxLines = 1) }
                             )
                         }
                     }
@@ -240,7 +247,7 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Uso reloj o pulsómetro",
+                            stringResource(R.string.ini_set_watch),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.weight(1f)
                         )
@@ -254,10 +261,7 @@ fun SettingsScreen(
                     }
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        "Si empiezas o controlas el entreno desde el reloj, esto se aplica " +
-                            "solo: Google Health usa las calorías reales de tu pulso y la app " +
-                            "no estima (evita el doble conteo). Actívalo aquí para forzarlo " +
-                            "también en los entrenos que empieces desde el móvil.",
+                        stringResource(R.string.ini_set_watch_body),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -271,9 +275,8 @@ fun SettingsScreen(
             item {
                 val context = LocalContext.current
                 WheelCard(
-                    title = "Tema",
-                    explicacion = "Cómo se ve la app. Por defecto sigue al móvil, pero puedes " +
-                        "fijarla en claro o en oscuro."
+                    title = stringResource(R.string.ini_set_theme),
+                    explicacion = stringResource(R.string.ini_set_theme_body)
                 ) {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -284,7 +287,7 @@ fun SettingsScreen(
                             FilterChip(
                                 selected = AppTheme.mode == modo,
                                 onClick = { AppTheme.set(context, modo) },
-                                label = { Text(modo.label, maxLines = 1) }
+                                label = { Text(stringResource(modo.label), maxLines = 1) }
                             )
                         }
                     }
@@ -336,11 +339,10 @@ fun SettingsScreen(
 
             item {
                 Bloque {
-                    Text("Cómo funciona", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.ini_set_how), style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        "El recorrido de la primera vez: qué hace la app y dónde está cada " +
-                            "cosa. Se puede volver a ver siempre que quieras.",
+                        stringResource(R.string.ini_set_how_body),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -350,7 +352,7 @@ fun SettingsScreen(
                         // que salir de Ajustes o quedaría esta pantalla debajo esperando.
                         onBack()
                         viewModel.showTourAgain()
-                    }) { Text("Ver el recorrido", maxLines = 1) }
+                    }) { Text(stringResource(R.string.ini_set_tour), maxLines = 1) }
                 }
             }
 
@@ -361,12 +363,12 @@ fun SettingsScreen(
             item {
                 Bloque {
                     Text(
-                        "Rellenar desde Google Health",
+                        stringResource(R.string.ini_set_health_title),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        "Trae el peso más reciente que tengas guardado en Google Health.",
+                        stringResource(R.string.ini_set_health_body),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -384,10 +386,10 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(min = Touch.primary)
-                        ) { Text("Importar de Google Health") }
+                        ) { Text(stringResource(R.string.ini_set_health_import)) }
                     } else {
                         Text(
-                            "Google Health no está disponible en este dispositivo.",
+                            stringResource(R.string.ini_set_health_unavailable),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -422,22 +424,21 @@ fun SettingsScreen(
 @Composable
 private fun SeccionDescansos(base: RestDefaults.Base, onChange: (RestDefaults.Base) -> Unit) {
     Bloque {
-        Text("Descansos", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.ini_set_rests), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.size(Space.x1))
         Text(
-            "Lo que dura la cuenta atrás si el plan no pide otra cosa. Después de cada serie " +
-                "puedes decir cómo ha ido: «Justo» suma 30 s y «Fallo», un minuto.",
+            stringResource(R.string.ini_set_rests_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.size(Space.x3))
-        FilaDescanso("Entre series", base.sets) { onChange(base.copy(sets = it)) }
+        FilaDescanso(stringResource(R.string.ini_set_rest_sets), base.sets) { onChange(base.copy(sets = it)) }
         Spacer(Modifier.size(Space.x2))
-        FilaDescanso("Entre ejercicios", base.exercises) { onChange(base.copy(exercises = it)) }
+        FilaDescanso(stringResource(R.string.ini_set_rest_exercises), base.exercises) { onChange(base.copy(exercises = it)) }
         if (base != RestDefaults.Base()) {
             Spacer(Modifier.size(Space.x1))
             TextButton(onClick = { onChange(RestDefaults.Base()) }) {
-                Text("Volver a 1:30 y 2:00", maxLines = 1)
+                Text(stringResource(R.string.ini_set_rest_reset), maxLines = 1)
             }
         }
     }
@@ -502,7 +503,7 @@ private fun SeccionRecordatorios() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Recordarme ir al gimnasio",
+                stringResource(R.string.ini_set_remind),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
@@ -514,8 +515,7 @@ private fun SeccionRecordatorios() {
         }
         Spacer(Modifier.size(Space.x1))
         Text(
-            "Elige qué días sueles entrenar y a qué hora quieres el aviso. Si ese día ya has " +
-                "entrenado, no te molesta.",
+            stringResource(R.string.ini_set_remind_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -553,7 +553,7 @@ private fun SeccionRecordatorios() {
                             }
                     ) {
                         Text(
-                            letra,
+                            stringResource(letra),
                             style = MaterialTheme.typography.titleMedium,
                             maxLines = 1,
                             color = if (elegido) MaterialTheme.colorScheme.onPrimary
@@ -564,7 +564,7 @@ private fun SeccionRecordatorios() {
             }
             Spacer(Modifier.size(Space.x3))
             Text(
-                "A las ${TrainingReminder.formatTime(minuto)}",
+                stringResource(R.string.ini_set_remind_at, TrainingReminder.formatTime(minuto)),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -584,7 +584,7 @@ private fun SeccionRecordatorios() {
             }
             if (dias.isEmpty()) {
                 Text(
-                    "Sin días elegidos no hay aviso que dar.",
+                    stringResource(R.string.ini_set_remind_no_days),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -605,11 +605,10 @@ private fun SeccionRecordatorios() {
 private fun SeccionCreditos() {
     val context = LocalContext.current
     Bloque {
-        Text("Créditos", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.ini_set_credits), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.size(Space.x1))
         Text(
-            "Las ilustraciones de los ejercicios son del set libre everkinetic, " +
-                "con licencia Creative Commons BY-SA 4.0.",
+            stringResource(R.string.ini_set_credits_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -619,15 +618,15 @@ private fun SeccionCreditos() {
                 context.startActivity(
                     Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/everkinetic/data"))
                 )
-            }) { Text("Ver el set", maxLines = 1) }
+            }) { Text(stringResource(R.string.ini_set_credits_set), maxLines = 1) }
             TextButton(onClick = {
                 context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://creativecommons.org/licenses/by-sa/4.0/deed.es")
+                        Uri.parse(context.getString(R.string.ini_set_license_url))
                     )
                 )
-            }) { Text("La licencia", maxLines = 1) }
+            }) { Text(stringResource(R.string.ini_set_credits_license), maxLines = 1) }
         }
         Spacer(Modifier.size(Space.x2))
         TextButton(onClick = {
@@ -637,7 +636,7 @@ private fun SeccionCreditos() {
                     Uri.parse("https://marcmayol.com/building-my-future/privacidad.html")
                 )
             )
-        }) { Text("Privacidad", maxLines = 1) }
+        }) { Text(stringResource(R.string.ini_set_privacy), maxLines = 1) }
     }
 }
 
@@ -645,7 +644,8 @@ private fun SeccionCreditos() {
 private fun SeccionCopia(viewModel: PlanViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var mensaje by remember { mutableStateOf<String?>(null) }
+    // El recurso del mensaje y no el texto: así se pinta en el idioma de la app.
+    var mensaje by remember { mutableStateOf<Int?>(null) }
     var porRestaurar by remember { mutableStateOf<BackupFile?>(null) }
 
     val guardar = rememberLauncherForActivityResult(
@@ -660,8 +660,8 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
                         salida.write(texto.toByteArray())
                     } ?: error("no se pudo escribir")
                 }
-                "Copia guardada."
-            }.getOrElse { "No se ha podido guardar la copia." }
+                R.string.ini_backup_saved
+            }.getOrElse { R.string.ini_backup_save_failed }
         }
     }
 
@@ -676,7 +676,7 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
                 }
             }.getOrNull()
             if (leido == null) {
-                mensaje = "No se ha podido leer el archivo."
+                mensaje = R.string.ini_backup_read_failed
                 return@launch
             }
             when (val resultado = Backup.parse(leido)) {
@@ -687,11 +687,10 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
     }
 
     Bloque {
-        Text("Copia de seguridad", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.ini_backup_title), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.size(Space.x1))
         Text(
-            "Tus días, tus pesos, tu historial y tus planes viven solo en este teléfono. " +
-                "Guarda una copia donde quieras y podrás recuperarlo todo en otro móvil.",
+            stringResource(R.string.ini_backup_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -700,17 +699,17 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
             onClick = { guardar.launch(Backup.suggestedName(System.currentTimeMillis())) },
             shape = CircleShape,
             modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-        ) { Text("Guardar una copia", maxLines = 1) }
+        ) { Text(stringResource(R.string.ini_backup_save), maxLines = 1) }
         Spacer(Modifier.size(Space.x2))
         OutlinedButton(
             onClick = { abrir.launch(arrayOf("application/json", "text/plain", "*/*")) },
             shape = CircleShape,
             modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-        ) { Text("Restaurar una copia", maxLines = 1) }
-        if (mensaje != null) {
+        ) { Text(stringResource(R.string.ini_backup_restore_button), maxLines = 1) }
+        mensaje?.let { recurso ->
             Spacer(Modifier.size(Space.x2))
             Text(
-                mensaje.orEmpty(),
+                stringResource(recurso),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -720,11 +719,14 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
     porRestaurar?.let { copia ->
         AlertDialog(
             onDismissRequest = { porRestaurar = null },
-            title = { Text("¿Restaurar esta copia?") },
+            title = { Text(stringResource(R.string.ini_backup_confirm_title)) },
             text = {
+                val dias = copia.diasCompletados()
                 Text(
-                    "La copia trae " + copia.resumen() + ". Al restaurarla se sustituye " +
-                        "TODO lo que hay ahora en la app: días, pesos, historial y planes."
+                    stringResource(
+                        R.string.ini_backup_confirm_body,
+                        pluralStringResource(R.plurals.ini_backup_completed_days, dias, dias)
+                    )
                 )
             },
             confirmButton = {
@@ -735,13 +737,13 @@ private fun SeccionCopia(viewModel: PlanViewModel) {
                         mensaje = runCatching {
                             Backup.restore(context, file)
                             viewModel.reloadAfterRestore()
-                            "Copia restaurada."
-                        }.getOrElse { "No se ha podido restaurar la copia." }
+                            R.string.ini_backup_restored
+                        }.getOrElse { R.string.ini_backup_restore_failed }
                     }
-                }) { Text("Restaurar") }
+                }) { Text(stringResource(R.string.ini_backup_restore)) }
             },
             dismissButton = {
-                TextButton(onClick = { porRestaurar = null }) { Text("Cancelar") }
+                TextButton(onClick = { porRestaurar = null }) { Text(stringResource(R.string.ini_backup_cancel)) }
             }
         )
     }

@@ -24,6 +24,7 @@ import com.marc.gymplan100.data.FreeStep
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.data.SessionPhase
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.wear.WearBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,26 +63,30 @@ object RestReminder {
         val mgr = context.getSystemService(NotificationManager::class.java)
         // El canal antiguo sonaba como notificación normal; lo retiramos.
         runCatching { mgr.deleteNotificationChannel("rest_done") }
-        if (mgr.getNotificationChannel(CHANNEL_ID) == null) {
+        // Los canales se vuelven a crear siempre: si ya existen, Android solo les cambia el
+        // nombre y la descripción (sonido e importancia se quedan como estaban), y así siguen
+        // el idioma elegido en la app.
+        val textos = AppLanguage.wrap(context)
+        run {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Descansos",
+                textos.getString(R.string.ini_rest_channel),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Aviso al terminar el descanso entre series"
+                description = textos.getString(R.string.ini_rest_channel_desc)
                 // El sonido y la vibración los reproducimos nosotros (canal silencioso para no duplicar).
                 setSound(null, null)
                 enableVibration(false)
             }
             mgr.createNotificationChannel(channel)
         }
-        if (mgr.getNotificationChannel(CHANNEL_TIMER) == null) {
+        run {
             val timer = NotificationChannel(
                 CHANNEL_TIMER,
-                "Temporizador en curso",
+                textos.getString(R.string.ini_timer_channel),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Cuenta atrás visible en la pantalla de bloqueo durante la sesión"
+                description = textos.getString(R.string.ini_timer_channel_desc)
                 setSound(null, null)
                 enableVibration(false)
                 setShowBadge(false)
@@ -211,17 +216,22 @@ object RestReminder {
      */
     private fun showOngoing(context: Context, endTimeMillis: Long, kind: Int, dayNumber: Int) {
         ensureChannel(context)
-        val title = when (kind) {
-            KIND_WARMUP -> "Calentamiento"
-            KIND_TIMED_SET -> "Serie por tiempo"
-            KIND_BETWEEN_EXERCISES -> "Descanso entre ejercicios"
-            else -> "Descanso entre series"
-        }
-        val skipLabel = when (kind) {
-            KIND_WARMUP -> "Empezar ya"
-            KIND_TIMED_SET -> "Serie hecha"
-            else -> "Saltar descanso"
-        }
+        val textos = AppLanguage.wrap(context)
+        val title = textos.getString(
+            when (kind) {
+                KIND_WARMUP -> R.string.ini_rest_ongoing_warmup
+                KIND_TIMED_SET -> R.string.ini_rest_ongoing_timed
+                KIND_BETWEEN_EXERCISES -> R.string.ini_rest_ongoing_exercises
+                else -> R.string.ini_rest_ongoing_sets
+            }
+        )
+        val skipLabel = textos.getString(
+            when (kind) {
+                KIND_WARMUP -> R.string.ini_action_start_now
+                KIND_TIMED_SET -> R.string.ini_action_set_done
+                else -> R.string.ini_action_skip_rest
+            }
+        )
         val openIntent = Intent(context, MainActivity::class.java).apply {
             putExtra(MainActivity.EXTRA_OPEN_SESSION_DAY, dayNumber)
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -241,7 +251,7 @@ object RestReminder {
         val notif = NotificationCompat.Builder(context, CHANNEL_TIMER)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
-            .setContentText("Cuenta atrás en marcha · toca para abrir")
+            .setContentText(textos.getString(R.string.ini_rest_ongoing_text))
             .setUsesChronometer(true)
             .setChronometerCountDown(true)
             .setWhen(endTimeMillis)
@@ -265,17 +275,22 @@ object RestReminder {
             Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val title = when (kind) {
-            KIND_WARMUP -> "¡Calentamiento terminado!"
-            KIND_TIMED_SET -> "¡Serie completada!"
-            else -> "¡Descanso terminado!"
-        }
-        val text = when (kind) {
-            KIND_WARMUP -> "A entrenar 💪"
-            KIND_TIMED_SET -> "¡Aguanta! Ya puedes descansar 💪"
-            KIND_BETWEEN_EXERCISES -> "Pasa al siguiente ejercicio"
-            else -> "A por la siguiente serie"
-        }
+        val textos = AppLanguage.wrap(context)
+        val title = textos.getString(
+            when (kind) {
+                KIND_WARMUP -> R.string.ini_rest_done_warmup
+                KIND_TIMED_SET -> R.string.ini_rest_done_timed
+                else -> R.string.ini_rest_done_rest
+            }
+        )
+        val text = textos.getString(
+            when (kind) {
+                KIND_WARMUP -> R.string.ini_rest_done_text_warmup
+                KIND_TIMED_SET -> R.string.ini_rest_done_text_timed
+                KIND_BETWEEN_EXERCISES -> R.string.ini_rest_done_text_exercises
+                else -> R.string.ini_rest_done_text_sets
+            }
+        )
         val notif = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)

@@ -29,6 +29,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
@@ -51,11 +53,11 @@ fun FatburnListScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Quema grasa", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.ses_fatburn_title), style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ses_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -76,8 +78,7 @@ fun FatburnListScreen(
         ) {
             item {
                 Text(
-                    "Elige un ejercicio. El número indica cuántas veces lo has hecho esta " +
-                        "semana respecto a lo recomendado.",
+                    stringResource(R.string.ses_fatburn_intro),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -117,7 +118,7 @@ private fun FatburnRow(
             Text(exercise.nombre, style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(2.dp))
             Text(
-                "Recomendado ${freq.min}-${freq.max} por semana",
+                stringResource(R.string.ses_fatburn_recommended, freq.min, freq.max),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

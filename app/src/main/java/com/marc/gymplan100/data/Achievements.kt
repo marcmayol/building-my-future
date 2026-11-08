@@ -1,13 +1,17 @@
 package com.marc.gymplan100.data
 
-/** Un logro del reto. */
+/**
+ * Un logro del reto. No lleva texto: el título y la descripción los pone la interfaz a partir
+ * del [id] (ver ui/AchievementsScreen.kt), en el idioma que toque.
+ */
 data class Achievement(
     val id: String,
-    val title: String,
-    val description: String,
     val emoji: String,
     /** Día del plan en el que cae. Sirve para decir cuánto falta para el siguiente. */
-    val atDay: Int = 0
+    val atDay: Int = 0,
+    /** Logros de fase: número y nombre de la fase (el nombre es contenido del plan). */
+    val phaseNumber: Int = 0,
+    val phaseName: String = ""
 )
 
 /**
@@ -29,8 +33,8 @@ object Achievements {
     /** Emojis de las fases del plan de la app; los planes con más fases repiten el último. */
     private val PHASE_EMOJIS = listOf("🛡️", "🏗️", "📈", "🏆")
 
-    private fun byDays(id: String, title: String, desc: String, emoji: String, days: Int) =
-        Rule(Achievement(id, title, desc, emoji, atDay = days), days) { state ->
+    private fun byDays(id: String, emoji: String, days: Int) =
+        Rule(Achievement(id, emoji, atDay = days), days) { state ->
             state.completedDays.count { it in 1..PlanData.TOTAL_DAYS } >= days
         }
 
@@ -39,10 +43,10 @@ object Achievements {
         return Rule(
             Achievement(
                 id = "phase${phase.number}",
-                title = "${phase.name} superada",
-                description = "Termina la fase ${phase.number}.",
                 emoji = emoji,
-                atDay = lastDay
+                atDay = lastDay,
+                phaseNumber = phase.number,
+                phaseName = phase.name
             ),
             atDay = lastDay
         ) { state ->
@@ -64,21 +68,13 @@ object Achievements {
         val threeQuarters = atPercent(75)
 
         val milestones = buildList {
-            add(byDays("first", "Primer paso", "Completa tu primer día.", "🥇", 1))
-            if (total >= 5) add(byDays("week", "Primera semana", "Completa 5 días.", "📅", 5))
-            if (total >= 10) add(byDays("ten", "Cogiendo ritmo", "Completa 10 días.", "🔥", 10))
-            if (quarter > 1) {
-                add(byDays("quarter", "Un cuarto del plan", "Completa $quarter días.", "⚡", quarter))
-            }
-            if (half > quarter) {
-                add(byDays("half", "Mitad del camino", "Completa $half días.", "🏔️", half))
-            }
-            if (threeQuarters > half) {
-                add(byDays("threequarter", "Recta final", "Completa $threeQuarters días.", "🚀", threeQuarters))
-            }
-            if (total > 1) {
-                add(byDays("complete", "¡Plan completado!", "Completa los $total días.", "👑", total))
-            }
+            add(byDays("first", "🥇", 1))
+            if (total >= 5) add(byDays("week", "📅", 5))
+            if (total >= 10) add(byDays("ten", "🔥", 10))
+            if (quarter > 1) add(byDays("quarter", "⚡", quarter))
+            if (half > quarter) add(byDays("half", "🏔️", half))
+            if (threeQuarters > half) add(byDays("threequarter", "🚀", threeQuarters))
+            if (total > 1) add(byDays("complete", "👑", total))
         }
 
         val phaseRules = mutableListOf<Rule>()
@@ -109,19 +105,22 @@ object Achievements {
     }
 }
 
-/** Mensajes de enhorabuena al completar un día. */
+/**
+ * Mensajes de enhorabuena al completar un día.
+ *
+ * Devuelve claves, no frases: el texto lo pone el diálogo de celebración en el idioma que toque
+ * (ui/CelebrationDialog.kt). Las claves solo viven en memoria; no se guardan.
+ */
 object Motivation {
 
-    val generic = listOf(
-        "¡Un día más cerca de tu objetivo!",
-        "Tu yo del futuro te lo agradece.",
-        "La constancia es tu superpoder.",
-        "Hoy has elegido ser mejor. 💪",
-        "Ladrillo a ladrillo, estás construyendo tu futuro.",
-        "Cada sesión cuenta. ¡Sigue así!",
-        "El esfuerzo de hoy es el orgullo de mañana.",
-        "Has aparecido y lo has hecho. Eso es lo que gana.",
-    )
+    const val FIRST = "first"
+    const val QUARTER = "quarter"
+    const val HALF = "half"
+    const val THREE_QUARTERS = "threequarter"
+    const val FINAL = "final"
+
+    /** Frases genéricas, por clave. */
+    val generic = (0 until 8).map { "g$it" }
 
     /** Frase genérica por defecto para [totalCompleted] (sin hito). */
     fun genericFor(totalCompleted: Int): String = generic[totalCompleted % generic.size]
@@ -133,11 +132,11 @@ object Motivation {
     fun message(totalCompleted: Int): String {
         val total = PlanData.TOTAL_DAYS
         return when (totalCompleted) {
-            1 -> "¡Has empezado! El primer paso es el más importante."
-            total * 25 / 100 -> "Un cuarto del plan hecho. Vas en serio."
-            total * 50 / 100 -> "¡Mitad del camino! Ya no hay vuelta atrás."
-            total * 75 / 100 -> "Recta final. Lo que viene es para nota."
-            total -> "¡LO HAS LOGRADO! $total días. Eres otra persona."
+            1 -> FIRST
+            total * 25 / 100 -> QUARTER
+            total * 50 / 100 -> HALF
+            total * 75 / 100 -> THREE_QUARTERS
+            total -> FINAL
             else -> genericFor(totalCompleted)
         }
     }
@@ -147,6 +146,7 @@ object Motivation {
 data class Celebration(
     val dayNumber: Int,
     val totalCompleted: Int,
+    /** Clave de [Motivation]; el texto lo resuelve la interfaz. */
     val message: String,
     val newAchievements: List<Achievement>,
     /** Cierto al completar el último día: el plan está terminado. */

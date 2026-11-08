@@ -14,7 +14,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.BuildConfig
+import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.Space
 
 /**
@@ -44,17 +46,15 @@ object Valoracion {
     fun SettingsSection() {
         val context = LocalContext.current
         Column(modifier = Modifier.fillMaxWidth()) {
-            Text("¿Qué tal te va?", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ini_rate_how), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.size(Space.x1))
             Text(
-                "Esta copia no viene de ninguna tienda, así que no hay estrellas que poner. " +
-                    "Si algo falla o echas algo en falta, escríbeme: el correo ya lleva puesta " +
-                    "la versión que tienes.",
+                stringResource(R.string.ini_rate_how_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.size(Space.x2))
-            TextButton(onClick = { escribeme(context) }) { Text("Escribirme", maxLines = 1) }
+            TextButton(onClick = { escribeme(context) }) { Text(stringResource(R.string.ini_rate_write), maxLines = 1) }
         }
     }
 

@@ -58,12 +58,19 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.R
 import com.marc.gymplan100.data.PlanGoal
 import com.marc.gymplan100.data.PlanImport
+import com.marc.gymplan100.data.PlanProblem
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.PlanSource
 import com.marc.gymplan100.data.TrainingPlan
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
@@ -71,63 +78,32 @@ import com.marc.gymplan100.ui.theme.Touch
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 /**
- * Ejemplos de los dos formatos, para copiarlos y usarlos de plantilla (a mano o pidiéndoselos
- * a una IA). Markdown va primero porque es el que se escribe sin pelearse con las comas.
+ * Convierte el motivo por el que no vale un plan en un mensaje en el idioma de la app. Lo usan
+ * esta pantalla y el editor; fuera de Compose (el aviso llega en un callback) va con contexto.
  */
-private val EJEMPLO_MD = """
-# Mi plan de fuerza
-Tres días por semana durante ocho semanas.
-
-## Base (4 semanas)
-Aprender el movimiento con peso cómodo.
-Progresión: sube peso cuando las 10 salgan fáciles.
-
-### Lunes — Empuje
-Calentamiento: 6 min bici + movilidad de hombros
-- Press de banca — 4 x 8
-- Press de hombros — 3 x 10 (sin bloquear el codo)
-- Plancha — 3 x 30 s
-
-### Jueves — Tirón
-- Jalón al pecho — 4 x 10
-- Remo sentado — 4 x 10
-
-## Carga (4 semanas)
-
-### Lunes — Fuerza
-- Sentadilla — 5 x 5
-- Press de banca — 5 x 5
-""".trimIndent()
-
-private val EJEMPLO_JSON = """
-{
-  "nombre": "Mi plan de fuerza",
-  "descripcion": "Tres días por semana, 8 semanas.",
-  "fases": [
-    {
-      "nombre": "Base",
-      "semanas": 4,
-      "descripcion": "Aprender el movimiento con peso cómodo.",
-      "progresion": "Sube peso cuando las 10 repeticiones salgan fáciles.",
-      "dias": [
-        {
-          "dia": "Lunes",
-          "titulo": "Empuje",
-          "calentamiento": "6 min bici + movilidad de hombros",
-          "ejercicios": [
-            { "nombre": "Press de banca", "esquema": "4 x 8" },
-            { "nombre": "Press de hombros", "esquema": "3 x 10", "nota": "Sin bloquear el codo" },
-            { "nombre": "Plancha", "esquema": "3 x 30 s" }
-          ]
-        }
-      ]
-    }
-  ]
+fun PlanProblem.text(context: Context): String = when (this) {
+    PlanProblem.EmptyFile -> context.getString(R.string.plan_error_empty_file)
+    PlanProblem.InvalidJson -> context.getString(R.string.plan_error_invalid_json)
+    PlanProblem.CannotOpen -> context.getString(R.string.plan_error_cannot_open)
+    PlanProblem.NotAPlanFile -> context.getString(R.string.plan_error_not_a_plan)
+    PlanProblem.NoName -> context.getString(R.string.plan_error_no_name)
+    PlanProblem.NoDays -> context.getString(R.string.plan_error_no_days)
+    is PlanProblem.PhaseWithoutDays -> context.getString(R.string.plan_error_phase_without_days, phase)
+    is PlanProblem.DayWithoutExercises ->
+        context.getString(R.string.plan_error_day_without_exercises, day, phase)
+    is PlanProblem.TooManyExercises ->
+        context.getString(R.string.plan_error_too_many_exercises, day, count, max)
+    is PlanProblem.ExerciseWithoutName -> context.getString(R.string.plan_error_exercise_without_name, day)
+    is PlanProblem.ExerciseWithoutScheme ->
+        context.getString(R.string.plan_error_exercise_without_scheme, exercise, day)
+    is PlanProblem.TooManyDays -> context.getString(R.string.plan_error_too_many_days, total, max)
+    PlanProblem.ReservedId -> context.getString(R.string.plan_error_reserved_id)
+    PlanProblem.MarkdownNoTitle -> context.getString(R.string.plan_error_markdown_no_title)
+    PlanProblem.MarkdownNoDays -> context.getString(R.string.plan_error_markdown_no_days)
+    is PlanProblem.Text -> message
 }
-""".trimIndent()
 
 @Composable
 fun PlansScreen(
@@ -141,6 +117,7 @@ fun PlansScreen(
     val activeSession by viewModel.activeSession.collectAsState()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var showFormat by remember { mutableStateOf(false) }
     var planToDelete by remember { mutableStateOf<TrainingPlan?>(null) }
@@ -155,9 +132,14 @@ fun PlansScreen(
             scope.launch {
                 when (result) {
                     is PlanImport.Ok -> snackbar.showSnackbar(
-                        "«${result.plan.name}» importado: ${result.plan.totalDays} días"
+                        context.resources.getQuantityString(
+                            R.plurals.plan_imported,
+                            result.plan.totalDays,
+                            result.plan.name,
+                            result.plan.totalDays
+                        )
                     )
-                    is PlanImport.Error -> snackbar.showSnackbar(result.message)
+                    is PlanImport.Error -> snackbar.showSnackbar(result.problem.text(context))
                 }
             }
         }
@@ -166,10 +148,10 @@ fun PlansScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mis planes", style = MaterialTheme.typography.headlineSmall) },
+                title = { Text(stringResource(R.string.plan_list_title), style = MaterialTheme.typography.headlineSmall) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.plan_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -191,7 +173,7 @@ fun PlansScreen(
         ) {
             item {
                 Text(
-                    "Cada plan guarda su propio progreso: cambiar de plan no borra nada.",
+                    stringResource(R.string.plan_list_intro),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -205,7 +187,7 @@ fun PlansScreen(
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(Space.x4)
                 ) {
-                    Text("Añadir un plan", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.plan_add_title), style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(Space.x3))
                     Button(
                         onClick = {
@@ -215,7 +197,7 @@ fun PlansScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = Touch.primary)
-                    ) { Text("Crear un plan") }
+                    ) { Text(stringResource(R.string.plan_create)) }
                     Spacer(Modifier.height(Space.x2))
                     Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                         OutlinedButton(
@@ -223,13 +205,13 @@ fun PlansScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .heightIn(min = Touch.min)
-                        ) { Text("Importar") }
+                        ) { Text(stringResource(R.string.plan_import)) }
                         OutlinedButton(
                             onClick = { showFormat = true },
                             modifier = Modifier
                                 .weight(1f)
                                 .heightIn(min = Touch.min)
-                        ) { Text("Ver formato") }
+                        ) { Text(stringResource(R.string.plan_see_format)) }
                     }
                 }
             }
@@ -243,7 +225,9 @@ fun PlansScreen(
                     onSeeSummary = { viewModel.showPlanSummaryAgain(); onBack() },
                     onActivate = {
                         viewModel.activatePlan(plan.id)
-                        scope.launch { snackbar.showSnackbar("Ahora sigues «${plan.name}»") }
+                        scope.launch {
+                            snackbar.showSnackbar(context.getString(R.string.plan_now_following, plan.name))
+                        }
                     },
                     onEdit = {
                         viewModel.startDraft(plan.id)
@@ -256,8 +240,7 @@ fun PlansScreen(
             if (activeSession != null) {
                 item {
                     Text(
-                        "Tienes el día ${activeSession!!.dayNumber} a medias: termínalo o " +
-                            "descártalo antes de cambiar de plan.",
+                        stringResource(R.string.plan_session_half_done, activeSession!!.dayNumber),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier
@@ -278,35 +261,33 @@ fun PlansScreen(
     planToDelete?.let { plan ->
         AlertDialog(
             onDismissRequest = { planToDelete = null },
-            title = { Text("¿Borrar «${plan.name}»?") },
+            title = { Text(stringResource(R.string.plan_delete_title, plan.name)) },
             text = {
-                Text(
-                    "Se borra el plan y también los días, pesos y entrenos que hayas " +
-                        "registrado en él. Esto no se puede deshacer."
-                )
+                Text(stringResource(R.string.plan_delete_text))
             },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deletePlan(plan.id)
                     planToDelete = null
-                    scope.launch { snackbar.showSnackbar("Plan borrado") }
-                }) { Text("Borrar") }
+                    scope.launch { snackbar.showSnackbar(context.getString(R.string.plan_deleted)) }
+                }) { Text(stringResource(R.string.plan_delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { planToDelete = null }) { Text("Cancelar") }
+                TextButton(onClick = { planToDelete = null }) { Text(stringResource(R.string.plan_cancel)) }
             }
         )
     }
 }
 
 /** El objetivo del plan en dos palabras, con lo que lo distingue cuando no es obvio. */
+@Composable
 private fun goalLabel(goal: PlanGoal?): String? = when (goal) {
-    PlanGoal.STRENGTH -> "Fuerza (3-5 reps)"
-    PlanGoal.MUSCLE -> "Músculo (8-12 reps)"
-    PlanGoal.LOSE_FAT -> "Perder grasa"
-    PlanGoal.MAINTAIN -> "Mantenimiento"
-    PlanGoal.MOBILITY -> "Movilidad"
-    PlanGoal.START -> "Para empezar"
+    PlanGoal.STRENGTH -> stringResource(R.string.plan_goal_strength)
+    PlanGoal.MUSCLE -> stringResource(R.string.plan_goal_muscle)
+    PlanGoal.LOSE_FAT -> stringResource(R.string.plan_goal_lose_fat)
+    PlanGoal.MAINTAIN -> stringResource(R.string.plan_goal_maintain)
+    PlanGoal.MOBILITY -> stringResource(R.string.plan_goal_mobility)
+    PlanGoal.START -> stringResource(R.string.plan_goal_start)
     null -> null
 }
 
@@ -322,6 +303,11 @@ private fun PlanCard(
     onDelete: () -> Unit
 ) {
     val app = LocalAppColors.current
+    val context = LocalContext.current
+    // Fechas en el idioma con el que se pinta la app, con el patrón que toca en cada uno.
+    val locale = AppLanguage.locale(context)
+    val shortPattern = stringResource(R.string.plan_date_short_pattern)
+    val longPattern = stringResource(R.string.plan_date_long_pattern)
 
     val completedDays = progress.completedDays.size
     // Estado del plan: es lo primero que se lee, y va en el raíl y en el distintivo.
@@ -337,11 +323,13 @@ private fun PlanCard(
         completedDays == 0 -> PlanBadge.SinEmpezar
         else -> PlanBadge.Activo
     }
-    val fechaFin = remember(progress.finishedAt) {
+    val fechaFin = remember(progress.finishedAt, shortPattern, locale) {
         progress.finishedAt.takeIf { it > 0L }?.let {
-            SimpleDateFormat("d MMM", Locale.forLanguageTag("es-ES")).format(Date(it))
+            SimpleDateFormat(shortPattern, locale).format(Date(it))
         }
     }
+    val vuelta = stringResource(R.string.plan_badge_round, progress.rounds + 1)
+    val activo = stringResource(R.string.plan_badge_active)
 
     Row(
         modifier = Modifier
@@ -377,21 +365,22 @@ private fun PlanCard(
             DoneBadge(
                 kind = estado,
                 label = when (estado) {
-                    PlanBadge.Activo -> "Activo"
+                    PlanBadge.Activo -> activo
                     PlanBadge.Terminado ->
-                        if (fechaFin != null) "Terminado el $fechaFin" else "Terminado"
-                    PlanBadge.VueltaEnCurso -> "${progress.rounds + 1}ª vuelta en curso"
-                    PlanBadge.SinEmpezar -> "Sin empezar"
+                        if (fechaFin != null) stringResource(R.string.plan_badge_finished_on, fechaFin)
+                        else stringResource(R.string.plan_badge_finished)
+                    PlanBadge.VueltaEnCurso -> vuelta
+                    PlanBadge.SinEmpezar -> stringResource(R.string.plan_badge_not_started)
                 }
             )
             if (repitiendo) {
                 DoneBadge(
                     kind = PlanBadge.VueltaEnCurso,
-                    label = "${progress.rounds + 1}ª vuelta en curso"
+                    label = vuelta
                 )
             }
             if (isActive && estado != PlanBadge.Activo) {
-                DoneBadge(kind = PlanBadge.Activo, label = "Activo")
+                DoneBadge(kind = PlanBadge.Activo, label = activo)
             }
         }
         if (plan.description.isNotBlank()) {
@@ -407,39 +396,42 @@ private fun PlanCard(
             )
         }
         Spacer(Modifier.height(Space.x2))
+        // El objetivo delante: «fuerza» y «músculo» se entrenan distinto (pocas
+        // repeticiones y descansos largos frente a 8-12), y es lo primero que se elige.
+        val goal = goalLabel(plan.goal)
+        val dias = pluralStringResource(R.plurals.plan_days_count, plan.totalDays, plan.totalDays)
+        val fases = pluralStringResource(R.plurals.plan_phases_count, plan.phases.size, plan.phases.size)
+        val completados = pluralStringResource(R.plurals.plan_completed_count, completedDays, completedDays)
+        val completadosVuelta = stringResource(R.string.plan_completed_in_round, completados, progress.rounds + 1)
         Text(
             buildString {
-                // El objetivo delante: «fuerza» y «músculo» se entrenan distinto (pocas
-                // repeticiones y descansos largos frente a 8-12), y es lo primero que se elige.
-                goalLabel(plan.goal)?.let { append("$it · ") }
-                append("${plan.totalDays} días · ")
-                append(if (plan.phases.size == 1) "1 fase" else "${plan.phases.size} fases")
+                goal?.let { append("$it · ") }
+                append("$dias · $fases")
                 // Sin empezar no se cuentan ceros: un "0 completados" es ruido, no información.
                 if (completedDays > 0) {
-                    append(if (completedDays == 1) " · 1 completado" else " · $completedDays completados")
-                    if (repitiendo) append(" de la ${progress.rounds + 1}ª vuelta")
+                    append(" · ")
+                    append(if (repitiendo) completadosVuelta else completados)
                 }
             },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (!plan.builtin && plan.importedAt > 0L) {
-            val fecha = remember(plan.importedAt) {
-                SimpleDateFormat("d MMM yyyy", Locale.forLanguageTag("es-ES"))
-                    .format(Date(plan.importedAt))
+            val fecha = remember(plan.importedAt, longPattern, locale) {
+                SimpleDateFormat(longPattern, locale).format(Date(plan.importedAt))
             }
             Text(
                 when (plan.source) {
-                    PlanSource.EDITOR -> "Creado el $fecha"
-                    PlanSource.MARKDOWN -> "Importado el $fecha (Markdown)"
-                    else -> "Importado el $fecha"
+                    PlanSource.EDITOR -> stringResource(R.string.plan_created_on, fecha)
+                    PlanSource.MARKDOWN -> stringResource(R.string.plan_imported_on_markdown, fecha)
+                    else -> stringResource(R.string.plan_imported_on, fecha)
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         } else if (plan.builtin) {
             Text(
-                "De serie en la app",
+                stringResource(R.string.plan_builtin),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -476,23 +468,23 @@ private fun PlanCard(
             verticalArrangement = Arrangement.spacedBy(Space.x2)
         ) {
             if (!isActive) {
-                Button(onClick = onActivate, enabled = canSwitch) { Text("Seguir este") }
+                Button(onClick = onActivate, enabled = canSwitch) { Text(stringResource(R.string.plan_follow_this)) }
             }
             // El resumen del cierre se puede volver a abrir, pero solo del plan que se está
             // siguiendo: abrirlo de otro obligaría a cambiar de plan por detrás, y eso no es
             // lo que pide quien pulsa "ver resumen".
             if (isActive && terminado) {
-                OutlinedButton(onClick = onSeeSummary) { Text("Ver resumen") }
+                OutlinedButton(onClick = onSeeSummary) { Text(stringResource(R.string.plan_see_summary)) }
             }
             if (!plan.builtin) {
-                OutlinedButton(onClick = onEdit) { Text("Editar") }
-                OutlinedButton(onClick = onDelete) { Text("Borrar") }
+                OutlinedButton(onClick = onEdit) { Text(stringResource(R.string.plan_edit)) }
+                OutlinedButton(onClick = onDelete) { Text(stringResource(R.string.plan_delete)) }
             }
         }
         if (!isActive && !canSwitch) {
             Spacer(Modifier.height(Space.x2))
             Text(
-                "No puedes cambiar con un entreno a medias.",
+                stringResource(R.string.plan_cannot_switch),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -506,18 +498,20 @@ private fun PlanCard(
 private fun FormatDialog(onDismiss: () -> Unit) {
     val clipboard = LocalClipboardManager.current
     var markdown by remember { mutableStateOf(true) }
-    val ejemplo = if (markdown) EJEMPLO_MD else EJEMPLO_JSON
+    // Ejemplos de los dos formatos, para copiarlos y usarlos de plantilla (a mano o
+    // pidiéndoselos a una IA). Markdown va primero porque es el que se escribe sin pelearse
+    // con las comas. En inglés el ejemplo usa las claves en inglés, que el lector acepta igual.
+    val ejemplo = stringResource(
+        if (markdown) R.string.plan_format_example_markdown else R.string.plan_format_example_json
+    )
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Formato del plan") },
+        title = { Text(stringResource(R.string.plan_format_title)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    "Un plan es una lista de fases; cada fase dice cuántas semanas se repiten " +
-                        "sus días, y cada día lleva sus ejercicios. Las series van en texto " +
-                        "(\"4 x 8\", \"3 x 30 s\", \"3 vueltas\"). Si tu plan no tiene fases, " +
-                        "escribe los días sin más y se tratará como una fase única.",
+                    stringResource(R.string.plan_format_text),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.height(Space.x3))
@@ -545,8 +539,8 @@ private fun FormatDialog(onDismiss: () -> Unit) {
             TextButton(onClick = {
                 clipboard.setText(AnnotatedString(ejemplo))
                 onDismiss()
-            }) { Text("Copiar ejemplo") }
+            }) { Text(stringResource(R.string.plan_copy_example)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cerrar") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.plan_close)) } }
     )
 }

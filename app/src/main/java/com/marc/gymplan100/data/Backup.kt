@@ -1,6 +1,8 @@
 package com.marc.gymplan100.data
 
 import android.content.Context
+import androidx.annotation.StringRes
+import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.AppTheme
 import kotlinx.serialization.Serializable
@@ -40,8 +42,11 @@ data class BackupFile(
      */
     val ajustes: Map<String, String> = emptyMap()
 ) {
-    /** Cuántos días completados hay dentro, para poder avisar antes de sobrescribir. */
-    fun resumen(): String {
+    /**
+     * Cuántos días completados hay dentro, para poder avisar antes de sobrescribir. La frase
+     * la monta la pantalla, que es la que sabe en qué idioma se pinta.
+     */
+    fun diasCompletados(): Int {
         val dias = progreso.entries
             .filter { it.key.startsWith("progress_json") }
             .sumOf { entrada ->
@@ -51,7 +56,7 @@ data class BackupFile(
                         .completedDays.size
                 }.getOrDefault(0)
             }
-        return contar(dias, "día completado", "días completados")
+        return dias
     }
 
     companion object {
@@ -90,10 +95,13 @@ object Backup {
         )
     }
 
-    /** Qué salió mal al leer una copia, en palabras que se puedan enseñar tal cual. */
+    /**
+     * Qué salió mal al leer una copia. Lleva el texto como recurso y no como frase: aquí no
+     * hay Context, y la pantalla lo resuelve en el idioma de la app.
+     */
     sealed interface Result {
         data class Ok(val file: BackupFile) : Result
-        data class Error(val message: String) : Result
+        data class Error(@StringRes val message: Int) : Result
     }
 
     /**
@@ -102,17 +110,15 @@ object Backup {
      */
     fun parse(raw: String): Result {
         val file = runCatching { json.decodeFromString<BackupFile>(raw) }.getOrNull()
-            ?: return Result.Error("Este archivo no es una copia de Building My Future.")
+            ?: return Result.Error(R.string.ini_backup_err_not_backup)
         if (file.app != BackupFile.APP) {
-            return Result.Error("Este archivo es de otra app.")
+            return Result.Error(R.string.ini_backup_err_other_app)
         }
         if (file.formato > BackupFile.FORMATO_ACTUAL) {
-            return Result.Error(
-                "La copia se hizo con una versión más nueva de la app. Actualiza y vuelve a intentarlo."
-            )
+            return Result.Error(R.string.ini_backup_err_newer)
         }
         if (file.progreso.isEmpty() && file.planes.isEmpty()) {
-            return Result.Error("La copia está vacía.")
+            return Result.Error(R.string.ini_backup_err_empty)
         }
         return Result.Ok(file)
     }

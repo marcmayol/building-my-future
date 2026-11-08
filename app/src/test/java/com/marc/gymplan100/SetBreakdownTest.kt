@@ -133,20 +133,20 @@ class SetBreakdownTest {
 
     @Test fun `en el entreno libre se leen kilos y repeticiones`() {
         val resumen = setsSummary(
-            listOf(SetLog("10", "12"), SetLog("12", "12"), SetLog("11", "10"))
+            listOf(SetLog("10", "12"), SetLog("12", "12"), SetLog("11", "10")), "cal."
         )
         assertEquals("10 kg × 12 · 12 kg × 12 · 11 kg × 10", resumen)
     }
 
     @Test fun `sin repeticiones apuntadas, el libre se lee como el desglose de pesos`() {
-        assertEquals("10 · 12 kg", setsSummary(listOf(SetLog("10"), SetLog("12"))))
+        assertEquals("10 · 12 kg", setsSummary(listOf(SetLog("10"), SetLog("12")), "cal."))
     }
 
     @Test fun `un ejercicio sin kilos se lee en repeticiones, sin aspas sueltas`() {
         // Unas dominadas o un ejercicio de peso corporal: "x 12 · x 12" no dice nada.
         assertEquals(
             "12 · 10 reps",
-            setsSummary(listOf(SetLog(reps = "12"), SetLog(reps = "10")))
+            setsSummary(listOf(SetLog(reps = "12"), SetLog(reps = "10")), "cal.")
         )
     }
 
@@ -163,6 +163,6 @@ class SetBreakdownTest {
 
     @Test fun `en el resumen se ve cual era de calentamiento`() {
         val series = listOf(SetLog("20", "10", warmup = true), SetLog("40", "8"))
-        assertEquals("20 kg × 10 (cal.) · 40 kg × 8", setsSummary(series))
+        assertEquals("20 kg × 10 (cal.) · 40 kg × 8", setsSummary(series, "cal."))
     }
 }

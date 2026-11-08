@@ -2,6 +2,8 @@
 
 package com.marc.gymplan100.ui
 
+import androidx.annotation.ArrayRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,171 +45,106 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.Space
 
-/** Un apartado de la ayuda: qué es, cómo se ve y qué hacer, paso a paso. */
+/** Un apartado de la ayuda: qué es, cómo se ve y qué hacer, paso a paso. Los textos son recursos. */
 private data class HelpSection(
-    val title: String,
-    val summary: String,
+    @StringRes val title: Int,
+    @StringRes val summary: Int,
     val image: Int?,
-    val steps: List<String>
+    @ArrayRes val steps: Int
 )
 
 private val SECCIONES = listOf(
     HelpSection(
-        "Inicio",
-        "Lo que te toca hoy y cómo vas.",
+        R.string.ayu_help_inicio_title,
+        R.string.ayu_help_inicio_summary,
         R.drawable.ayuda_inicio,
-        listOf(
-            "Arriba a la derecha, ⓘ abre esta ayuda (también está en Ajustes y en la cabecera del entreno) y el engranaje, los ajustes.",
-            "Debajo, el plan que sigues y la fase. «Ver otros planes» lleva a la lista: hay planes de fuerza, de músculo, para casa, para empezar desde cero…",
-            "El bloque grande es el día que toca. «Empezar día» arranca el entreno guiado; «Ver el día antes de empezar» enseña los ejercicios sin empezar nada.",
-            "Si tienes un entreno a medias, ese bloque dice «En curso» y el botón lo reanuda donde lo dejaste.",
-            "«Entreno libre» es para entrenar sin seguir el plan, con descansos y apuntando sobre la marcha. Los «Entrenamientos especiales» son rutinas sueltas que no cuentan como día.",
-            "Abajo, la barra: Logros, Mis pesos, Resultados y Estadísticas."
-        )
+        R.array.ayu_help_inicio_steps
     ),
     HelpSection(
-        "La ficha del día",
-        "Los ejercicios de un día, antes o después de hacerlo.",
+        R.string.ayu_help_dia_title,
+        R.string.ayu_help_dia_summary,
         R.drawable.ayuda_dia,
-        listOf(
-            "Cada ejercicio con su dibujo, las series y repeticiones («3 x 12») y el descanso entre series.",
-            "«Cómo se hace» abre la ficha: músculos, técnica, errores típicos, alternativas y un vídeo.",
-            "«Apuntar a mano» sirve para anotar un día que entrenaste sin la app. Lo hecho con el entreno guiado se apunta solo al terminar.",
-            "Si tienes el entreno de ese día a medias, el botón dice «Continuar entrenamiento»."
-        )
+        R.array.ayu_help_dia_steps
     ),
     HelpSection(
-        "Antes de empezar: el exprés",
-        "Cuánto dura el día y cómo recortarlo si vas justo.",
+        R.string.ayu_help_expres_title,
+        R.string.ayu_help_expres_summary,
         R.drawable.ayuda_expres,
-        listOf(
-            "Al empezar ves cuánto suele durar el día. La cuenta aprende de lo que tú tardas de verdad.",
-            "Si vas justo, elige 45 o 30 minutos: todos los ejercicios bajan a 2 series y, si aún no cabe, se quitan los del final. La app te dice cuáles.",
-            "Un exprés cuenta como día hecho igual que uno entero."
-        )
+        R.array.ayu_help_expres_steps
     ),
     HelpSection(
-        "La serie",
-        "Lo que haces con la máquina delante.",
+        R.string.ayu_help_serie_title,
+        R.string.ayu_help_serie_summary,
         R.drawable.ayuda_serie,
-        listOf(
-            "Pon el peso con − y + (de medio en medio kilo; manteniendo pulsado corre), con «Rueda» o tocando la cifra para escribirla.",
-            "Las repeticiones vienen puestas con las del plan: tócalas solo si hoy han salido otras.",
-            "«Serie de calentamiento» apunta una serie de aproximación sin gastar serie del plan.",
-            "«Saltar» es para cuando ese ejercicio no toca ahora: «Máquina ocupada» lo deja para el final, «Hacer otro en su lugar» lo cambia por una alternativa y «No lo hago hoy» lo tacha (lo hecho queda apuntado; lo que no, no cuenta).",
-            "«Plan» enseña todo el día y por dónde vas, con los saltados tachados al final.",
-            "Cuando acabes, «Serie hecha»."
-        )
+        R.array.ayu_help_serie_steps
     ),
     HelpSection(
-        "El descanso",
-        "La cuenta atrás entre series.",
+        R.string.ayu_help_descanso_title,
+        R.string.ayu_help_descanso_summary,
         R.drawable.ayuda_descanso,
-        listOf(
-            "El descanso depende del ejercicio: el tuyo de siempre en series normales (1:30 si no lo cambias en Ajustes), 3 minutos en series pesadas (8 repeticiones o menos en un básico) o lo que diga el plan. Debajo de la cifra pone de dónde sale.",
-            "−30 s y +30 s lo ajustan. Si lo cambias entre series, la próxima vez ese ejercicio ya empieza con tu descanso.",
-            "Suena y vibra al acabar aunque tengas la pantalla apagada (y el reloj, si lo usas).",
-            "«¿Cómo ha ido?» apunta si la serie fue fácil, justa o al fallo, y alarga el descanso: «Justo» suma 30 s y «Fallo», un minuto. En «Después» puedes dejar preparado el peso de la siguiente."
-        )
+        R.array.ayu_help_descanso_steps
     ),
     HelpSection(
-        "Si no tienes la máquina",
-        "Hacer otro ejercicio y que quede apuntado como lo que fue.",
+        R.string.ayu_help_maquina_title,
+        R.string.ayu_help_maquina_summary,
         R.drawable.ayuda_ficha,
-        listOf(
-            "En la serie, toca «Saltar» → «Hacer otro en su lugar» (o «Cómo se hace» y baja a «Si está ocupada o no la tienes»).",
-            "Las alternativas que la app conoce salen con su dibujo: toca «La hago» y el ejercicio de hoy pasa a ser ese, con sus propios pesos.",
-            "«He hecho otro ejercicio…» busca entre 151 ejercicios o deja escribir el tuyo.",
-            "Con «Recordarlo para los próximos días» marcado, los días siguientes ya empiezan con el cambio. «Volver al del plan» lo deshace."
-        )
+        R.array.ayu_help_maquina_steps
     ),
     HelpSection(
-        "El entreno libre",
-        "Sin plan, pero con descansos y todo apuntado sobre la marcha.",
+        R.string.ayu_help_libre_title,
+        R.string.ayu_help_libre_summary,
         R.drawable.ayuda_libre,
-        listOf(
-            "Empieza con el calentamiento: «Ya he calentado» lo salta.",
-            "Haz tu serie y pulsa «Serie terminada». El descanso arranca en el acto y, mientras corre, eliges qué ejercicio era (solo la primera vez) y apuntas kilos y repeticiones.",
-            "Las siguientes series del mismo ejercicio vienen con lo de la anterior: solo tocas lo que cambie. «¿Cómo ha ido?» alarga el descanso igual que en el guiado.",
-            "Si lo haces con tu peso, marca «Peso corporal, sin kilos»: solo te pedirá repeticiones, y se acuerda para la próxima vez.",
-            "Si escribes uno que la app no conoce, como «Remo en TRX», se guarda en el móvil como tuyo, sin dibujo ni mapa de músculos. Te lo ofrece solo con un plan creado por ti: en el buscador, en las sugerencias y al montar el plan.",
-            "«Terminar ejercicio» da el descanso entre ejercicios; la siguiente serie vuelve a preguntar cuál es.",
-            "«Finalizar» enseña todo lo apuntado para repasarlo antes de guardar."
-        )
+        R.array.ayu_help_libre_steps
     ),
     HelpSection(
-        "Salir sin perder nada",
-        "El entreno se guarda solo mientras lo haces.",
+        R.string.ayu_help_salir_title,
+        R.string.ayu_help_salir_summary,
         R.drawable.ayuda_salir,
-        listOf(
-            "El botón atrás del móvil te lleva a Inicio con el entreno en marcha: lo reanudas desde el bloque «En curso».",
-            "La X de arriba pregunta qué quieres: «Terminar y guardar» da el día por hecho con lo que lleves, «Reanudar luego» lo deja como está y «Descartar» lo borra.",
-            "Mirar esta ayuda, la ficha o el plan nunca toca el entreno."
-        )
+        R.array.ayu_help_salir_steps
     ),
     HelpSection(
-        "Resultados",
-        "Lo que hiciste cada día.",
+        R.string.ayu_help_resultados_title,
+        R.string.ayu_help_resultados_summary,
         R.drawable.ayuda_resultados,
-        listOf(
-            "Cada entreno con su duración y, por ejercicio, los kilos de cada serie.",
-            "«Recientes / Antiguos» cambia el orden.",
-            "Si hiciste otro ejercicio en lugar del del plan, sale con su nombre y «en lugar de…»."
-        )
+        R.array.ayu_help_resultados_steps
     ),
     HelpSection(
-        "Estadísticas",
-        "Tu racha, tus números y tu progreso.",
+        R.string.ayu_help_estadisticas_title,
+        R.string.ayu_help_estadisticas_summary,
         R.drawable.ayuda_estadisticas,
-        listOf(
-            "Resumen: racha, días hechos, tiempo total, series y kilos movidos.",
-            "Pesos: cómo ha subido cada ejercicio. Músculos: qué has trabajado los últimos días. Constancia: qué días entrenas."
-        )
+        R.array.ayu_help_estadisticas_steps
     ),
     HelpSection(
-        "Mis pesos",
-        "El peso con el que trabajas en cada ejercicio.",
+        R.string.ayu_help_pesos_title,
+        R.string.ayu_help_pesos_summary,
         R.drawable.ayuda_pesos,
-        listOf(
-            "Agrupados por músculo. Se rellenan solos al entrenar y los puedes corregir.",
-            "Es el peso de tu última sesión; tu récord (PR) sale debajo de cada ejercicio."
-        )
+        R.array.ayu_help_pesos_steps
     ),
     HelpSection(
-        "Planes",
-        "Cambiar de plan, importar uno o crear el tuyo.",
+        R.string.ayu_help_planes_title,
+        R.string.ayu_help_planes_summary,
         R.drawable.ayuda_planes,
-        listOf(
-            "Cada plan guarda su propio progreso: cambiar de plan no borra nada.",
-            "Debajo de cada uno: su objetivo (fuerza, músculo…), los días y cuántos llevas.",
-            "«Crear un plan» abre el editor; «Importar» trae uno en JSON o Markdown."
-        )
+        R.array.ayu_help_planes_steps
     ),
     HelpSection(
-        "Ajustes",
-        "Tus datos, descansos, avisos, tema y copia de seguridad.",
+        R.string.ayu_help_ajustes_title,
+        R.string.ayu_help_ajustes_summary,
         R.drawable.ayuda_ajustes,
-        listOf(
-            "Peso (para estimar calorías), género de los dibujos y si usas reloj.",
-            "Descansos: cuánto duran por defecto entre series y entre ejercicios.",
-            "Recordatorios: elige días y hora y la app te avisa de que toca entrenar.",
-            "Tema claro u oscuro, y copia de seguridad para llevarte el progreso a otro móvil."
-        )
+        R.array.ayu_help_ajustes_steps
     ),
     HelpSection(
-        "Con el reloj",
-        "Si tienes un reloj con Wear OS.",
+        R.string.ayu_help_reloj_title,
+        R.string.ayu_help_reloj_summary,
         null,
-        listOf(
-            "Instala la app del reloj y el reloj hará de mando: «Serie hecha», saltar el descanso o cambiar de máquina sin sacar el móvil.",
-            "El reloj vibra al acabar cada descanso y, mientras entrenas, enseña en la esfera el tiempo que queda."
-        )
+        R.array.ayu_help_reloj_steps
     ),
 )
 
@@ -221,16 +158,16 @@ private val SECCIONES = listOf(
  */
 @Composable
 fun HelpScreen(onBack: () -> Unit) {
-    var abierto by rememberSaveable { mutableStateOf<String?>(null) }
+    var abierto by rememberSaveable { mutableStateOf<Int?>(null) }
     var ampliada by rememberSaveable { mutableStateOf<Int?>(null) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ayuda", style = MaterialTheme.typography.headlineSmall) },
+                title = { Text(stringResource(R.string.ayu_help_titulo), style = MaterialTheme.typography.headlineSmall) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ayu_help_volver))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -251,8 +188,7 @@ fun HelpScreen(onBack: () -> Unit) {
         ) {
             item {
                 Text(
-                    "Toca un apartado para verlo. Mirar la ayuda no cambia nada: si tienes un " +
-                        "entreno en marcha, sigue exactamente igual al volver.",
+                    stringResource(R.string.ayu_help_intro),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = Space.x2)
@@ -260,6 +196,7 @@ fun HelpScreen(onBack: () -> Unit) {
             }
             items(SECCIONES, key = { it.title }) { s ->
                 val open = abierto == s.title
+                val titulo = stringResource(s.title)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -274,9 +211,9 @@ fun HelpScreen(onBack: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(s.title, style = MaterialTheme.typography.titleMedium)
+                            Text(titulo, style = MaterialTheme.typography.titleMedium)
                             Text(
-                                s.summary,
+                                stringResource(s.summary),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -298,7 +235,7 @@ fun HelpScreen(onBack: () -> Unit) {
                                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                                     Image(
                                         painter = painterResource(img),
-                                        contentDescription = "Captura: ${s.title}",
+                                        contentDescription = stringResource(R.string.ayu_help_captura, titulo),
                                         contentScale = ContentScale.Fit,
                                         modifier = Modifier
                                             .widthIn(max = 220.dp)
@@ -309,7 +246,7 @@ fun HelpScreen(onBack: () -> Unit) {
                                     )
                                 }
                             }
-                            s.steps.forEachIndexed { i, paso ->
+                            stringArrayResource(s.steps).forEachIndexed { i, paso ->
                                 Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                                     Text(
                                         "${i + 1}.",
@@ -340,7 +277,7 @@ fun HelpScreen(onBack: () -> Unit) {
             ) {
                 Image(
                     painter = painterResource(img),
-                    contentDescription = "Captura ampliada. Toca para cerrar.",
+                    contentDescription = stringResource(R.string.ayu_help_captura_ampliada),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxWidth()

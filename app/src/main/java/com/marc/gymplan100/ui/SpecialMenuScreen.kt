@@ -30,6 +30,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
@@ -60,11 +62,11 @@ fun SpecialMenuScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Especiales", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.ses_special_title), style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ses_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -85,15 +87,15 @@ fun SpecialMenuScreen(
         ) {
             item {
                 Text(
-                    "NINGUNO CUENTA COMO DÍA DEL PLAN",
+                    stringResource(R.string.ses_special_overline),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(Space.x1))
-                Text("Elige qué entrenar hoy", style = MaterialTheme.typography.headlineLarge)
+                Text(stringResource(R.string.ses_special_heading), style = MaterialTheme.typography.headlineLarge)
                 Spacer(Modifier.height(Space.x1))
                 Text(
-                    "Son extras que se guardan aparte.",
+                    stringResource(R.string.ses_special_intro),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -102,17 +104,17 @@ fun SpecialMenuScreen(
             item {
                 OptionCard(
                     emoji = "⏱️",
-                    title = "Entrenamiento libre (extra)",
-                    subtitle = "El entreno extra de siempre: cronómetro simple, tú marcas el ritmo.",
+                    title = stringResource(R.string.ses_special_free_title),
+                    subtitle = stringResource(R.string.ses_special_free_sub),
                     onClick = onFreeWorkout
                 )
             }
             item {
                 OptionCard(
                     emoji = "🎖️",
-                    title = militar?.nombre ?: "Rutina Militar",
+                    title = militar?.nombre ?: stringResource(R.string.ses_special_military_title),
                     subtitle = militar?.descripcion
-                        ?: "Secuencia guiada de fuerza, cardio y resistencia sin parar.",
+                        ?: stringResource(R.string.ses_special_military_sub),
                     onClick = {
                         val status = viewModel.militaryFrequency()
                         if (status.reached && militar != null) militaryWarning = militar.aviso_frecuencia
@@ -123,17 +125,17 @@ fun SpecialMenuScreen(
             item {
                 OptionCard(
                     emoji = "🔥",
-                    title = "Rutina Quema Grasa",
-                    subtitle = "Catálogo de ejercicios de alta intensidad, cada uno con su protocolo.",
+                    title = stringResource(R.string.ses_special_fatburn_title),
+                    subtitle = stringResource(R.string.ses_special_fatburn_sub),
                     onClick = onOpenFatburn
                 )
             }
             item {
                 OptionCard(
                     emoji = "🧘",
-                    title = altura?.nombre ?: "Rutina Altura y Postura",
+                    title = altura?.nombre ?: stringResource(R.string.ses_special_posture_title),
                     subtitle = altura?.descripcion
-                        ?: "Cinco ejercicios de postura y descompresión de columna. Baja intensidad.",
+                        ?: stringResource(R.string.ses_special_posture_sub),
                     onClick = {
                         val status = viewModel.postureFrequency()
                         if (status.reached && altura != null) postureWarning = altura.aviso_frecuencia
@@ -202,9 +204,9 @@ fun FrequencyWarningDialog(
 ) {
     AlertDialog(
         onDismissRequest = onCancel,
-        title = { Text("Ya has cumplido esta semana") },
+        title = { Text(stringResource(R.string.ses_freq_title)) },
         text = { Text(text) },
-        confirmButton = { Button(onClick = onContinue) { Text("Entrenar igualmente") } },
-        dismissButton = { TextButton(onClick = onCancel) { Text("Mejor no") } }
+        confirmButton = { Button(onClick = onContinue) { Text(stringResource(R.string.ses_freq_continue)) } },
+        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.ses_freq_cancel)) } }
     )
 }

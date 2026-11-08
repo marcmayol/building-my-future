@@ -17,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.ui.theme.Space
@@ -58,24 +60,24 @@ fun SkipExerciseSheet(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Text("¿Qué hacemos con él?", style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.ses_skip_question), style = MaterialTheme.typography.headlineMedium)
             if (canPostpone) {
                 SkipOption(
-                    title = "Máquina ocupada",
-                    detail = "Lo haces al final y sigues con el siguiente.",
+                    title = stringResource(R.string.ses_skip_busy_title),
+                    detail = stringResource(R.string.ses_skip_busy_detail),
                     onClick = { onDismiss(); onPostpone() }
                 )
             }
             SkipOption(
-                title = "Hacer otro en su lugar",
-                detail = "Las alternativas de la ficha, por si no tienes esta máquina.",
+                title = stringResource(R.string.ses_skip_swap_title),
+                detail = stringResource(R.string.ses_skip_swap_detail),
                 onClick = { onDismiss(); onSwap() }
             )
             SkipOption(
-                title = if (doneSets > 0) "No hago más series" else "No lo hago hoy",
+                title = if (doneSets > 0) stringResource(R.string.ses_skip_stop_title) else stringResource(R.string.ses_skip_drop_title),
                 detail = if (doneSets > 0)
-                    "Lo dejas aquí: las series hechas quedan apuntadas y sigues con el siguiente."
-                else "Se tacha de hoy y no cuenta como hecho. Sigues con el siguiente.",
+                    stringResource(R.string.ses_skip_stop_detail)
+                else stringResource(R.string.ses_skip_drop_detail),
                 onClick = { onDismiss(); onDrop() }
             )
         }

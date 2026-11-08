@@ -50,6 +50,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -171,7 +173,7 @@ fun SessionShell(
                     IconButton(onClick = abrir, modifier = Modifier.size(40.dp)) {
                         Icon(
                             Icons.Filled.Info,
-                            contentDescription = "Ayuda",
+                            contentDescription = stringResource(R.string.ses_help),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -179,7 +181,7 @@ fun SessionShell(
                 IconButton(onClick = onExit, modifier = Modifier.size(40.dp)) {
                     Icon(
                         Icons.Filled.Close,
-                        contentDescription = "Salir del entrenamiento",
+                        contentDescription = stringResource(R.string.ses_exit_workout),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

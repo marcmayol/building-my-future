@@ -20,8 +20,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.BuildConfig
+import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.Space
 import com.marc.gymplan100.ui.theme.Touch
 import com.marcm.actualizador.EstadoActualizacion
@@ -42,11 +44,10 @@ fun SeccionActualizacionesDirecta(actualizador: com.marcm.actualizador.Actualiza
     val scope = rememberCoroutineScope()
 
     Bloque {
-        Text("Actualizaciones", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.ini_updates_title), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.size(Space.x1))
         Text(
-            "La app se instala fuera de Play Store, así que se actualiza sola desde " +
-                "su página de versiones.",
+            stringResource(R.string.ini_upd_direct_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -55,7 +56,7 @@ fun SeccionActualizacionesDirecta(actualizador: com.marcm.actualizador.Actualiza
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Buscar actualizaciones", modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.ini_upd_auto), modifier = Modifier.weight(1f))
             Spacer(Modifier.size(Space.x3))
             Switch(
                 checked = buscarAuto,
@@ -72,7 +73,7 @@ fun SeccionActualizacionesDirecta(actualizador: com.marcm.actualizador.Actualiza
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = Touch.primary)
-        ) { Text("Buscar ahora") }
+        ) { Text(stringResource(R.string.ini_upd_check_now)) }
 
         if (estado is EstadoActualizacion.Disponible) {
             Spacer(Modifier.size(Space.x2))
@@ -84,8 +85,10 @@ fun SeccionActualizacionesDirecta(actualizador: com.marcm.actualizador.Actualiza
                     .heightIn(min = Touch.primary)
             ) {
                 Text(
-                    "Actualizar a la " +
+                    stringResource(
+                        R.string.ini_upd_update_to,
                         (estado as EstadoActualizacion.Disponible).info.versionName
+                    )
                 )
             }
         }
@@ -94,7 +97,7 @@ fun SeccionActualizacionesDirecta(actualizador: com.marcm.actualizador.Actualiza
 
         Spacer(Modifier.size(Space.x3))
         Text(
-            "Versión ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+            stringResource(R.string.ini_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -105,18 +108,19 @@ fun SeccionActualizacionesDirecta(actualizador: com.marcm.actualizador.Actualiza
 @Composable
 private fun EstadoComprobacionManual(estado: EstadoActualizacion) {
     val texto = when (estado) {
-        EstadoActualizacion.Comprobando -> "Buscando…"
-        EstadoActualizacion.AlDia -> "Estás al día ✓"
+        EstadoActualizacion.Comprobando -> stringResource(R.string.ini_upd_checking)
+        EstadoActualizacion.AlDia -> stringResource(R.string.ini_upd_up_to_date)
         is EstadoActualizacion.Disponible -> null       // ya lo dice el botón
-        is EstadoActualizacion.Descargando -> "Descargando… ${estado.porcentaje}%"
-        EstadoActualizacion.Verificando -> "Comprobando la copia…"
-        EstadoActualizacion.Instalando -> "Instalando…"
+        is EstadoActualizacion.Descargando -> stringResource(R.string.ini_upd_downloading, estado.porcentaje)
+        EstadoActualizacion.Verificando -> stringResource(R.string.ini_upd_verifying)
+        EstadoActualizacion.Instalando -> stringResource(R.string.ini_installing)
         is EstadoActualizacion.Error -> when (estado.tipo) {
-            TipoError.SIN_RED -> "Sin conexión. Inténtalo más tarde."
-            TipoError.HTTP, TipoError.MANIFIESTO -> "No se pudo consultar si hay versión nueva."
-            TipoError.DESCARGA -> "Falló la descarga."
-            TipoError.HASH -> "La descarga llegó corrupta y se ha borrado."
-            TipoError.INSTALACION -> estado.mensaje ?: "No se pudo instalar."
+            TipoError.SIN_RED -> stringResource(R.string.ini_upd_err_offline)
+            TipoError.HTTP, TipoError.MANIFIESTO -> stringResource(R.string.ini_upd_err_check)
+            TipoError.DESCARGA -> stringResource(R.string.ini_upd_err_download)
+            TipoError.HASH -> stringResource(R.string.ini_upd_err_hash)
+            // El mensaje viene del módulo :actualizador (fuera de esta app), tal cual.
+            TipoError.INSTALACION -> estado.mensaje ?: stringResource(R.string.ini_upd_err_install)
         }
         EstadoActualizacion.Inactivo, EstadoActualizacion.PidiendoPermiso -> null
     }

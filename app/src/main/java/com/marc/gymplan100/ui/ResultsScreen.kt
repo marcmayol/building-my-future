@@ -42,8 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.PermissionController
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
-import com.marc.gymplan100.data.contar
-import com.marc.gymplan100.data.palabra
+import com.marc.gymplan100.R
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.data.ProgressState
 import com.marc.gymplan100.data.SessionRecord
 import com.marc.gymplan100.data.SetLog
@@ -86,7 +89,7 @@ fun ResultsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Resultados", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.est_resultados_titulo), style = MaterialTheme.typography.headlineSmall)
                 },
                 actions = {
                     TextButton(onClick = { viewModel.toggleResultsOrder() }) {
@@ -97,7 +100,7 @@ fun ResultsScreen(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(Space.x1))
-                        Text(if (newestFirst) "Recientes" else "Antiguos")
+                        Text(if (newestFirst) stringResource(R.string.est_orden_recientes) else stringResource(R.string.est_orden_antiguos))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -128,9 +131,7 @@ fun ResultsScreen(
             if (completed.isEmpty() && extras.isEmpty()) {
                 item {
                     Text(
-                        "Aún no has completado ningún día. Cuando termines tu primer " +
-                            "entrenamiento, aquí verás cuánto tardaste y con qué peso hiciste " +
-                            "cada ejercicio.",
+                        stringResource(R.string.est_resultados_vacio),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -147,7 +148,7 @@ fun ResultsScreen(
             if (extras.isNotEmpty()) {
                 item {
                     Text(
-                        "ENTRENAMIENTOS EXTRA",
+                        stringResource(R.string.est_entrenos_extra_titulo),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = Space.x2)
@@ -178,18 +179,16 @@ private fun HealthConnectBlock(connected: Boolean, onConnect: () -> Unit) {
             )
             Spacer(Modifier.width(Space.x2))
             Text(
-                if (connected) "Conectado con Google Health" else "Google Health",
+                if (connected) stringResource(R.string.est_health_conectado) else "Google Health",
                 style = MaterialTheme.typography.titleMedium
             )
         }
         Spacer(Modifier.height(Space.x2))
         Text(
             if (connected)
-                "Cada entreno que termines se guardará automáticamente en Google Health, " +
-                    "con su duración y el detalle de ejercicios y pesos."
+                stringResource(R.string.est_health_conectado_texto)
             else
-                "Conecta la app para que tus entrenamientos aparezcan en Google Health " +
-                    "automáticamente al terminarlos.",
+                stringResource(R.string.est_health_conectar_texto),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -201,7 +200,7 @@ private fun HealthConnectBlock(connected: Boolean, onConnect: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = Touch.primary)
-            ) { Text("Conectar con Google Health") }
+            ) { Text(stringResource(R.string.est_health_conectar)) }
         }
     }
 }
@@ -219,10 +218,14 @@ private fun ExtraBlock(record: SessionRecord) {
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Entrenamiento extra", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.est_entreno_extra), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    formatDate(record.endMillis),
+                    formatDate(
+                        record.endMillis,
+                        stringResource(R.string.est_fecha_entreno),
+                        AppLanguage.locale(LocalContext.current)
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -250,8 +253,9 @@ private fun ExtraBlock(record: SessionRecord) {
     }
 }
 
-private fun formatDate(millis: Long): String {
-    val fmt = java.text.SimpleDateFormat("EEE d MMM · HH:mm", java.util.Locale("es", "ES"))
+/** [pattern] sale de los recursos: cada idioma ordena el día y el mes a su manera. */
+private fun formatDate(millis: Long, pattern: String, locale: java.util.Locale): String {
+    val fmt = java.text.SimpleDateFormat(pattern, locale)
     return fmt.format(java.util.Date(millis)).replaceFirstChar { it.uppercase() }
 }
 
@@ -275,13 +279,13 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
             Column(modifier = Modifier.weight(1f)) {
                 if (record?.special == true) {
                     Text(
-                        "ESPECIAL",
+                        stringResource(R.string.est_especial),
                         style = MaterialTheme.typography.labelMedium,
                         color = app.work
                     )
                     Spacer(Modifier.height(2.dp))
                 }
-                Text("Día $dayNumber", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.est_dia_titulo, dayNumber), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(2.dp))
                 Text(
                     day.template.title,
@@ -305,7 +309,7 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
             val apuntado = record.logged.filter { it.setsOrSingle.isNotEmpty() }
             if (apuntado.isEmpty()) {
                 Text(
-                    "Sesión libre guiada (p. ej. con tu tío). Solo se registró el tiempo total.",
+                    stringResource(R.string.est_sesion_libre_solo_tiempo),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -314,7 +318,7 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
                 // pero no se enseñaba en ningún sitio: el entreno salía como "solo el tiempo"
                 // aunque hubieras escrito los kilos de cada serie.
                 Text(
-                    "Entreno libre · lo que apuntaste",
+                    stringResource(R.string.est_entreno_libre_apuntado),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -331,10 +335,11 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
         } else {
             day.template.exercises.forEachIndexed { index, exercise ->
                 val log = progress.logs["$dayNumber-$index"]
+                val hecho = log?.doneAs?.takeIf { it.isNotBlank() }
                 ExerciseResultRow(
                     // Lo que se hizo de verdad, con el del plan entre paréntesis para no perderse.
-                    name = log?.doneAs?.takeIf { it.isNotBlank() }
-                        ?.let { "$it (en lugar de ${exercise.name})" } ?: exercise.name,
+                    name = if (hecho != null) stringResource(R.string.est_en_lugar_de, hecho, exercise.name)
+                    else exercise.name,
                     weight = log?.weight.orEmpty(),
                     sets = log?.filledSets.orEmpty(),
                     conReps = false
@@ -344,8 +349,11 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
             if (record != null) {
                 Spacer(Modifier.height(Space.x2))
                 Text(
-                    contar(record.totalSets, "serie", "series") + " · descanso total " +
-                        formatDuration(record.totalRestSeconds),
+                    stringResource(
+                        R.string.est_descanso_total,
+                        pluralStringResource(R.plurals.est_series, record.totalSets, record.totalSets),
+                        formatDuration(record.totalRestSeconds)
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -369,7 +377,8 @@ private fun ExerciseResultRow(
     conReps: Boolean
 ) {
     val styles = LocalAppTextStyles.current
-    val desglose = if (conReps) setsSummary(sets) else weightsSummary(sets)
+    val marcaCal = stringResource(R.string.mot_warmup_short)
+    val desglose = if (conReps) setsSummary(sets, marcaCal) else weightsSummary(sets)
     Column(
         modifier = Modifier
             .fillMaxWidth()

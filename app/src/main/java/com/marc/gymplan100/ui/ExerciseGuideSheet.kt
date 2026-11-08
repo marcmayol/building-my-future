@@ -46,6 +46,8 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -156,25 +158,18 @@ fun ExerciseGuideSheet(
             if (guide == null) {
                 OutlinedButton(onClick = abrirVideo, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                    Text("  Buscarlo en YouTube")
+                    Text("  " + stringResource(R.string.est_buscar_youtube))
                 }
                 Text(
                     // Con planes propios este caso es habitual (el ejercicio no está en el
                     // catálogo de la app), y entonces tampoco hay ilustración a la que mirar.
                     when {
                         kind == ExerciseKind.CARDIO ->
-                            "Un bloque de cardio no tiene técnica que mirar: elige la máquina " +
-                                "que quieras (cinta, bici, elíptica o remo) y mantén el ritmo " +
-                                "que pide el plan de principio a fin."
+                            stringResource(R.string.est_sin_ficha_cardio)
                         imageRes != null ->
-                            "Todavía no hay ficha para este ejercicio. Fíjate en la imagen y " +
-                                "haz el movimiento controlando el peso, con la espalda neutra " +
-                                "y sin impulso."
+                            stringResource(R.string.est_sin_ficha_con_imagen)
                         else ->
-                            "Este ejercicio no está en el catálogo de la app, así que no hay " +
-                                "ficha ni ilustración. El vídeo de aquí arriba te lo busca en " +
-                                "YouTube; hazlo controlando el peso, con la espalda neutra y " +
-                                "sin impulso."
+                            stringResource(R.string.est_sin_ficha)
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -190,7 +185,7 @@ fun ExerciseGuideSheet(
                 return@Column
             }
 
-            GuideSection("Músculos que trabaja") {
+            GuideSection(stringResource(R.string.est_musculos_que_trabaja)) {
                 Text(guide.muscles, style = MaterialTheme.typography.bodyMedium)
                 val targets = MuscleTargets.forName(exerciseName)
                 if (targets != null) {
@@ -209,14 +204,14 @@ fun ExerciseGuideSheet(
                     )
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            "Frente",
+                            stringResource(R.string.est_frente),
                             modifier = Modifier.weight(1f),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            "Espalda",
+                            stringResource(R.string.est_espalda_vista),
                             modifier = Modifier.weight(1f),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.labelMedium,
@@ -232,13 +227,13 @@ fun ExerciseGuideSheet(
                         ) {
                             LegendDot(primaryColor)
                             Text(
-                                "  Principal    ",
+                                "  " + stringResource(R.string.est_principal) + "    ",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             LegendDot(secondaryColor)
                             Text(
-                                "  Secundario",
+                                "  " + stringResource(R.string.est_secundario),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -247,7 +242,7 @@ fun ExerciseGuideSheet(
                 }
             }
 
-            GuideSection("Cómo se hace") {
+            GuideSection(stringResource(R.string.est_como_se_hace)) {
                 Text(guide.howTo, style = MaterialTheme.typography.bodyMedium)
             }
 
@@ -255,7 +250,7 @@ fun ExerciseGuideSheet(
             // "Cómo se hace" no quede enterrado.
             // Solo si hay algo que contar: una sección plegable vacía es una promesa rota.
             if (guide.mistakes.isNotEmpty()) {
-                CollapsibleSection("Errores típicos") {
+                CollapsibleSection(stringResource(R.string.est_errores_tipicos)) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         guide.mistakes.forEach { Bullet(it) }
                     }
@@ -265,11 +260,11 @@ fun ExerciseGuideSheet(
             if (onSwap != null) {
                 // En mitad del entreno esta es la sección que se busca: va abierta, y cada
                 // alternativa conocida se puede hacer con un toque.
-                CollapsibleSection("Si está ocupada o no la tienes", startOpen = true) {
+                CollapsibleSection(stringResource(R.string.est_si_esta_ocupada), startOpen = true) {
                     SwapSection(planName, exerciseName, guide.alternatives, swapRemembered, onSwap)
                 }
             } else if (guide.alternatives.isNotEmpty()) {
-                CollapsibleSection("Si está ocupada o no la tienes") {
+                CollapsibleSection(stringResource(R.string.est_si_esta_ocupada)) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         guide.alternatives.forEach { Bullet(it) }
                     }
@@ -278,7 +273,7 @@ fun ExerciseGuideSheet(
 
             OutlinedButton(onClick = abrirVideo, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                Text("  Ver vídeo en YouTube")
+                Text("  " + stringResource(R.string.est_ver_video))
             }
         }
     }
@@ -364,18 +359,18 @@ private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit)
 
     if (actual != null) {
         Text(
-            "Ahora se comporta como \u00ab$actual\u00bb.",
+            stringResource(R.string.est_se_comporta_como, actual),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Button(onClick = { abierto = true }, shape = CircleShape) {
-            Text(if (actual == null) "Se parece a\u2026" else "Cambiar", maxLines = 1)
+            Text(if (actual == null) stringResource(R.string.est_se_parece_a) else stringResource(R.string.est_cambiar), maxLines = 1)
         }
         if (actual != null) {
             OutlinedButton(onClick = { onAlias(null) }, shape = CircleShape) {
-                Text("Quitar", maxLines = 1)
+                Text(stringResource(R.string.est_quitar), maxLines = 1)
             }
         }
     }
@@ -394,11 +389,11 @@ private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit)
                     .padding(bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("\u00bfA cu\u00e1l se parece?", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.est_a_cual_se_parece), style = MaterialTheme.typography.headlineSmall)
                 OutlinedTextField(
                     value = busqueda,
                     onValueChange = { busqueda = it },
-                    label = { Text("Buscar") },
+                    label = { Text(stringResource(R.string.est_buscar)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -412,7 +407,7 @@ private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit)
                 }
                 if (filtrados.isEmpty()) {
                     Text(
-                        "Nada con ese nombre.",
+                        stringResource(R.string.est_nada_con_ese_nombre),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

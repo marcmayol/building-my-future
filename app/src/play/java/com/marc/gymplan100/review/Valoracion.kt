@@ -16,8 +16,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.marc.gymplan100.BuildConfig
+import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.Space
 
 /**
@@ -69,17 +71,16 @@ object Valoracion {
     fun SettingsSection() {
         val context = LocalContext.current
         Column(modifier = Modifier.fillMaxWidth()) {
-            Text("Valorar la app", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ini_rate_title), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.size(Space.x1))
             Text(
-                "La app no tiene detrás ninguna empresa ni se anuncia en ningún sitio: se " +
-                    "encuentra porque alguien la valora. Si te está sirviendo, dilo en la ficha.",
+                stringResource(R.string.ini_rate_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.size(Space.x2))
             TextButton(onClick = { abreLaFicha(context) }) {
-                Text("Valorar en Google Play", maxLines = 1)
+                Text(stringResource(R.string.ini_rate_play), maxLines = 1)
             }
         }
     }

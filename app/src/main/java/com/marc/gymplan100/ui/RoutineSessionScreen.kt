@@ -47,6 +47,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -84,8 +86,8 @@ fun RoutineSessionScreen(
     val rutina = viewModel.specialWorkouts.rutina(s.routineId ?: "")
     val isFixed = rutina?.esSecuenciaFija == true
     val title = when {
-        isFixed -> rutina?.nombre ?: "Rutina"
-        else -> viewModel.specialWorkouts.ejercicio(s.exerciseId ?: "")?.nombre ?: "Quema Grasa"
+        isFixed -> rutina?.nombre ?: stringResource(R.string.ses_routine)
+        else -> viewModel.specialWorkouts.ejercicio(s.exerciseId ?: "")?.nombre ?: stringResource(R.string.ses_fatburn_short)
     }
 
     Scaffold(
@@ -94,7 +96,7 @@ fun RoutineSessionScreen(
                 title = { Text(title) },
                 navigationIcon = {
                     IconButton(onClick = { confirmExit = true }) {
-                        Icon(Icons.Filled.Close, contentDescription = "Salir")
+                        Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.ses_exit))
                     }
                 }
             )
@@ -124,7 +126,7 @@ fun RoutineSessionScreen(
                     modifier = Modifier.fillMaxWidth().height(56.dp)
                 ) {
                     Icon(Icons.Filled.Check, contentDescription = null)
-                    Text("  Finalizar y guardar")
+                    Text("  " + stringResource(R.string.ses_finish_save))
                 }
             }
         }
@@ -133,14 +135,14 @@ fun RoutineSessionScreen(
     if (confirmExit) {
         AlertDialog(
             onDismissRequest = { confirmExit = false },
-            title = { Text("¿Salir de la rutina?") },
-            text = { Text("Si sales ahora, esta sesión no se guardará.") },
+            title = { Text(stringResource(R.string.ses_routine_exit_title)) },
+            text = { Text(stringResource(R.string.ses_routine_exit_text)) },
             confirmButton = {
                 Button(onClick = { confirmExit = false; viewModel.cancelSession(); onExit() }) {
-                    Text("Salir sin guardar")
+                    Text(stringResource(R.string.ses_exit_no_save))
                 }
             },
-            dismissButton = { TextButton(onClick = { confirmExit = false }) { Text("Seguir") } }
+            dismissButton = { TextButton(onClick = { confirmExit = false }) { Text(stringResource(R.string.ses_keep_going)) } }
         )
     }
 }
@@ -160,10 +162,10 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
 
     // Etiqueta, no botón: un AssistChip con onClick vacío se ilumina al tocarlo y promete
     // algo que no pasa. Aquí solo dice por dónde vas.
-    Etiqueta("Paso ${s.stepIndex + 1} de ${s.totalUnits}")
+    Etiqueta(stringResource(R.string.ses_step_of, s.stepIndex + 1, s.totalUnits))
     if (hasSeries) {
         Text(
-            "Serie ${s.setNumber} de ${paso.numSeries}",
+            stringResource(R.string.ses_set_of, s.setNumber, paso.numSeries),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
@@ -176,7 +178,7 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
             val target = if (usingAlt) paso.alternativa!!.duracion_seg else paso.objetivoSeg
             CountdownCircle(elapsed = s.timedElapsed(now), target = target)
             TimerButtons(s, viewModel)
-            PrimaryAdvance(if (hasSeries) "Serie hecha" else "Siguiente paso") {
+            PrimaryAdvance(if (hasSeries) stringResource(R.string.ses_set_done) else stringResource(R.string.ses_next_step)) {
                 viewModel.completeFixedSerie("")
             }
             if (canEndEarly) EndExerciseButton { viewModel.completeFixedSerie("", endExercise = true) }
@@ -188,25 +190,25 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
                 OutlinedButton(
                     onClick = { viewModel.chooseAlternative() },
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(paso.alternativa.nombre + " en su lugar") }
+                ) { Text(stringResource(R.string.ses_instead, paso.alternativa.nombre)) }
             }
             var reps by remember(s.stepIndex, s.setNumber) { mutableStateOf("") }
             OutlinedTextField(
                 value = reps,
                 onValueChange = { reps = it },
-                label = { Text("Repeticiones hechas") },
+                label = { Text(stringResource(R.string.ses_reps_done)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
-            PrimaryAdvance(if (hasSeries) "Serie hecha" else "Paso hecho") {
+            PrimaryAdvance(if (hasSeries) stringResource(R.string.ses_set_done) else stringResource(R.string.ses_step_done)) {
                 viewModel.completeFixedSerie(reps)
             }
             if (canEndEarly) EndExerciseButton { viewModel.completeFixedSerie(reps, endExercise = true) }
         }
         SessionPhase.RESTING -> {
             Text(
-                if (s.restBetweenExercises) "Descanso · siguiente ejercicio" else "Descanso entre series",
+                if (s.restBetweenExercises) stringResource(R.string.ses_rest_next_exercise) else stringResource(R.string.ses_rest_between_sets),
                 style = MaterialTheme.typography.titleMedium
             )
             CountdownCircle(
@@ -217,9 +219,9 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
                 OutlinedButton(onClick = { viewModel.adjustRest(-15) }) { Text("-15 s") }
                 OutlinedButton(onClick = { viewModel.adjustRest(15) }) { Text("+15 s") }
             }
-            PrimaryAdvance("Saltar descanso") { viewModel.endRoutineRest() }
+            PrimaryAdvance(stringResource(R.string.ses_skip_rest)) { viewModel.endRoutineRest() }
         }
-        SessionPhase.FINISHED -> FinishedNote("¡Rutina completada!")
+        SessionPhase.FINISHED -> FinishedNote(stringResource(R.string.ses_routine_done))
         else -> {}
     }
 }
@@ -227,7 +229,7 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
 @Composable
 private fun EndExerciseButton(onClick: () -> Unit) {
     OutlinedButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-        Text("Terminar ejercicio · pasar al siguiente")
+        Text(stringResource(R.string.ses_end_exercise))
     }
 }
 
@@ -238,8 +240,8 @@ private fun FatburnContent(s: ActiveSession, now: Long, viewModel: PlanViewModel
     val exercise = viewModel.specialWorkouts.ejercicio(s.exerciseId ?: "") ?: return
     val protocol = exercise.protocolos.firstOrNull { it.nombre == s.protocolName } ?: return
     val unitLabel = when {
-        protocol.esSeries -> "Serie ${s.stepIndex + 1} de ${s.totalUnits}"
-        s.totalUnits > 1 -> "Ronda ${s.stepIndex + 1} de ${s.totalUnits}"
+        protocol.esSeries -> stringResource(R.string.ses_set_of, s.stepIndex + 1, s.totalUnits)
+        s.totalUnits > 1 -> stringResource(R.string.ses_round_of, s.stepIndex + 1, s.totalUnits)
         else -> protocol.nombre
     }
     Etiqueta(unitLabel)
@@ -248,14 +250,14 @@ private fun FatburnContent(s: ActiveSession, now: Long, viewModel: PlanViewModel
         SessionPhase.TIMED_SET -> {
             CountdownCircle(elapsed = s.timedElapsed(now), target = s.timedTargetSeconds)
             TimerButtons(s, viewModel)
-            PrimaryAdvance(if (protocol.esIntervalos) "Ronda hecha" else "Hecho") {
+            PrimaryAdvance(if (protocol.esIntervalos) stringResource(R.string.ses_round_done) else stringResource(R.string.ses_done)) {
                 viewModel.completeFatburnUnit("")
             }
         }
         SessionPhase.WORKING -> {
             if (protocol.repsLabel.isNotBlank()) {
                 Text(
-                    "Objetivo: ${protocol.repsLabel} reps",
+                    stringResource(R.string.ses_target_reps, protocol.repsLabel),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -265,15 +267,15 @@ private fun FatburnContent(s: ActiveSession, now: Long, viewModel: PlanViewModel
             OutlinedTextField(
                 value = reps,
                 onValueChange = { reps = it },
-                label = { Text("Repeticiones hechas") },
+                label = { Text(stringResource(R.string.ses_reps_done)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
-            PrimaryAdvance("Serie hecha") { viewModel.completeFatburnUnit(reps) }
+            PrimaryAdvance(stringResource(R.string.ses_set_done)) { viewModel.completeFatburnUnit(reps) }
         }
         SessionPhase.RESTING -> {
-            Text("Descanso", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ses_rest), style = MaterialTheme.typography.titleMedium)
             CountdownCircle(
                 elapsed = ((now - s.restStartMillis) / 1000).toInt().coerceAtLeast(0),
                 target = s.restTargetSeconds
@@ -282,9 +284,9 @@ private fun FatburnContent(s: ActiveSession, now: Long, viewModel: PlanViewModel
                 OutlinedButton(onClick = { viewModel.adjustRest(-15) }) { Text("-15 s") }
                 OutlinedButton(onClick = { viewModel.adjustRest(15) }) { Text("+15 s") }
             }
-            PrimaryAdvance("Saltar descanso") { viewModel.endRoutineRest() }
+            PrimaryAdvance(stringResource(R.string.ses_skip_rest)) { viewModel.endRoutineRest() }
         }
-        SessionPhase.FINISHED -> FinishedNote("¡Ejercicio completado!")
+        SessionPhase.FINISHED -> FinishedNote(stringResource(R.string.ses_exercise_done))
         else -> {}
     }
 }
@@ -310,7 +312,7 @@ private fun CountdownCircle(elapsed: Int, target: Int) {
                 else MaterialTheme.colorScheme.primary
             )
             Text(
-                if (remaining >= 0) "restante" else "de más",
+                if (remaining >= 0) stringResource(R.string.ses_remaining) else stringResource(R.string.ses_over),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -323,9 +325,9 @@ private fun TimerButtons(s: ActiveSession, viewModel: PlanViewModel) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedButton(onClick = { viewModel.adjustTimedSet(-10) }) { Text("-10 s") }
         if (s.timedPaused) {
-            OutlinedButton(onClick = { viewModel.resumeTimedSet() }) { Text("Reanudar") }
+            OutlinedButton(onClick = { viewModel.resumeTimedSet() }) { Text(stringResource(R.string.ses_resume)) }
         } else {
-            OutlinedButton(onClick = { viewModel.pauseTimedSet() }) { Text("Pausa") }
+            OutlinedButton(onClick = { viewModel.pauseTimedSet() }) { Text(stringResource(R.string.ses_pause)) }
         }
         OutlinedButton(onClick = { viewModel.adjustTimedSet(10) }) { Text("+10 s") }
     }
@@ -334,8 +336,8 @@ private fun TimerButtons(s: ActiveSession, viewModel: PlanViewModel) {
 @Composable
 private fun RepsTarget(paso: PasoMilitar) {
     val target = when {
-        paso.reps.equals("AMRAP", ignoreCase = true) -> "Máximas repeticiones con buena forma (AMRAP)"
-        paso.repsObjetivo.isNotBlank() -> "Objetivo: ${paso.repsObjetivo} reps"
+        paso.reps.equals("AMRAP", ignoreCase = true) -> stringResource(R.string.ses_amrap)
+        paso.repsObjetivo.isNotBlank() -> stringResource(R.string.ses_target_reps, paso.repsObjetivo)
         else -> ""
     }
     if (target.isNotBlank()) {

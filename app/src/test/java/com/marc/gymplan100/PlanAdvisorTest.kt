@@ -117,8 +117,11 @@ class PlanAdvisorTest {
     @Test fun `siempre explica por que`() {
         val r = recomienda(PlanGoal.MUSCLE, Shape.REGULAR, Days.FOUR, Place.GYM)
         assertNotNull(r.best)
-        assertTrue(r.best!!.reason.length > 20)
-        assertTrue(r.best!!.reason.endsWith("."))
+        // El motivo es la frase "trozos: cola.", con lo que pesa (forma, días) y el porqué.
+        val ids = r.best!!.reason.ids()
+        assertEquals(R.string.mot_advisor_reason, ids.first())
+        assertTrue(R.plurals.mot_advisor_days_per_week in ids)
+        assertTrue(R.string.mot_advisor_shape_regular in ids)
     }
 
     /**
@@ -128,14 +131,14 @@ class PlanAdvisorTest {
     @Test fun `no se propone un plan de otro objetivo`() {
         val r = recomienda(PlanGoal.MOBILITY, Shape.REGULAR, Days.TWO, Place.HOME)
         assertNull(r.best)
-        assertTrue(r.whyNothing.contains("movilidad"))
+        assertTrue(R.string.mot_advisor_goal_mobility in r.whyNothing!!.ids())
         assertTrue("y sí se ofrece el bloque de movilidad", r.addOns.any { it.id == "movilidad" })
     }
 
     @Test fun `cuando nada encaja se explica que le falta a lo mas cercano`() {
         val r = recomienda(PlanGoal.MOBILITY, Shape.REGULAR, Days.TWO, Place.HOME)
         assertNotNull(r.closest)
-        assertTrue(r.closest!!.reason.isNotBlank())
+        assertTrue(r.closest!!.reason.ids().isNotEmpty())
     }
 
     @Test fun `sin planes que encajen no se inventa una recomendacion`() {
@@ -167,7 +170,7 @@ class PlanAdvisorTest {
         val r = recomiendaConSuaves(PlanGoal.MUSCLE, Shape.LIMITED, Days.TWO, Place.HOME)
         assertEquals("suave-casa", r.best?.plan?.id)
         assertTrue(r.alternatives.isEmpty())
-        assertTrue(r.best!!.reason.contains("te cuesta moverte"))
+        assertTrue(R.string.mot_advisor_shape_limited in r.best!!.reason.ids())
     }
 
     @Test fun `quien solo lleva tiempo parado sigue empezando por Arranque`() {

@@ -61,12 +61,12 @@ object Routes {
 }
 
 /** Las pestañas de la barra de abajo. Fuera de estas pantallas la barra no se ve. */
-private enum class Pestana(val route: String, val label: String, val icon: Int) {
-    INICIO(Routes.HOME, "Inicio", R.drawable.ic_inicio),
-    LOGROS(Routes.ACHIEVEMENTS, "Logros", R.drawable.ic_logros),
-    PESOS(Routes.WEIGHTS, "Mis pesos", R.drawable.ic_pesos),
-    RESULTADOS(Routes.RESULTS, "Resultados", R.drawable.ic_resultados),
-    ESTADISTICAS(Routes.STATS, "Estadísticas", R.drawable.ic_estadisticas)
+private enum class Pestana(val route: String, val label: Int, val icon: Int) {
+    INICIO(Routes.HOME, R.string.ini_tab_home, R.drawable.ic_inicio),
+    LOGROS(Routes.ACHIEVEMENTS, R.string.ini_tab_achievements, R.drawable.ic_logros),
+    PESOS(Routes.WEIGHTS, R.string.ini_tab_weights, R.drawable.ic_pesos),
+    RESULTADOS(Routes.RESULTS, R.string.ini_tab_results, R.drawable.ic_resultados),
+    ESTADISTICAS(Routes.STATS, R.string.ini_tab_stats, R.drawable.ic_estadisticas)
 }
 
 /** Género del perfil, para elegir la ilustración del ejercicio (true = mujer). */
@@ -346,7 +346,7 @@ private fun BarraInferior(navController: NavHostController, rutaActual: String?)
                 // cinco etiquetas se cortaban, y el icono ya dice qué es cada pestaña.
                 label = {
                     Text(
-                        pestana.label,
+                        androidx.compose.ui.res.stringResource(pestana.label),
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = with(LocalDensity.current) { 12.dp.toSp() },
                             letterSpacing = 0.sp

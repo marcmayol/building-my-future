@@ -41,9 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
-import com.marc.gymplan100.data.contar
-import com.marc.gymplan100.data.palabra
+import com.marc.gymplan100.R
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.data.Statistics
+import com.marc.gymplan100.data.texto
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
@@ -126,8 +130,8 @@ fun PlanFinishedScreen(
             item {
                 DoneBadge(
                     kind = if (progress.rounds > 0) PlanBadge.VueltaEnCurso else PlanBadge.Terminado,
-                    label = if (progress.rounds > 0) "Vuelta ${progress.rounds + 1} terminada"
-                    else "Plan terminado"
+                    label = if (progress.rounds > 0) stringResource(R.string.est_vuelta_terminada, progress.rounds + 1)
+                    else stringResource(R.string.est_plan_terminado)
                 )
                 Spacer(Modifier.height(Space.x3))
                 Text(
@@ -153,7 +157,7 @@ fun PlanFinishedScreen(
                         )
                         Spacer(Modifier.size(Space.x2))
                         Text(
-                            "de ${plan.totalDays} días",
+                            pluralStringResource(R.plurals.est_de_n_dias, plan.totalDays, plan.totalDays),
                             style = MaterialTheme.typography.titleMedium,
                             color = onHero,
                             modifier = Modifier.padding(bottom = 10.dp)
@@ -162,8 +166,15 @@ fun PlanFinishedScreen(
                     if (semanas != null && inicio != null) {
                         Spacer(Modifier.height(Space.x1))
                         Text(
-                            "en $semanas ${if (semanas == 1) "semana" else "semanas"} · " +
-                                "empezaste el ${fecha(inicio)}",
+                            stringResource(
+                                R.string.est_empezaste,
+                                pluralStringResource(R.plurals.est_en_semanas, semanas, semanas),
+                                fecha(
+                                    inicio,
+                                    stringResource(R.string.est_fecha_inicio),
+                                    AppLanguage.locale(LocalContext.current)
+                                )
+                            ),
                             style = MaterialTheme.typography.bodyLarge,
                             color = onHero
                         )
@@ -182,11 +193,11 @@ fun PlanFinishedScreen(
                         horizontalArrangement = Arrangement.spacedBy(Space.x2),
                         verticalArrangement = Arrangement.spacedBy(Space.x2)
                     ) {
-                        Cifra("Entrenado", tiempo(minutos), Modifier.weight(1f))
+                        Cifra(stringResource(R.string.est_cifra_entrenado), tiempo(minutos), Modifier.weight(1f))
                         // Un cero rotundo suena a suspenso; el guion dice "de esto no hay
                         // registro", que es lo que pasa cuando los días se marcan a mano.
-                        Cifra("Series", if (series > 0) "$series" else "—", Modifier.weight(1f))
-                        Cifra("Mejor racha", "$racha d", Modifier.weight(1f), app.streak)
+                        Cifra(stringResource(R.string.est_cifra_series), if (series > 0) "$series" else "—", Modifier.weight(1f))
+                        Cifra(stringResource(R.string.est_cifra_mejor_racha), stringResource(R.string.est_racha_dias, racha), Modifier.weight(1f), app.streak)
                     }
                 }
             }
@@ -194,7 +205,7 @@ fun PlanFinishedScreen(
             if (subidas.isNotEmpty()) {
                 item {
                     Text(
-                        "LO QUE HA SUBIDO",
+                        stringResource(R.string.est_lo_que_ha_subido),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = Space.x2)
@@ -222,7 +233,7 @@ fun PlanFinishedScreen(
                 ) {
                     HorizontalDivider(modifier = Modifier.weight(1f))
                     Text(
-                        "¿Y AHORA QUÉ?",
+                        stringResource(R.string.est_y_ahora_que),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -235,16 +246,19 @@ fun PlanFinishedScreen(
                 item {
                     MotiveCard(
                         name = siguiente.plan.name,
-                        meta = "${siguiente.plan.totalDays} días · " +
-                            "${siguiente.plan.daysPerWeek} por semana",
-                        motive = siguiente.reason,
-                        actionLabel = "Seguir con este",
+                        meta = stringResource(
+                            R.string.est_meta_plan,
+                            pluralStringResource(R.plurals.est_n_dias, siguiente.plan.totalDays, siguiente.plan.totalDays),
+                            siguiente.plan.daysPerWeek
+                        ),
+                        motive = siguiente.reason.texto(),
+                        actionLabel = stringResource(R.string.est_seguir_con_este),
                         onAction = {
                             viewModel.dismissPlanFinished()
                             viewModel.activatePlan(siguiente.plan.id)
                         },
                         featured = true,
-                        overline = "El que viene después"
+                        overline = stringResource(R.string.est_el_que_viene)
                     )
                 }
             }
@@ -253,26 +267,30 @@ fun PlanFinishedScreen(
             if (ultimaFase != null) {
                 item {
                     DecisionRow(
-                        title = "Repetir solo «${ultimaFase.name}»",
-                        explanation = "La última fase son " +
-                            contar(PlanData.daysOfPhase(ultimaFase.number).size, "día", "días") + ": repetirla " +
-                            "mantiene el nivel al que has llegado sin volver al principio.",
+                        title = stringResource(R.string.est_repetir_fase, ultimaFase.name),
+                        explanation = PlanData.daysOfPhase(ultimaFase.number).size.let { n ->
+                            pluralStringResource(R.plurals.est_ultima_fase, n, n)
+                        },
                         onClick = { viewModel.repeatLastPhase() }
                     )
                 }
             }
             item {
                 DecisionRow(
-                    title = "Empezarlo de cero",
-                    explanation = "Los ${plan.totalDays} días otra vez, como " +
-                        "${progress.rounds + 2}ª vuelta.",
+                    title = stringResource(R.string.est_empezar_de_cero),
+                    explanation = pluralStringResource(
+                        R.plurals.est_otra_vuelta,
+                        plan.totalDays,
+                        plan.totalDays,
+                        progress.rounds + 2
+                    ),
                     onClick = { viewModel.startNewRound() }
                 )
             }
             item {
                 DecisionRow(
-                    title = "Elegir otro plan",
-                    explanation = "Los doce, con el asistente si quieres que te ayude.",
+                    title = stringResource(R.string.est_elegir_otro_plan),
+                    explanation = stringResource(R.string.est_elegir_otro_plan_texto),
                     onClick = { viewModel.dismissPlanFinished(); onSeePlans() }
                 )
             }
@@ -284,7 +302,7 @@ fun PlanFinishedScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        "Ahora no, déjalo así",
+                        stringResource(R.string.est_ahora_no),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             textDecoration = TextDecoration.Underline
                         ),
@@ -343,14 +361,12 @@ private fun SinRegistro() {
         )
         Column {
             Text(
-                "Marcaste los días a mano, sin usar el entrenamiento guiado, así que de este " +
-                    "plan no queda registro de tiempo, series ni pesos.",
+                stringResource(R.string.est_sin_registro),
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(Modifier.height(Space.x2))
             Text(
-                "Los días están hechos, y eso es lo que cuenta. Si quieres que el próximo deje " +
-                    "datos, entrena con el guiado o con el libre.",
+                stringResource(R.string.est_sin_registro_2),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -358,8 +374,9 @@ private fun SinRegistro() {
     }
 }
 
-private fun fecha(millis: Long): String =
-    SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES")).format(Date(millis))
+/** [pattern] sale de los recursos: «3 de marzo» en español, «March 3» en inglés. */
+private fun fecha(millis: Long, pattern: String, locale: Locale): String =
+    SimpleDateFormat(pattern, locale).format(Date(millis))
 
 private fun tiempo(minutos: Int): String {
     val h = minutos / 60

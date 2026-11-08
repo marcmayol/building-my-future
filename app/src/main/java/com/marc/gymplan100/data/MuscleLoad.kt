@@ -1,5 +1,8 @@
 package com.marc.gymplan100.data
 
+import android.content.Context
+import androidx.annotation.StringRes
+import com.marc.gymplan100.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -136,10 +139,44 @@ object MuscleLoad {
         "neck" to "Cuello"
     )
 
+    /** El mismo nombre, como recurso traducible. Null si el slug no es conocido. */
+    private val NOMBRES_RES = mapOf(
+        "chest" to R.string.est_musculo_chest,
+        "upper-back" to R.string.est_musculo_upper_back,
+        "lower-back" to R.string.est_musculo_lower_back,
+        "trapezius" to R.string.est_musculo_trapezius,
+        "deltoids" to R.string.est_musculo_deltoids,
+        "biceps" to R.string.est_musculo_biceps,
+        "triceps" to R.string.est_musculo_triceps,
+        "forearm" to R.string.est_musculo_forearm,
+        "abs" to R.string.est_musculo_abs,
+        "obliques" to R.string.est_musculo_obliques,
+        "quadriceps" to R.string.est_musculo_quadriceps,
+        "hamstring" to R.string.est_musculo_hamstring,
+        "gluteal" to R.string.est_musculo_gluteal,
+        "calves" to R.string.est_musculo_calves,
+        "adductors" to R.string.est_musculo_adductors,
+        "tibialis" to R.string.est_musculo_tibialis,
+        "neck" to R.string.est_musculo_neck
+    )
+
     /** El grupo, escrito como se llama en el gimnasio. */
+    @Deprecated("usa labelRes / label(context, group)")
     fun label(group: String): String = NOMBRES[group] ?: group.replace('-', ' ')
+
+    /** El recurso con el nombre del grupo; null si el slug no es conocido. */
+    @StringRes
+    fun labelRes(group: String): Int? = NOMBRES_RES[group]
+
+    /** El grupo, en el idioma de la app. */
+    fun label(context: Context, group: String): String =
+        labelRes(group)?.let { context.getString(it) } ?: group.replace('-', ' ')
 
     /** "3" o "4,5": las medias series salen de los músculos que solo ayudan. */
     fun formatSets(sets: Float): String =
         if (sets % 1f == 0f) sets.toInt().toString() else "%.1f".format(sets).replace('.', ',')
+
+    /** Igual, con el separador decimal del idioma en uso: «4,5» en español, «4.5» en inglés. */
+    fun formatSets(sets: Float, locale: java.util.Locale): String =
+        if (sets % 1f == 0f) sets.toInt().toString() else String.format(locale, "%.1f", sets)
 }

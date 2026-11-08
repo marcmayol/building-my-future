@@ -1,6 +1,7 @@
 package com.marc.gymplan100
 
 import com.marc.gymplan100.data.PlanImport
+import com.marc.gymplan100.data.PlanProblem
 import com.marc.gymplan100.data.PlanMarkdownParser
 import com.marc.gymplan100.data.PlanSource
 import org.junit.Assert.assertEquals
@@ -20,10 +21,10 @@ class PlanMarkdownTest {
         return result as PlanImport.Ok
     }
 
-    private fun errorOf(md: String): String {
+    private fun errorOf(md: String): PlanProblem {
         val result = PlanMarkdownParser.parse(md, now = 2_000L)
         assertTrue("Se esperaba un error, salió: $result", result is PlanImport.Error)
-        return (result as PlanImport.Error).message
+        return (result as PlanImport.Error).problem
     }
 
     private val completo = """
@@ -156,12 +157,12 @@ class PlanMarkdownTest {
             - Press — 4 x 8
             """.trimIndent()
         )
-        assertTrue(message, message.contains("# Nombre del plan"))
+        assertEquals(PlanProblem.MarkdownNoTitle, message)
     }
 
     @Test fun `sin dias se explica como escribirlos`() {
         val message = errorOf("# Solo el título\nUn párrafo suelto.")
-        assertTrue(message, message.contains("###"))
+        assertEquals(PlanProblem.MarkdownNoDays, message)
     }
 
     @Test fun `un ejercicio sin series se caza en la validacion comun`() {
@@ -172,6 +173,6 @@ class PlanMarkdownTest {
             - Press de banca
             """.trimIndent()
         )
-        assertTrue(message, message.contains("Press de banca"))
+        assertEquals(PlanProblem.ExerciseWithoutScheme("Press de banca", "Lunes"), message)
     }
 }

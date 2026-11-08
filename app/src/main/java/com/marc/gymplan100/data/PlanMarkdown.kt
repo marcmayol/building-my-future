@@ -28,8 +28,11 @@ package com.marc.gymplan100.data
  */
 object PlanMarkdownParser {
 
-    /** "## Base (4 semanas)", "## Fase 2: Carga - 6 semanas". */
-    private val WEEKS = Regex("""(\d+)\s*semanas?""", RegexOption.IGNORE_CASE)
+    /**
+     * "## Base (4 semanas)", "## Fase 2: Carga - 6 semanas". También "(4 weeks)": el ejemplo
+     * que enseña la app en inglés se escribe así.
+     */
+    private val WEEKS = Regex("""(\d+)\s*(?:semanas?|weeks?)""", RegexOption.IGNORE_CASE)
 
     /** Etiquetas de línea suelta dentro de un día o una fase. */
     private val WARMUP = Regex("""^(calentamiento|warm\s*-?up)\s*[:\-–—]\s*""", RegexOption.IGNORE_CASE)
@@ -54,7 +57,7 @@ object PlanMarkdownParser {
 
     /** "Fase 2: Carga" -> "Carga"; "Fase 3" -> "Fase 3". */
     private fun stripPhasePrefix(title: String): String {
-        val m = Regex("""^fase\s*\d*\s*[:\-–—]\s*(.+)$""", RegexOption.IGNORE_CASE).find(title)
+        val m = Regex("""^(?:fase|phase)\s*\d*\s*[:\-–—]\s*(.+)$""", RegexOption.IGNORE_CASE).find(title)
         return m?.groupValues?.get(1)?.trim() ?: title
     }
 
@@ -112,7 +115,7 @@ object PlanMarkdownParser {
 
     /** Convierte el texto en plan, o explica por qué no se puede. */
     fun parse(text: String, now: Long = System.currentTimeMillis()): PlanImport {
-        if (text.isBlank()) return PlanImport.Error("El archivo está vacío.")
+        if (text.isBlank()) return PlanImport.Error(PlanProblem.EmptyFile)
 
         var planName = ""
         val planDescription = StringBuilder()
@@ -186,8 +189,8 @@ object PlanMarkdownParser {
                     phaseWeeks = WEEKS.find(heading)?.groupValues?.get(1)?.toIntOrNull() ?: 1
                     phaseName = stripPhasePrefix(
                         heading
-                            .replace(Regex("""\(\s*\d+\s*semanas?\s*\)""", RegexOption.IGNORE_CASE), "")
-                            .replace(Regex("""[,\-–—]?\s*\d+\s*semanas?""", RegexOption.IGNORE_CASE), "")
+                            .replace(Regex("""\(\s*\d+\s*(?:semanas?|weeks?)\s*\)""", RegexOption.IGNORE_CASE), "")
+                            .replace(Regex("""[,\-–—]?\s*\d+\s*(?:semanas?|weeks?)""", RegexOption.IGNORE_CASE), "")
                             .trim()
                             .trimEnd(':', '-', '–', '—')
                             .trim()
@@ -221,15 +224,10 @@ object PlanMarkdownParser {
         flushPhase()
 
         if (planName.isBlank()) {
-            return PlanImport.Error(
-                "Falta el nombre del plan. Empieza el archivo con una línea \"# Nombre del plan\"."
-            )
+            return PlanImport.Error(PlanProblem.MarkdownNoTitle)
         }
         if (phases.isEmpty()) {
-            return PlanImport.Error(
-                "No se ha encontrado ningún día. Escribe cada día con \"### Lunes — Empuje\" y " +
-                    "sus ejercicios en una lista con guiones."
-            )
+            return PlanImport.Error(PlanProblem.MarkdownNoDays)
         }
 
         return PlanCodec.fromDto(

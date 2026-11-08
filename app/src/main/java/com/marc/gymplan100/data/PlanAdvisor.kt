@@ -1,5 +1,7 @@
 package com.marc.gymplan100.data
 
+import com.marc.gymplan100.R
+
 /**
  * Elige qué plan proponerle a quien abre la app por primera vez.
  *
@@ -68,7 +70,7 @@ object PlanAdvisor {
      * explicación es un oráculo, y aquí lo que se busca es que la persona pueda decir "no,
      * eso no es lo mío" con conocimiento de causa.
      */
-    data class Suggestion(val plan: TrainingPlan, val reason: String)
+    data class Suggestion(val plan: TrainingPlan, val reason: Frase)
 
     data class Result(
         val best: Suggestion?,
@@ -81,7 +83,7 @@ object PlanAdvisor {
          * un día o si se crea el suyo.
          */
         val closest: Suggestion? = null,
-        val whyNothing: String = ""
+        val whyNothing: Frase? = null
     )
 
     /**
@@ -100,7 +102,7 @@ object PlanAdvisor {
         // Nada encaja: se busca lo más parecido soltando la restricción más dura (el material)
         // y se explica qué falta para que cuadre.
         var cercano: Suggestion? = null
-        var porque = ""
+        var porque: Frase? = null
         if (sugerencias.isEmpty()) {
             // Se sueltan las dos restricciones duras —el material y el objetivo— y se mira qué
             // queda. Lo que sobrevive es "lo más cercano", y se dice exactamente qué le falta
@@ -121,18 +123,22 @@ object PlanAdvisor {
                 cercano = Suggestion(
                     candidato,
                     when {
-                        pegas.isEmpty() -> "Es lo más parecido a lo que has pedido."
+                        pegas.isEmpty() -> frase(R.string.mot_advisor_closest_plain)
                         // Dos pegas ya explican el desencuentro; una tercera es ensañamiento.
-                        else -> "Es lo más parecido, pero " +
-                            pegas.take(2).joinToString(" y ") + "."
+                        pegas.size == 1 -> frase(R.string.mot_advisor_closest_but, pegas[0])
+                        else -> frase(
+                            R.string.mot_advisor_closest_but,
+                            frase(R.string.mot_advisor_and, pegas[0], pegas[1])
+                        )
                     }
                 )
             }
-            porque = buildString {
-                append("Con ${a.days.n} días")
-                if (a.place == Place.HOME) append(" y sin material")
-                append(", no hay ningún plan ${deQue(a.goal)} que cuadre.")
-            }
+            val dias = frasePlural(R.plurals.mot_advisor_days, a.days.n)
+            porque = frase(
+                R.string.mot_advisor_none,
+                if (a.place == Place.HOME) frase(R.string.mot_advisor_days_no_gear, dias) else dias,
+                deQue(a.goal)
+            )
         }
 
         return Result(
@@ -213,32 +219,37 @@ object PlanAdvisor {
     }
 
     /** Qué habría que ceder para que este plan cuadrase con lo que ha pedido. */
-    private fun pegasDe(plan: TrainingPlan, a: Answers): List<String> = buildList {
+    private fun pegasDe(plan: TrainingPlan, a: Answers): List<Frase> = buildList {
         if (a.place == Place.HOME && plan.equipment == PlanEquipment.GYM) {
-            add("necesita gimnasio")
+            add(frase(R.string.mot_advisor_issue_gym))
         }
         if (plan.daysPerWeek > a.days.n) {
-            add("pide ${plan.daysPerWeek} días por semana")
+            add(frasePlural(R.plurals.mot_advisor_issue_days, plan.daysPerWeek))
         }
         if (plan.goal != a.goal && !parientes(plan.goal, a.goal)) {
-            add("va a otra cosa: es ${deQue(plan.goal)}")
+            add(
+                if (plan.goal == null) frase(R.string.mot_advisor_issue_other_goal_generic)
+                else frase(R.string.mot_advisor_issue_other_goal, deQue(plan.goal))
+            )
         }
         a.time?.let { t ->
             val dura = typicalMinutes(plan)
-            if (dura > t.minutes + MARGEN_MIN) add("sus sesiones son de unos $dura minutos")
+            if (dura > t.minutes + MARGEN_MIN) add(frase(R.string.mot_advisor_issue_minutes, dura))
         }
     }
 
     /** Cómo se llama un objetivo cuando hay que meterlo en una frase. */
-    private fun deQue(goal: PlanGoal?): String = when (goal) {
-        PlanGoal.STRENGTH -> "de fuerza"
-        PlanGoal.MUSCLE -> "de músculo"
-        PlanGoal.LOSE_FAT -> "de perder grasa"
-        PlanGoal.MAINTAIN -> "de mantenimiento"
-        PlanGoal.MOBILITY -> "de movilidad"
-        PlanGoal.START -> "de arranque"
-        null -> "de eso"
-    }
+    private fun deQue(goal: PlanGoal?): Frase = frase(
+        when (goal) {
+            PlanGoal.STRENGTH -> R.string.mot_advisor_goal_strength
+            PlanGoal.MUSCLE -> R.string.mot_advisor_goal_muscle
+            PlanGoal.LOSE_FAT -> R.string.mot_advisor_goal_lose_fat
+            PlanGoal.MAINTAIN -> R.string.mot_advisor_goal_maintain
+            PlanGoal.MOBILITY -> R.string.mot_advisor_goal_mobility
+            PlanGoal.START -> R.string.mot_advisor_goal_start
+            null -> R.string.mot_advisor_goal_other
+        }
+    )
 
     private fun parientes(a: PlanGoal?, b: PlanGoal): Boolean {
         if (a == null) return false
@@ -263,33 +274,35 @@ object PlanAdvisor {
     }
 
     /** El porqué, en una frase y en cristiano. */
-    private fun reason(plan: TrainingPlan, a: Answers): String {
-        val trozos = mutableListOf<String>()
-        trozos += when (a.shape) {
-            Shape.LIMITED -> "te cuesta moverte"
-            Shape.STOPPED -> "vienes de estar parado"
-            Shape.SOMETIMES -> "entrenas de vez en cuando"
-            Shape.REGULAR -> "ya entrenas con constancia"
-        }
-        trozos += "${a.days.n} días por semana"
-        if (a.place == Place.HOME) trozos += "sin material"
+    private fun reason(plan: TrainingPlan, a: Answers): Frase {
+        val trozos = mutableListOf<Frase>()
+        trozos += frase(
+            when (a.shape) {
+                Shape.LIMITED -> R.string.mot_advisor_shape_limited
+                Shape.STOPPED -> R.string.mot_advisor_shape_stopped
+                Shape.SOMETIMES -> R.string.mot_advisor_shape_sometimes
+                Shape.REGULAR -> R.string.mot_advisor_shape_regular
+            }
+        )
+        trozos += frasePlural(R.plurals.mot_advisor_days_per_week, a.days.n)
+        if (a.place == Place.HOME) trozos += frase(R.string.mot_advisor_no_gear)
         a.time?.let { t ->
             val dura = typicalMinutes(plan)
-            trozos += if (dura > t.minutes) "sesiones de unos $dura min (con el exprés caben en ${t.minutes})"
-            else "sesiones de unos $dura min"
+            trozos += if (dura > t.minutes) frase(R.string.mot_advisor_session_min_express, dura, t.minutes)
+            else frase(R.string.mot_advisor_session_min, dura)
         }
 
         val cola = if (plan.level == PlanLevel.GENTLE) {
-            "aquí se empieza de pie o sentado, con apoyo y a tu ritmo"
+            R.string.mot_advisor_tail_gentle
         } else when (plan.goal) {
-            PlanGoal.START -> "esto es para coger el hábito sin machacarte"
-            PlanGoal.LOSE_FAT -> "aquí se mueve mucho y se suda"
-            PlanGoal.MUSCLE -> "el volumen está repartido para crecer"
-            PlanGoal.STRENGTH -> "pocas repeticiones y peso de verdad"
-            PlanGoal.MAINTAIN -> "lo justo para no perder lo ganado"
-            PlanGoal.MOBILITY -> "sesiones cortas para recuperar rango"
-            null -> "encaja con lo que has pedido"
+            PlanGoal.START -> R.string.mot_advisor_tail_start
+            PlanGoal.LOSE_FAT -> R.string.mot_advisor_tail_lose_fat
+            PlanGoal.MUSCLE -> R.string.mot_advisor_tail_muscle
+            PlanGoal.STRENGTH -> R.string.mot_advisor_tail_strength
+            PlanGoal.MAINTAIN -> R.string.mot_advisor_tail_maintain
+            PlanGoal.MOBILITY -> R.string.mot_advisor_tail_mobility
+            null -> R.string.mot_advisor_tail_other
         }
-        return trozos.joinToString(", ") + ": " + cola + "."
+        return frase(R.string.mot_advisor_reason, Frase.Lista(trozos), frase(cola))
     }
 }

@@ -47,10 +47,14 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.R
 import com.marc.gymplan100.data.PlanAdvisor
+import com.marc.gymplan100.data.texto
 import com.marc.gymplan100.data.PlanGoal
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.Space
@@ -88,6 +92,17 @@ fun WelcomeScreen(
     val resultado = if (completas) {
         PlanAdvisor.recommend(plans, PlanAdvisor.Answers(goal!!, shape!!, days!!, place!!, time))
     } else null
+
+    // Etiquetas de las respuestas en el idioma en uso. Solo se comparan en memoria para saber
+    // cuál está marcada; no se guardan.
+    val objetivos = OBJETIVOS.map { it.first to stringResource(it.second) }
+    val forma = FORMA.map { it.first to stringResource(it.second) }
+    val tiempo = TIEMPO.map { it.first to stringResource(it.second) }
+    val lugar = LUGAR.map { it.first to stringResource(it.second) }
+    val dias = PlanAdvisor.Days.entries.map {
+        it to pluralStringResource(R.plurals.ayu_welcome_n_dias, it.n, it.n)
+    }
+    val empezarConEste = stringResource(R.string.ayu_welcome_empezar_con_este)
 
     val lista = rememberLazyListState()
     // Al contestar la cuarta, el resultado se busca solo: nadie tiene que adivinar que hay
@@ -134,17 +149,18 @@ fun WelcomeScreen(
                 }
                 Spacer(Modifier.height(Space.block))
                 Text(
-                    if (preguntando) "Cuéntame cinco cosas" else "Vamos a elegir tu plan",
+                    stringResource(
+                        if (preguntando) R.string.ayu_welcome_titulo_preguntando
+                        else R.string.ayu_welcome_titulo
+                    ),
                     style = MaterialTheme.typography.displaySmall.copy(fontSize = 38.sp)
                 )
                 Spacer(Modifier.height(Space.x3))
                 Text(
-                    if (preguntando) {
-                        "No se guarda nada de esto: solo sirve para proponerte un plan."
-                    } else {
-                        "Hay quince planes dentro. Puedo recomendarte uno en cinco preguntas, " +
-                            "o los miras tú mismo."
-                    },
+                    stringResource(
+                        if (preguntando) R.string.ayu_welcome_sub_preguntando
+                        else R.string.ayu_welcome_sub
+                    ),
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -158,19 +174,19 @@ fun WelcomeScreen(
                         onClick = { preguntando = true },
                         shape = CircleShape,
                         modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                    ) { Text("Ayúdame a elegir") }
+                    ) { Text(stringResource(R.string.ayu_welcome_ayudame)) }
                 }
                 item {
                     OutlinedButton(
                         onClick = onSeePlans,
                         shape = CircleShape,
                         modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                    ) { Text("Ver los planes") }
+                    ) { Text(stringResource(R.string.ayu_welcome_ver_planes)) }
                 }
-                item { Subrayado("Crear el mío", onCreatePlan) }
+                item { Subrayado(stringResource(R.string.ayu_welcome_crear), onCreatePlan) }
                 // Hay quien ya sabe lo que hace y no quiere plan: entra y usa el entreno libre
                 // de la portada, que no depende de ninguna rutina.
-                item { Subrayado("Solo quiero apuntar lo que entreno", onDone) }
+                item { Subrayado(stringResource(R.string.ayu_welcome_solo_apuntar), onDone) }
             }
 
             if (preguntando) {
@@ -178,48 +194,46 @@ fun WelcomeScreen(
 
                 item {
                     AnswerGroup(
-                        question = "¿Qué buscas?",
-                        options = OBJETIVOS.map { it.second },
-                        selected = OBJETIVOS.firstOrNull { it.first == goal }?.second,
+                        question = stringResource(R.string.ayu_welcome_q_objetivo),
+                        options = objetivos.map { it.second },
+                        selected = objetivos.firstOrNull { it.first == goal }?.second,
                         onSelect = { etiqueta ->
-                            goal = OBJETIVOS.first { it.second == etiqueta }.first
+                            goal = objetivos.first { it.second == etiqueta }.first
                         }
                     )
                 }
                 item {
                     AnswerGroup(
-                        question = "¿Cómo estás ahora?",
-                        options = FORMA.map { it.second },
-                        selected = FORMA.firstOrNull { it.first == shape }?.second,
-                        onSelect = { etiqueta -> shape = FORMA.first { it.second == etiqueta }.first }
+                        question = stringResource(R.string.ayu_welcome_q_forma),
+                        options = forma.map { it.second },
+                        selected = forma.firstOrNull { it.first == shape }?.second,
+                        onSelect = { etiqueta -> shape = forma.first { it.second == etiqueta }.first }
                     )
                 }
                 item {
                     AnswerGroup(
-                        question = "¿Cuántos días por semana?",
-                        options = PlanAdvisor.Days.entries.map { "${it.n} días" },
-                        selected = days?.let { "${it.n} días" },
-                        onSelect = { etiqueta ->
-                            days = PlanAdvisor.Days.entries.first { "${it.n} días" == etiqueta }
-                        }
+                        question = stringResource(R.string.ayu_welcome_q_dias),
+                        options = dias.map { it.second },
+                        selected = dias.firstOrNull { it.first == days }?.second,
+                        onSelect = { etiqueta -> days = dias.first { it.second == etiqueta }.first }
                     )
                 }
                 item {
                     // El rato que hay cada día pesa tanto como los días: un plan de una hora
                     // no le sirve a quien tiene cuarenta minutos antes de ir a trabajar.
                     AnswerGroup(
-                        question = "¿Cuánto tiempo tienes cada día?",
-                        options = TIEMPO.map { it.second },
-                        selected = TIEMPO.firstOrNull { it.first == time }?.second,
-                        onSelect = { etiqueta -> time = TIEMPO.first { it.second == etiqueta }.first }
+                        question = stringResource(R.string.ayu_welcome_q_tiempo),
+                        options = tiempo.map { it.second },
+                        selected = tiempo.firstOrNull { it.first == time }?.second,
+                        onSelect = { etiqueta -> time = tiempo.first { it.second == etiqueta }.first }
                     )
                 }
                 item {
                     AnswerGroup(
-                        question = "¿Dónde entrenas?",
-                        options = LUGAR.map { it.second },
-                        selected = LUGAR.firstOrNull { it.first == place }?.second,
-                        onSelect = { etiqueta -> place = LUGAR.first { it.second == etiqueta }.first }
+                        question = stringResource(R.string.ayu_welcome_q_lugar),
+                        options = lugar.map { it.second },
+                        selected = lugar.firstOrNull { it.first == place }?.second,
+                        onSelect = { etiqueta -> place = lugar.first { it.second == etiqueta }.first }
                     )
                 }
 
@@ -229,7 +243,7 @@ fun WelcomeScreen(
                         item {
                             Spacer(Modifier.height(Space.x2))
                             Text(
-                                "TE PROPONGO",
+                                stringResource(R.string.ayu_welcome_te_propongo),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = app.work
                             )
@@ -237,10 +251,9 @@ fun WelcomeScreen(
                         item {
                             MotiveCard(
                                 name = mejor.plan.name,
-                                meta = "${mejor.plan.totalDays} días · " +
-                                    "${mejor.plan.daysPerWeek} por semana",
-                                motive = mejor.reason,
-                                actionLabel = "Empezar con este",
+                                meta = planMeta(mejor.plan.totalDays, mejor.plan.daysPerWeek),
+                                motive = mejor.reason.texto(),
+                                actionLabel = empezarConEste,
                                 onAction = { viewModel.activatePlan(mejor.plan.id); onDone() },
                                 featured = true
                             )
@@ -248,7 +261,7 @@ fun WelcomeScreen(
                         if (resultado.alternatives.isNotEmpty()) {
                             item {
                                 Text(
-                                    "TAMBIÉN TE PEGAN",
+                                    stringResource(R.string.ayu_welcome_tambien),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(top = Space.x2)
@@ -258,10 +271,9 @@ fun WelcomeScreen(
                                 val alt = resultado.alternatives[i]
                                 MotiveCard(
                                     name = alt.plan.name,
-                                    meta = "${alt.plan.totalDays} días · " +
-                                        "${alt.plan.daysPerWeek} por semana",
-                                    motive = alt.reason,
-                                    actionLabel = "Empezar con este",
+                                    meta = planMeta(alt.plan.totalDays, alt.plan.daysPerWeek),
+                                    motive = alt.reason.texto(),
+                                    actionLabel = empezarConEste,
                                     onAction = { viewModel.activatePlan(alt.plan.id); onDone() },
                                     featured = false
                                 )
@@ -270,9 +282,12 @@ fun WelcomeScreen(
                         if (resultado.addOns.isNotEmpty()) {
                             item {
                                 Text(
-                                    "Y si te sobra un día, encima de cualquiera de estos puedes " +
-                                        "montar " +
-                                        resultado.addOns.joinToString(" o ") { it.name } + ".",
+                                    stringResource(
+                                        R.string.ayu_welcome_addons,
+                                        resultado.addOns.joinToString(
+                                            stringResource(R.string.ayu_welcome_o)
+                                        ) { it.name }
+                                    ),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -286,7 +301,7 @@ fun WelcomeScreen(
                         if (resultado.addOns.isNotEmpty()) {
                             item {
                                 Text(
-                                    "LO QUE SÍ TENGO DE ESTO",
+                                    stringResource(R.string.ayu_welcome_lo_que_si),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(top = Space.x2)
@@ -296,11 +311,9 @@ fun WelcomeScreen(
                                 val extra = resultado.addOns[i]
                                 MotiveCard(
                                     name = extra.name,
-                                    meta = "${extra.totalDays} días · " +
-                                        "${extra.daysPerWeek} por semana",
-                                    motive = "Es un bloque corto: se hace solo o encima de " +
-                                        "cualquier plan, sin que te cambie la semana.",
-                                    actionLabel = "Empezar con este",
+                                    meta = planMeta(extra.totalDays, extra.daysPerWeek),
+                                    motive = stringResource(R.string.ayu_welcome_bloque_corto),
+                                    actionLabel = empezarConEste,
                                     onAction = { viewModel.activatePlan(extra.id); onDone() },
                                     featured = i == 0
                                 )
@@ -314,9 +327,9 @@ fun WelcomeScreen(
                             onClick = onSeePlans,
                             shape = CircleShape,
                             modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                        ) { Text("Ver todos los planes") }
+                        ) { Text(stringResource(R.string.ayu_welcome_ver_todos)) }
                     }
-                    item { Subrayado("Mejor me creo el mío", onCreatePlan) }
+                    item { Subrayado(stringResource(R.string.ayu_welcome_mejor_creo), onCreatePlan) }
                 }
             }
         }
@@ -324,13 +337,15 @@ fun WelcomeScreen(
         // Barra fija: mientras faltan respuestas, el botón está inhabilitado **con el motivo
         // escrito al lado**, nunca solo gris.
         if (preguntando && !completas) {
-            val falta = when {
-                goal == null -> "qué buscas"
-                shape == null -> "cómo estás ahora"
-                days == null -> "cuántos días"
-                time == null -> "cuánto tiempo tienes"
-                else -> "dónde entrenas"
-            }
+            val falta = stringResource(
+                when {
+                    goal == null -> R.string.ayu_welcome_falta_objetivo
+                    shape == null -> R.string.ayu_welcome_falta_forma
+                    days == null -> R.string.ayu_welcome_falta_dias
+                    time == null -> R.string.ayu_welcome_falta_tiempo
+                    else -> R.string.ayu_welcome_falta_lugar
+                }
+            )
             // «Te falta una» solo si de verdad es una; con varias, se cuentan.
             val cuantas = listOf(goal, shape, days, time, place).count { it == null }
             Column(
@@ -345,10 +360,10 @@ fun WelcomeScreen(
                     enabled = false,
                     shape = CircleShape,
                     modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                ) { Text("Ver qué me propones") }
+                ) { Text(stringResource(R.string.ayu_welcome_ver_propuesta)) }
                 Spacer(Modifier.height(Space.x2))
                 Text(
-                    if (cuantas == 1) "Te falta una: $falta." else "Te faltan $cuantas; la siguiente: $falta.",
+                    pluralStringResource(R.plurals.ayu_welcome_te_faltan, cuantas, cuantas, falta),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth()
@@ -358,34 +373,42 @@ fun WelcomeScreen(
     }
 }
 
+/** «120 días · 3 por semana», en el idioma en uso. */
+@Composable
+private fun planMeta(totalDays: Int, daysPerWeek: Int): String = stringResource(
+    R.string.ayu_welcome_meta,
+    pluralStringResource(R.plurals.ayu_welcome_n_dias, totalDays, totalDays),
+    daysPerWeek
+)
+
 /** Cabecera, bloque de privacidad y las cinco preguntas: el resultado empieza en el séptimo. */
 private const val PRIMER_RESULTADO = 7
 
 private val OBJETIVOS = listOf(
-    PlanGoal.LOSE_FAT to "Perder grasa",
-    PlanGoal.MUSCLE to "Ganar músculo",
-    PlanGoal.STRENGTH to "Levantar más",
-    PlanGoal.MAINTAIN to "Mantenerme",
-    PlanGoal.MOBILITY to "Moverme mejor",
+    PlanGoal.LOSE_FAT to R.string.ayu_welcome_obj_perder,
+    PlanGoal.MUSCLE to R.string.ayu_welcome_obj_musculo,
+    PlanGoal.STRENGTH to R.string.ayu_welcome_obj_fuerza,
+    PlanGoal.MAINTAIN to R.string.ayu_welcome_obj_mantener,
+    PlanGoal.MOBILITY to R.string.ayu_welcome_obj_movilidad,
 )
 
 private val FORMA = listOf(
-    PlanAdvisor.Shape.LIMITED to "Me cuesta moverme",
-    PlanAdvisor.Shape.STOPPED to "Parado hace tiempo",
-    PlanAdvisor.Shape.SOMETIMES to "De vez en cuando",
-    PlanAdvisor.Shape.REGULAR to "Entreno regular",
+    PlanAdvisor.Shape.LIMITED to R.string.ayu_welcome_forma_limitado,
+    PlanAdvisor.Shape.STOPPED to R.string.ayu_welcome_forma_parado,
+    PlanAdvisor.Shape.SOMETIMES to R.string.ayu_welcome_forma_aveces,
+    PlanAdvisor.Shape.REGULAR to R.string.ayu_welcome_forma_regular,
 )
 
 private val TIEMPO = listOf(
-    PlanAdvisor.SessionTime.MIN30 to "Media hora",
-    PlanAdvisor.SessionTime.MIN45 to "45 minutos",
-    PlanAdvisor.SessionTime.MIN60 to "Una hora",
-    PlanAdvisor.SessionTime.MIN90 to "Más de una hora",
+    PlanAdvisor.SessionTime.MIN30 to R.string.ayu_welcome_tiempo_30,
+    PlanAdvisor.SessionTime.MIN45 to R.string.ayu_welcome_tiempo_45,
+    PlanAdvisor.SessionTime.MIN60 to R.string.ayu_welcome_tiempo_60,
+    PlanAdvisor.SessionTime.MIN90 to R.string.ayu_welcome_tiempo_90,
 )
 
 private val LUGAR = listOf(
-    PlanAdvisor.Place.GYM to "En el gimnasio",
-    PlanAdvisor.Place.HOME to "En casa, sin material",
+    PlanAdvisor.Place.GYM to R.string.ayu_welcome_lugar_gym,
+    PlanAdvisor.Place.HOME to R.string.ayu_welcome_lugar_casa,
 )
 
 /**
@@ -410,7 +433,7 @@ private fun BloquePrivacidad() {
             modifier = Modifier.size(20.dp)
         )
         Text(
-            "Se calcula en el móvil y se descarta. No hay cuentas ni servidor.",
+            stringResource(R.string.ayu_welcome_privacidad),
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp)
         )
     }
@@ -438,16 +461,16 @@ private fun NadaEncaja(resultado: PlanAdvisor.Result) {
             .padding(Space.x4)
     ) {
         Text(
-            "NO TENGO NADA QUE ENCAJE",
+            stringResource(R.string.ayu_welcome_nada_encaja),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(Space.x3))
-        Text(resultado.whyNothing, style = MaterialTheme.typography.bodyLarge)
+        Text(resultado.whyNothing?.texto().orEmpty(), style = MaterialTheme.typography.bodyLarge)
         resultado.closest?.let { cercano ->
             Spacer(Modifier.height(Space.x4))
             Text(
-                "LO MÁS CERCANO",
+                stringResource(R.string.ayu_welcome_lo_mas_cercano),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -455,7 +478,7 @@ private fun NadaEncaja(resultado: PlanAdvisor.Result) {
             Text(cercano.plan.name, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(Space.x1))
             Text(
-                cercano.reason,
+                cercano.reason.texto(),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

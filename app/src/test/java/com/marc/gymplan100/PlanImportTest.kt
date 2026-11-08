@@ -3,6 +3,7 @@ package com.marc.gymplan100
 import com.marc.gymplan100.data.BuiltinPlan
 import com.marc.gymplan100.data.PlanCodec
 import com.marc.gymplan100.data.PlanImport
+import com.marc.gymplan100.data.PlanProblem
 import com.marc.gymplan100.data.PlanSource
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -22,10 +23,10 @@ class PlanImportTest {
         return result as PlanImport.Ok
     }
 
-    private fun errorOf(json: String): String {
+    private fun errorOf(json: String): PlanProblem {
         val result = PlanCodec.parseJson(json, now = 1_000L)
         assertTrue("Se esperaba un error, salió: $result", result is PlanImport.Error)
-        return (result as PlanImport.Error).message
+        return (result as PlanImport.Error).problem
     }
 
     private val conFases = """
@@ -150,33 +151,33 @@ class PlanImportTest {
     // --- Lo que tiene que fallar ------------------------------------------
 
     @Test fun `sin nombre no hay plan`() {
-        assertTrue(errorOf("""{ "dias": [] }""").contains("nombre"))
+        assertTrue(errorOf("""{ "dias": [] }""") == PlanProblem.NoName)
     }
 
     @Test fun `sin dias no hay plan`() {
-        assertTrue(errorOf("""{ "nombre": "Vacío" }""").contains("ningún día"))
+        assertTrue(errorOf("""{ "nombre": "Vacío" }""") == PlanProblem.NoDays)
     }
 
     @Test fun `un dia sin ejercicios se rechaza diciendo cual`() {
         val message = errorOf(
             """{ "nombre": "X", "dias": [ { "dia": "Lunes", "ejercicios": [] } ] }"""
         )
-        assertTrue(message, message.contains("Lunes"))
+        assertEquals(PlanProblem.DayWithoutExercises("Lunes", "X"), message)
     }
 
     @Test fun `un ejercicio sin series se rechaza diciendo cual`() {
         val message = errorOf(
             """{ "nombre": "X", "dias": [ { "dia": "Lunes", "ejercicios": [ { "nombre": "Remo" } ] } ] }"""
         )
-        assertTrue(message, message.contains("Remo"))
+        assertEquals(PlanProblem.ExerciseWithoutScheme("Remo", "Lunes"), message)
     }
 
     @Test fun `un json roto no revienta la app`() {
-        assertTrue(errorOf("""{ "nombre": "X" ,,, }""").contains("JSON"))
+        assertTrue(errorOf("""{ "nombre": "X" ,,, }""") == PlanProblem.InvalidJson)
     }
 
     @Test fun `el archivo vacio da un error claro`() {
-        assertTrue(errorOf("   ").contains("vacío"))
+        assertTrue(errorOf("   ") == PlanProblem.EmptyFile)
     }
 
     @Test fun `un archivo que no es texto se detecta antes de parsearlo`() {
@@ -196,7 +197,7 @@ class PlanImportTest {
               "dias": [ { "ejercicios": [ { "nombre": "X", "esquema": "3 x 3" } ] } ] }
             """.trimIndent()
         )
-        assertTrue(message, message.contains("reservado"))
+        assertEquals(PlanProblem.ReservedId, message)
     }
 
     @Test fun `un plan desmesurado se corta antes de generarse`() {
@@ -218,7 +219,7 @@ class PlanImportTest {
               ] } ] }
             """.trimIndent()
         )
-        assertTrue(message, message.contains("máximo"))
+        assertTrue(message.toString(), message is PlanProblem.TooManyDays)
     }
 
     // --- Identidad y guardado ---------------------------------------------

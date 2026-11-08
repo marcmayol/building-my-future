@@ -29,9 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.R
 import com.marc.gymplan100.data.Achievement
 import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.PlanData
@@ -58,7 +61,7 @@ fun AchievementsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Logros", style = MaterialTheme.typography.headlineSmall) },
+                title = { Text(stringResource(R.string.ayu_logros_titulo), style = MaterialTheme.typography.headlineSmall) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 )
@@ -96,8 +99,7 @@ fun AchievementsScreen(
             item {
                 Spacer(Modifier.height(Space.x3))
                 Text(
-                    "Los logros se calculan sobre el plan que sigues, así que cambian si " +
-                        "cambias de plan.",
+                    stringResource(R.string.ayu_logros_nota),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -129,7 +131,7 @@ private fun AchievementsHero(unlocked: Int, total: Int, next: Achievement?, done
             Text("$unlocked", style = styles.bigNumber, color = onHero)
             Spacer(Modifier.width(Space.x2))
             Text(
-                "de $total logros",
+                pluralStringResource(R.plurals.ayu_logros_de_total, total, total),
                 style = MaterialTheme.typography.titleLarge,
                 color = onHero,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -138,18 +140,18 @@ private fun AchievementsHero(unlocked: Int, total: Int, next: Achievement?, done
         if (next != null) {
             Spacer(Modifier.height(Space.x2))
             val missing = (next.atDay - doneDays).coerceAtLeast(0)
+            val nextTitle = achievementTitle(next).lowercase()
             Text(
                 if (missing > 0)
-                    "El siguiente cae en $missing ${if (missing == 1) "día" else "días"}: " +
-                        next.title.lowercase() + "."
-                else "El siguiente está a un entreno: ${next.title.lowercase()}.",
+                    pluralStringResource(R.plurals.ayu_logros_siguiente_en, missing, missing, nextTitle)
+                else stringResource(R.string.ayu_logros_siguiente_un_entreno, nextTitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = onHero
             )
         } else {
             Spacer(Modifier.height(Space.x2))
             Text(
-                "Los tienes todos. Poca broma.",
+                stringResource(R.string.ayu_logros_todos),
                 style = MaterialTheme.typography.bodyMedium,
                 color = onHero
             )
@@ -173,14 +175,36 @@ private fun AchievementRow(achievement: Achievement, unlocked: Boolean, doneDays
         )
         Spacer(Modifier.width(Space.x4))
         Column(modifier = Modifier.weight(1f)) {
-            Text(achievement.title, style = MaterialTheme.typography.titleMedium)
+            Text(achievementTitle(achievement), style = MaterialTheme.typography.titleMedium)
             Text(
                 if (!unlocked && missing > 0)
-                    if (missing == 1) "Te falta 1 día." else "Te faltan $missing días."
-                else achievement.description,
+                    pluralStringResource(R.plurals.ayu_logros_te_faltan, missing, missing)
+                else achievementDescription(achievement),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
+}
+
+/** Título de un logro en el idioma en uso, a partir de su id. */
+@Composable
+internal fun achievementTitle(a: Achievement): String = when (a.id) {
+    "first" -> stringResource(R.string.ayu_logro_first_title)
+    "week" -> stringResource(R.string.ayu_logro_week_title)
+    "ten" -> stringResource(R.string.ayu_logro_ten_title)
+    "quarter" -> stringResource(R.string.ayu_logro_quarter_title)
+    "half" -> stringResource(R.string.ayu_logro_half_title)
+    "threequarter" -> stringResource(R.string.ayu_logro_threequarter_title)
+    "complete" -> stringResource(R.string.ayu_logro_complete_title)
+    else -> stringResource(R.string.ayu_logro_phase_title, a.phaseName)
+}
+
+/** Descripción de un logro en el idioma en uso, a partir de su id. */
+@Composable
+internal fun achievementDescription(a: Achievement): String = when {
+    a.id == "first" -> stringResource(R.string.ayu_logro_first_desc)
+    a.id == "complete" -> pluralStringResource(R.plurals.ayu_logro_complete_desc, a.atDay, a.atDay)
+    a.id.startsWith("phase") -> stringResource(R.string.ayu_logro_phase_desc, a.phaseNumber)
+    else -> pluralStringResource(R.plurals.ayu_logro_desc_days, a.atDay, a.atDay)
 }

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Comunes -->
+    <string name="ini_back">Volver</string>
+    <string name="ini_day_n">Día %1$d</string>
+    <string name="ini_day_n_title">Día %1$d · %2$s</string>
+    <string name="ini_title_dot_detail">%1$s · %2$s</string>
+    <string name="ini_percent">%1$d %%</string>
+    <plurals name="ini_days">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <plurals name="ini_exercises">
+        <item quantity="one">%d ejercicio</item>
+        <item quantity="other">%d ejercicios</item>
+    </plurals>
+    <string name="ini_action_start_now">Empezar ya</string>
+    <string name="ini_action_set_done">Serie hecha</string>
+    <string name="ini_action_skip_rest">Saltar descanso</string>
+    <string name="ini_version">Versión %1$s (%2$d)</string>
+    <string name="ini_updates_title">Actualizaciones</string>
+    <string name="ini_installing">Instalando…</string>
+
+    <!-- Pestañas -->
+    <string name="ini_tab_home">Inicio</string>
+    <string name="ini_tab_achievements">Logros</string>
+    <string name="ini_tab_weights">Mis pesos</string>
+    <string name="ini_tab_results">Resultados</string>
+    <string name="ini_tab_stats">Estadísticas</string>
+
+    <!-- Tema -->
+    <string name="ini_theme_system">El del móvil</string>
+    <string name="ini_theme_light">Claro</string>
+    <string name="ini_theme_dark">Oscuro</string>
+
+    <!-- Inicio -->
+    <string name="ini_home_logo">Logo Building My Future</string>
+    <string name="ini_home_help">Ayuda</string>
+    <string name="ini_home_settings">Configuración</string>
+    <string name="ini_home_builtin_plan">PLAN DE %1$d DÍAS</string>
+    <string name="ini_home_plan_phase">%1$s · FASE %2$d %3$s</string>
+    <string name="ini_home_other_plans">Ver otros planes (fuerza, músculo, en casa…)</string>
+    <string name="ini_home_exact_title">El descanso puede llegar tarde</string>
+    <string name="ini_home_exact_body">Para que el aviso suene justo a los 90 segundos, y no cuando al sistema le venga bien, hay que darle permiso para alarmas exactas.</string>
+    <string name="ini_home_exact_button">Dar permiso</string>
+    <string name="ini_home_battery_title">Para que suenen los avisos</string>
+    <string name="ini_home_battery_body">Desactiva el ahorro de batería para esta app. Así el aviso del descanso sonará puntual aunque tengas la pantalla apagada.</string>
+    <string name="ini_home_battery_adjust">Ajustar</string>
+    <string name="ini_home_battery_ok">Vale</string>
+    <string name="ini_home_extra_running">Entrenamiento extra · no cuenta día</string>
+    <string name="ini_home_special_running">Sesión libre en marcha</string>
+    <string name="ini_home_phases">FASES DEL PLAN</string>
+    <string name="ini_home_in_progress">EN CURSO · TOCA PARA REANUDAR</string>
+    <string name="ini_home_resume">Reanudar</string>
+    <string name="ini_home_plan_done">Plan terminado</string>
+    <plurals name="ini_home_done_body">
+        <item quantity="one">El día, hecho. Elige qué sigue cuando quieras.</item>
+        <item quantity="other">Los %d días, hechos. Elige qué sigue cuando quieras.</item>
+    </plurals>
+    <string name="ini_home_pick_next">Elegir el siguiente</string>
+    <string name="ini_home_see_summary">Ver el resumen del plan</string>
+    <string name="ini_home_date_pattern">d \'de\' MMMM</string>
+    <string name="ini_home_finished_on">Terminado el %1$s.</string>
+    <plurals name="ini_home_finished_on_weeks">
+        <item quantity="one">Terminado el %2$s, en %1$d semana.</item>
+        <item quantity="other">Terminado el %2$s, en %1$d semanas.</item>
+    </plurals>
+    <string name="ini_home_today">HOY TE TOCA</string>
+    <string name="ini_home_new_plan">PLAN NUEVO · EMPIEZA CUANDO QUIERAS</string>
+    <string name="ini_home_start_day">Empezar día %1$d</string>
+    <string name="ini_home_see_day">Ver el día antes de empezar</string>
+    <plurals name="ini_home_progress">
+        <item quantity="one">%1$d de %2$d día</item>
+        <item quantity="other">%1$d de %2$d días</item>
+    </plurals>
+    <string name="ini_home_no_progress">Aún no hay progreso: la barra se llena a partir de hoy.</string>
+    <string name="ini_home_free_title">Entreno libre</string>
+    <string name="ini_home_free_body">Sin rutina: entrenas a tu aire y apuntas lo que haces</string>
+    <string name="ini_home_free_start">Empezar</string>
+    <string name="ini_home_specials">Entrenamientos especiales</string>
+    <string name="ini_home_specials_note">no cuentan día</string>
+
+    <!-- Día -->
+    <string name="ini_day_phase">FASE %1$d · %2$s</string>
+    <string name="ini_day_continue">Continuar entrenamiento</string>
+    <string name="ini_day_start">Empezar entrenamiento</string>
+    <string name="ini_day_free">Entrenar libre · cuenta como día</string>
+    <string name="ini_day_warmup">CALENTAMIENTO</string>
+    <string name="ini_day_cooldown">VUELTA A LA CALMA</string>
+    <string name="ini_day_done_undo">Día hecho · deshacer</string>
+    <string name="ini_day_mark_done">Marcar día hecho</string>
+    <string name="ini_day_you_work">HOY TRABAJAS</string>
+    <string name="ini_day_front">Frente</string>
+    <string name="ini_day_rear">Espalda</string>
+    <string name="ini_day_done_as">Lo haces como %1$s</string>
+    <string name="ini_day_scheme_rest">%1$s · descanso %2$s</string>
+    <string name="ini_day_unit_sec">seg</string>
+    <string name="ini_day_unit_reps">reps</string>
+    <string name="ini_day_set_n">%1$dª</string>
+    <string name="ini_day_set_n_unit">%1$dª · %2$s</string>
+    <string name="ini_day_ready">Listo</string>
+    <string name="ini_day_edit">Editar</string>
+    <string name="ini_day_log_by_hand">Apuntar a mano</string>
+    <string name="ini_day_how_to">Cómo se hace</string>
+
+    <!-- Ajustes -->
+    <string name="ini_set_weight_imported">Peso importado desde Google Health</string>
+    <string name="ini_set_weight_none">Google Health no tiene ningún peso guardado</string>
+    <string name="ini_set_title">Ajustes</string>
+    <string name="ini_set_plan_title">Plan de entrenamiento</string>
+    <string name="ini_set_plan_body">Sigues «%1$s» · %2$s. Puedes traerte tu propio plan y alternar entre ellos sin perder el progreso de ninguno.</string>
+    <string name="ini_set_my_plans">Mis planes</string>
+    <string name="ini_set_help">Ayuda: cómo funciona la app</string>
+    <string name="ini_set_your_data">TUS DATOS</string>
+    <string name="ini_set_your_data_body">Solo se guarda lo que la app usa de verdad. Cada uno dice para qué sirve.</string>
+    <string name="ini_set_weight">Peso</string>
+    <string name="ini_set_weight_body">Con él se estiman las calorías de cada entreno, que es lo que Google Health necesita para contarlo en tus objetivos.</string>
+    <string name="ini_set_gender">Género</string>
+    <string name="ini_set_gender_body">Elige si las ilustraciones de los ejercicios son de hombre o de mujer. No entra en ningún cálculo.</string>
+    <string name="ini_gender_male">Hombre</string>
+    <string name="ini_gender_female">Mujer</string>
+    <string name="ini_gender_other">Otro</string>
+    <string name="ini_set_watch">Uso reloj o pulsómetro</string>
+    <string name="ini_set_watch_body">Si empiezas o controlas el entreno desde el reloj, esto se aplica solo: Google Health usa las calorías reales de tu pulso y la app no estima (evita el doble conteo). Actívalo aquí para forzarlo también en los entrenos que empieces desde el móvil.</string>
+    <string name="ini_set_theme">Tema</string>
+    <string name="ini_set_theme_body">Cómo se ve la app. Por defecto sigue al móvil, pero puedes fijarla en claro o en oscuro.</string>
+    <string name="ini_set_how">Cómo funciona</string>
+    <string name="ini_set_how_body">El recorrido de la primera vez: qué hace la app y dónde está cada cosa. Se puede volver a ver siempre que quieras.</string>
+    <string name="ini_set_tour">Ver el recorrido</string>
+    <string name="ini_set_health_title">Rellenar desde Google Health</string>
+    <string name="ini_set_health_body">Trae el peso más reciente que tengas guardado en Google Health.</string>
+    <string name="ini_set_health_import">Importar de Google Health</string>
+    <string name="ini_set_health_unavailable">Google Health no está disponible en este dispositivo.</string>
+    <string name="ini_set_rests">Descansos</string>
+    <string name="ini_set_rests_body">Lo que dura la cuenta atrás si el plan no pide otra cosa. Después de cada serie puedes decir cómo ha ido: «Justo» suma 30 s y «Fallo», un minuto.</string>
+    <string name="ini_set_rest_sets">Entre series</string>
+    <string name="ini_set_rest_exercises">Entre ejercicios</string>
+    <string name="ini_set_rest_reset">Volver a 1:30 y 2:00</string>
+    <string name="ini_set_remind">Recordarme ir al gimnasio</string>
+    <string name="ini_set_remind_body">Elige qué días sueles entrenar y a qué hora quieres el aviso. Si ese día ya has entrenado, no te molesta.</string>
+    <string name="ini_set_remind_at">A las %1$s</string>
+    <string name="ini_set_remind_no_days">Sin días elegidos no hay aviso que dar.</string>
+    <string name="ini_weekday_mon">L</string>
+    <string name="ini_weekday_tue">M</string>
+    <string name="ini_weekday_wed">X</string>
+    <string name="ini_weekday_thu">J</string>
+    <string name="ini_weekday_fri">V</string>
+    <string name="ini_weekday_sat">S</string>
+    <string name="ini_weekday_sun">D</string>
+    <string name="ini_set_credits">Créditos</string>
+    <string name="ini_set_credits_body">Las ilustraciones de los ejercicios son del set libre everkinetic, con licencia Creative Commons BY-SA 4.0.</string>
+    <string name="ini_set_credits_set">Ver el set</string>
+    <string name="ini_set_credits_license">La licencia</string>
+    <string name="ini_set_license_url">https://creativecommons.org/licenses/by-sa/4.0/deed.es</string>
+    <string name="ini_set_privacy">Privacidad</string>
+    <string name="ini_backup_saved">Copia guardada.</string>
+    <string name="ini_backup_save_failed">No se ha podido guardar la copia.</string>
+    <string name="ini_backup_read_failed">No se ha podido leer el archivo.</string>
+    <string name="ini_backup_title">Copia de seguridad</string>
+    <string name="ini_backup_body">Tus días, tus pesos, tu historial y tus planes viven solo en este teléfono. Guarda una copia donde quieras y podrás recuperarlo todo en otro móvil.</string>
+    <string name="ini_backup_save">Guardar una copia</string>
+    <string name="ini_backup_restore_button">Restaurar una copia</string>
+    <string name="ini_backup_confirm_title">¿Restaurar esta copia?</string>
+    <string name="ini_backup_confirm_body">La copia trae %1$s. Al restaurarla se sustituye TODO lo que hay ahora en la app: días, pesos, historial y planes.</string>
+    <plurals name="ini_backup_completed_days">
+        <item quantity="one">%d día completado</item>
+        <item quantity="other">%d días completados</item>
+    </plurals>
+    <string name="ini_backup_restored">Copia restaurada.</string>
+    <string name="ini_backup_restore_failed">No se ha podido restaurar la copia.</string>
+    <string name="ini_backup_restore">Restaurar</string>
+    <string name="ini_backup_cancel">Cancelar</string>
+    <string name="ini_backup_err_not_backup">Este archivo no es una copia de Building My Future.</string>
+    <string name="ini_backup_err_other_app">Este archivo es de otra app.</string>
+    <string name="ini_backup_err_newer">La copia se hizo con una versión más nueva de la app. Actualiza y vuelve a intentarlo.</string>
+    <string name="ini_backup_err_empty">La copia está vacía.</string>
+
+    <!-- Health Connect -->
+    <string name="ini_health_title">Building My Future y Health Connect</string>
+    <string name="ini_health_intro">Cuando terminas un entrenamiento en la app, guardamos esa sesión en Health Connect (la plataforma de Google Health) para que tus entrenos aparezcan junto al resto de tu actividad física.</string>
+    <string name="ini_health_what">Qué escribimos</string>
+    <string name="ini_health_what_body">• La sesión de ejercicio (tipo fuerza) con su fecha y duración.\n• El detalle de cada ejercicio y los pesos usados, en las notas de la sesión.</string>
+    <string name="ini_health_only_write">La app solo escribe estos datos: nunca lee tu información de salud. Puedes revocar el permiso en cualquier momento desde los ajustes de Health Connect.</string>
+
+    <!-- Avisos de descanso -->
+    <string name="ini_rest_channel">Descansos</string>
+    <string name="ini_rest_channel_desc">Aviso al terminar el descanso entre series</string>
+    <string name="ini_timer_channel">Temporizador en curso</string>
+    <string name="ini_timer_channel_desc">Cuenta atrás visible en la pantalla de bloqueo durante la sesión</string>
+    <string name="ini_rest_ongoing_warmup">Calentamiento</string>
+    <string name="ini_rest_ongoing_timed">Serie por tiempo</string>
+    <string name="ini_rest_ongoing_exercises">Descanso entre ejercicios</string>
+    <string name="ini_rest_ongoing_sets">Descanso entre series</string>
+    <string name="ini_rest_ongoing_text">Cuenta atrás en marcha · toca para abrir</string>
+    <string name="ini_rest_done_warmup">¡Calentamiento terminado!</string>
+    <string name="ini_rest_done_timed">¡Serie completada!</string>
+    <string name="ini_rest_done_rest">¡Descanso terminado!</string>
+    <string name="ini_rest_done_text_warmup">A entrenar 💪</string>
+    <string name="ini_rest_done_text_timed">¡Aguanta! Ya puedes descansar 💪</string>
+    <string name="ini_rest_done_text_exercises">Pasa al siguiente ejercicio</string>
+    <string name="ini_rest_done_text_sets">A por la siguiente serie</string>
+
+    <!-- Recordatorio de entrenamiento -->
+    <string name="ini_reminder_channel">Recordatorio de entrenamiento</string>
+    <string name="ini_reminder_channel_desc">El aviso de los días que has dicho que vas al gimnasio.</string>
+    <string name="ini_reminder_title">Hoy toca gimnasio</string>
+
+    <!-- Reloj -->
+    <string name="ini_wear_workout">Entrenamiento</string>
+    <string name="ini_wear_free">Entrenamiento libre</string>
+    <string name="ini_wear_special">Entrenamiento especial</string>
+    <string name="ini_wear_busy">Máquina ocupada</string>
+    <string name="ini_wear_busy_too">También ocupada</string>
+
+    <!-- Valoración -->
+    <string name="ini_rate_how">¿Qué tal te va?</string>
+    <string name="ini_rate_how_body">Esta copia no viene de ninguna tienda, así que no hay estrellas que poner. Si algo falla o echas algo en falta, escríbeme: el correo ya lleva puesta la versión que tienes.</string>
+    <string name="ini_rate_write">Escribirme</string>
+    <string name="ini_rate_title">Valorar la app</string>
+    <string name="ini_rate_body">La app no tiene detrás ninguna empresa ni se anuncia en ningún sitio: se encuentra porque alguien la valora. Si te está sirviendo, dilo en la ficha.</string>
+    <string name="ini_rate_play">Valorar en Google Play</string>
+
+    <!-- Actualizaciones -->
+    <string name="ini_upd_play_body">Las actualizaciones llegan por Google Play, como en cualquier otra app.</string>
+    <string name="ini_upd_direct_body">La app se instala fuera de Play Store, así que se actualiza sola desde su página de versiones.</string>
+    <string name="ini_upd_auto">Buscar actualizaciones</string>
+    <string name="ini_upd_check_now">Buscar ahora</string>
+    <string name="ini_upd_update_to">Actualizar a la %1$s</string>
+    <string name="ini_upd_checking">Buscando…</string>
+    <string name="ini_upd_up_to_date">Estás al día ✓</string>
+    <string name="ini_upd_downloading">Descargando… %1$d%%</string>
+    <string name="ini_upd_verifying">Comprobando la copia…</string>
+    <string name="ini_upd_err_offline">Sin conexión. Inténtalo más tarde.</string>
+    <string name="ini_upd_err_check">No se pudo consultar si hay versión nueva.</string>
+    <string name="ini_upd_err_download">Falló la descarga.</string>
+    <string name="ini_upd_err_hash">La descarga llegó corrupta y se ha borrado.</string>
+    <string name="ini_upd_err_install">No se pudo instalar.</string>
+    <string name="ini_upd_available">Versión %1$s disponible</string>
+    <string name="ini_upd_update">Actualizar</string>
+    <string name="ini_upd_banner_downloading">Descargando la nueva versión… %1$d%%</string>
+    <string name="ini_upd_banner_verifying">Comprobando que la copia es íntegra…</string>
+</resources>

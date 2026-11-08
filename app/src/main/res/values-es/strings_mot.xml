@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Recomendador de planes (PlanAdvisor) -->
+    <string name="mot_advisor_closest_plain">Es lo más parecido a lo que has pedido.</string>
+    <string name="mot_advisor_closest_but">Es lo más parecido, pero %1$s.</string>
+    <string name="mot_advisor_and">%1$s y %2$s</string>
+    <string name="mot_advisor_none">Con %1$s, no hay ningún plan %2$s que cuadre.</string>
+    <plurals name="mot_advisor_days">
+        <item quantity="one">%d día</item>
+        <item quantity="many">%d días</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <string name="mot_advisor_days_no_gear">%1$s y sin material</string>
+    <string name="mot_advisor_issue_gym">necesita gimnasio</string>
+    <plurals name="mot_advisor_issue_days">
+        <item quantity="one">pide %d día por semana</item>
+        <item quantity="many">pide %d días por semana</item>
+        <item quantity="other">pide %d días por semana</item>
+    </plurals>
+    <string name="mot_advisor_issue_other_goal">va a otra cosa: es %1$s</string>
+    <string name="mot_advisor_issue_other_goal_generic">va a otra cosa: es de eso</string>
+    <string name="mot_advisor_issue_minutes">sus sesiones son de unos %1$d minutos</string>
+    <string name="mot_advisor_goal_strength">de fuerza</string>
+    <string name="mot_advisor_goal_muscle">de músculo</string>
+    <string name="mot_advisor_goal_lose_fat">de perder grasa</string>
+    <string name="mot_advisor_goal_maintain">de mantenimiento</string>
+    <string name="mot_advisor_goal_mobility">de movilidad</string>
+    <string name="mot_advisor_goal_start">de arranque</string>
+    <string name="mot_advisor_goal_other">de eso</string>
+    <string name="mot_advisor_shape_limited">te cuesta moverte</string>
+    <string name="mot_advisor_shape_stopped">vienes de estar parado</string>
+    <string name="mot_advisor_shape_sometimes">entrenas de vez en cuando</string>
+    <string name="mot_advisor_shape_regular">ya entrenas con constancia</string>
+    <plurals name="mot_advisor_days_per_week">
+        <item quantity="one">%d día por semana</item>
+        <item quantity="many">%d días por semana</item>
+        <item quantity="other">%d días por semana</item>
+    </plurals>
+    <string name="mot_advisor_no_gear">sin material</string>
+    <string name="mot_advisor_session_min_express">sesiones de unos %1$d min (con el exprés caben en %2$d)</string>
+    <string name="mot_advisor_session_min">sesiones de unos %1$d min</string>
+    <string name="mot_advisor_tail_gentle">aquí se empieza de pie o sentado, con apoyo y a tu ritmo</string>
+    <string name="mot_advisor_tail_start">esto es para coger el hábito sin machacarte</string>
+    <string name="mot_advisor_tail_lose_fat">aquí se mueve mucho y se suda</string>
+    <string name="mot_advisor_tail_muscle">el volumen está repartido para crecer</string>
+    <string name="mot_advisor_tail_strength">pocas repeticiones y peso de verdad</string>
+    <string name="mot_advisor_tail_maintain">lo justo para no perder lo ganado</string>
+    <string name="mot_advisor_tail_mobility">sesiones cortas para recuperar rango</string>
+    <string name="mot_advisor_tail_other">encaja con lo que has pedido</string>
+    <!-- "trozo, trozo, trozo: cola." -->
+    <string name="mot_advisor_reason">%1$s: %2$s.</string>
+    <string name="mot_next_after_gentle">Ya te mueves con soltura: toca un poco más de trabajo, con el mismo cuidado.</string>
+
+    <!-- Progresión (Progression) -->
+    <string name="mot_prog_first_weight">Primera vez con este ejercicio: apunta el peso que uses hoy.</string>
+    <string name="mot_prog_first_reps">Primera vez con este ejercicio: apunta las repeticiones que te salgan.</string>
+    <!-- %1$d series, %2$d repeticiones -->
+    <plurals name="mot_prog_bw_closed">
+        <item quantity="one">Ya cierras las %1$d series a %2$d. Sin peso que añadir, el siguiente paso es una variante más difícil.</item>
+        <item quantity="many">Ya cierras las %1$d series a %2$d. Sin peso que añadir, el siguiente paso es una variante más difícil.</item>
+        <item quantity="other">Ya cierras las %1$d series a %2$d. Sin peso que añadir, el siguiente paso es una variante más difícil.</item>
+    </plurals>
+    <string name="mot_prog_bw_more">La última vez empezaste con %1$d. Prueba %2$d.</string>
+    <!-- %1$d series, %2$d repeticiones, %3$s kg nuevos, %4$d repeticiones de vuelta -->
+    <plurals name="mot_prog_more_weight">
+        <item quantity="one">La última vez cerraste las %1$d series a %2$d. Sube a %3$s kg y vuelve a %4$d.</item>
+        <item quantity="many">La última vez cerraste las %1$d series a %2$d. Sube a %3$s kg y vuelve a %4$d.</item>
+        <item quantity="other">La última vez cerraste las %1$d series a %2$d. Sube a %3$s kg y vuelve a %4$d.</item>
+    </plurals>
+    <string name="mot_prog_deload">Llevas %1$d sesiones sin pasar de aquí. Baja a %2$s kg y vuelve a subir: es la forma de romperlo.</string>
+    <string name="mot_prog_more_reps">La última vez empezaste con %1$d. Prueba %2$d con el mismo peso.</string>
+    <!-- %1$d series del plan, %2$d repeticiones -->
+    <plurals name="mot_prog_close_range">
+        <item quantity="one">Mismo peso: para subir, cierra hoy las %1$d series a %2$d.</item>
+        <item quantity="many">Mismo peso: para subir, cierra hoy las %1$d series a %2$d.</item>
+        <item quantity="other">Mismo peso: para subir, cierra hoy las %1$d series a %2$d.</item>
+    </plurals>
+
+    <!-- Desglose de series: marca de las de calentamiento, entre paréntesis -->
+    <string name="mot_warmup_short">cal.</string>
+
+    <!-- PlanViewModel -->
+    <string name="mot_import_cant_open">No se pudo abrir el archivo.</string>
+    <string name="mot_import_not_plan">Ese archivo no es un plan: elige un .md o un .json.</string>
+    <string name="mot_draft_phase">Fase 1</string>
+    <string name="mot_draft_day">Lunes</string>
+    <string name="mot_hc_military">Rutina Militar</string>
+    <string name="mot_hc_fatburn">Quema grasa</string>
+    <string name="mot_hc_fatburn_exercise">Quema grasa · %1$s</string>
+    <string name="mot_hc_exercise_fallback">ejercicio</string>
+    <string name="mot_hc_extra">Entrenamiento extra</string>
+    <string name="mot_hc_day">Día %1$d · %2$s</string>
+    <string name="mot_hc_workout">Entrenamiento</string>
+    <string name="mot_hc_free_guided">Sesión libre guiada.</string>
+    <string name="mot_hc_duration">Duración: %1$d min · %2$s</string>
+    <plurals name="mot_sets">
+        <item quantity="one">%d serie</item>
+        <item quantity="many">%d series</item>
+        <item quantity="other">%d series</item>
+    </plurals>
+
+    <!-- Apuntar el entreno libre (FreeSessionLog) -->
+    <string name="mot_free_live_label">EN MARCHA · EL TIEMPO SIGUE CORRIENDO</string>
+    <string name="mot_free_done_label">ENTRENO TERMINADO</string>
+    <string name="mot_free_title_live">¿Qué llevas hecho?</string>
+    <string name="mot_free_title_review">Repasa lo apuntado</string>
+    <string name="mot_free_title_done">¿Qué has hecho?</string>
+    <string name="mot_free_intro_live">Apunta cada ejercicio cuando lo acabes, o serie a serie. Se guarda solo, y al finalizar te lo enseño para repasarlo.</string>
+    <string name="mot_free_intro_review">Esto es lo que has ido apuntando. Corrige lo que haga falta o añade lo que te dejaste.</string>
+    <string name="mot_free_intro_blank">Hoy no había ejercicios apuntados en el plan, así que empiezas en blanco: escribe los que hayas hecho, o guarda solo el tiempo.</string>
+    <string name="mot_free_intro_done">Apunta lo que quieras y déjate el resto. Cada serie lleva sus kilos y sus repeticiones, y el más alto se queda como tu peso de ese ejercicio.</string>
+    <string name="mot_free_logged_count">%1$d de %2$d apuntados</string>
+    <string name="mot_free_next_exercise">Siguiente ejercicio ›</string>
+    <string name="mot_free_can_save_partial">Puedes guardar aunque falten cosas</string>
+    <string name="mot_free_save">Guardar</string>
+    <string name="mot_free_done_keep_going">Listo, seguir entrenando</string>
+    <string name="mot_free_save_finish">Guardar y terminar</string>
+    <string name="mot_free_keep_training">Seguir entrenando</string>
+    <string name="mot_free_finish_no_log">Terminar sin apuntar nada</string>
+    <string name="mot_free_time_label">TIEMPO DEL ENTRENO</string>
+    <string name="mot_free_time_saved">Ya está guardado, apuntes lo que apuntes.</string>
+    <string name="mot_free_exercise">Ejercicio</string>
+    <string name="mot_free_add_named">Añadir «%1$s»</string>
+    <string name="mot_free_remove_named">Quitar %1$s</string>
+    <string name="mot_free_this_exercise">este ejercicio</string>
+    <string name="mot_free_bodyweight">Peso corporal, sin kilos</string>
+    <string name="mot_free_warmup_mark">C</string>
+    <string name="mot_free_set_ordinal">%1$dª</string>
+    <string name="mot_free_set_weight">Peso de la serie %1$d</string>
+    <string name="mot_free_set_time">Tiempo de la serie %1$d</string>
+    <string name="mot_free_set_reps">Repeticiones de la serie %1$d</string>
+    <string name="mot_free_warmup">Calentamiento</string>
+    <string name="mot_free_remove_set">Quitar la serie %1$d</string>
+    <string name="mot_free_add_set">+ Añadir serie</string>
+    <string name="mot_free_add_other">Añadir otro ejercicio</string>
+</resources>

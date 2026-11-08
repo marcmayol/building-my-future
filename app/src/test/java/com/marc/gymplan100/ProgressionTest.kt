@@ -66,7 +66,7 @@ class ProgressionTest {
         val s = Progression.suggest("3 x 8-12", atascado)!!
         assertEquals(Progression.Kind.DELOAD, s.kind)
         assertEquals("18", s.weight)
-        assertTrue(s.reason.contains("Baja"))
+        assertEquals(listOf(R.string.mot_prog_deload), s.reason.ids())
     }
 
     @Test
@@ -119,7 +119,7 @@ class ProgressionTest {
         val s = Progression.suggest("3 x 8-12", dominadas)!!
         assertEquals(Progression.Kind.MORE_REPS, s.kind)
         assertEquals("", s.weight)
-        assertTrue(s.reason.contains("variante"))
+        assertEquals(listOf(R.plurals.mot_prog_bw_closed), s.reason.ids())
     }
 
     @Test

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logros (data/Achievements.kt, ui/AchievementsScreen.kt) -->
+    <string name="ayu_logro_first_title">First step</string>
+    <string name="ayu_logro_first_desc">Complete your first day.</string>
+    <string name="ayu_logro_week_title">First week</string>
+    <string name="ayu_logro_ten_title">Finding your rhythm</string>
+    <string name="ayu_logro_quarter_title">A quarter of the plan</string>
+    <string name="ayu_logro_half_title">Halfway there</string>
+    <string name="ayu_logro_threequarter_title">Home stretch</string>
+    <string name="ayu_logro_complete_title">Plan complete!</string>
+    <plurals name="ayu_logro_desc_days">
+        <item quantity="one">Complete %1$d day.</item>
+        <item quantity="other">Complete %1$d days.</item>
+    </plurals>
+    <plurals name="ayu_logro_complete_desc">
+        <item quantity="one">Complete the plan\'s day.</item>
+        <item quantity="other">Complete all %1$d days.</item>
+    </plurals>
+    <string name="ayu_logro_phase_title">%1$s cleared</string>
+    <string name="ayu_logro_phase_desc">Finish phase %1$d.</string>
+
+    <string name="ayu_logros_titulo">Achievements</string>
+    <string name="ayu_logros_nota">Achievements are based on the plan you\'re following, so they change if you switch plans.</string>
+    <plurals name="ayu_logros_de_total">
+        <item quantity="one">of %1$d achievement</item>
+        <item quantity="other">of %1$d achievements</item>
+    </plurals>
+    <plurals name="ayu_logros_siguiente_en">
+        <item quantity="one">Next one in %1$d day: %2$s.</item>
+        <item quantity="other">Next one in %1$d days: %2$s.</item>
+    </plurals>
+    <string name="ayu_logros_siguiente_un_entreno">Next one is a workout away: %1$s.</string>
+    <string name="ayu_logros_todos">You\'ve got them all. No small feat.</string>
+    <plurals name="ayu_logros_te_faltan">
+        <item quantity="one">%1$d day to go.</item>
+        <item quantity="other">%1$d days to go.</item>
+    </plurals>
+
+    <!-- Frases de enhorabuena (Motivation) -->
+    <string name="ayu_motiv_g0">One day closer to your goal!</string>
+    <string name="ayu_motiv_g1">Future you says thanks.</string>
+    <string name="ayu_motiv_g2">Consistency is your superpower.</string>
+    <string name="ayu_motiv_g3">Today you chose to get better. 💪</string>
+    <string name="ayu_motiv_g4">Brick by brick, you\'re building your future.</string>
+    <string name="ayu_motiv_g5">Every session counts. Keep it up!</string>
+    <string name="ayu_motiv_g6">Today\'s effort is tomorrow\'s pride.</string>
+    <string name="ayu_motiv_g7">You showed up and did it. That\'s what wins.</string>
+    <string name="ayu_motiv_first">You\'ve started! The first step matters most.</string>
+    <string name="ayu_motiv_quarter">A quarter of the plan done. You mean business.</string>
+    <string name="ayu_motiv_half">Halfway there! No turning back now.</string>
+    <string name="ayu_motiv_threequarter">Home stretch. The best part is coming.</string>
+    <plurals name="ayu_motiv_final">
+        <item quantity="one">YOU DID IT! %1$d day. You\'re a new person.</item>
+        <item quantity="other">YOU DID IT! %1$d days. You\'re a new person.</item>
+    </plurals>
+
+    <!-- Celebración -->
+    <string name="ayu_celeb_dia_completado">Day %1$d done!</string>
+    <plurals name="ayu_celeb_marcador">
+        <item quantity="one">%1$d of %2$d day</item>
+        <item quantity="other">%1$d of %2$d days</item>
+    </plurals>
+    <plurals name="ayu_celeb_logros_desbloqueados">
+        <item quantity="one">ACHIEVEMENT UNLOCKED</item>
+        <item quantity="other">ACHIEVEMENTS UNLOCKED</item>
+    </plurals>
+    <string name="ayu_celeb_cerrar">Close</string>
+    <string name="ayu_celeb_seguir">Keep going!</string>
+
+    <!-- Recorrido -->
+    <string name="ayu_tour_cabecera">HOW IT WORKS</string>
+    <string name="ayu_tour_saltar">Skip</string>
+    <string name="ayu_tour_empezar">Start</string>
+    <string name="ayu_tour_siguiente">Next</string>
+    <string name="ayu_tour_donde">WHERE</string>
+    <string name="ayu_tour_1_titulo">The app runs your session</string>
+    <string name="ayu_tour_1_texto">Open today\'s day and the app leads the way: warm-up, set by set with its weight and reps, and the rest timer running on its own. No need to remember which set you were on.</string>
+    <string name="ayu_tour_1_donde">On the home screen, the top block: “Today’s workout”.</string>
+    <string name="ayu_tour_2_titulo">Rest alerts with your phone in your pocket</string>
+    <string name="ayu_tour_2_texto">It alerts you even with the screen off and the app closed. And from the lock screen you can move to the next set without unlocking your phone.</string>
+    <string name="ayu_tour_2_donde">It pops up after every set. If it doesn\'t ring, the home screen tells you which permission is missing.</string>
+    <string name="ayu_tour_3_titulo">It tells you when to add weight</string>
+    <string name="ayu_tour_3_texto">When you finish every set above the rep range, it suggests more load (using the jumps your machine really has) and tells you why underneath. Stuck for three sessions? It suggests dropping back to build up again.</string>
+    <string name="ayu_tour_3_donde">During the workout, and the history in “My weights”, in the bottom bar.</string>
+    <string name="ayu_tour_4_titulo">Your numbers, not just a list</string>
+    <string name="ayu_tour_4_texto">Weight lifted, estimated strength, streaks and a muscle map showing what each muscle got this week. That\'s what warns you you\'ve skipped legs for three weeks.</string>
+    <string name="ayu_tour_4_donde">In the bottom bar: “Stats”, “Results” and “Achievements”.</string>
+    <string name="ayu_tour_5_titulo">The plan is yours. So is the data</string>
+    <string name="ayu_tour_5_texto">Fifteen plans are included, but you can bring your own or build one in the app. No account, no server: everything stays on your phone, so backups are up to you.</string>
+    <string name="ayu_tour_5_donde">“My plans” on the home screen, and backup in Settings (the gear at the top).</string>
+
+    <!-- Bienvenida -->
+    <string name="ayu_welcome_titulo_preguntando">Tell me five things</string>
+    <string name="ayu_welcome_titulo">Let\'s pick your plan</string>
+    <string name="ayu_welcome_sub_preguntando">None of this is saved: it\'s only used to suggest a plan.</string>
+    <string name="ayu_welcome_sub">There are fifteen plans inside. I can recommend one in five questions, or you can browse them yourself.</string>
+    <string name="ayu_welcome_ayudame">Help me choose</string>
+    <string name="ayu_welcome_ver_planes">See the plans</string>
+    <string name="ayu_welcome_crear">Create my own</string>
+    <string name="ayu_welcome_solo_apuntar">I just want to log my workouts</string>
+    <string name="ayu_welcome_q_objetivo">What are you after?</string>
+    <string name="ayu_welcome_q_forma">Where are you at now?</string>
+    <string name="ayu_welcome_q_dias">How many days a week?</string>
+    <string name="ayu_welcome_q_tiempo">How much time do you have each day?</string>
+    <string name="ayu_welcome_q_lugar">Where do you train?</string>
+    <plurals name="ayu_welcome_n_dias">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <string name="ayu_welcome_te_propongo">MY PICK FOR YOU</string>
+    <string name="ayu_welcome_meta">%1$s · %2$d a week</string>
+    <string name="ayu_welcome_empezar_con_este">Start this one</string>
+    <string name="ayu_welcome_tambien">THESE SUIT YOU TOO</string>
+    <string name="ayu_welcome_addons">And if you have a spare day, you can add %1$s on top of any of these.</string>
+    <string name="ayu_welcome_o">" or "</string>
+    <string name="ayu_welcome_lo_que_si">WHAT I DO HAVE FOR THIS</string>
+    <string name="ayu_welcome_bloque_corto">It\'s a short block: do it alone or on top of any plan, without changing your week.</string>
+    <string name="ayu_welcome_ver_todos">See all plans</string>
+    <string name="ayu_welcome_mejor_creo">I\'d rather create my own</string>
+    <string name="ayu_welcome_falta_objetivo">what you\'re after</string>
+    <string name="ayu_welcome_falta_forma">where you\'re at now</string>
+    <string name="ayu_welcome_falta_dias">how many days</string>
+    <string name="ayu_welcome_falta_tiempo">how much time you have</string>
+    <string name="ayu_welcome_falta_lugar">where you train</string>
+    <string name="ayu_welcome_ver_propuesta">See what you suggest</string>
+    <plurals name="ayu_welcome_te_faltan">
+        <item quantity="one">One left: %2$s.</item>
+        <item quantity="other">%1$d left; next up: %2$s.</item>
+    </plurals>
+    <string name="ayu_welcome_obj_perder">Lose fat</string>
+    <string name="ayu_welcome_obj_musculo">Build muscle</string>
+    <string name="ayu_welcome_obj_fuerza">Lift more</string>
+    <string name="ayu_welcome_obj_mantener">Stay in shape</string>
+    <string name="ayu_welcome_obj_movilidad">Move better</string>
+    <string name="ayu_welcome_forma_limitado">Moving is hard for me</string>
+    <string name="ayu_welcome_forma_parado">Out of it for a while</string>
+    <string name="ayu_welcome_forma_aveces">Now and then</string>
+    <string name="ayu_welcome_forma_regular">I train regularly</string>
+    <string name="ayu_welcome_tiempo_30">Half an hour</string>
+    <string name="ayu_welcome_tiempo_45">45 minutes</string>
+    <string name="ayu_welcome_tiempo_60">An hour</string>
+    <string name="ayu_welcome_tiempo_90">Over an hour</string>
+    <string name="ayu_welcome_lugar_gym">At the gym</string>
+    <string name="ayu_welcome_lugar_casa">At home, no equipment</string>
+    <string name="ayu_welcome_privacidad">It\'s worked out on your phone and thrown away. No accounts, no server.</string>
+    <string name="ayu_welcome_nada_encaja">NOTHING I HAVE FITS</string>
+    <string name="ayu_welcome_lo_mas_cercano">THE CLOSEST</string>
+
+    <!-- Ayuda -->
+    <string name="ayu_help_titulo">Help</string>
+    <string name="ayu_help_volver">Back</string>
+    <string name="ayu_help_intro">Tap a section to open it. Reading the help changes nothing: if you have a workout going, it\'ll be exactly as you left it.</string>
+    <string name="ayu_help_captura">Screenshot: %1$s</string>
+    <string name="ayu_help_captura_ampliada">Enlarged screenshot. Tap to close.</string>
+
+    <string name="ayu_help_inicio_title">Home</string>
+    <string name="ayu_help_inicio_summary">What\'s on today and how you\'re doing.</string>
+    <string-array name="ayu_help_inicio_steps">
+        <item>Top right, ⓘ opens this help (it\'s also in Settings and in the workout header) and the gear opens settings.</item>
+        <item>Below, the plan you\'re following and its phase. “See other plans” takes you to the list: there are strength plans, muscle plans, home plans, plans for starting from scratch…</item>
+        <item>The big block is today\'s day. “Start day” begins the guided workout; “See the day before starting” shows the exercises without starting anything.</item>
+        <item>If you have a workout half done, that block says “In progress” and the button picks it up where you left off.</item>
+        <item>“Free workout” is for training without the plan, with rest timers and logging as you go. “Special workouts” are one-off routines that don\'t count as a day.</item>
+        <item>At the bottom, the bar: Achievements, My weights, Results and Stats.</item>
+    </string-array>
+
+    <string name="ayu_help_dia_title">The day sheet</string>
+    <string name="ayu_help_dia_summary">A day\'s exercises, before or after you do it.</string>
+    <string-array name="ayu_help_dia_steps">
+        <item>Each exercise with its drawing, sets and reps (“3 x 12”) and the rest between sets.</item>
+        <item>“How to do it” opens the guide: muscles, technique, common mistakes, alternatives and a video.</item>
+        <item>“Log by hand” is for a day you trained without the app. Guided workouts are logged automatically when you finish.</item>
+        <item>If that day\'s workout is half done, the button says “Continue workout”.</item>
+    </string-array>
+
+    <string name="ayu_help_expres_title">Before you start: express</string>
+    <string name="ayu_help_expres_summary">How long the day takes and how to trim it if you\'re short on time.</string>
+    <string-array name="ayu_help_expres_steps">
+        <item>When you start you see how long the day usually takes. The estimate learns from how long you actually take.</item>
+        <item>Short on time? Pick 45 or 30 minutes: every exercise drops to 2 sets and, if it still doesn\'t fit, the last ones are cut. The app tells you which.</item>
+        <item>An express workout counts as a day done, just like a full one.</item>
+    </string-array>
+
+    <string name="ayu_help_serie_title">The set</string>
+    <string name="ayu_help_serie_summary">What you do with the machine in front of you.</string>
+    <string-array name="ayu_help_serie_steps">
+        <item>Set the weight with − and + (half a kilo at a time; hold to go faster), with “Wheel” or by tapping the number to type it.</item>
+        <item>Reps come filled in from the plan: only touch them if today you did a different number.</item>
+        <item>“Warm-up set” logs a ramp-up set without using up a plan set.</item>
+        <item>“Skip” is for when that exercise doesn\'t fit right now: “Machine taken” moves it to the end, “Do another one instead” swaps it for an alternative and “Not doing it today” crosses it out (what you did stays logged; the rest doesn\'t count).</item>
+        <item>“Plan” shows the whole day and where you are, with skipped ones crossed out at the end.</item>
+        <item>When you\'re done, “Set done”.</item>
+    </string-array>
+
+    <string name="ayu_help_descanso_title">Rest</string>
+    <string name="ayu_help_descanso_summary">The countdown between sets.</string>
+    <string-array name="ayu_help_descanso_steps">
+        <item>Rest depends on the exercise: your usual one for normal sets (1:30 unless you change it in Settings), 3 minutes for heavy sets (8 reps or fewer on a compound lift) or whatever the plan says. Under the number it says where it comes from.</item>
+        <item>−30 s and +30 s adjust it. If you change it between sets, next time that exercise starts with your rest.</item>
+        <item>It rings and vibrates when it ends, even with the screen off (and on your watch, if you use one).</item>
+        <item>“How did it go?” logs whether the set was easy, hard or to failure, and adds rest: “Tough” adds 30 s and “Failure” a minute. In “Next” you can set up the weight for the next set.</item>
+    </string-array>
+
+    <string name="ayu_help_maquina_title">If you don\'t have the machine</string>
+    <string name="ayu_help_maquina_summary">Do another exercise and have it logged as what it was.</string>
+    <string-array name="ayu_help_maquina_steps">
+        <item>During the set, tap “Skip” → “Do another one instead” (or “How to do it” and scroll down to “If it\'s taken or you don\'t have it”).</item>
+        <item>The alternatives the app knows show up with their drawing: tap “Do this” and today\'s exercise becomes that one, with its own weights.</item>
+        <item>“I did a different exercise…” searches 151 exercises or lets you type your own.</item>
+        <item>With “Remember it for next time” ticked, the following days start with the swap. “Back to the plan\'s one” undoes it.</item>
+    </string-array>
+
+    <string name="ayu_help_libre_title">Free workout</string>
+    <string name="ayu_help_libre_summary">No plan, but with rest timers and everything logged as you go.</string>
+    <string-array name="ayu_help_libre_steps">
+        <item>It starts with the warm-up: “I\'ve warmed up” skips it.</item>
+        <item>Do your set and tap “Set finished”. Rest starts right away and, while it runs, you pick which exercise it was (only the first time) and log weight and reps.</item>
+        <item>The next sets of the same exercise come with the previous values: only change what\'s different. “How did it go?” adds rest just like in the guided workout.</item>
+        <item>If you use your bodyweight, tick “Bodyweight, no weight”: it\'ll only ask for reps, and it remembers for next time.</item>
+        <item>If you type one the app doesn\'t know, like “TRX row”, it\'s saved on your phone as yours, with no drawing or muscle map. It\'s only offered with a plan you created: in search, in suggestions and when building the plan.</item>
+        <item>“Finish exercise” starts the rest between exercises; the next set asks again which one it is.</item>
+        <item>“Finish” shows everything you logged so you can review it before saving.</item>
+    </string-array>
+
+    <string name="ayu_help_salir_title">Leave without losing anything</string>
+    <string name="ayu_help_salir_summary">Your workout saves itself as you go.</string>
+    <string-array name="ayu_help_salir_steps">
+        <item>Your phone\'s back button takes you Home with the workout still running: resume it from the “In progress” block.</item>
+        <item>The X at the top asks what you want: “Finish and save” marks the day done with what you have, “Resume later” leaves it as is and “Discard workout” deletes it.</item>
+        <item>Looking at this help, the exercise guide or the plan never touches the workout.</item>
+    </string-array>
+
+    <string name="ayu_help_resultados_title">Results</string>
+    <string name="ayu_help_resultados_summary">What you did each day.</string>
+    <string-array name="ayu_help_resultados_steps">
+        <item>Every workout with its duration and, per exercise, the weight of each set.</item>
+        <item>“Newest / Oldest” changes the order.</item>
+        <item>If you did another exercise instead of the plan\'s, it shows with its name and “instead of…”.</item>
+    </string-array>
+
+    <string name="ayu_help_estadisticas_title">Stats</string>
+    <string name="ayu_help_estadisticas_summary">Your streak, your numbers and your progress.</string>
+    <string-array name="ayu_help_estadisticas_steps">
+        <item>Summary: streak, days done, total time, sets and weight lifted.</item>
+        <item>Weights: how each exercise has gone up. Muscles: what you\'ve worked lately. Consistency: which days you train.</item>
+    </string-array>
+
+    <string name="ayu_help_pesos_title">My weights</string>
+    <string name="ayu_help_pesos_summary">The weight you work with on each exercise.</string>
+    <string-array name="ayu_help_pesos_steps">
+        <item>Grouped by muscle. They fill in by themselves as you train and you can correct them.</item>
+        <item>It\'s the weight from your last session; your record (PR) shows under each exercise.</item>
+    </string-array>
+
+    <string name="ayu_help_planes_title">Plans</string>
+    <string name="ayu_help_planes_summary">Switch plans, import one or create your own.</string>
+    <string-array name="ayu_help_planes_steps">
+        <item>Each plan keeps its own progress: switching plans deletes nothing.</item>
+        <item>Under each one: its goal (strength, muscle…), the days and how many you\'ve done.</item>
+        <item>“Create a plan” opens the editor; “Import” brings one in from JSON or Markdown.</item>
+    </string-array>
+
+    <string name="ayu_help_ajustes_title">Settings</string>
+    <string name="ayu_help_ajustes_summary">Your details, rest, reminders, theme and backup.</string>
+    <string-array name="ayu_help_ajustes_steps">
+        <item>Weight (to estimate calories), the drawings\' gender and whether you use a watch.</item>
+        <item>Rest: default length between sets and between exercises.</item>
+        <item>Reminders: pick days and a time and the app tells you it\'s time to train.</item>
+        <item>Light or dark theme, and backup to take your progress to another phone.</item>
+    </string-array>
+
+    <string name="ayu_help_reloj_title">With a watch</string>
+    <string name="ayu_help_reloj_summary">If you have a Wear OS watch.</string>
+    <string-array name="ayu_help_reloj_steps">
+        <item>Install the watch app and the watch becomes a remote: “Set done”, skip rest or switch machines without taking out your phone.</item>
+        <item>The watch vibrates at the end of each rest and, while you train, shows the time left on the watch face.</item>
+    </string-array>
+</resources>

@@ -63,6 +63,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +75,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.ActiveSession
+import com.marc.gymplan100.data.texto
 import com.marc.gymplan100.data.ExpressPlan
 import com.marc.gymplan100.data.RestDefaults
 import com.marc.gymplan100.data.ExerciseImages
@@ -81,8 +85,6 @@ import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.review.Valoracion
 import com.marc.gymplan100.data.SetLog
 import com.marc.gymplan100.data.setsSummary
-import com.marc.gymplan100.data.contar
-import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.data.REPS_STEP
@@ -149,7 +151,7 @@ fun WorkoutSessionScreen(
     BackHandler {
         Toast.makeText(
             context,
-            "El entreno sigue en marcha. Lo retomas desde Inicio.",
+            context.getString(R.string.ses_back_toast),
             Toast.LENGTH_LONG
         ).show()
         onExit()
@@ -157,7 +159,7 @@ fun WorkoutSessionScreen(
 
     val order = s.order.ifEmpty { day.template.exercises.indices.toList() }
     val pos = order.indexOf(s.exerciseIndex).coerceAtLeast(0)
-    val dayContext = "${pos + 1} de ${order.size} · Día ${s.dayNumber}"
+    val dayContext = stringResource(R.string.ses_day_context, pos + 1, order.size, s.dayNumber)
 
     when (s.phase) {
         SessionPhase.WARMUP -> WarmupContent(s, day, now, dark, viewModel) { showQuitDialog = true }
@@ -218,16 +220,17 @@ fun WorkoutSessionScreen(
             s.phase != SessionPhase.FREE && s.phase != SessionPhase.FINISHED
         AlertDialog(
             onDismissRequest = { showQuitDialog = false },
-            title = { Text("¿Dejas el entreno a medias?", style = MaterialTheme.typography.headlineSmall) },
+            title = { Text(stringResource(R.string.ses_quit_title), style = MaterialTheme.typography.headlineSmall) },
             text = {
                 Text(
                     if (puedeTerminar)
-                        "Llevas ${contar(seriesHechas, "serie", "series")}. Si lo terminas " +
-                            "ahora, se guarda lo hecho y el día ${s.dayNumber} cuenta como " +
-                            "completado. Si lo dejas para luego, sigues por donde ibas."
+                        stringResource(
+                            R.string.ses_quit_text_finish,
+                            pluralStringResource(R.plurals.ses_n_sets, seriesHechas, seriesHechas),
+                            s.dayNumber
+                        )
                     else
-                        "Puedes reanudarlo cuando quieras: se guarda por dónde ibas, series y " +
-                            "pesos incluidos."
+                        stringResource(R.string.ses_quit_text_resume)
                 )
             },
             // Tres salidas no caben en los dos huecos del diálogo: van apiladas, de la que
@@ -245,16 +248,16 @@ fun WorkoutSessionScreen(
                                 cierraElEntreno()
                             },
                             modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                        ) { Text("Terminar y guardar") }
+                        ) { Text(stringResource(R.string.ses_finish_and_save)) }
                         OutlinedButton(
                             onClick = { showQuitDialog = false; onExit() },
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("Reanudar luego") }
+                        ) { Text(stringResource(R.string.ses_resume_later)) }
                     } else {
                         Button(
                             onClick = { showQuitDialog = false; onExit() },
                             modifier = Modifier.fillMaxWidth()
-                        ) { Text("Reanudar luego") }
+                        ) { Text(stringResource(R.string.ses_resume_later)) }
                     }
                     TextButton(
                         onClick = {
@@ -263,7 +266,7 @@ fun WorkoutSessionScreen(
                             onExit()
                         },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("Descartar el entreno") }
+                    ) { Text(stringResource(R.string.ses_discard_workout)) }
                 }
             }
         )
@@ -291,19 +294,19 @@ private fun WarmupContent(
     SessionShell(
         tint = SessionTint.WARMUP,
         dark = dark,
-        stateLabel = "Calentamiento",
-        context = "Día ${s.dayNumber}",
+        stateLabel = stringResource(R.string.ses_warmup),
+        context = stringResource(R.string.ses_day_n, s.dayNumber),
         onExit = onExit,
         secondaries = {
             SessionSecondary("−1 min", { viewModel.adjustWarmup(-60) })
             SessionSecondary(
-                if (s.warmupPaused) "Seguir" else "Pausa",
+                if (s.warmupPaused) stringResource(R.string.ses_keep_going) else stringResource(R.string.ses_pause),
                 { if (s.warmupPaused) viewModel.resumeWarmup() else viewModel.pauseWarmup() }
             )
             SessionSecondary("+1 min", { viewModel.adjustWarmup(60) })
         },
         contextCard = {
-            SessionCard(label = "Hoy toca", dark = dark) {
+            SessionCard(label = stringResource(R.string.ses_today), dark = dark) {
                 Text(
                     day.template.title,
                     style = MaterialTheme.typography.headlineSmall,
@@ -311,9 +314,9 @@ private fun WarmupContent(
                 )
                 Spacer(Modifier.height(Space.x1))
                 Text(
-                    (if (s.isExpress) "Exprés · " else "") +
-                        contar(deHoy.size, "ejercicio", "ejercicios") + " · " +
-                        contar(totalSets, "serie", "series"),
+                    (if (s.isExpress) stringResource(R.string.ses_express) + " · " else "") +
+                        pluralStringResource(R.plurals.ses_n_exercises, deHoy.size, deHoy.size) + " · " +
+                        pluralStringResource(R.plurals.ses_n_sets, totalSets, totalSets),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -321,7 +324,7 @@ private fun WarmupContent(
         },
         primary = {
             SessionPrimary(
-                text = "Empezar ejercicios",
+                text = stringResource(R.string.ses_start_exercises),
                 onClick = { viewModel.endWarmup() },
                 dark = dark,
                 tint = SessionTint.WARMUP,
@@ -332,14 +335,14 @@ private fun WarmupContent(
         // El calentamiento no tiene dibujo propio (es "6 min de lo que quieras"), así que el
         // hueco lo llena con qué se empieza: da tiempo a ir buscando la máquina.
         deHoy.firstOrNull()?.let {
-            SessionIllustration(it.name, label = "Empezamos con ${it.name.lowercase()}")
+            SessionIllustration(it.name, label = stringResource(R.string.ses_starting_with, it.name.lowercase()))
         }
         Countdown(
             text = if (!done) formatSecs(remaining) else "+${formatSecs(-remaining)}",
             caption = when {
-                s.warmupPaused -> "en pausa · ${day.template.warmup}"
-                !done -> "restante · ${day.template.warmup}"
-                else -> "de más · cuando quieras, empezamos"
+                s.warmupPaused -> stringResource(R.string.ses_paused_dot, day.template.warmup)
+                !done -> stringResource(R.string.ses_remaining_dot, day.template.warmup)
+                else -> stringResource(R.string.ses_warmup_over)
             },
             captionColor = tintAccent(SessionTint.WARMUP)
         )
@@ -448,10 +451,10 @@ private fun WorkingContent(
     // se entendía ninguna de las dos.
     val yaHayoSerieHecha = s.completedSets.any { it.exerciseIndex == s.exerciseIndex }
     val pesoHint = when {
-        progression != null -> progression.reason
-        yaHayoSerieHecha -> "El mismo peso que la serie anterior."
-        parseKg(weight) != null -> "El peso con el que lo dejaste la última vez."
-        else -> "Primera vez con este ejercicio: pon el peso que uses hoy."
+        progression != null -> progression.reason.texto()
+        yaHayoSerieHecha -> stringResource(R.string.ses_hint_same_weight)
+        parseKg(weight) != null -> stringResource(R.string.ses_hint_last_weight)
+        else -> stringResource(R.string.ses_hint_first_time)
     }
 
     // La propuesta se guarda en cuanto se ve, no solo si se toca: el reloj y la notificación
@@ -482,17 +485,17 @@ private fun WorkingContent(
     SessionShell(
         tint = SessionTint.WORK,
         dark = dark,
-        stateLabel = "Serie ${s.setNumber} de $totalSets",
+        stateLabel = stringResource(R.string.ses_set_of, s.setNumber, totalSets),
         context = dayContext,
         onExit = onExit,
         secondaries = {
             // «Saltar» y no «Máquina ocupada»: hay más razones para no hacer un ejercicio
             // ahora (no tienes la máquina, ya has tenido bastante) y todas se eligen ahí.
-            SessionSecondary("Saltar", { showSkip = true })
-            SessionSecondary("Cómo se hace", { showGuide = true })
+            SessionSecondary(stringResource(R.string.ses_skip), { showSkip = true })
+            SessionSecondary(stringResource(R.string.ses_how_to), { showGuide = true })
             // "Plan" y no "Ejercicios": con el texto del sistema grande la palabra larga no
             // cabía en su tercio y se partía a media palabra ("Ejercicio/s").
-            SessionSecondary("Plan", { showDayPlan = true })
+            SessionSecondary(stringResource(R.string.ses_plan), { showDayPlan = true })
         },
         contextCard = {
             if (timedSecs == null) {
@@ -510,12 +513,12 @@ private fun WorkingContent(
                 } else if (repsRange != null) {
                     // Una dominada no lleva kilos pero sí repeticiones, y son justo las que
                     // marcan si se progresa.
-                    SessionCard(label = "Repeticiones de esta serie", dark = dark) {
+                    SessionCard(label = stringResource(R.string.ses_reps_this_set), dark = dark) {
                         RepsRow(
                             value = reps,
                             onValue = { reps = it; repsTouched = true },
-                            hint = progression?.reason.orEmpty()
-                                .ifBlank { "El plan pide ${exercise.scheme}" }
+                            hint = progression?.reason?.texto().orEmpty()
+                                .ifBlank { stringResource(R.string.ses_plan_asks, exercise.scheme) }
                         )
                     }
                 }
@@ -524,23 +527,23 @@ private fun WorkingContent(
         primary = {
             when {
                 timedSecs != null -> SessionPrimary(
-                    text = "Empezar serie · ${formatSecs(timedSecs)}",
+                    text = stringResource(R.string.ses_start_set, formatSecs(timedSecs)),
                     onClick = { viewModel.startTimedSet() },
                     dark = dark, tint = SessionTint.WORK
                 )
                 // Un circuito se cuenta por vueltas; unas dominadas, por series.
                 bodyweight && repsRange == null -> SessionPrimary(
-                    text = "Vuelta hecha",
+                    text = stringResource(R.string.ses_lap_done),
                     onClick = { viewModel.completeSet("") },
                     dark = dark, tint = SessionTint.WORK
                 )
                 bodyweight -> SessionPrimary(
-                    text = if (esCalentamiento) "Aproximación hecha" else "Serie hecha",
+                    text = if (esCalentamiento) stringResource(R.string.ses_warmup_set_done) else stringResource(R.string.ses_set_done),
                     onClick = { viewModel.completeSet("", reps, esCalentamiento) },
                     dark = dark, tint = SessionTint.WORK
                 )
                 else -> SessionPrimary(
-                    text = if (esCalentamiento) "Aproximación hecha" else "Serie hecha",
+                    text = if (esCalentamiento) stringResource(R.string.ses_warmup_set_done) else stringResource(R.string.ses_set_done),
                     onClick = { viewModel.completeSet(weight, reps, esCalentamiento) },
                     dark = dark, tint = SessionTint.WORK
                 )
@@ -565,7 +568,7 @@ private fun WorkingContent(
         if (delPlan != exercise.name) {
             Spacer(Modifier.height(Space.x1))
             Text(
-                "En lugar de ${ExerciseImages.headlineName(delPlan)}",
+                stringResource(R.string.ses_instead_of, ExerciseImages.headlineName(delPlan)),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -574,8 +577,8 @@ private fun WorkingContent(
             Spacer(Modifier.height(Space.x1))
             Text(
                 if (siguienteDelGrupo != null)
-                    "SUPERSERIE · sin descanso, encadenas con ${ExerciseImages.headlineName(siguienteDelGrupo)}"
-                else "SUPERSERIE · al acabar esta, a descansar",
+                    stringResource(R.string.ses_superset_chain, ExerciseImages.headlineName(siguienteDelGrupo))
+                else stringResource(R.string.ses_superset_last),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -589,10 +592,9 @@ private fun WorkingContent(
             // Un plan propio puede traer ejercicios que no están en el catálogo: se dice con
             // palabras en vez de dejar un hueco.
             Spacer(Modifier.height(Space.x4))
-            SessionCard(label = "Sin ilustración", dark = dark) {
+            SessionCard(label = stringResource(R.string.ses_no_illustration), dark = dark) {
                 Text(
-                    "Este ejercicio no está en el catálogo de la app, así que no tengo " +
-                        "ilustración ni ficha. Te lo busco en el vídeo.",
+                    stringResource(R.string.ses_no_illustration_text),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -657,7 +659,7 @@ private fun RepsRow(value: String, onValue: (String) -> Unit, hint: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                "Repeticiones",
+                stringResource(R.string.ses_reps),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -726,7 +728,7 @@ private fun WeightBlock(
     val kg = parseKg(value)
 
     // Con repeticiones dentro, la tarjeta ya no habla solo de kilos.
-    SessionCard(label = if (reps != null) "Esta serie" else "Peso de esta serie", dark = dark) {
+    SessionCard(label = if (reps != null) stringResource(R.string.ses_this_set) else stringResource(R.string.ses_weight_this_set), dark = dark) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             StepperButton(
                 "−",
@@ -773,7 +775,7 @@ private fun WeightBlock(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)
             )
-            TextButton(onClick = { showWheel = true }) { Text("Rueda") }
+            TextButton(onClick = { showWheel = true }) { Text(stringResource(R.string.ses_wheel)) }
         }
         // Aproximar antes de la serie buena es normal y hasta ahora no había dónde apuntarlo:
         // o se contaba como serie de trabajo (y ensuciaba los kilos movidos y la progresión)
@@ -781,7 +783,7 @@ private fun WeightBlock(
         if (onWarmup != null) Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(checked = warmup, onCheckedChange = onWarmup)
             Text(
-                "Serie de calentamiento",
+                stringResource(R.string.ses_warmup_set),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.clickable { onWarmup(!warmup) }
@@ -806,7 +808,7 @@ private fun WeightBlock(
                     .padding(bottom = Space.block)
             ) {
                 Text(
-                    "Peso de esta serie",
+                    stringResource(R.string.ses_weight_this_set),
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(Modifier.height(Space.x3))
@@ -822,7 +824,7 @@ private fun WeightBlock(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = Touch.primary)
-                ) { Text("Hecho") }
+                ) { Text(stringResource(R.string.ses_done)) }
             }
         }
     }
@@ -830,7 +832,7 @@ private fun WeightBlock(
     if (typing) {
         AlertDialog(
             onDismissRequest = { typing = false },
-            title = { Text("Escribe el peso") },
+            title = { Text(stringResource(R.string.ses_type_weight)) },
             text = {
                 OutlinedTextField(
                     value = value,
@@ -840,7 +842,7 @@ private fun WeightBlock(
                     modifier = Modifier.fillMaxWidth()
                 )
             },
-            confirmButton = { TextButton(onClick = { typing = false }) { Text("Hecho") } }
+            confirmButton = { TextButton(onClick = { typing = false }) { Text(stringResource(R.string.ses_done)) } }
         )
     }
 }
@@ -867,20 +869,20 @@ private fun TimedSetContent(
     SessionShell(
         tint = SessionTint.WORK,
         dark = dark,
-        stateLabel = "Serie ${s.setNumber} de $totalSets · por tiempo",
+        stateLabel = stringResource(R.string.ses_set_of_timed, s.setNumber, totalSets),
         context = dayContext,
         onExit = onExit,
         secondaries = {
             SessionSecondary("−10 s", { viewModel.adjustTimedSet(-10) })
             SessionSecondary(
-                if (s.timedPaused) "Seguir" else "Pausa",
+                if (s.timedPaused) stringResource(R.string.ses_keep_going) else stringResource(R.string.ses_pause),
                 { if (s.timedPaused) viewModel.resumeTimedSet() else viewModel.pauseTimedSet() }
             )
             SessionSecondary("+10 s", { viewModel.adjustTimedSet(10) })
         },
         primary = {
             SessionPrimary(
-                text = "Serie hecha",
+                text = stringResource(R.string.ses_set_done),
                 onClick = { viewModel.completeSet("") },
                 dark = dark,
                 tint = SessionTint.WORK,
@@ -894,9 +896,9 @@ private fun TimedSetContent(
         Countdown(
             text = if (!done) formatSecs(remaining) else "+${formatSecs(-remaining)}",
             caption = when {
-                s.timedPaused -> "en pausa"
-                !done -> "aguanta"
-                else -> "¡tiempo!"
+                s.timedPaused -> stringResource(R.string.ses_paused)
+                !done -> stringResource(R.string.ses_hold)
+                else -> stringResource(R.string.ses_time_up)
             },
             captionColor = tintAccent(SessionTint.WARMUP)
         )
@@ -917,7 +919,7 @@ private fun TimedSetContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)
             )
-            TextButton(onClick = { showGuide = true }) { Text("Cómo se hace") }
+            TextButton(onClick = { showGuide = true }) { Text(stringResource(R.string.ses_how_to)) }
         }
     }
 
@@ -974,14 +976,14 @@ private fun RestingContent(
     SessionShell(
         tint = SessionTint.REST,
         dark = dark,
-        stateLabel = if (s.restBetweenExercises) "Descanso · cambio de máquina" else "Descanso",
+        stateLabel = if (s.restBetweenExercises) stringResource(R.string.ses_rest_change_machine) else stringResource(R.string.ses_rest),
         context = dayContext,
         onExit = onExit,
         secondaries = {
             SessionSecondary("−30 s", { viewModel.adjustRest(-30) })
             // "Plan" y no "Ejercicios": con el texto del sistema grande la palabra larga no
             // cabía en su tercio y se partía a media palabra ("Ejercicio/s").
-            SessionSecondary("Plan", { showDayPlan = true })
+            SessionSecondary(stringResource(R.string.ses_plan), { showDayPlan = true })
             SessionSecondary("+30 s", { viewModel.adjustRest(30) })
         },
         contextCard = {
@@ -990,15 +992,15 @@ private fun RestingContent(
             // no en numeros porque "RIR 2" no lo dice nadie en un gimnasio.
             val ultima = s.completedSets.lastOrNull()
             if (ultima != null && !ultima.warmup) {
-                SessionCard(label = "¿Cómo ha ido?", dark = dark) {
+                SessionCard(label = stringResource(R.string.ses_how_was_it), dark = dark) {
                     // "Fallo" y no "Al limite": con el texto del sistema al 150 % la etiqueta
                     // larga no cabia en su tercio y se quedaba en "Al". Ademas es la palabra
                     // que se usa en el gimnasio.
                     Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                         listOf(
-                            "Fácil" to "3",
-                            "Justo" to "1",
-                            "Fallo" to "0"
+                            stringResource(R.string.ses_effort_easy) to "3",
+                            stringResource(R.string.ses_effort_hard) to "1",
+                            stringResource(R.string.ses_effort_failure) to "0"
                         ).forEach { (etiqueta, valor) ->
                             FilterChip(
                                 selected = ultima.rir == valor,
@@ -1015,7 +1017,7 @@ private fun RestingContent(
             }
             if (nextExercise != null) {
                 SessionCard(
-                    label = if (nextIsNewExercise) "Después · deja la máquina lista" else "Después",
+                    label = if (nextIsNewExercise) stringResource(R.string.ses_next_setup) else stringResource(R.string.ses_next),
                     dark = dark
                 ) {
                     Text(
@@ -1026,13 +1028,13 @@ private fun RestingContent(
                     Spacer(Modifier.height(Space.x1))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "Serie $nextSetNumber de $nextTotalSets · ${nextExercise.scheme}",
+                            stringResource(R.string.ses_set_of_scheme, nextSetNumber, nextTotalSets, nextExercise.scheme),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f)
                         )
                         TextButton(onClick = { showNextGuide = true }) {
-                            Text(if (nextIsNewExercise) "Buscar la máquina" else "Repasar")
+                            Text(if (nextIsNewExercise) stringResource(R.string.ses_find_machine) else stringResource(R.string.ses_review))
                         }
                     }
                     if (!nextIsTimed && !nextIsBodyweight) {
@@ -1073,7 +1075,7 @@ private fun RestingContent(
         },
         primary = {
             SessionPrimary(
-                text = "Empezar ya",
+                text = stringResource(R.string.ses_start_now),
                 onClick = { viewModel.endRest() },
                 dark = dark,
                 tint = SessionTint.REST,
@@ -1132,7 +1134,7 @@ private fun RestingContent(
                 }
                 if (nextTargets != null && nextImageRes != null) {
                     TextButton(onClick = { verMusculos = !verMusculos }) {
-                        Text(if (verMusculos) "Ver el ejercicio" else "Ver los músculos")
+                        Text(if (verMusculos) stringResource(R.string.ses_see_exercise) else stringResource(R.string.ses_see_muscles))
                     }
                 }
             }
@@ -1140,20 +1142,20 @@ private fun RestingContent(
         // De dónde sale el descanso, en pocas palabras: tres minutos sin explicación parecen
         // un fallo de la cuenta atrás, y noventa segundos tras una serie de cinco, también.
         val motivo = when (s.restSource) {
-            RestDefaults.Source.YOURS.name -> " · el tuyo"
-            RestDefaults.Source.PLAN.name -> " · lo pide el plan"
-            RestDefaults.Source.HEAVY.name -> " · serie pesada"
+            RestDefaults.Source.YOURS.name -> " · " + stringResource(R.string.ses_rest_src_yours)
+            RestDefaults.Source.PLAN.name -> " · " + stringResource(R.string.ses_rest_src_plan)
+            RestDefaults.Source.HEAVY.name -> " · " + stringResource(R.string.ses_rest_src_heavy)
             else -> ""
         } + when (RestDefaults.forEffort(s.completedSets.lastOrNull()?.rir.orEmpty())) {
             // Lo que ha sumado «¿Cómo ha ido?»: si no se dice, el tiempo cambia sin motivo.
-            30 -> " · +30 s, justo"
-            60 -> " · +1 min, al fallo"
+            30 -> " · " + stringResource(R.string.ses_rest_plus_hard)
+            60 -> " · " + stringResource(R.string.ses_rest_plus_failure)
             else -> ""
         }
         Countdown(
             text = if (remaining >= 0) formatSecs(remaining) else "+${formatSecs(-remaining)}",
-            caption = if (remaining >= 0) "restante de ${formatSecs(s.restTargetSeconds)}$motivo"
-            else "de más · cuando quieras",
+            caption = if (remaining >= 0) stringResource(R.string.ses_rest_left_of, formatSecs(s.restTargetSeconds)) + motivo
+            else stringResource(R.string.ses_over_whenever),
             captionColor = tintAccent(SessionTint.REST)
         )
         Spacer(Modifier.height(Space.x4))
@@ -1205,10 +1207,10 @@ private fun RestingContent(
 private fun FreeLoggedCard(s: ActiveSession, dark: Boolean) {
     val apuntados = s.freeLog.filter { it.name.isNotBlank() && it.setsOrSingle.isNotEmpty() }
     if (apuntados.isEmpty()) return
-    SessionCard(label = "Apuntado · ${contar(apuntados.size, "ejercicio", "ejercicios")}", dark = dark) {
+    SessionCard(label = stringResource(R.string.ses_logged_label, pluralStringResource(R.plurals.ses_n_exercises, apuntados.size, apuntados.size)), dark = dark) {
         if (apuntados.size > 4) {
             Text(
-                "y ${contar(apuntados.size - 4, "anterior", "anteriores")}",
+                pluralStringResource(R.plurals.ses_and_n_earlier, apuntados.size - 4, apuntados.size - 4),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1224,7 +1226,7 @@ private fun FreeLoggedCard(s: ActiveSession, dark: Boolean) {
                 )
                 Spacer(Modifier.width(Space.x2))
                 Text(
-                    setsSummary(e.setsOrSingle),
+                    setsSummary(e.setsOrSingle, stringResource(R.string.mot_warmup_short)),
                     style = LocalAppTextStyles.current.tabular,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1246,13 +1248,14 @@ private fun FreeWarmupContent(
     val remaining = s.warmupTargetSeconds - s.warmupElapsed(now)
     val done = remaining <= 0
     // En un extra no hay día del plan que mirar: el calentamiento es el de cada uno.
-    val queCalentar = if (s.extra) "a tu manera" else day.template.warmup.ifBlank { "a tu manera" }
+    val tuManera = stringResource(R.string.ses_your_way)
+    val queCalentar = if (s.extra) tuManera else day.template.warmup.ifBlank { tuManera }
     SessionShell(
         tint = SessionTint.WARMUP,
         dark = dark,
-        stateLabel = "Calentamiento",
+        stateLabel = stringResource(R.string.ses_warmup),
         // Corto: con el texto grande, uno largo partía el estado («DESCANS/O»).
-        context = if (s.extra) "Extra" else "Día ${s.dayNumber}",
+        context = if (s.extra) stringResource(R.string.ses_extra) else stringResource(R.string.ses_day_n, s.dayNumber),
         onExit = onExit,
         secondaries = {
             SessionSecondary("−1 min", { viewModel.freeAdjustWarmup(-60) })
@@ -1260,7 +1263,7 @@ private fun FreeWarmupContent(
         },
         primary = {
             SessionPrimary(
-                text = "Ya he calentado",
+                text = stringResource(R.string.ses_warmed_up),
                 onClick = { viewModel.freeEndWarmup() },
                 dark = dark,
                 tint = SessionTint.WARMUP,
@@ -1269,15 +1272,14 @@ private fun FreeWarmupContent(
         }
     ) {
         Text(
-            "Haz tus series a tu aire. Al terminar cada una, pulsa «Serie terminada»: el " +
-                "descanso arranca solo y, mientras, apuntas qué era.",
+            stringResource(R.string.ses_free_intro),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(Space.block))
         Countdown(
             text = if (!done) formatSecs(remaining) else "+${formatSecs(-remaining)}",
-            caption = if (!done) "restante · calienta $queCalentar" else "de más · cuando quieras, empezamos",
+            caption = if (!done) stringResource(R.string.ses_warmup_left, queCalentar) else stringResource(R.string.ses_warmup_over),
             captionColor = tintAccent(SessionTint.WARMUP)
         )
     }
@@ -1300,21 +1302,21 @@ private fun FreeContent(
         tint = SessionTint.WORK,
         dark = dark,
         stateLabel = when {
-            actual != null -> "Serie ${hechas + 1}"
-            s.extra -> "Entreno extra"
-            else -> "Entreno libre"
+            actual != null -> stringResource(R.string.ses_set_n, hechas + 1)
+            s.extra -> stringResource(R.string.ses_extra_workout)
+            else -> stringResource(R.string.ses_free_workout)
         },
-        context = if (s.extra) "no cuenta día" else "Día ${s.dayNumber}",
+        context = if (s.extra) stringResource(R.string.ses_not_a_day) else stringResource(R.string.ses_day_n, s.dayNumber),
         onExit = onExit,
         contextCard = { FreeLoggedCard(s, dark) },
         secondaries = {
-            if (actual != null) SessionSecondary("Terminar ejercicio", { viewModel.freeFinishExercise() })
-            SessionSecondary("Apuntar o editar", onLog)
-            SessionSecondary("Finalizar", onFinish)
+            if (actual != null) SessionSecondary(stringResource(R.string.ses_finish_exercise), { viewModel.freeFinishExercise() })
+            SessionSecondary(stringResource(R.string.ses_log_or_edit), onLog)
+            SessionSecondary(stringResource(R.string.ses_finish), onFinish)
         },
         primary = {
             SessionPrimary(
-                text = "Serie terminada",
+                text = stringResource(R.string.ses_set_finished),
                 onClick = { viewModel.freeSetDone() },
                 dark = dark,
                 tint = SessionTint.WORK
@@ -1330,7 +1332,7 @@ private fun FreeContent(
             )
             actual.sets.lastOrNull()?.let { ultima ->
                 Text(
-                    "La anterior: " + setsSummary(listOf(ultima)),
+                    stringResource(R.string.ses_previous, setsSummary(listOf(ultima), stringResource(R.string.mot_warmup_short))),
                     style = MaterialTheme.typography.bodyLarge,
                     color = tintAccent(SessionTint.WORK)
                 )
@@ -1339,15 +1341,15 @@ private fun FreeContent(
         }
         Countdown(
             text = formatClock(now - s.startMillis),
-            caption = "entrenando",
+            caption = stringResource(R.string.ses_training),
             captionColor = tintAccent(SessionTint.WORK)
         )
         if (actual == null) {
             Spacer(Modifier.height(Space.x3))
             Text(
                 if (s.freeLog.none { it.name.isNotBlank() })
-                    "Haz tu primera serie. Al terminarla te pregunto qué ejercicio era."
-                else "Siguiente ejercicio: haz la serie y luego me dices cuál es.",
+                    stringResource(R.string.ses_free_first_set)
+                else stringResource(R.string.ses_free_next_exercise),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1404,29 +1406,29 @@ private fun FreeRestContent(
     }
 
     val porEsfuerzo = when (RestDefaults.forEffort(ultima?.rir.orEmpty())) {
-        30 -> " · +30 s, justo"
-        60 -> " · +1 min, al fallo"
+        30 -> " · " + stringResource(R.string.ses_rest_plus_hard)
+        60 -> " · " + stringResource(R.string.ses_rest_plus_failure)
         else -> ""
     }
     SessionShell(
         tint = SessionTint.REST,
         dark = dark,
-        stateLabel = if (s.restBetweenExercises) "Descanso · cambio de ejercicio" else "Descanso",
+        stateLabel = if (s.restBetweenExercises) stringResource(R.string.ses_rest_change_exercise) else stringResource(R.string.ses_rest),
         // Corto: con el texto grande, uno largo partía el estado («DESCANS/O»).
-        context = if (s.extra) "Extra" else "Día ${s.dayNumber}",
+        context = if (s.extra) stringResource(R.string.ses_extra) else stringResource(R.string.ses_day_n, s.dayNumber),
         onExit = onExit,
         secondaries = {
             SessionSecondary("−30 s", { viewModel.freeAdjustRest(-30) })
             if (actual != null && !s.restBetweenExercises) {
-                SessionSecondary("Terminar ejercicio", { viewModel.freeFinishExercise() })
+                SessionSecondary(stringResource(R.string.ses_finish_exercise), { viewModel.freeFinishExercise() })
             } else {
-                SessionSecondary("Apuntar o editar", onLog)
+                SessionSecondary(stringResource(R.string.ses_log_or_edit), onLog)
             }
             SessionSecondary("+30 s", { viewModel.freeAdjustRest(30) })
         },
         contextCard = {
             when {
-                sinNombre -> SessionCard(label = "¿Qué ejercicio era?", dark = dark) {
+                sinNombre -> SessionCard(label = stringResource(R.string.ses_which_exercise), dark = dark) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(Space.x2),
                         verticalArrangement = Arrangement.spacedBy(Space.x1)
@@ -1452,12 +1454,12 @@ private fun FreeRestContent(
                             }
                         }
                     }
-                    TextButton(onClick = { buscando = true }) { Text("Buscar otro…", maxLines = 1) }
+                    TextButton(onClick = { buscando = true }) { Text(stringResource(R.string.ses_search_other), maxLines = 1) }
                 }
                 actual != null && !s.restBetweenExercises -> {
-                    SessionCard(label = "¿Cómo ha ido?", dark = dark) {
+                    SessionCard(label = stringResource(R.string.ses_how_was_it), dark = dark) {
                         Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
-                            listOf("Fácil" to "3", "Justo" to "1", "Fallo" to "0").forEach { (etiqueta, valor) ->
+                            listOf(stringResource(R.string.ses_effort_easy) to "3", stringResource(R.string.ses_effort_hard) to "1", stringResource(R.string.ses_effort_failure) to "0").forEach { (etiqueta, valor) ->
                                 FilterChip(
                                     selected = ultima?.rir == valor,
                                     onClick = { viewModel.freeSetLastRir(if (ultima?.rir == valor) "" else valor) },
@@ -1469,13 +1471,13 @@ private fun FreeRestContent(
                     }
                     Spacer(Modifier.height(Space.x2))
                     val hint = when {
-                        (actual.sets.size) > 1 -> "Lo de la serie anterior: cámbialo si no fue así."
-                        weight.isNotBlank() || reps.isNotBlank() -> "Lo de la última vez: cámbialo si no fue así."
-                        else -> if (conTuPeso) "Apunta cuántas has hecho." else "Apunta lo que has movido."
+                        (actual.sets.size) > 1 -> stringResource(R.string.ses_hint_prev_set)
+                        weight.isNotBlank() || reps.isNotBlank() -> stringResource(R.string.ses_hint_last_time)
+                        else -> if (conTuPeso) stringResource(R.string.ses_hint_log_reps) else stringResource(R.string.ses_hint_log_weight)
                     }
                     if (conTuPeso) {
                         // Con tu peso no hay kilos que apuntar: solo las repeticiones.
-                        SessionCard(label = "Esta serie · peso corporal", dark = dark) {
+                        SessionCard(label = stringResource(R.string.ses_this_set_bodyweight), dark = dark) {
                             RepsRow(value = reps, onValue = { reps = it }, hint = hint)
                         }
                     } else {
@@ -1497,7 +1499,7 @@ private fun FreeRestContent(
                                 if (!conTuPeso) weight = ""
                                 viewModel.setBodyweight(actual.name, !conTuPeso)
                             },
-                            label = { Text("Peso corporal, sin kilos", maxLines = 2) }
+                            label = { Text(stringResource(R.string.ses_bodyweight_chip), maxLines = 2) }
                         )
                     }
                 }
@@ -1506,7 +1508,7 @@ private fun FreeRestContent(
         },
         primary = {
             SessionPrimary(
-                text = if (s.restBetweenExercises) "Siguiente ejercicio" else "Siguiente serie",
+                text = if (s.restBetweenExercises) stringResource(R.string.ses_next_exercise) else stringResource(R.string.ses_next_set),
                 onClick = { viewModel.freeEndRest() },
                 dark = dark,
                 tint = SessionTint.REST,
@@ -1523,14 +1525,14 @@ private fun FreeRestContent(
                     modifier = Modifier.weight(1f)
                 )
                 // Por si se eligió mal: se vuelve a preguntar.
-                TextButton(onClick = { buscando = true }) { Text("Cambiar", maxLines = 1) }
+                TextButton(onClick = { buscando = true }) { Text(stringResource(R.string.ses_change), maxLines = 1) }
             }
             Spacer(Modifier.height(Space.x2))
         }
         Countdown(
             text = if (remaining >= 0) formatSecs(remaining) else "+${formatSecs(-remaining)}",
-            caption = if (remaining >= 0) "restante de ${formatSecs(s.restTargetSeconds)}$porEsfuerzo"
-            else "de más · cuando quieras",
+            caption = if (remaining >= 0) stringResource(R.string.ses_rest_left_of, formatSecs(s.restTargetSeconds)) + porEsfuerzo
+            else stringResource(R.string.ses_over_whenever),
             captionColor = tintAccent(SessionTint.REST)
         )
         Spacer(Modifier.height(Space.x4))
@@ -1552,7 +1554,7 @@ private fun FreeRestContent(
                     .padding(start = 20.dp, end = 20.dp, bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(Space.x2)
             ) {
-                Text("¿Qué ejercicio era?", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.ses_which_exercise), style = MaterialTheme.typography.headlineSmall)
                 SwapSearch(currentName = actual?.name.orEmpty()) { nombre ->
                     viewModel.freeNameCurrent(nombre)
                     buscando = false
@@ -1587,9 +1589,10 @@ private fun FinishedContent(
         .filter { it.weight.isNotBlank() || it.reps.isNotBlank() }
         .groupBy { it.exerciseIndex }
         .map { (idx, seriesDelEjercicio) ->
-            val nombre = s.exerciseAt(idx)?.name ?: "Ejercicio"
+            val nombre = s.exerciseAt(idx)?.name ?: stringResource(R.string.ses_exercise)
             nombre to setsSummary(
-                seriesDelEjercicio.sortedBy { it.setNumber }.map { SetLog(it.weight, it.reps) }
+                seriesDelEjercicio.sortedBy { it.setNumber }.map { SetLog(it.weight, it.reps) },
+                stringResource(R.string.mot_warmup_short)
             )
         }
         .filter { it.second.isNotBlank() }
@@ -1597,12 +1600,12 @@ private fun FinishedContent(
     SessionShell(
         tint = SessionTint.NEUTRAL,
         dark = dark,
-        stateLabel = "Día ${s.dayNumber} completado",
+        stateLabel = stringResource(R.string.ses_day_completed, s.dayNumber),
         context = "",
         onExit = onExit,
         contextCard = {
             Text(
-                "Se guarda también en Google Health.",
+                stringResource(R.string.ses_saved_google_health),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = Space.x3)
@@ -1610,7 +1613,7 @@ private fun FinishedContent(
         },
         primary = {
             SessionPrimary(
-                text = "Guardar el día",
+                text = stringResource(R.string.ses_save_day),
                 onClick = onFinish,
                 dark = dark,
                 tint = SessionTint.NEUTRAL,
@@ -1626,15 +1629,15 @@ private fun FinishedContent(
             )
             Spacer(Modifier.height(Space.x4))
             Row(horizontalArrangement = Arrangement.spacedBy(Space.x3)) {
-                ResultTile("$minutes", "min", "duración", Modifier.weight(1f), dark)
-                ResultTile("$sets", "", "series", Modifier.weight(1f), dark)
+                ResultTile("$minutes", "min", stringResource(R.string.ses_tile_duration), Modifier.weight(1f), dark)
+                ResultTile("$sets", "", stringResource(R.string.ses_tile_sets), Modifier.weight(1f), dark)
             }
             Spacer(Modifier.height(Space.x3))
             Row(horizontalArrangement = Arrangement.spacedBy(Space.x3)) {
-                ResultTile(formatSecs(totalRest), "", "descanso total", Modifier.weight(1f), dark)
+                ResultTile(formatSecs(totalRest), "", stringResource(R.string.ses_tile_total_rest), Modifier.weight(1f), dark)
                 ResultTile(
                     formatSecs(if (sets > 0) totalRest / sets else 0), "",
-                    "media por serie", Modifier.weight(1f), dark
+                    stringResource(R.string.ses_tile_avg_per_set), Modifier.weight(1f), dark
                 )
             }
             // Las calorias se calculaban para mandarlas a Google Health y no se ensenaban en
@@ -1643,7 +1646,7 @@ private fun FinishedContent(
             val kcal = viewModel.estimatedKcal(((now - s.startMillis) / 1000).toInt())
             Spacer(Modifier.height(Space.x3))
             if (kcal != null) {
-                SessionCard(label = "Calorías", dark = dark) {
+                SessionCard(label = stringResource(R.string.ses_calories), dark = dark) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
                             "~$kcal",
@@ -1659,17 +1662,16 @@ private fun FinishedContent(
                     }
                     Text(
                         if (viewModel.usesWatch)
-                            "Estimadas por tu peso y el tiempo. Las de verdad las mide tu reloj: " +
-                                "míralas en Google Health."
-                        else "Estimadas por tu peso y el tiempo que ha durado, no medidas.",
+                            stringResource(R.string.ses_kcal_watch)
+                        else stringResource(R.string.ses_kcal_estimated),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
-                SessionCard(label = "Calorías", dark = dark) {
+                SessionCard(label = stringResource(R.string.ses_calories), dark = dark) {
                     Text(
-                        "Pon tu peso en Ajustes y las calcularé al acabar cada entreno.",
+                        stringResource(R.string.ses_kcal_no_weight),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1678,7 +1680,7 @@ private fun FinishedContent(
             if (weights.isNotEmpty()) {
                 Spacer(Modifier.height(Space.x3))
                 // Ya no son solo los pesos: cada ejercicio trae sus series con repeticiones.
-                SessionCard(label = "Series de hoy", dark = dark) {
+                SessionCard(label = stringResource(R.string.ses_todays_sets), dark = dark) {
                     // El nombre arriba y el desglose debajo, no en la misma línea: "10 · 12 ·
                     // 11 kg" al lado de "Curl de bíceps con mancuernas" no cabe, y menos con
                     // el texto del sistema al 150 %.
@@ -1765,6 +1767,7 @@ private fun StartPrompt(
     // Solo se ofrecen los tiempos que de verdad recortan algo.
     val opciones = listOf(45, 30).filter { estimatedMinutes != null && it < estimatedMinutes }
     val express = remember(minutos, day.number) { minutos?.let(expressFor) }
+    val warmupWord = stringResource(R.string.ses_warmup_word)
 
     Column(
         modifier = Modifier
@@ -1774,7 +1777,7 @@ private fun StartPrompt(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Día ${day.number}",
+            stringResource(R.string.ses_day_n, day.number),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -1786,11 +1789,15 @@ private fun StartPrompt(
         )
         Spacer(Modifier.height(Space.x2))
         Text(
-            contar(day.template.exercises.size, "ejercicio", "ejercicios") +
-                (estimatedMinutes?.let { " · unos $it min" } ?: "") +
+            pluralStringResource(R.plurals.ses_n_exercises, day.template.exercises.size, day.template.exercises.size) +
+                (estimatedMinutes?.let { " · " + stringResource(R.string.ses_about_min, it) } ?: "") +
                 // Hay planes que ya escriben «6 min de calentamiento»: no se repite la palabra.
+                // El texto del plan es contenido (en castellano): se mira también la palabra
+                // castellana aunque la app esté en inglés.
                 " · " + day.template.warmup.let {
-                    if (it.contains("calentamiento", ignoreCase = true)) it else "calentamiento: $it"
+                    if (it.contains("calentamiento", ignoreCase = true) ||
+                        it.contains(warmupWord, ignoreCase = true)
+                    ) it else stringResource(R.string.ses_warmup_colon, it)
                 },
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1799,7 +1806,7 @@ private fun StartPrompt(
         if (opciones.isNotEmpty()) {
             Spacer(Modifier.height(Space.block))
             Text(
-                "¿VAS JUSTO DE TIEMPO?",
+                stringResource(R.string.ses_short_on_time),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1808,7 +1815,7 @@ private fun StartPrompt(
                 FilterChip(
                     selected = minutos == null,
                     onClick = { minutos = null },
-                    label = { Text("Entero", maxLines = 1) }
+                    label = { Text(stringResource(R.string.ses_whole), maxLines = 1) }
                 )
                 opciones.forEach { m ->
                     FilterChip(
@@ -1832,7 +1839,7 @@ private fun StartPrompt(
         if (other != null) {
             Spacer(Modifier.height(Space.x3))
             Text(
-                "Tienes el día ${other.dayNumber} a medias: si empiezas este, aquel se descarta.",
+                stringResource(R.string.ses_other_day_pending, other.dayNumber),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error
             )
@@ -1844,7 +1851,7 @@ private fun StartPrompt(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = Touch.primary)
-        ) { Text(if (express != null) "Empezar exprés" else "Empezar entrenamiento") }
+        ) { Text(if (express != null) stringResource(R.string.ses_start_express) else stringResource(R.string.ses_start_workout)) }
         Spacer(Modifier.height(Space.x3))
         OutlinedButton(
             onClick = { showSpecialConfirm = true },
@@ -1857,31 +1864,29 @@ private fun StartPrompt(
             // Sin el "(con guía)": cabía en una sola línea solo a tamaño de texto normal, y
             // partida dejaba la estrella descolgada. Lo que es ya lo cuenta el diálogo, y así
             // se llama igual que en el reloj.
-            Text("Entrenamiento especial")
+            Text(stringResource(R.string.ses_special_workout))
         }
         Spacer(Modifier.height(Space.x2))
-        TextButton(onClick = onExit) { Text("Volver") }
+        TextButton(onClick = onExit) { Text(stringResource(R.string.ses_go_back)) }
     }
 
     if (showSpecialConfirm) {
         AlertDialog(
             onDismissRequest = { showSpecialConfirm = false },
             icon = { Icon(Icons.Filled.Star, contentDescription = null) },
-            title = { Text("¿Entrenamiento especial?") },
+            title = { Text(stringResource(R.string.ses_special_confirm_title)) },
             text = {
                 Text(
-                    "Este modo es para cuando entrenas guiado (p. ej. con tu tío). " +
-                        "No habrá series ni pesos: solo un cronómetro contando el tiempo hasta que " +
-                        "pulses \"Finalizar\". Se guardará como el entreno del día ${day.number}."
+                    stringResource(R.string.ses_special_confirm_text, day.number)
                 )
             },
             confirmButton = {
                 Button(onClick = { showSpecialConfirm = false; onStartSpecial() }) {
-                    Text("Sí, empezar especial")
+                    Text(stringResource(R.string.ses_special_confirm_yes))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showSpecialConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showSpecialConfirm = false }) { Text(stringResource(R.string.ses_cancel)) }
             }
         )
     }
@@ -1891,15 +1896,25 @@ private fun StartPrompt(
  * El exprés en una frase: qué se hace, qué se queda fuera y cuánto dura. Si se queda fuera
  * algo, se nombra: «te quito dos ejercicios» sin decir cuáles obliga a ir a mirarlo.
  */
+@Composable
 private fun describeExpress(day: TrainingDay, plan: ExpressPlan?, minutos: Int): String {
-    if (plan == null) return "Entero ya cabe en $minutos minutos."
+    if (plan == null) return stringResource(R.string.ses_express_fits, minutos)
     val total = day.template.exercises.size
     val hechos = plan.order.size
-    val cuantos = if (hechos == total) "Todos los ejercicios" else "$hechos de $total ejercicios"
+    val cuantos = if (hechos == total) stringResource(R.string.ses_express_all)
+    else pluralStringResource(R.plurals.ses_express_some, total, hechos, total)
     val fuera = if (plan.dropped.isEmpty()) "" else
-        " Se quedan fuera: " + plan.dropped.joinToString(", ") { ExerciseImages.headlineName(it) } + "."
-    return "$cuantos, a ${plan.maxSets} series y con ${plan.warmupSeconds / 60} min de calentamiento: " +
-        "unos ${(plan.estimatedSeconds + 59) / 60} min.$fuera"
+        " " + stringResource(
+            R.string.ses_express_left_out,
+            plan.dropped.joinToString(", ") { ExerciseImages.headlineName(it) }
+        )
+    return stringResource(
+        R.string.ses_express_summary,
+        cuantos,
+        pluralStringResource(R.plurals.ses_n_sets, plan.maxSets, plan.maxSets),
+        plan.warmupSeconds / 60,
+        (plan.estimatedSeconds + 59) / 60
+    ) + fuera
 }
 
 // ─── Utilidades ───────────────────────────────────────────────────────────────

@@ -2,6 +2,10 @@
 
 package com.marc.gymplan100.ui
 
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Phase
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.contar
-import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.TrainingDay
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -70,11 +73,11 @@ fun PhaseScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Fase ${phase.number}", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.plan_phase_n, phase.number), style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.plan_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -95,7 +98,7 @@ fun PhaseScreen(
         ) {
             item {
                 Text(
-                    "${phase.range.uppercase()} · ${phase.weeks.uppercase()}",
+                    phaseSpanText(phase).uppercase(),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -104,7 +107,7 @@ fun PhaseScreen(
                 Spacer(Modifier.height(Space.x3))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "$hechos de ${days.size} " + palabra(days.size, "día", "días"),
+                        pluralStringResource(R.plurals.plan_phase_done_of, days.size, hechos, days.size),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f)
@@ -112,7 +115,7 @@ fun PhaseScreen(
                     // El porcentaje, no un segundo "1/6": la misma lectura que en Inicio, y
                     // repetir la cifra al lado era decir lo mismo dos veces.
                     Text(
-                        "${(hechos * 100f / days.size).toInt()} %",
+                        stringResource(R.string.plan_percent, (hechos * 100f / days.size).toInt()),
                         style = LocalAppTextStyles.current.tabular,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -139,12 +142,12 @@ fun PhaseScreen(
                 }
             }
 
-            item { PhaseSection("OBJETIVO", phase.description) }
-            item { PhaseSection("PROGRESIÓN", phase.progression) }
+            item { PhaseSection(stringResource(R.string.plan_phase_goal), phase.description) }
+            item { PhaseSection(stringResource(R.string.plan_phase_progression), phase.progression) }
 
             item {
                 Text(
-                    "DÍAS",
+                    stringResource(R.string.plan_phase_days),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = Space.x2)
@@ -162,6 +165,27 @@ fun PhaseScreen(
             }
         }
     }
+}
+
+/**
+ * "Días 21 al 50 · Semanas 5-10" de una fase, en el idioma de la app.
+ *
+ * Se calcula con los números del plan activo y no con [Phase.range]/[Phase.weeks], que son
+ * texto fijo en castellano (los del plan de serie y los que pone el lector de planes).
+ */
+@Composable
+fun phaseSpanText(phase: Phase): String {
+    val days = PlanData.daysOfPhase(phase.number)
+    if (days.isEmpty()) return "${phase.range} · ${phase.weeks}"
+    val first = days.first().number
+    val last = days.last().number
+    val firstWeek = PlanData.phases.filter { it.number < phase.number }.sumOf { it.weeksCount } + 1
+    val lastWeek = firstWeek + phase.weeksCount - 1
+    val range = if (first == last) stringResource(R.string.plan_phase_span_day, first)
+    else stringResource(R.string.plan_phase_span_days, first, last)
+    val weeks = if (firstWeek >= lastWeek) stringResource(R.string.plan_phase_span_week, firstWeek)
+    else stringResource(R.string.plan_phase_span_weeks, firstWeek, lastWeek)
+    return "$range · $weeks"
 }
 
 /** Objetivo y progresión: versalitas y texto, sin tarjeta de color. */
@@ -228,7 +252,7 @@ private fun DayRow(
                 if (completed) {
                     Icon(
                         Icons.Filled.Check,
-                        contentDescription = "Día hecho",
+                        contentDescription = stringResource(R.string.plan_day_done),
                         tint = Color.White,
                         modifier = Modifier.size(22.dp)
                     )
@@ -247,16 +271,16 @@ private fun DayRow(
                 // de la fila se le comía el subtítulo en cuanto el texto del sistema crecía.
                 if (isNext && !completed) {
                     Text(
-                        "HOY TOCA",
+                        stringResource(R.string.plan_up_today),
                         style = MaterialTheme.typography.labelMedium,
                         color = app.work
                     )
                     Spacer(Modifier.height(2.dp))
                 }
-                Text("Día ${day.number}", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.plan_day_n, day.number), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "${day.template.title} · semana $week",
+                    stringResource(R.string.plan_day_title_week, day.template.title, week),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

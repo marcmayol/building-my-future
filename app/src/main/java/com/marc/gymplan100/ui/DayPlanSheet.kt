@@ -2,6 +2,9 @@
 
 package com.marc.gymplan100.ui
 
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,15 +75,15 @@ fun DayPlanSheet(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                "DÍA ${day.number} · ${day.template.title.uppercase()}",
+                stringResource(R.string.plan_sheet_overline, day.number, day.template.title.uppercase()),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Text("Plan de hoy", style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.plan_sheet_title), style = MaterialTheme.typography.headlineMedium)
 
             if (day.template.warmup.isNotBlank()) {
                 Text(
-                    "Calentamiento · ${day.template.warmup}",
+                    stringResource(R.string.plan_sheet_warmup, day.template.warmup),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -121,14 +124,14 @@ fun DayPlanSheet(
             if (day.template.cooldown.isNotBlank()) {
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "Vuelta a la calma · ${day.template.cooldown}",
+                    stringResource(R.string.plan_sheet_cooldown, day.template.cooldown),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Text(
-                "Toca un ejercicio para ver cómo se hace",
+                stringResource(R.string.plan_sheet_hint),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -199,19 +202,19 @@ private fun PlanRow(
                 when {
                     isCurrent -> Icon(
                         Icons.Filled.PlayArrow,
-                        contentDescription = "En curso",
+                        contentDescription = stringResource(R.string.plan_sheet_current),
                         tint = bubbleContent,
                         modifier = Modifier.size(16.dp)
                     )
                     isSkipped -> Icon(
                         Icons.Filled.Close,
-                        contentDescription = "Saltado",
+                        contentDescription = stringResource(R.string.plan_sheet_skipped),
                         tint = bubbleContent,
                         modifier = Modifier.size(16.dp)
                     )
                     isDone -> Icon(
                         Icons.Filled.Check,
-                        contentDescription = "Hecho",
+                        contentDescription = stringResource(R.string.plan_done),
                         tint = bubbleContent,
                         modifier = Modifier.size(16.dp)
                     )
@@ -233,15 +236,18 @@ private fun PlanRow(
                 else MaterialTheme.colorScheme.onSurface
             )
             Text(
-                if (isSkipped) "Saltado hoy  ·  $doneSets/$totalSets series"
-                else "${exercise.scheme}  ·  $doneSets/$totalSets series",
+                if (isSkipped) {
+                    pluralStringResource(R.plurals.plan_sheet_sets_skipped, totalSets, doneSets, totalSets)
+                } else {
+                    pluralStringResource(R.plurals.plan_sheet_sets, totalSets, exercise.scheme, doneSets, totalSets)
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = if (isCurrent) accent else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Icon(
             Icons.Filled.Info,
-            contentDescription = "Cómo se hace",
+            contentDescription = stringResource(R.string.plan_sheet_how),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp)
         )

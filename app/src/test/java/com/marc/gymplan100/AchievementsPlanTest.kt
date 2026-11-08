@@ -60,13 +60,14 @@ class AchievementsPlanTest {
 
     @Test fun `las fases mantienen su nombre en los logros`() {
         PlanData.setActive(BuiltinPlan.plan)
-        val titulos = Achievements.all.filter { it.id.startsWith("phase") }.map { it.title }
+        // El texto («Adaptación superada») lo pone la interfaz; aquí se comprueba el nombre.
+        val titulos = Achievements.all.filter { it.id.startsWith("phase") }.map { it.phaseName }
         assertEquals(
             listOf(
-                "Adaptación superada",
-                "Construcción superada",
-                "Progresión superada",
-                "Consolidación superada"
+                "Adaptación",
+                "Construcción",
+                "Progresión",
+                "Consolidación"
             ),
             titulos
         )
@@ -100,8 +101,9 @@ class AchievementsPlanTest {
 
     @Test fun `el mensaje del final habla de los dias que dura el plan`() {
         activarPlanDe(20)
-        assertTrue(Motivation.message(20).contains("20 días"))
-        assertTrue(Motivation.message(5).contains("cuarto"))
+        // Motivation da claves; la frase («… 20 días …») la pone la interfaz con el total.
+        assertEquals(Motivation.FINAL, Motivation.message(20))
+        assertEquals(Motivation.QUARTER, Motivation.message(5))
     }
 
     @Test fun `los logros nuevos son solo los que acaban de caer`() {

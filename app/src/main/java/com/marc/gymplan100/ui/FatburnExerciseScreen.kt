@@ -36,6 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
@@ -69,7 +72,7 @@ fun FatburnExerciseScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.ses_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -93,7 +96,7 @@ fun FatburnExerciseScreen(
                     // El aviso de calentar usa el amarillo del calentamiento de la sesión.
                     val app = LocalAppColors.current
                     Text(
-                        "Calienta al menos ${exercise.calentamiento_obligatorio_min} min antes.",
+                        stringResource(R.string.ses_fatburn_warmup, exercise.calentamiento_obligatorio_min),
                         style = MaterialTheme.typography.bodyLarge,
                         color = app.warmup,
                         modifier = Modifier
@@ -107,7 +110,7 @@ fun FatburnExerciseScreen(
 
             item {
                 Text(
-                    "ELIGE PROTOCOLO",
+                    stringResource(R.string.ses_fatburn_pick_protocol),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = Space.x2)
@@ -126,7 +129,7 @@ fun FatburnExerciseScreen(
                 item {
                     Column(modifier = Modifier.padding(top = Space.x2)) {
                         Text(
-                            "PROGRESIONES",
+                            stringResource(R.string.ses_fatburn_progressions),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -142,7 +145,7 @@ fun FatburnExerciseScreen(
                 item {
                     Column(modifier = Modifier.padding(top = Space.x2)) {
                         Text(
-                            "TÉCNICA",
+                            stringResource(R.string.ses_fatburn_technique),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -170,7 +173,7 @@ fun FatburnExerciseScreen(
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Spacer(Modifier.width(Space.x2))
-                    Text("Empezar")
+                    Text(stringResource(R.string.ses_start))
                 }
             }
         }
@@ -234,15 +237,16 @@ private fun ProtocolRow(
 }
 
 /** Resumen legible del protocolo para la tarjeta de selección. */
+@Composable
 fun protocolSummary(p: Protocolo): String = when {
     p.esIntervalos -> {
         val trabajo = if (p.trabajo_seg > 0) "${p.trabajo_seg}s"
         else "${p.trabajo_seg_min}-${p.trabajo_seg_max}s"
         val descanso = if (p.descanso_seg > 0) "${p.descanso_seg}s"
         else "${p.descanso_seg_min}-${p.descanso_seg_max}s"
-        "$trabajo trabajo · $descanso descanso · ${p.numRondas} rondas"
+        pluralStringResource(R.plurals.ses_protocol_intervals, p.numRondas, trabajo, descanso, p.numRondas)
     }
-    p.esSeries -> "${p.numSeries} series · ${p.repsLabel} reps"
-    p.esTiempoUnico -> "Aguanta ${p.duracion_inicial_seg}s (progresa cada semana)"
-    else -> p.repsLabel.ifBlank { "Protocolo" }
+    p.esSeries -> pluralStringResource(R.plurals.ses_protocol_sets, p.numSeries, p.numSeries, p.repsLabel)
+    p.esTiempoUnico -> stringResource(R.string.ses_protocol_hold, p.duracion_inicial_seg)
+    else -> p.repsLabel.ifBlank { stringResource(R.string.ses_protocol) }
 }

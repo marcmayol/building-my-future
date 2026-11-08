@@ -1,5 +1,7 @@
 package com.marc.gymplan100.data
 
+import androidx.annotation.StringRes
+import com.marc.gymplan100.R
 import java.text.Normalizer
 
 /**
@@ -14,17 +16,20 @@ import java.text.Normalizer
  * Un solo grupo por ejercicio, el del músculo que manda: un press de banca también mueve
  * tríceps, pero nadie lo buscaría ahí.
  */
-enum class ExerciseGroup(val label: String) {
-    PECHO("Pecho"),
-    ESPALDA("Espalda"),
-    HOMBROS("Hombros"),
-    BICEPS("Bíceps"),
-    TRICEPS("Tríceps"),
-    PIERNA("Pierna"),
-    CORE("Core"),
-    CARDIO("Cardio"),
-    MOVILIDAD("Movilidad"),
-    OTROS("Otros")
+enum class ExerciseGroup(
+    @Deprecated("usa labelRes") val label: String,
+    @StringRes val labelRes: Int
+) {
+    PECHO("Pecho", R.string.est_grupo_pecho),
+    ESPALDA("Espalda", R.string.est_grupo_espalda),
+    HOMBROS("Hombros", R.string.est_grupo_hombros),
+    BICEPS("Bíceps", R.string.est_grupo_biceps),
+    TRICEPS("Tríceps", R.string.est_grupo_triceps),
+    PIERNA("Pierna", R.string.est_grupo_pierna),
+    CORE("Core", R.string.est_grupo_core),
+    CARDIO("Cardio", R.string.est_grupo_cardio),
+    MOVILIDAD("Movilidad", R.string.est_grupo_movilidad),
+    OTROS("Otros", R.string.est_grupo_otros)
 }
 
 object ExerciseGroups {

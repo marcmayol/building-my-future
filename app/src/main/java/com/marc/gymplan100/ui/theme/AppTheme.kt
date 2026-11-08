@@ -1,17 +1,19 @@
 package com.marc.gymplan100.ui.theme
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.marc.gymplan100.R
 
-/** Claro, oscuro, o lo que diga el móvil. */
-enum class ThemeMode(val id: String, val label: String) {
-    SISTEMA("sistema", "El del móvil"),
-    CLARO("claro", "Claro"),
-    OSCURO("oscuro", "Oscuro");
+/** Claro, oscuro, o lo que diga el móvil. La etiqueta es un recurso: la resuelve la pantalla. */
+enum class ThemeMode(val id: String, @StringRes val label: Int) {
+    SISTEMA("sistema", R.string.ini_theme_system),
+    CLARO("claro", R.string.ini_theme_light),
+    OSCURO("oscuro", R.string.ini_theme_dark);
 
     companion object {
         fun from(id: String?): ThemeMode = entries.firstOrNull { it.id == id } ?: SISTEMA

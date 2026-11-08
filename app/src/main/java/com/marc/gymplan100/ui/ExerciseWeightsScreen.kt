@@ -47,6 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.R
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.data.ExerciseGroup
 import com.marc.gymplan100.data.ExerciseGroups
 import com.marc.gymplan100.data.MyExercises
@@ -95,7 +98,7 @@ fun ExerciseWeightsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Mis pesos", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.est_mis_pesos), style = MaterialTheme.typography.headlineSmall)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
@@ -117,8 +120,7 @@ fun ExerciseWeightsScreen(
         ) {
             item {
                 Text(
-                    "Se actualiza solo cuando registras peso en una sesión, y puedes editarlo " +
-                        "aquí. Así no tienes que acordarte de qué peso usabas.",
+                    stringResource(R.string.est_mis_pesos_intro),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -142,9 +144,7 @@ fun ExerciseWeightsScreen(
                     // El campo NO es el PR: se pisa en cada sesión, también el día que bajas
                     // carga. Llamarlo récord mentiría justo ese día, así que el récord va aparte.
                     Text(
-                        "Aquí se guarda el peso MÁS ALTO de tu última sesión, el que te toca " +
-                            "usar: si hoy hiciste 10, 12 y 11 kg, verás 12. Tu PR (peso récord, " +
-                            "lo máximo que has movido nunca) sale debajo de cada ejercicio.",
+                        stringResource(R.string.est_mis_pesos_aviso),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -156,7 +156,7 @@ fun ExerciseWeightsScreen(
                 val abierto = grupo.name in abiertos
                 item(key = "grupo-${grupo.name}") {
                     GroupHeader(
-                        label = grupo.label,
+                        label = stringResource(grupo.labelRes),
                         count = nombres.size,
                         open = abierto,
                         onClick = { alternar(grupo) }
@@ -181,6 +181,11 @@ fun ExerciseWeightsScreen(
 @Composable
 private fun GroupHeader(label: String, count: Int, open: Boolean, onClick: () -> Unit) {
     val giro by animateFloatAsState(if (open) 180f else 0f, label = "flecha")
+    val descripcion = stringResource(
+        if (open) R.string.est_grupo_abierto else R.string.est_grupo_cerrado,
+        label,
+        pluralStringResource(R.plurals.est_n_ejercicios, count, count)
+    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,7 +193,7 @@ private fun GroupHeader(label: String, count: Int, open: Boolean, onClick: () ->
             .clip(MaterialTheme.shapes.medium)
             .clickable(onClick = onClick)
             .semantics {
-                contentDescription = "$label, $count ejercicios, " + if (open) "abierto" else "cerrado"
+                contentDescription = descripcion
             }
             .padding(horizontal = Space.x2, vertical = Space.x2),
         verticalAlignment = Alignment.CenterVertically
@@ -240,7 +245,7 @@ private fun ExerciseWeightRow(
                 Text(name, style = MaterialTheme.typography.titleMedium)
                 if (pr != null && pr > 0f) {
                     Text(
-                        "PR ${formatPr(pr)} kg",
+                        stringResource(R.string.est_pr_kg, formatPr(pr)),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary

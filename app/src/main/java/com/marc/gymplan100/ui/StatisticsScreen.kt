@@ -50,11 +50,14 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.R
+import com.marc.gymplan100.ui.theme.AppLanguage
 import androidx.compose.foundation.Canvas
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
-import com.marc.gymplan100.data.contar
-import com.marc.gymplan100.data.palabra
 import com.marc.gymplan100.data.SessionRecord
 import com.marc.gymplan100.data.MuscleLoad
 import com.marc.gymplan100.data.Statistics
@@ -89,7 +92,7 @@ fun StatisticsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Estadísticas") },
+                title = { Text(stringResource(R.string.est_titulo)) },
             )
         }
     ) { inner ->
@@ -113,7 +116,7 @@ fun StatisticsScreen(
             if (empty) {
                 item {
                     Text(
-                        "Esto se llena con el primer entreno. No hay nada que configurar.",
+                        stringResource(R.string.est_vacio),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -131,7 +134,12 @@ fun StatisticsScreen(
                     edgePadding = 0.dp,
                     divider = {}
                 ) {
-                    listOf("Resumen", "Pesos", "Músculos", "Constancia").forEachIndexed { i, label ->
+                    listOf(
+                        stringResource(R.string.est_tab_resumen),
+                        stringResource(R.string.est_tab_pesos),
+                        stringResource(R.string.est_tab_musculos),
+                        stringResource(R.string.est_tab_constancia)
+                    ).forEachIndexed { i, label ->
                         Tab(
                             selected = tab == i,
                             onClick = { tab = i },
@@ -188,7 +196,7 @@ private fun StreakHero(s: Statistics.Summary, empty: Boolean) {
             )
             .padding(Space.screen)
     ) {
-        Text("RACHA ACTUAL", style = MaterialTheme.typography.labelMedium, color = onHero)
+        Text(stringResource(R.string.est_racha_actual), style = MaterialTheme.typography.labelMedium, color = onHero)
         Spacer(Modifier.height(Space.x2))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
@@ -198,7 +206,7 @@ private fun StreakHero(s: Statistics.Summary, empty: Boolean) {
             )
             Spacer(Modifier.width(Space.x3))
             Text(
-                if (s.currentStreak == 1) "día seguido" else "días seguidos",
+                pluralStringResource(R.plurals.est_dias_seguidos, s.currentStreak),
                 style = MaterialTheme.typography.titleLarge,
                 color = onHero,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -209,10 +217,13 @@ private fun StreakHero(s: Statistics.Summary, empty: Boolean) {
             Text(
                 when {
                     s.bestStreak > s.currentStreak ->
-                        "Tu mejor racha son ${s.bestStreak}. Te faltan " +
-                            "${s.bestStreak - s.currentStreak}."
-                    s.currentStreak > 0 -> "Es tu mejor racha hasta hoy."
-                    else -> "Empieza una nueva hoy mismo."
+                        stringResource(
+                            R.string.est_racha_mejor,
+                            s.bestStreak,
+                            s.bestStreak - s.currentStreak
+                        )
+                    s.currentStreak > 0 -> stringResource(R.string.est_racha_es_la_mejor)
+                    else -> stringResource(R.string.est_racha_empieza)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = onHero
@@ -225,10 +236,9 @@ private fun StreakHero(s: Statistics.Summary, empty: Boolean) {
 @Composable
 private fun WeeklySection(weeks: List<Statistics.WeekCount>) {
     Column {
-        SectionTitle("Entrenos por semana")
+        SectionTitle(stringResource(R.string.est_entrenos_semana))
         Text(
-            "Cada barra es una semana de lunes a domingo, de la más antigua a la de hoy. " +
-                "Debajo, el lunes con el que empieza.",
+            stringResource(R.string.est_entrenos_semana_explicacion),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -247,12 +257,13 @@ private fun SummarySection(s: Statistics.Summary, volume: Float) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatTile(
                 value = "${s.completedDays}/${s.totalDays}",
-                label = "días · ${s.percent}%",
+                label = stringResource(R.string.est_dias_porcentaje, s.percent),
                 modifier = Modifier.weight(1f)
             )
             StatTile(
                 value = "${s.totalWorkouts}",
-                label = if (s.extraWorkouts > 0) "entrenos · ${s.extraWorkouts} extra" else "entrenos",
+                label = if (s.extraWorkouts > 0) stringResource(R.string.est_entrenos_extra, s.extraWorkouts)
+                else stringResource(R.string.est_entrenos),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -260,12 +271,12 @@ private fun SummarySection(s: Statistics.Summary, volume: Float) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatTile(
                 value = formatDurationLong(s.totalTrainingSeconds),
-                label = "tiempo total",
+                label = stringResource(R.string.est_tiempo_total),
                 modifier = Modifier.weight(1f)
             )
             StatTile(
                 value = "${s.totalSets}",
-                label = "series totales",
+                label = stringResource(R.string.est_series_totales),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -275,8 +286,8 @@ private fun SummarySection(s: Statistics.Summary, volume: Float) {
         if (volume > 0f) {
             Spacer(Modifier.height(12.dp))
             StatTile(
-                value = fmtVolume(volume),
-                label = "kilos movidos · peso × repeticiones de cada serie",
+                value = fmtVolume(volume, AppLanguage.locale(LocalContext.current)),
+                label = stringResource(R.string.est_kilos_movidos),
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -323,11 +334,11 @@ private fun ProgressionSection(
     oneRm: Map<String, List<Statistics.WeightPoint>>
 ) {
     Column {
-        SectionTitle("Progresión")
+        SectionTitle(stringResource(R.string.est_progresion))
         Spacer(Modifier.height(4.dp))
         if (progression.isEmpty()) {
             Text(
-                "Registra el peso de tus series para ver aquí cómo evoluciona en cada ejercicio.",
+                stringResource(R.string.est_progresion_vacia),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -389,7 +400,7 @@ private fun ProgressionSection(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            if (verFuerza) "fuerza estimada" else "peso actual",
+                            if (verFuerza) stringResource(R.string.est_fuerza_estimada) else stringResource(R.string.est_peso_actual),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -398,7 +409,7 @@ private fun ProgressionSection(
                         val delta = last - first
                         val sign = if (delta >= 0) "+" else ""
                         Text(
-                            "$sign${fmtWeight(delta)} kg desde el inicio",
+                            stringResource(R.string.est_desde_el_inicio, "$sign${fmtWeight(delta)}"),
                             style = MaterialTheme.typography.labelMedium,
                             color = if (delta >= 0) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.onSurfaceVariant
@@ -409,11 +420,9 @@ private fun ProgressionSection(
                 WeightChart(points)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    buildString {
-                        append("${points.size} ${if (points.size == 1) "registro" else "registros"}")
-                        if (max != null) append(" · máx ${fmtWeight(max)} kg")
-                        points.firstOrNull()?.let { append(" · desde el día ${it.day}") }
-                    },
+                    pluralStringResource(R.plurals.est_registros, points.size, points.size) +
+                        (if (max != null) stringResource(R.string.est_maximo, fmtWeight(max)) else "") +
+                        (points.firstOrNull()?.let { stringResource(R.string.est_desde_el_dia, it.day) } ?: ""),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -421,14 +430,13 @@ private fun ProgressionSection(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         if (verFuerza)
-                            "La fuerza estimada compara días con esquemas distintos: 40 kg × 12 " +
-                                "y 50 kg × 5 son casi el mismo esfuerzo aunque los kilos digan otra cosa."
-                        else "Los kilos solos engañan cuando cambian las repeticiones.",
+                            stringResource(R.string.est_fuerza_explicacion)
+                        else stringResource(R.string.est_kilos_enganan),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     TextButton(onClick = { quiereFuerza = !verFuerza }) {
-                        Text(if (verFuerza) "Ver los kilos" else "Ver la fuerza estimada")
+                        Text(if (verFuerza) stringResource(R.string.est_ver_kilos) else stringResource(R.string.est_ver_fuerza))
                     }
                 }
             }
@@ -504,19 +512,18 @@ private fun ConsistencySection(
         val thisWeek = Statistics.workoutsBetween(history, Statistics.weekStart(today), today)
         val thisMonth = Statistics.workoutsBetween(history, today.withDayOfMonth(1), today)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatTile("$thisWeek", "esta semana", Modifier.weight(1f))
-            StatTile("$thisMonth", "este mes", Modifier.weight(1f))
+            StatTile("$thisWeek", stringResource(R.string.est_esta_semana), Modifier.weight(1f))
+            StatTile("$thisMonth", stringResource(R.string.est_este_mes), Modifier.weight(1f))
         }
 
         Spacer(Modifier.height(20.dp))
         Text(
-            "Últimas semanas",
+            stringResource(R.string.est_ultimas_semanas),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold
         )
         Text(
-            "Cada columna es una semana y cada fila un día, con el lunes arriba y el " +
-                "domingo abajo.",
+            stringResource(R.string.est_heatmap_explicacion),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -574,7 +581,8 @@ private fun WeeklyBars(weeks: List<Statistics.WeekCount>) {
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    if (esLaActual) "Esta" else "${wc.weekStart.dayOfMonth}/${wc.weekStart.monthValue}",
+                    if (esLaActual) stringResource(R.string.est_semana_esta)
+                    else stringResource(R.string.est_semana_fecha, wc.weekStart.dayOfMonth, wc.weekStart.monthValue),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = if (esLaActual) FontWeight.Bold else FontWeight.Normal,
                     color = if (esLaActual) MaterialTheme.colorScheme.primary
@@ -627,7 +635,7 @@ private fun Heatmap(trained: Set<LocalDate>, weeks: Int = 13) {
                 .background(on)
         )
         Text(
-            "  día entrenado",
+            "  " + stringResource(R.string.est_dia_entrenado),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -647,19 +655,18 @@ private fun Heatmap(trained: Set<LocalDate>, weeks: Int = 13) {
 @Composable
 private fun MuscleLoadSection(loads: List<MuscleLoad.GroupLoad>) {
     Column {
-        SectionTitle("Lo que has trabajado")
+        SectionTitle(stringResource(R.string.est_lo_trabajado))
         Spacer(Modifier.height(4.dp))
         if (loads.isEmpty()) {
             Text(
-                "Aquí se pinta lo que se ha llevado cada músculo en los últimos siete días. " +
-                    "Con el primer entreno de la semana aparece.",
+                stringResource(R.string.est_musculos_vacio),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             return
         }
         Text(
-            "Últimos 7 días · series por músculo",
+            stringResource(R.string.est_ultimos_7_dias),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -690,14 +697,14 @@ private fun MuscleLoadSection(loads: List<MuscleLoad.GroupLoad>) {
                 )
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        "Frente",
+                        stringResource(R.string.est_frente),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        "Espalda",
+                        stringResource(R.string.est_espalda_vista),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelMedium,
@@ -714,7 +721,7 @@ private fun MuscleLoadSection(loads: List<MuscleLoad.GroupLoad>) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            MuscleLoad.label(carga.group),
+                            MuscleLoad.labelRes(carga.group)?.let { stringResource(it) } ?: carga.group.replace('-', ' '),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(0.9f)
                         )
@@ -734,7 +741,7 @@ private fun MuscleLoadSection(loads: List<MuscleLoad.GroupLoad>) {
                             )
                         }
                         Text(
-                            MuscleLoad.formatSets(carga.sets),
+                            MuscleLoad.formatSets(carga.sets, AppLanguage.locale(LocalContext.current)),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.End,
@@ -751,7 +758,7 @@ private fun MuscleLoadSection(loads: List<MuscleLoad.GroupLoad>) {
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Media serie cuando el músculo solo ayuda.",
+                    stringResource(R.string.est_media_serie),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -769,7 +776,7 @@ private fun RecordsSection(
     productive: SessionRecord?
 ) {
     Column {
-        SectionTitle("Tus PR · récords personales")
+        SectionTitle(stringResource(R.string.est_tus_pr))
         Spacer(Modifier.height(10.dp))
 
         if (records.isNotEmpty()) {
@@ -780,7 +787,7 @@ private fun RecordsSection(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Peso máximo por ejercicio",
+                        stringResource(R.string.est_peso_maximo),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -806,7 +813,7 @@ private fun RecordsSection(
                             )
                             Spacer(Modifier.width(10.dp))
                             Text(
-                                "día ${r.day}",
+                                stringResource(R.string.est_dia_n, r.day),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -823,15 +830,15 @@ private fun RecordsSection(
                     RecordTile(
                         emoji = "⏱️",
                         value = formatDurationLong(it.durationSeconds.toLong()),
-                        label = "sesión más larga · día ${it.dayNumber}",
+                        label = stringResource(R.string.est_sesion_mas_larga, it.dayNumber),
                         modifier = Modifier.weight(1f)
                     )
                 }
                 productive?.let {
                     RecordTile(
                         emoji = "💪",
-                        value = contar(it.totalSets, "serie", "series"),
-                        label = "sesión más productiva · día ${it.dayNumber}",
+                        value = pluralStringResource(R.plurals.est_series, it.totalSets, it.totalSets),
+                        label = stringResource(R.string.est_sesion_mas_productiva, it.dayNumber),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -878,11 +885,10 @@ private fun SectionTitle(text: String) {
 
 /** Formatea un peso: entero si es redondo (50), con un decimal si no (52.5). */
 /** 12480,0 -> "12.480 kg"; por debajo del millar, sin separador. */
-private fun fmtVolume(kg: Float): String {
+private fun fmtVolume(kg: Float, locale: java.util.Locale): String {
     val entero = kg.toLong()
-    val texto = if (entero >= 1000) {
-        entero.toString().reversed().chunked(3).joinToString(".").reversed()
-    } else entero.toString()
+    // Separador de millares del idioma en uso: «12.480» en español, «12,480» en inglés.
+    val texto = if (entero >= 1000) String.format(locale, "%,d", entero) else entero.toString()
     return "$texto kg"
 }
 

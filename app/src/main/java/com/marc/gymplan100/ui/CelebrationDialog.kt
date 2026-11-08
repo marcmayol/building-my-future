@@ -19,11 +19,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.marc.gymplan100.R
 import com.marc.gymplan100.data.Achievement
 import com.marc.gymplan100.data.Celebration
+import com.marc.gymplan100.data.Motivation
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.Space
@@ -52,13 +56,13 @@ fun CelebrationDialog(
             Text("🎉", style = MaterialTheme.typography.displayMedium)
             Spacer(Modifier.height(Space.x2))
             Text(
-                "¡Día ${celebration.dayNumber} completado!",
+                stringResource(R.string.ayu_celeb_dia_completado, celebration.dayNumber),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(Space.x2))
             Text(
-                celebration.message,
+                motivationText(celebration.message, celebration.totalCompleted),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -67,7 +71,12 @@ fun CelebrationDialog(
             // El marcador va con el degradado de marca: es el momento de celebrar, no un dato más.
             // En cifra grande, además, para que no se lea como un segundo botón encima de "¡Seguir!".
             Text(
-                "${celebration.totalCompleted} de ${PlanData.TOTAL_DAYS} días",
+                pluralStringResource(
+                    R.plurals.ayu_celeb_marcador,
+                    PlanData.TOTAL_DAYS,
+                    celebration.totalCompleted,
+                    PlanData.TOTAL_DAYS
+                ),
                 style = MaterialTheme.typography.headlineMedium,
                 color = OnHero,
                 textAlign = TextAlign.Center,
@@ -81,8 +90,10 @@ fun CelebrationDialog(
             if (celebration.newAchievements.isNotEmpty()) {
                 Spacer(Modifier.height(Space.x4))
                 Text(
-                    if (celebration.newAchievements.size == 1) "LOGRO DESBLOQUEADO"
-                    else "LOGROS DESBLOQUEADOS",
+                    pluralStringResource(
+                        R.plurals.ayu_celeb_logros_desbloqueados,
+                        celebration.newAchievements.size
+                    ),
                     style = MaterialTheme.typography.labelMedium,
                     color = app.work
                 )
@@ -101,7 +112,7 @@ fun CelebrationDialog(
                 ) { Text("We Are The Champions") }
                 Spacer(Modifier.height(Space.x2))
                 TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
-                    Text("Cerrar")
+                    Text(stringResource(R.string.ayu_celeb_cerrar))
                 }
             } else {
                 Spacer(Modifier.height(Space.block))
@@ -111,7 +122,7 @@ fun CelebrationDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = Touch.primary)
-                ) { Text("¡Seguir!") }
+                ) { Text(stringResource(R.string.ayu_celeb_seguir)) }
             }
         }
     }
@@ -131,13 +142,31 @@ private fun AchievementRow(achievement: Achievement) {
     ) {
         Text(achievement.emoji, style = MaterialTheme.typography.headlineSmall)
         Column {
-            Text(achievement.title, style = MaterialTheme.typography.titleMedium)
+            Text(achievementTitle(achievement), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(2.dp))
             Text(
-                achievement.description,
+                achievementDescription(achievement),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
+}
+
+/** La frase de [Motivation] (una clave) en el idioma en uso. */
+@Composable
+private fun motivationText(key: String, total: Int): String = when (key) {
+    Motivation.FIRST -> stringResource(R.string.ayu_motiv_first)
+    Motivation.QUARTER -> stringResource(R.string.ayu_motiv_quarter)
+    Motivation.HALF -> stringResource(R.string.ayu_motiv_half)
+    Motivation.THREE_QUARTERS -> stringResource(R.string.ayu_motiv_threequarter)
+    Motivation.FINAL -> pluralStringResource(R.plurals.ayu_motiv_final, total, total)
+    "g1" -> stringResource(R.string.ayu_motiv_g1)
+    "g2" -> stringResource(R.string.ayu_motiv_g2)
+    "g3" -> stringResource(R.string.ayu_motiv_g3)
+    "g4" -> stringResource(R.string.ayu_motiv_g4)
+    "g5" -> stringResource(R.string.ayu_motiv_g5)
+    "g6" -> stringResource(R.string.ayu_motiv_g6)
+    "g7" -> stringResource(R.string.ayu_motiv_g7)
+    else -> stringResource(R.string.ayu_motiv_g0)
 }

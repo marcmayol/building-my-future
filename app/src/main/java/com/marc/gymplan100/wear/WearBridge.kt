@@ -5,7 +5,9 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.PlanData
+import com.marc.gymplan100.R
 import com.marc.gymplan100.data.SessionPhase
+import com.marc.gymplan100.ui.theme.AppLanguage
 
 /**
  * Puente con el reloj (Wear OS / Google Pixel Watch).
@@ -54,12 +56,15 @@ object WearBridge {
     const val KEY_NEXT_DAY = "next_day"      // Int: siguiente día pendiente (para el botón "Empezar" sin sesión)
     const val KEY_TS = "ts"                  // Long: marca de tiempo, fuerza la actualización del DataItem
 
-    /** Etiqueta del botón principal del reloj para cada fase (vacía si no hay acción). */
-    fun primaryLabel(phase: SessionPhase): String = when (phase) {
-        SessionPhase.WARMUP -> "Empezar ya"
-        SessionPhase.WORKING -> "Serie hecha"
-        SessionPhase.TIMED_SET -> "Serie hecha"
-        SessionPhase.RESTING -> "Saltar descanso"
+    /**
+     * Etiqueta del botón principal del reloj para cada fase (vacía si no hay acción). Es texto
+     * que el reloj solo pinta, así que va en el idioma de la app ([textos] ya envuelto).
+     */
+    fun primaryLabel(textos: Context, phase: SessionPhase): String = when (phase) {
+        SessionPhase.WARMUP -> textos.getString(R.string.ini_action_start_now)
+        SessionPhase.WORKING -> textos.getString(R.string.ini_action_set_done)
+        SessionPhase.TIMED_SET -> textos.getString(R.string.ini_action_set_done)
+        SessionPhase.RESTING -> textos.getString(R.string.ini_action_skip_rest)
         else -> ""
     }
 
@@ -78,6 +83,8 @@ object WearBridge {
             map.putInt(KEY_NEXT_DAY, nextDay)
         } else {
             val now = System.currentTimeMillis()
+            // El reloj enseña estos textos tal cual: se mandan en el idioma elegido en la app.
+            val textos = AppLanguage.wrap(context)
             // El ejercicio de hoy: si se cambió por otro, el reloj enseña el que se hace.
             val exercise = session.exerciseAt(session.exerciseIndex)
             // En cronómetro libre no se sigue el plan: el ejercicio y las series del día no
@@ -88,14 +95,18 @@ object WearBridge {
 
             map.putBoolean(KEY_ACTIVE, true)
             map.putString(KEY_PHASE, session.phase.name)
-            map.putString(KEY_EXERCISE, if (libre) tituloLibre(session) else exercise?.name ?: "Entrenamiento")
+            map.putString(
+                KEY_EXERCISE,
+                if (libre) tituloLibre(textos, session)
+                else exercise?.name ?: textos.getString(R.string.ini_wear_workout)
+            )
             map.putInt(KEY_SET_NUMBER, if (libre) 0 else session.setNumber)
             map.putInt(KEY_TOTAL_SETS, total)
             map.putLong(KEY_START_TIME, if (libre) session.startMillis else 0L)
-            map.putString(KEY_PRIMARY_LABEL, primaryLabel(session.phase))
+            map.putString(KEY_PRIMARY_LABEL, primaryLabel(textos, session.phase))
             map.putInt(KEY_DAY, session.dayNumber)
             map.putBoolean(KEY_CAN_SWAP, canSwap(session))
-            map.putString(KEY_SWAP_LABEL, swapLabel(session))
+            map.putString(KEY_SWAP_LABEL, swapLabel(textos, session))
             map.putBoolean(KEY_PAUSED, isPaused(session))
             map.putLong(KEY_END_TIME, endTimeMillis(session, now))
         }
@@ -125,15 +136,18 @@ object WearBridge {
     }
 
     /** Cómo se llama en el reloj una sesión de cronómetro libre. */
-    private fun tituloLibre(s: ActiveSession): String = when {
-        s.extra -> "Entrenamiento libre"
-        s.special -> "Entrenamiento especial"
-        else -> "Entrenamiento"
-    }
+    private fun tituloLibre(textos: Context, s: ActiveSession): String = textos.getString(
+        when {
+            s.extra -> R.string.ini_wear_free
+            s.special -> R.string.ini_wear_special
+            else -> R.string.ini_wear_workout
+        }
+    )
 
     /** Etiqueta del botón de cambio: tras un salto avisa de que se puede seguir saltando. */
-    private fun swapLabel(s: ActiveSession): String =
-        if (s.occupiedSkips > 0) "También ocupada" else "Máquina ocupada"
+    private fun swapLabel(textos: Context, s: ActiveSession): String = textos.getString(
+        if (s.occupiedSkips > 0) R.string.ini_wear_busy_too else R.string.ini_wear_busy
+    )
 
     private fun canSwap(s: ActiveSession): Boolean {
         if (s.phase != SessionPhase.WORKING) return false

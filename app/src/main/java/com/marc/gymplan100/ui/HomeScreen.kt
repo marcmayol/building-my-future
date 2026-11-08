@@ -55,6 +55,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -62,7 +64,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.material3.TextButton
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
@@ -70,8 +71,7 @@ import com.marc.gymplan100.notify.RestReminder
 import com.marc.gymplan100.update.Updates
 import com.marc.gymplan100.data.Phase
 import com.marc.gymplan100.data.PlanData
-import com.marc.gymplan100.data.contar
-import com.marc.gymplan100.data.palabra
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
@@ -152,7 +152,7 @@ fun HomeScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(R.drawable.logo_icon),
-                    contentDescription = "Logo Building My Future",
+                    contentDescription = stringResource(R.string.ini_home_logo),
                     modifier = Modifier
                         .size(38.dp)
                         .clip(RoundedCornerShape(10.dp))
@@ -172,7 +172,7 @@ fun HomeScreen(
                     ) {
                         Icon(
                             Icons.Filled.Info,
-                            contentDescription = "Ayuda",
+                            contentDescription = stringResource(R.string.ini_home_help),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
@@ -187,7 +187,7 @@ fun HomeScreen(
                 ) {
                     Icon(
                         Icons.Filled.Settings,
-                        contentDescription = "Configuración",
+                        contentDescription = stringResource(R.string.ini_home_settings),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
@@ -200,18 +200,22 @@ fun HomeScreen(
             // Y debajo, la puerta a los demás: había quien pedía «un plan de fuerza, no de
             // hipertrofia» sin saber que existe, porque la lista vivía dentro de Ajustes.
             Column {
+                val cabecera = if (activePlan.builtin) {
+                    stringResource(R.string.ini_home_builtin_plan, total)
+                } else {
+                    activePlan.name.uppercase()
+                }
                 Text(
-                    buildString {
-                        append(if (activePlan.builtin) "PLAN DE $total DÍAS" else activePlan.name.uppercase())
-                        currentPhase?.let { append(" · FASE ${it.number} ${it.name.uppercase()}") }
-                    },
+                    currentPhase?.let {
+                        stringResource(R.string.ini_home_plan_phase, cabecera, it.number, it.name.uppercase())
+                    } ?: cabecera,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 // Debajo y no al lado: a la derecha partía el nombre de la fase con el texto
                 // del sistema grande.
                 Text(
-                    "Ver otros planes (fuerza, músculo, en casa…)",
+                    stringResource(R.string.ini_home_other_plans),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -236,13 +240,12 @@ fun HomeScreen(
                 ) {
                     Column(modifier = Modifier.padding(Space.x4)) {
                         Text(
-                            "El descanso puede llegar tarde",
+                            stringResource(R.string.ini_home_exact_title),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(Modifier.height(Space.x1))
                         Text(
-                            "Para que el aviso suene justo a los 90 segundos, y no cuando al " +
-                                "sistema le venga bien, hay que darle permiso para alarmas exactas.",
+                            stringResource(R.string.ini_home_exact_body),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -251,7 +254,7 @@ fun HomeScreen(
                             onClick = { RestReminder.openExactAlarmSettings(context) },
                             shape = CircleShape,
                             modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                        ) { Text("Dar permiso", maxLines = 1) }
+                        ) { Text(stringResource(R.string.ini_home_exact_button), maxLines = 1) }
                     }
                 }
             }
@@ -267,11 +270,10 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(Space.x4)) {
-                        Text("Para que suenen los avisos", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.ini_home_battery_title), style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(Space.x1))
                         Text(
-                            "Desactiva el ahorro de batería para esta app. Así el aviso del " +
-                                "descanso sonará puntual aunque tengas la pantalla apagada.",
+                            stringResource(R.string.ini_home_battery_body),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -283,11 +285,11 @@ fun HomeScreen(
                             Button(
                                 onClick = { openBatterySettings(context) },
                                 modifier = Modifier.weight(1f)
-                            ) { Text("Ajustar", maxLines = 1) }
+                            ) { Text(stringResource(R.string.ini_home_battery_adjust), maxLines = 1) }
                             OutlinedButton(
                                 onClick = { viewModel.dismissBatteryHint() },
                                 modifier = Modifier.weight(1f)
-                            ) { Text("Vale", maxLines = 1) }
+                            ) { Text(stringResource(R.string.ini_home_battery_ok), maxLines = 1) }
                         }
                     }
                 }
@@ -300,8 +302,8 @@ fun HomeScreen(
                 HeroEnCurso(
                     dayNumber = session.dayNumber,
                     subtitle = when {
-                        session.extra -> "Entrenamiento extra · no cuenta día"
-                        session.special -> "Sesión libre en marcha"
+                        session.extra -> stringResource(R.string.ini_home_extra_running)
+                        session.special -> stringResource(R.string.ini_home_special_running)
                         else -> PlanData.dayByNumber(session.dayNumber)?.template?.title.orEmpty()
                     },
                     onResume = { onResumeSession(session.dayNumber) }
@@ -324,7 +326,11 @@ fun HomeScreen(
                 HeroHoy(
                     dayNumber = nextDay,
                     subtitle = nextTemplate?.let {
-                        "${it.title} · " + contar(it.exercises.size, "ejercicio", "ejercicios")
+                        stringResource(
+                            R.string.ini_title_dot_detail,
+                            it.title,
+                            pluralStringResource(R.plurals.ini_exercises, it.exercises.size, it.exercises.size)
+                        )
                     }.orEmpty(),
                     everStarted = done > 0,
                     onStart = { onOpenDay(nextDay) },
@@ -349,7 +355,7 @@ fun HomeScreen(
 
         item {
             Text(
-                "FASES DEL PLAN",
+                stringResource(R.string.ini_home_phases),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = Space.x2)
@@ -388,12 +394,12 @@ private fun HeroEnCurso(
             .padding(Space.screen)
     ) {
         Text(
-            "EN CURSO · TOCA PARA REANUDAR",
+            stringResource(R.string.ini_home_in_progress),
             style = MaterialTheme.typography.labelMedium,
             color = onHero
         )
         Spacer(Modifier.height(Space.x2))
-        Text("Día $dayNumber", style = styles.displayCard, color = onHero)
+        Text(stringResource(R.string.ini_day_n, dayNumber), style = styles.displayCard, color = onHero)
         if (subtitle.isNotBlank()) {
             Spacer(Modifier.height(Space.x1))
             Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = onHero)
@@ -409,7 +415,7 @@ private fun HeroEnCurso(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = Touch.primary)
-        ) { Text("Reanudar") }
+        ) { Text(stringResource(R.string.ini_home_resume)) }
     }
 }
 
@@ -443,12 +449,12 @@ private fun HeroTerminado(
                 .background(app.brandGradient)
         )
         Column(modifier = Modifier.padding(Space.screen)) {
-            DoneBadge(kind = PlanBadge.Terminado, label = "Plan terminado")
+            DoneBadge(kind = PlanBadge.Terminado, label = stringResource(R.string.ini_home_plan_done))
             Spacer(Modifier.height(Space.x3))
             Text(planName, style = MaterialTheme.typography.headlineLarge)
             Spacer(Modifier.height(Space.x1))
             Text(
-                "Los $total días, hechos. Elige qué sigue cuando quieras.",
+                pluralStringResource(R.plurals.ini_home_done_body, total, total),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -459,24 +465,24 @@ private fun HeroTerminado(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = Touch.primary)
-            ) { Text("Elegir el siguiente") }
+            ) { Text(stringResource(R.string.ini_home_pick_next)) }
             TextButton(onClick = onSeeSummary, modifier = Modifier.fillMaxWidth()) {
-                Text("Ver el resumen del plan")
+                Text(stringResource(R.string.ini_home_see_summary))
             }
             if (finishedAt > 0L) {
                 Spacer(Modifier.height(Space.x1))
+                // La fecha en el idioma con el que se pinta la app, con su patrón por idioma
+                // («8 de noviembre» / «November 8»).
+                val context = LocalContext.current
+                val fecha = SimpleDateFormat(
+                    stringResource(R.string.ini_home_date_pattern),
+                    AppLanguage.locale(context)
+                ).format(Date(finishedAt))
                 Text(
-                    buildString {
-                        append("Terminado el ")
-                        append(
-                            SimpleDateFormat("d 'de' MMMM", Locale.forLanguageTag("es-ES"))
-                                .format(Date(finishedAt))
-                        )
-                        if (weeks != null) {
-                            append(", en $weeks ")
-                            append(if (weeks == 1) "semana" else "semanas")
-                        }
-                        append(".")
+                    if (weeks != null) {
+                        pluralStringResource(R.plurals.ini_home_finished_on_weeks, weeks, weeks, fecha)
+                    } else {
+                        stringResource(R.string.ini_home_finished_on, fecha)
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -504,13 +510,13 @@ private fun HeroHoy(
             .padding(Space.screen)
     ) {
         Text(
-            if (everStarted) "HOY TE TOCA" else "PLAN NUEVO · EMPIEZA CUANDO QUIERAS",
+            stringResource(if (everStarted) R.string.ini_home_today else R.string.ini_home_new_plan),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Spacer(Modifier.height(Space.x2))
         Text(
-            "Día $dayNumber",
+            stringResource(R.string.ini_day_n, dayNumber),
             style = styles.displayCard,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
@@ -529,10 +535,10 @@ private fun HeroHoy(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = Touch.primary)
-        ) { Text("Empezar día $dayNumber") }
+        ) { Text(stringResource(R.string.ini_home_start_day, dayNumber)) }
         Spacer(Modifier.height(Space.x2))
         Text(
-            "Ver el día antes de empezar",
+            stringResource(R.string.ini_home_see_day),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             textDecoration = TextDecoration.Underline,
@@ -552,11 +558,11 @@ private fun ProgresoDelPlan(done: Int, total: Int) {
     Column(modifier = Modifier.padding(top = Space.x2)) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                "$done de $total días",
+                pluralStringResource(R.plurals.ini_home_progress, total, done, total),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
-            Text("$percent %", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ini_percent, percent), style = MaterialTheme.typography.titleMedium)
         }
         Spacer(Modifier.height(Space.x2))
         Box(
@@ -579,7 +585,7 @@ private fun ProgresoDelPlan(done: Int, total: Int) {
         if (done == 0) {
             Spacer(Modifier.height(Space.x2))
             Text(
-                "Aún no hay progreso: la barra se llena a partir de hoy.",
+                stringResource(R.string.ini_home_no_progress),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -603,15 +609,15 @@ private fun FilaEntrenoLibre(onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text("Entreno libre", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ini_home_free_title), style = MaterialTheme.typography.titleMedium)
             Text(
-                "Sin rutina: entrenas a tu aire y apuntas lo que haces",
+                stringResource(R.string.ini_home_free_body),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Text(
-            "Empezar",
+            stringResource(R.string.ini_home_free_start),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(start = Space.x2)
@@ -632,12 +638,12 @@ private fun FilaEspeciales(onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            "Entrenamientos especiales",
+            stringResource(R.string.ini_home_specials),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f)
         )
         Text(
-            "no cuentan día",
+            stringResource(R.string.ini_home_specials_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -675,7 +681,7 @@ private fun PhaseRow(
         }
         Spacer(Modifier.height(Space.x1))
         Text(
-            "${phase.range} · ${phase.weeks}",
+            phaseSpanText(phase),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

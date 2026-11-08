@@ -25,8 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.BrandAmber
 import com.marc.gymplan100.ui.theme.BrandMagenta
 import com.marc.gymplan100.ui.theme.BrandOrange
@@ -68,7 +70,7 @@ fun BannerActualizacion(
                         .padding(horizontal = 12.dp)
                 ) {
                     Text(
-                        text = "Versión ${estado.info.versionName} disponible",
+                        text = stringResource(R.string.ini_upd_available, estado.info.versionName),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -88,21 +90,21 @@ fun BannerActualizacion(
                         contentColor = BrandMagenta
                     )
                 ) {
-                    Text("Actualizar", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.ini_upd_update), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
 
         is EstadoActualizacion.Descargando -> MarcoBanner(modifier) {
-            Progreso("Descargando la nueva versión… ${estado.porcentaje}%", estado.porcentaje / 100f)
+            Progreso(stringResource(R.string.ini_upd_banner_downloading, estado.porcentaje), estado.porcentaje / 100f)
         }
 
         EstadoActualizacion.Verificando -> MarcoBanner(modifier) {
-            Progreso("Comprobando que la copia es íntegra…", null)
+            Progreso(stringResource(R.string.ini_upd_banner_verifying), null)
         }
 
         EstadoActualizacion.Instalando -> MarcoBanner(modifier) {
-            Progreso("Instalando…", null)
+            Progreso(stringResource(R.string.ini_installing), null)
         }
 
         // Inactivo, Comprobando, AlDia, PidiendoPermiso y Error no pintan nada.

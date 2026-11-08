@@ -69,8 +69,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.marc.gymplan100.R
 import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.LoggedExercise
 import com.marc.gymplan100.data.MyExercises
@@ -201,17 +203,17 @@ fun FreeSessionLog(
         ) {
             item {
                 Text(
-                    if (modo == ModoApunte.DURANTE) "EN MARCHA · EL TIEMPO SIGUE CORRIENDO"
-                    else "ENTRENO TERMINADO",
+                    if (modo == ModoApunte.DURANTE) stringResource(R.string.mot_free_live_label)
+                    else stringResource(R.string.mot_free_done_label),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(Space.x2))
                 Text(
                     when {
-                        modo == ModoApunte.DURANTE -> "¿Qué llevas hecho?"
-                        repaso -> "Repasa lo apuntado"
-                        else -> "¿Qué has hecho?"
+                        modo == ModoApunte.DURANTE -> stringResource(R.string.mot_free_title_live)
+                        repaso -> stringResource(R.string.mot_free_title_review)
+                        else -> stringResource(R.string.mot_free_title_done)
                     },
                     style = MaterialTheme.typography.displaySmall
                 )
@@ -224,18 +226,13 @@ fun FreeSessionLog(
                     }
                     Text(
                         if (modo == ModoApunte.DURANTE) {
-                            "Apunta cada ejercicio cuando lo acabes, o serie a serie. Se guarda " +
-                                "solo, y al finalizar te lo enseño para repasarlo."
+                            stringResource(R.string.mot_free_intro_live)
                         } else if (repaso) {
-                            "Esto es lo que has ido apuntando. Corrige lo que haga falta o " +
-                                "añade lo que te dejaste."
+                            stringResource(R.string.mot_free_intro_review)
                         } else if (filas.size == 1 && filas[0].name.isBlank()) {
-                            "Hoy no había ejercicios apuntados en el plan, así que empiezas en " +
-                                "blanco: escribe los que hayas hecho, o guarda solo el tiempo."
+                            stringResource(R.string.mot_free_intro_blank)
                         } else {
-                            "Apunta lo que quieras y déjate el resto. Cada serie lleva sus " +
-                                "kilos y sus repeticiones, y el más alto se queda como tu " +
-                                "peso de ese ejercicio."
+                            stringResource(R.string.mot_free_intro_done)
                         },
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -286,7 +283,7 @@ fun FreeSessionLog(
                 // nada" ya no toca, pero sí hace falta decir que se puede guardar a medias.
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "$apuntados de ${filas.size} apuntados",
+                        stringResource(R.string.mot_free_logged_count, apuntados, filas.size),
                         style = LocalAppTextStyles.current.tabular,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f)
@@ -294,13 +291,13 @@ fun FreeSessionLog(
                     // Saltar de fila sin buscar el scroll con el teclado tapando media pantalla.
                     // En cuerpo pequeño a propósito: es un atajo, no compite con Guardar.
                     TextButton(onClick = { foco.moveFocus(FocusDirection.Next) }) {
-                        Text("Siguiente ejercicio ›", style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.mot_free_next_exercise), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
                 Spacer(Modifier.height(Space.x1))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "Puedes guardar aunque falten cosas",
+                        stringResource(R.string.mot_free_can_save_partial),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f)
@@ -310,20 +307,25 @@ fun FreeSessionLog(
                         onClick = { onSave(filas.toList()) },
                         shape = CircleShape,
                         modifier = Modifier.height(48.dp)
-                    ) { Text("Guardar") }
+                    ) { Text(stringResource(R.string.mot_free_save)) }
                 }
             } else {
                 Button(
                     onClick = { onSave(filas.toList()) },
                     shape = CircleShape,
                     modifier = Modifier.fillMaxWidth().heightIn(min = Touch.primary)
-                ) { Text(if (modo == ModoApunte.DURANTE) "Listo, seguir entrenando" else "Guardar y terminar") }
+                ) {
+                    Text(
+                        if (modo == ModoApunte.DURANTE) stringResource(R.string.mot_free_done_keep_going)
+                        else stringResource(R.string.mot_free_save_finish)
+                    )
+                }
                 // Con cosas apuntadas, "terminar sin apuntar nada" las tiraría: la salida
                 // secundaria pasa a ser volver al cronómetro, por si se finalizó sin querer.
                 when {
                     modo == ModoApunte.DURANTE -> Unit
-                    repaso -> Subrayado("Seguir entrenando", { onBack(filas.toList()) })
-                    else -> Subrayado("Terminar sin apuntar nada", onSkip)
+                    repaso -> Subrayado(stringResource(R.string.mot_free_keep_training), { onBack(filas.toList()) })
+                    else -> Subrayado(stringResource(R.string.mot_free_finish_no_log), onSkip)
                 }
             }
         }
@@ -342,7 +344,7 @@ private fun TiempoGuardado(elapsedMs: Long) {
             .padding(Space.x4)
     ) {
         Text(
-            "TIEMPO DEL ENTRENO",
+            stringResource(R.string.mot_free_time_label),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -354,7 +356,7 @@ private fun TiempoGuardado(elapsedMs: Long) {
         )
         Spacer(Modifier.height(Space.x1))
         Text(
-            "Ya está guardado, apuntes lo que apuntes.",
+            stringResource(R.string.mot_free_time_saved),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -409,7 +411,7 @@ private fun FilaEjercicio(
                 OutlinedTextFieldSinBorde(
                     value = fila.name,
                     onValueChange = { onChange(fila.copy(name = it)); abierto = true },
-                    label = "Ejercicio",
+                    label = stringResource(R.string.mot_free_exercise),
                     // Dos líneas: "Prensa de piernas (recorrido corto)" no cabe en una, y
                     // cortarlo obliga a adivinar cuál de los dos parecidos es.
                     modifier = Modifier
@@ -426,7 +428,7 @@ private fun FilaEjercicio(
                     }
                     if (puedeCrear) {
                         DropdownMenuItem(
-                            text = { Text("Añadir «${fila.name}»") },
+                            text = { Text(stringResource(R.string.mot_free_add_named, fila.name)) },
                             onClick = { abierto = false }
                         )
                     }
@@ -435,7 +437,10 @@ private fun FilaEjercicio(
             IconButton(onClick = onRemove, modifier = Modifier.size(38.dp)) {
                 Icon(
                     Icons.Filled.Close,
-                    contentDescription = "Quitar ${fila.name.ifBlank { "este ejercicio" }}",
+                    contentDescription = stringResource(
+                        R.string.mot_free_remove_named,
+                        fila.name.ifBlank { stringResource(R.string.mot_free_this_exercise) }
+                    ),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
@@ -445,7 +450,7 @@ private fun FilaEjercicio(
             FilterChip(
                 selected = pesoCorporal,
                 onClick = { onPesoCorporal(!pesoCorporal) },
-                label = { Text("Peso corporal, sin kilos", style = MaterialTheme.typography.bodyMedium) }
+                label = { Text(stringResource(R.string.mot_free_bodyweight), style = MaterialTheme.typography.bodyMedium) }
             )
         }
         Spacer(Modifier.height(Space.x3))
@@ -462,7 +467,8 @@ private fun FilaEjercicio(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val deTrabajo = series.take(i + 1).count { !it.warmup }
                 Text(
-                    if (serie.warmup) "C" else "${deTrabajo}ª",
+                    if (serie.warmup) stringResource(R.string.mot_free_warmup_mark)
+                    else stringResource(R.string.mot_free_set_ordinal, deTrabajo),
                     style = LocalAppTextStyles.current.tabular,
                     color = if (serie.warmup) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -477,7 +483,7 @@ private fun FilaEjercicio(
                         CampoCorto(
                             value = serie.weight,
                             onValueChange = { cambiar(serie.copy(weight = it)) },
-                            label = "Peso de la serie ${i + 1}",
+                            label = stringResource(R.string.mot_free_set_weight, i + 1),
                             unidad = "kg",
                             decimal = true
                         )
@@ -485,8 +491,8 @@ private fun FilaEjercicio(
                     CampoCorto(
                         value = serie.reps,
                         onValueChange = { cambiar(serie.copy(reps = it)) },
-                        label = if (kind == ExerciseKind.TIME) "Tiempo de la serie ${i + 1}"
-                        else "Repeticiones de la serie ${i + 1}",
+                        label = if (kind == ExerciseKind.TIME) stringResource(R.string.mot_free_set_time, i + 1)
+                        else stringResource(R.string.mot_free_set_reps, i + 1),
                         unidad = if (kind == ExerciseKind.TIME) "s" else "reps",
                         decimal = false
                     )
@@ -495,7 +501,7 @@ private fun FilaEjercicio(
                             selected = serie.warmup,
                             onClick = { cambiar(serie.copy(warmup = !serie.warmup)) },
                             label = {
-                                Text("Calentamiento", style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.mot_free_warmup), style = MaterialTheme.typography.bodyMedium)
                             },
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
@@ -509,7 +515,7 @@ private fun FilaEjercicio(
                     ) {
                         Icon(
                             Icons.Filled.Close,
-                            contentDescription = "Quitar la serie ${i + 1}",
+                            contentDescription = stringResource(R.string.mot_free_remove_set, i + 1),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp)
                         )
@@ -519,7 +525,7 @@ private fun FilaEjercicio(
             Spacer(Modifier.height(Space.x2))
         }
         TextButton(onClick = { onChange(fila.copy(sets = series + SetLog())) }) {
-            Text("+ Añadir serie", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.mot_free_add_set), style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -617,7 +623,7 @@ private fun AñadirEjercicio(onClick: () -> Unit) {
             modifier = Modifier.size(20.dp)
         )
         Text(
-            "Añadir otro ejercicio",
+            stringResource(R.string.mot_free_add_other),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

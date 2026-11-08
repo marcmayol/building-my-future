@@ -114,10 +114,39 @@ data class EjercicioDto(
     val superserie: String = ""
 )
 
+/**
+ * Por qué no vale un plan. Es un código con sus datos y no un texto: la capa de datos no
+ * sabe en qué idioma se ve la app, así que la pantalla lo convierte en mensaje (ver
+ * `PlanProblem.text` en la UI).
+ */
+sealed interface PlanProblem {
+    data object EmptyFile : PlanProblem
+    data object InvalidJson : PlanProblem
+    data object CannotOpen : PlanProblem
+    data object NotAPlanFile : PlanProblem
+    data object NoName : PlanProblem
+    data object NoDays : PlanProblem
+    data class PhaseWithoutDays(val phase: String) : PlanProblem
+    data class DayWithoutExercises(val day: String, val phase: String) : PlanProblem
+    data class TooManyExercises(val day: String, val count: Int, val max: Int) : PlanProblem
+    data class ExerciseWithoutName(val day: String) : PlanProblem
+    data class ExerciseWithoutScheme(val exercise: String, val day: String) : PlanProblem
+    data class TooManyDays(val total: Int, val max: Int) : PlanProblem
+    data object ReservedId : PlanProblem
+    /** Markdown sin "# Nombre del plan". */
+    data object MarkdownNoTitle : PlanProblem
+    /** Markdown sin ningún "### Día". */
+    data object MarkdownNoDays : PlanProblem
+    /** Un mensaje ya escrito (compatibilidad con quien aún pasa texto). */
+    data class Text(val message: String) : PlanProblem
+}
+
 /** Resultado de leer un plan: o sale un plan usable, o un motivo concreto por el que no. */
 sealed interface PlanImport {
     data class Ok(val dto: PlanDto, val plan: TrainingPlan) : PlanImport
-    data class Error(val message: String) : PlanImport
+    data class Error(val problem: PlanProblem) : PlanImport {
+        constructor(message: String) : this(PlanProblem.Text(message))
+    }
 }
 
 /**
@@ -155,11 +184,9 @@ object PlanCodec {
 
     /** Lee el texto de un archivo .json y lo convierte en plan. */
     fun parseJson(text: String, now: Long = System.currentTimeMillis()): PlanImport {
-        if (text.isBlank()) return PlanImport.Error("El archivo está vacío.")
+        if (text.isBlank()) return PlanImport.Error(PlanProblem.EmptyFile)
         val dto = runCatching { json.decodeFromString<PlanDto>(text) }.getOrElse {
-            return PlanImport.Error(
-                "El archivo no es un JSON válido. Revisa que no falte una coma o una comilla."
-            )
+            return PlanImport.Error(PlanProblem.InvalidJson)
         }
         return fromDto(dto, now)
     }
@@ -216,12 +243,12 @@ object PlanCodec {
      */
     fun fromDto(dto: PlanDto, now: Long = System.currentTimeMillis()): PlanImport {
         val name = dto.nombre.trim()
-        if (name.isEmpty()) return PlanImport.Error("El plan no tiene nombre.")
+        if (name.isEmpty()) return PlanImport.Error(PlanProblem.NoName)
 
         val rawPhases = when {
             dto.fases.isNotEmpty() -> dto.fases
             dto.dias.isNotEmpty() -> listOf(FaseDto(nombre = name, semanas = 1, dias = dto.dias))
-            else -> return PlanImport.Error("El plan no tiene ningún día de entrenamiento.")
+            else -> return PlanImport.Error(PlanProblem.NoDays)
         }
 
         val phases = mutableListOf<Phase>()
@@ -231,7 +258,7 @@ object PlanCodec {
             val number = index + 1
             val label = fase.nombre.trim().ifEmpty { "Fase $number" }
             if (fase.dias.isEmpty()) {
-                return PlanImport.Error("La fase «$label» no tiene ningún día.")
+                return PlanImport.Error(PlanProblem.PhaseWithoutDays(label))
             }
             val weeks = fase.semanas.coerceIn(1, MAX_WEEKS)
 
@@ -239,24 +266,21 @@ object PlanCodec {
             fase.dias.forEachIndexed { dayIndex, dia ->
                 val dayLabel = dia.dia.trim().ifEmpty { "Día ${dayIndex + 1}" }
                 if (dia.ejercicios.isEmpty()) {
-                    return PlanImport.Error("«$dayLabel» de la fase «$label» no tiene ejercicios.")
+                    return PlanImport.Error(PlanProblem.DayWithoutExercises(dayLabel, label))
                 }
                 if (dia.ejercicios.size > MAX_EXERCISES) {
                     return PlanImport.Error(
-                        "«$dayLabel» tiene ${dia.ejercicios.size} ejercicios; el máximo es $MAX_EXERCISES."
+                        PlanProblem.TooManyExercises(dayLabel, dia.ejercicios.size, MAX_EXERCISES)
                     )
                 }
                 val exercises = dia.ejercicios.map { ex ->
                     val exName = ex.nombre.trim()
                     if (exName.isEmpty()) {
-                        return PlanImport.Error("Hay un ejercicio sin nombre en «$dayLabel».")
+                        return PlanImport.Error(PlanProblem.ExerciseWithoutName(dayLabel))
                     }
                     val scheme = ex.esquema.trim()
                     if (scheme.isEmpty()) {
-                        return PlanImport.Error(
-                            "«$exName» ($dayLabel) no dice las series. Escríbelas como \"4 x 8\", " +
-                                "\"3 x 30 s\" o \"3 vueltas\"."
-                        )
+                        return PlanImport.Error(PlanProblem.ExerciseWithoutScheme(exName, dayLabel))
                     }
                     Exercise(
                         name = exName,
@@ -284,6 +308,8 @@ object PlanCodec {
                 Phase(
                     number = number,
                     name = label,
+                    // Texto de respaldo en castellano, como el del plan de serie. Las pantallas
+                    // ya no lo enseñan: lo calculan en su idioma con los números (phaseSpanText).
                     range = if (daysInPhase == 1) "Día $dayCursor" else "Días $dayCursor al $lastDay",
                     weeks = if (weeks == 1) "Semana $weekCursor" else "Semanas $weekCursor-$lastWeek",
                     weeksCount = weeks,
@@ -298,12 +324,12 @@ object PlanCodec {
 
         val total = dayCursor - 1
         if (total > MAX_DAYS) {
-            return PlanImport.Error("El plan sale de $total días y el máximo son $MAX_DAYS.")
+            return PlanImport.Error(PlanProblem.TooManyDays(total, MAX_DAYS))
         }
 
         val id = dto.id?.trim()?.takeIf { it.isNotEmpty() } ?: "plan-$now"
         if (id == BuiltinPlan.ID) {
-            return PlanImport.Error("Ese id está reservado para el plan que viene con la app.")
+            return PlanImport.Error(PlanProblem.ReservedId)
         }
         val source = when (dto.origen.lowercase()) {
             "markdown", "md" -> PlanSource.MARKDOWN

@@ -200,7 +200,7 @@ class SupersetWarmupTest {
         )
         val leida = Backup.parse(raw)
         assertTrue(leida is Backup.Result.Ok)
-        assertTrue((leida as Backup.Result.Ok).file.resumen().contains("3"))
+        assertTrue((leida as Backup.Result.Ok).file.diasCompletados() == 3)
     }
 
     @Test
@@ -214,7 +214,7 @@ class SupersetWarmupTest {
         val raw = "{\"app\":\"otra-cosa\",\"progreso\":{\"a\":\"b\"}}"
         val leida = Backup.parse(raw)
         assertTrue(leida is Backup.Result.Error)
-        assertTrue((leida as Backup.Result.Error).message.contains("otra app"))
+        assertTrue((leida as Backup.Result.Error).message == com.marc.gymplan100.R.string.ini_backup_err_other_app)
     }
 
     @Test

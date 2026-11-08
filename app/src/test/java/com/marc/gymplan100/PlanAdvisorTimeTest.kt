@@ -63,7 +63,11 @@ class PlanAdvisorTimeTest {
         if (r.best == null) {
             assertNotNull(r.closest)
         } else {
-            assertTrue(r.best!!.reason.contains("min"))
+            val ids = r.best!!.reason.ids()
+            assertTrue(
+                R.string.mot_advisor_session_min in ids ||
+                    R.string.mot_advisor_session_min_express in ids
+            )
         }
     }
 }
