@@ -996,22 +996,7 @@ private fun RestingContent(
                     // "Fallo" y no "Al limite": con el texto del sistema al 150 % la etiqueta
                     // larga no cabia en su tercio y se quedaba en "Al". Ademas es la palabra
                     // que se usa en el gimnasio.
-                    Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
-                        listOf(
-                            stringResource(R.string.ses_effort_easy) to "3",
-                            stringResource(R.string.ses_effort_hard) to "1",
-                            stringResource(R.string.ses_effort_failure) to "0"
-                        ).forEach { (etiqueta, valor) ->
-                            FilterChip(
-                                selected = ultima.rir == valor,
-                                onClick = {
-                                    viewModel.setLastSetRir(if (ultima.rir == valor) "" else valor)
-                                },
-                                label = { Text(etiqueta, maxLines = 1) },
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                    }
+                    EffortChips(ultima.rir) { viewModel.setLastSetRir(it) }
                 }
                 Spacer(Modifier.height(Space.x2))
             }
@@ -1458,16 +1443,7 @@ private fun FreeRestContent(
                 }
                 actual != null && !s.restBetweenExercises -> {
                     SessionCard(label = stringResource(R.string.ses_how_was_it), dark = dark) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
-                            listOf(stringResource(R.string.ses_effort_easy) to "3", stringResource(R.string.ses_effort_hard) to "1", stringResource(R.string.ses_effort_failure) to "0").forEach { (etiqueta, valor) ->
-                                FilterChip(
-                                    selected = ultima?.rir == valor,
-                                    onClick = { viewModel.freeSetLastRir(if (ultima?.rir == valor) "" else valor) },
-                                    label = { Text(etiqueta, maxLines = 1) },
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                        }
+                        EffortChips(ultima?.rir) { viewModel.freeSetLastRir(it) }
                     }
                     Spacer(Modifier.height(Space.x2))
                     val hint = when {

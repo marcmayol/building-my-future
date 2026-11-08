@@ -87,6 +87,13 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    androidResources {
+        // Solo los idiomas que tiene la app. Las librerías traen sus propios textos en
+        // decenas de idiomas (catalán incluido), y con el móvil en [catalán, español]
+        // Android veía «catalán disponible», se quedaba con él y, como la app no lo tiene,
+        // pintaba values (inglés) en vez de saltar al español.
+        localeFilters += listOf("en", "es")
+    }
     buildFeatures {
         compose = true
         // El módulo :actualizador compara contra BuildConfig.VERSION_CODE.
