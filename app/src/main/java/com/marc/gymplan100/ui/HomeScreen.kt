@@ -207,7 +207,14 @@ fun HomeScreen(
                 }
                 Text(
                     currentPhase?.let {
-                        stringResource(R.string.ini_home_plan_phase, cabecera, it.number, it.name.uppercase())
+                        // Una fase sin nombre propio se llama «Fase 1»: no repetirlo dos veces.
+                        val nombre = it.name.trim()
+                        val generico = nombre.isEmpty() ||
+                            Regex("""(fase|phase)\s*${it.number}""", RegexOption.IGNORE_CASE).matches(nombre)
+                        stringResource(
+                            R.string.ini_home_plan_phase, cabecera, it.number,
+                            if (generico) "" else nombre.uppercase()
+                        ).trimEnd()
                     } ?: cabecera,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -637,16 +644,25 @@ private fun FilaEspeciales(onClick: () -> Unit) {
             .padding(horizontal = Space.x4, vertical = Space.x4),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            stringResource(R.string.ini_home_specials),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            stringResource(R.string.ini_home_specials_note),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        // La nota a la derecha si cabe y, si no, debajo: con weight a su lado, la letra grande
+        // partía el título a media palabra («Entrenamient / os especiales»).
+        @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+        androidx.compose.foundation.layout.FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                stringResource(R.string.ini_home_specials),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(end = Space.x2)
+            )
+            Text(
+                stringResource(R.string.ini_home_specials_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+        }
     }
 }
 

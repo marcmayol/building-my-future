@@ -153,7 +153,6 @@
     <string name="ses_set_n">Set %1$d</string>
     <string name="ses_extra_workout">Extra workout</string>
     <string name="ses_free_workout">Free workout</string>
-    <string name="ses_not_a_day">doesn\'t count as a day</string>
     <string name="ses_finish_exercise">Finish exercise</string>
     <string name="ses_log_or_edit">Log or edit</string>
     <string name="ses_finish">Finish</string>

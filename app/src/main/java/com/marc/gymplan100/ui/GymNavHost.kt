@@ -345,14 +345,13 @@ private fun BarraInferior(navController: NavHostController, rutaActual: String?)
                 // a tamaño normal. Y en unidades fijas: con la letra del sistema al 150 % las
                 // cinco etiquetas se cortaban, y el icono ya dice qué es cada pestaña.
                 label = {
-                    Text(
+                    // Y aun así, en 360 dp «Estadísticas» no cabe: que encoja en vez de cortarse.
+                    TextoQueCabe(
                         androidx.compose.ui.res.stringResource(pestana.label),
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = with(LocalDensity.current) { 12.dp.toSp() },
                             letterSpacing = 0.sp
-                        ),
-                        maxLines = 1,
-                        softWrap = false
+                        )
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(

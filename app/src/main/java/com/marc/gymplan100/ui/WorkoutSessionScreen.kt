@@ -1291,7 +1291,8 @@ private fun FreeContent(
             s.extra -> stringResource(R.string.ses_extra_workout)
             else -> stringResource(R.string.ses_free_workout)
         },
-        context = if (s.extra) stringResource(R.string.ses_not_a_day) else stringResource(R.string.ses_day_n, s.dayNumber),
+        // Corto, como en el descanso: «no cuenta como día» se comía la cabecera entera.
+        context = if (s.extra) stringResource(R.string.ses_extra) else stringResource(R.string.ses_day_n, s.dayNumber),
         onExit = onExit,
         contextCard = { FreeLoggedCard(s, dark) },
         secondaries = {

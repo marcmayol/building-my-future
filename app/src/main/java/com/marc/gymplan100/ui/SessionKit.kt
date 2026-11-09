@@ -29,7 +29,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.layout.Layout
@@ -165,10 +167,13 @@ fun SessionShell(
                     modifier = Modifier.weight(1f)
                 )
                 if (context.isNotBlank()) {
-                    Text(
+                    // Nunca más de la mitad: si se lo come todo, el estado desaparece y la X
+                    // de salir se queda en nada.
+                    TextoQueCabe(
                         context,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.widthIn(max = (LocalConfiguration.current.screenWidthDp * 0.4f).dp)
                     )
                 }
                 // La ayuda, a mano también entrenando: se abre encima y el entreno sigue igual.
