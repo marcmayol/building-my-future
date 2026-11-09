@@ -30,6 +30,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.layout.Layout
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -155,7 +158,7 @@ fun SessionShell(
                     .padding(top = Space.x3, bottom = Space.x2),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
+                TextoQueCabe(
                     stateLabel.uppercase(),
                     style = MaterialTheme.typography.labelMedium,
                     color = accent,
@@ -187,17 +190,26 @@ fun SessionShell(
                 }
             }
 
-            // El contenido se apoya en la parte baja: así la cifra queda a la altura de los
-            // ojos cuando el móvil está en el banco, y el aire sobrante se va arriba.
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(bottom = Space.block),
-                verticalArrangement = Arrangement.Bottom,
-                content = content
+            ContenidoYTarjeta(
+                modifier = Modifier.weight(1f),
+                // El contenido se apoya en la parte baja: así la cifra queda a la altura de los
+                // ojos cuando el móvil está en el banco, y el aire sobrante se va arriba.
+                content = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = Space.block),
+                        verticalArrangement = Arrangement.Bottom,
+                        content = content
+                    )
+                },
+                card = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                        content = contextCard
+                    )
+                }
             )
-
-            contextCard()
 
             Row(
                 modifier = Modifier
@@ -211,6 +223,41 @@ fun SessionShell(
         }
     }
 }
+
+/**
+ * El hueco entre la cabecera y los botones: arriba el contenido (ejercicio y cifra), debajo la
+ * tarjeta de contexto.
+ *
+ * La tarjeta se queda lo que necesita, pero nunca tanto como para dejar al contenido sin
+ * [CONTENIDO_MINIMO]: con la letra al 150 % en 360 dp, el descanso del libre («¿Cómo ha ido?»
+ * + repeticiones) se comía la pantalla y la cuenta atrás quedaba en 8 px. Si no cabe entera,
+ * la tarjeta se desplaza por dentro; la cifra encoge lo que haga falta en el resto.
+ */
+@Composable
+private fun ContenidoYTarjeta(
+    modifier: Modifier,
+    content: @Composable () -> Unit,
+    card: @Composable () -> Unit,
+) {
+    Layout(contents = listOf(content, card), modifier = modifier) { (contenido, tarjeta), c ->
+        val alto = c.maxHeight
+        val minimo = CONTENIDO_MINIMO.roundToPx().coerceAtMost(alto)
+        val t = tarjeta.firstOrNull()?.measure(
+            c.copy(minWidth = 0, minHeight = 0, maxHeight = (alto - minimo).coerceAtLeast(0))
+        )
+        val altoTarjeta = t?.height ?: 0
+        val altoContenido = (alto - altoTarjeta).coerceAtLeast(0)
+        val ct = contenido.firstOrNull()?.measure(
+            c.copy(minWidth = 0, minHeight = altoContenido, maxHeight = altoContenido)
+        )
+        layout(c.maxWidth, alto) {
+            ct?.place(0, 0)
+            t?.place(0, altoContenido)
+        }
+    }
+}
+
+private val CONTENIDO_MINIMO = 180.dp
 
 /** Botón secundario en píldora: vive sobre el fondo teñido, así que va con borde, no relleno. */
 @Composable
@@ -231,10 +278,11 @@ fun RowScope.SessionSecondary(
             .padding(horizontal = Space.x2, vertical = Space.x3),
         contentAlignment = Alignment.Center
     ) {
-        Text(
+        TextoQueCabe(
             text,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
             textAlign = TextAlign.Center
         )
     }
@@ -328,10 +376,15 @@ fun Countdown(
     val styles = LocalAppTextStyles.current
     val fontScale = LocalDensity.current.fontScale
     Column(modifier = modifier) {
-        Text(
+        // Con la letra grande y varias tarjetas debajo (el descanso del libre) no siempre queda
+        // alto para la cifra: con weight se mide después del pie, que conserva su sitio, y la
+        // cifra encoge en vez de salir recortada por arriba y por abajo.
+        TextoQueCabe(
             text,
             style = if (fontScale > 1.3f) styles.countdownCompact else styles.countdown,
             color = MaterialTheme.colorScheme.onSurface,
+            medirDeNuevoCon = fontScale,
+            modifier = Modifier.weight(1f, fill = false),
         )
         Spacer(Modifier.height(Space.x1))
         Text(
