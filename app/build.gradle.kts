@@ -94,6 +94,14 @@ android {
         // pintaba values (inglés) en vez de saltar al español.
         localeFilters += listOf("en", "es")
     }
+    bundle {
+        // El idioma se elige en Ajustes, no solo por el del móvil. Si Play partiera el AAB
+        // por idioma, a un móvil solo en inglés no le bajaría values-es y elegir «Español»
+        // no cambiaría nada. Los textos de los dos idiomas pesan poco: van siempre.
+        language {
+            enableSplit = false
+        }
+    }
     buildFeatures {
         compose = true
         // El módulo :actualizador compara contra BuildConfig.VERSION_CODE.
