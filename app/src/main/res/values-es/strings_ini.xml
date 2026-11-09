@@ -239,4 +239,10 @@
     <string name="ini_upd_update">Actualizar</string>
     <string name="ini_upd_banner_downloading">Descargando la nueva versión… %1$d%%</string>
     <string name="ini_upd_banner_verifying">Comprobando que la copia es íntegra…</string>
+    <!-- Pausa del recordatorio («vacaciones»): la fecha es el último día en silencio. -->
+    <string name="ini_set_pause">Pausar hasta el…</string>
+    <string name="ini_set_pause_hint">Para las vacaciones: el aviso vuelve solo, sin que tengas que acordarte.</string>
+    <string name="ini_set_paused_until">En pausa hasta el %1$s</string>
+    <string name="ini_set_pause_remove">Quitar pausa</string>
+    <string name="ini_set_pause_ok">Pausar</string>
 </resources>

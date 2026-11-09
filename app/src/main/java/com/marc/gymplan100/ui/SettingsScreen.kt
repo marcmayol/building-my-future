@@ -60,6 +60,15 @@ import androidx.health.connect.client.PermissionController
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.rememberDatePickerState
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import com.marc.gymplan100.update.Updates
 import com.marc.gymplan100.review.Valoracion
 import com.marc.gymplan100.data.Backup
@@ -495,7 +504,26 @@ private fun SeccionRecordatorios() {
     var dias by remember { mutableStateOf(TrainingReminder.days(context)) }
     var minuto by remember { mutableStateOf(TrainingReminder.minuteOfDay(context)) }
 
-    fun guardar() = TrainingReminder.save(context, activo, dias, minuto)
+    var pausa by remember { mutableStateOf(TrainingReminder.pausedUntil(context)) }
+    var eligiendoPausa by remember { mutableStateOf(false) }
+
+    fun guardar() {
+        TrainingReminder.save(context, activo, dias, minuto)
+        // Apagarlo borra la pausa: se relee para no seguir enseñándola.
+        pausa = TrainingReminder.pausedUntil(context)
+    }
+
+    if (eligiendoPausa) {
+        ElegirPausa(
+            inicial = pausa,
+            onElegida = {
+                TrainingReminder.setPause(context, it)
+                pausa = it
+                eligiendoPausa = false
+            },
+            onCancelar = { eligiendoPausa = false }
+        )
+    }
 
     Bloque {
         Row(
@@ -520,6 +548,12 @@ private fun SeccionRecordatorios() {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (activo) {
+            Spacer(Modifier.size(Space.x2))
+            PausaDelRecordatorio(
+                pausa = pausa,
+                onElegir = { eligiendoPausa = true },
+                onQuitar = { TrainingReminder.setPause(context, null); pausa = null }
+            )
             Spacer(Modifier.size(Space.x3))
             // Los siete a partes iguales en una sola fila: con chips normales el domingo no
             // cabia y se caia solo a la linea de abajo, que para una semana se lee fatal.
@@ -590,6 +624,91 @@ private fun SeccionRecordatorios() {
                 )
             }
         }
+    }
+}
+
+/**
+ * «Pausar hasta el…» o, si ya hay pausa, «En pausa hasta el 16 nov» con su «Quitar pausa».
+ * Es una fecha de vuelta, no un modo: cuando pasa, la pausa se borra sola.
+ */
+@Composable
+private fun PausaDelRecordatorio(
+    pausa: LocalDate?,
+    onElegir: () -> Unit,
+    onQuitar: () -> Unit,
+) {
+    if (pausa != null) {
+        val context = LocalContext.current
+        val patron = stringResource(R.string.plan_date_short_pattern)
+        val fecha = remember(pausa, patron) {
+            java.text.SimpleDateFormat(patron, AppLanguage.locale(context)).format(
+                java.util.Date.from(pausa.atStartOfDay(ZoneId.systemDefault()).toInstant())
+            )
+        }
+        Text(
+            stringResource(R.string.ini_set_paused_until, fecha),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        TextButton(
+            onClick = onQuitar,
+            contentPadding = PaddingValues(horizontal = 0.dp, vertical = Space.x1)
+        ) {
+            Text(stringResource(R.string.ini_set_pause_remove))
+        }
+    } else {
+        OutlinedButton(onClick = onElegir, modifier = Modifier.heightIn(min = Touch.min)) {
+            Text(stringResource(R.string.ini_set_pause))
+        }
+        Spacer(Modifier.size(Space.x1))
+        Text(
+            stringResource(R.string.ini_set_pause_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * El calendario para elegir el último día de la pausa. Lo más pronto, mañana: pausar «hasta
+ * hoy» no serviría de nada.
+ */
+@Composable
+private fun ElegirPausa(
+    inicial: LocalDate?,
+    onElegida: (LocalDate) -> Unit,
+    onCancelar: () -> Unit,
+) {
+    val manana = remember { LocalDate.now().plusDays(1) }
+    // El DatePicker trabaja en milisegundos UTC a medianoche, no en la zona del móvil.
+    fun aMillis(d: LocalDate) = d.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+    val estado = rememberDatePickerState(
+        initialSelectedDateMillis = aMillis(inicial ?: manana.plusDays(6)),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis >= aMillis(manana)
+            override fun isSelectableYear(year: Int) = year >= manana.year
+        }
+    )
+    // El fondo, el de la app: el de serie de Material sale lila, fuera de la paleta.
+    val colores = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
+    DatePickerDialog(
+        onDismissRequest = onCancelar,
+        colors = colores,
+        confirmButton = {
+            TextButton(
+                enabled = estado.selectedDateMillis != null,
+                onClick = {
+                    estado.selectedDateMillis?.let {
+                        onElegida(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate())
+                    }
+                }
+            ) { Text(stringResource(R.string.ini_set_pause_ok)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancelar) { Text(stringResource(R.string.ini_backup_cancel)) }
+        }
+    ) {
+        DatePicker(state = estado, colors = colores)
     }
 }
 

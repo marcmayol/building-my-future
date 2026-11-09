@@ -240,4 +240,10 @@
     <string name="ini_upd_update">Update</string>
     <string name="ini_upd_banner_downloading">Downloading the new version… %1$d%%</string>
     <string name="ini_upd_banner_verifying">Checking the download is intact…</string>
+    <!-- Reminder pause ("holidays"): the date is the last silent day. -->
+    <string name="ini_set_pause">Pause until…</string>
+    <string name="ini_set_pause_hint">For holidays: the reminder comes back on its own, nothing to remember.</string>
+    <string name="ini_set_paused_until">Paused until %1$s</string>
+    <string name="ini_set_pause_remove">Remove pause</string>
+    <string name="ini_set_pause_ok">Pause</string>
 </resources>

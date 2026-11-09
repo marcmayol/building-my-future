@@ -266,7 +266,7 @@
     <string-array name="ayu_help_ajustes_steps">
         <item>Weight (to estimate calories), the drawings\' gender and whether you use a watch.</item>
         <item>Rest: default length between sets and between exercises.</item>
-        <item>Reminders: pick days and a time and the app tells you it\'s time to train.</item>
+        <item>Reminders: pick days and a time and the app tells you it\'s time to train. Going on holiday? "Pause until…" silences them until the date you pick, and they come back on their own.</item>
         <item>Light or dark theme, and backup to take your progress to another phone.</item>
     </string-array>
 

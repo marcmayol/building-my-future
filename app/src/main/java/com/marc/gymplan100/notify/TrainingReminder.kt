@@ -47,6 +47,7 @@ object TrainingReminder {
     private const val KEY_ON = "activo"
     private const val KEY_DAYS = "dias"
     private const val KEY_MINUTE = "minuto"
+    private const val KEY_PAUSE = "pausa_hasta"
     private const val CHANNEL_ID = "training_reminder"
     private const val NOTIF_ID = 5100
     private const val REQUEST = 5101
@@ -80,27 +81,75 @@ object TrainingReminder {
             .putBoolean(KEY_ON, enabled)
             .putStringSet(KEY_DAYS, days.map { it.toString() }.toSet())
             .putInt(KEY_MINUTE, minuteOfDay)
+            .apply {
+                // Apagar el recordatorio también quita la pausa: al volver a encenderlo, que
+                // avise como siempre y no arrastre unas vacaciones de hace meses.
+                if (!enabled) remove(KEY_PAUSE)
+            }
             .apply()
         reschedule(context)
     }
 
     /**
+     * Último día en silencio de la pausa («Pausar hasta el…»), o null si no hay pausa.
+     *
+     * Es para las vacaciones: apagar el aviso ya se podía, pero luego se olvida encenderlo y la
+     * app se queda muda justo al volver a la rutina. Con fecha de vuelta no hay que acordarse
+     * de nada. Una pausa ya pasada se borra aquí mismo y no vuelve a salir.
+     */
+    fun pausedUntil(context: Context, today: LocalDate = LocalDate.now()): LocalDate? {
+        val guardada = prefs(context).getString(KEY_PAUSE, null) ?: return null
+        val fecha = runCatching { LocalDate.parse(guardada) }.getOrNull()
+        if (fecha == null || fecha.isBefore(today)) {
+            prefs(context).edit().remove(KEY_PAUSE).apply()
+            return null
+        }
+        return fecha
+    }
+
+    /** Pausa los avisos hasta [until] incluido (null la quita) y reprograma el próximo. */
+    fun setPause(context: Context, until: LocalDate?) {
+        prefs(context).edit().apply {
+            if (until == null) remove(KEY_PAUSE) else putString(KEY_PAUSE, until.toString())
+        }.apply()
+        reschedule(context)
+    }
+
+    /** ¿Hoy cae dentro de la pausa? */
+    fun isPausedOn(pausedUntil: LocalDate?, day: LocalDate): Boolean =
+        pausedUntil != null && !day.isAfter(pausedUntil)
+
+    /**
      * Cuándo cae el próximo aviso, o null si no hay ninguno que programar.
      *
      * Se busca el siguiente de los días elegidos a partir de [from]; si hoy es uno de ellos pero
-     * la hora ya pasó, se salta a la semana que viene. Función pura para poder probarla.
+     * la hora ya pasó, se salta a la semana que viene. Con una pausa vigente ([pausedUntil] es
+     * su último día en silencio) la búsqueda empieza el día de vuelta, a cualquier hora: así no
+     * queda ninguna alarma programada en mitad de las vacaciones. Una pausa ya pasada no cuenta.
+     * Función pura para poder probarla.
      */
-    fun nextTrigger(from: LocalDateTime, days: Set<Int>, minuteOfDay: Int): LocalDateTime? {
+    fun nextTrigger(
+        from: LocalDateTime,
+        days: Set<Int>,
+        minuteOfDay: Int,
+        pausedUntil: LocalDate? = null,
+    ): LocalDateTime? {
         if (days.isEmpty()) return null
         val hora = LocalTime.of(minuteOfDay / 60, minuteOfDay % 60)
+        val enPausa = isPausedOn(pausedUntil, from.toLocalDate())
+        val desde = if (enPausa) pausedUntil!!.plusDays(1) else from.toLocalDate()
         for (salto in 0..7) {
-            val fecha = from.toLocalDate().plusDays(salto.toLong())
+            val fecha = desde.plusDays(salto.toLong())
             if (fecha.dayOfWeek.value !in days) continue
             val cuando = LocalDateTime.of(fecha, hora)
-            if (cuando.isAfter(from)) return cuando
+            if (enPausa || cuando.isAfter(from)) return cuando
         }
         return null
     }
+
+    /** El aviso en milisegundos, en la zona del móvil (con su cambio de hora). */
+    fun triggerMillis(trigger: LocalDateTime, zone: ZoneId): Long =
+        trigger.atZone(zone).toInstant().toEpochMilli()
 
     /** Reprograma el próximo aviso: al cambiar los ajustes, al terminar un entreno y al arrancar. */
     fun reschedule(context: Context) {
@@ -112,8 +161,10 @@ object TrainingReminder {
         )
         am.cancel(pi)
         if (!isEnabled(context)) return
-        val proximo = nextTrigger(LocalDateTime.now(), days(context), minuteOfDay(context)) ?: return
-        val millis = proximo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val proximo = nextTrigger(
+            LocalDateTime.now(), days(context), minuteOfDay(context), pausedUntil(context)
+        ) ?: return
+        val millis = triggerMillis(proximo, ZoneId.systemDefault())
         // Un recordatorio no necesita ser exacto al segundo: `setWindow` deja que el sistema lo
         // agrupe con otros y no gasta el permiso de alarmas exactas, que aqui no hace falta.
         am.setWindow(AlarmManager.RTC_WAKEUP, millis, 15 * 60 * 1000L, pi)
@@ -184,10 +235,12 @@ class TrainingAlarmReceiver : BroadcastReceiver() {
                 val repo = ProgressRepository(app)
                 val zona = ZoneId.systemDefault()
                 val hoy = LocalDate.now(zona)
+                // Una alarma puesta antes de pausar puede saltar igual: en pausa no se avisa.
+                val enPausa = TrainingReminder.isPausedOn(TrainingReminder.pausedUntil(app, hoy), hoy)
                 val yaEntrenado = repo.history.first().any {
                     Instant.ofEpochMilli(it.endMillis).atZone(zona).toLocalDate() == hoy
                 }
-                if (!yaEntrenado) {
+                if (!enPausa && !yaEntrenado) {
                     val dia = SessionEngine.nextDay(repo.progress.first().completedDays)
                     val titulo = PlanData.dayByNumber(dia)?.template?.title.orEmpty()
                     TrainingReminder.notifyToday(app, dia, titulo)

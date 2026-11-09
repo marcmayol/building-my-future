@@ -266,7 +266,7 @@
     <string-array name="ayu_help_ajustes_steps">
         <item>Peso (para estimar calorías), género de los dibujos y si usas reloj.</item>
         <item>Descansos: cuánto duran por defecto entre series y entre ejercicios.</item>
-        <item>Recordatorios: elige días y hora y la app te avisa de que toca entrenar.</item>
+        <item>Recordatorios: elige días y hora y la app te avisa de que toca entrenar. Si te vas de vacaciones, «Pausar hasta el…» los calla hasta la fecha que elijas y vuelven solos.</item>
         <item>Tema claro u oscuro, y copia de seguridad para llevarte el progreso a otro móvil.</item>
     </string-array>
 
