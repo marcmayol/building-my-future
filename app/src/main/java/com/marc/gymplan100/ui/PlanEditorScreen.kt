@@ -777,12 +777,12 @@ private fun ExerciseSheet(
         ) {
             // Como en el entreno libre: «Leg press» se guarda como «Prensa de piernas» y así
             // tiene dibujo, ficha e historial.
-            val (escrito, alEscribir) = campoDeContenido(ejercicio.nombre) { onChange(ejercicio.copy(nombre = it)) }
+            val campo = campoDeContenido(ejercicio.nombre) { onChange(ejercicio.copy(nombre = it)) }
             EditorField(
                 label = stringResource(R.string.plan_editor_exercise_label),
-                value = escrito,
+                value = campo.texto,
                 placeholder = stringResource(R.string.plan_editor_exercise_placeholder),
-                onValue = alEscribir
+                onValue = campo.escribir
             )
             // Los que registraste en entrenos libres: tu plan es el sitio donde valen.
             val tuyos = remember(ejercicio.nombre) {
@@ -795,7 +795,7 @@ private fun ExerciseSheet(
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                     tuyos.forEach { nombre ->
                         SuggestionChip(
-                            onClick = { onChange(ejercicio.copy(nombre = nombre)) },
+                            onClick = { campo.elegir(nombre) },
                             label = { Text(Contenido.t(nombre), style = MaterialTheme.typography.bodyMedium, maxLines = 2) }
                         )
                     }

@@ -76,11 +76,16 @@ class ContenidoInglesTest {
         assertEquals("Mi press raro", Contenido.t("Mi press raro"))
         // Dos claves con la misma traducción: gana la que usan los planes, que tiene historial.
         assertEquals("Remo sentado en polea", Contenido.clave(Contenido.t("Remo en polea sentado")))
+        // En minúsculas también: lo que se teclea no lleva por qué la mayúscula.
+        assertEquals("Prensa de piernas", Contenido.clave(en.lowercase()))
+        // Una clave que ya está en inglés se queda la suya, no la del catálogo.
+        assertEquals("Mountain climbers", Contenido.clave("Mountain climbers"))
     }
 
     @Test
     fun cada_nombre_de_los_planes_vuelve_a_su_clave() {
-        val planes = ContenidoFuentes.planesDeSerie().flatMap { it.exerciseNames }.toSet()
+        val planes = ContenidoFuentes.planesDeSerie().flatMap { it.exerciseNames }.toSet() +
+            ContenidoFuentes.nombresDeEspeciales()
         // Si dos nombres de los planes comparten traducción, solo uno puede volver: el test
         // avisa para que se distingan en el diccionario.
         val malos = planes.filter { Contenido.t(it) != it && Contenido.clave(Contenido.t(it)) != it }

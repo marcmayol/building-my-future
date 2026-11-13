@@ -382,8 +382,9 @@ private fun FilaEjercicio(
     var enFoco by remember { mutableStateOf(false) }
     // Se enseña en el idioma de la app y se guarda con la clave en castellano, para que
     // «Leg press» siga sumando al historial de «Prensa de piernas».
-    val (escrito, alEscribir) = campoDeContenido(fila.name) { onChange(fila.copy(name = it)) }
-    val coincidencias = remember(escrito, fila.name, sugerencias) {
+    val campo = campoDeContenido(fila.name) { onChange(fila.copy(name = it)) }
+    val escrito = campo.texto.trim()
+    val coincidencias = remember(escrito, sugerencias) {
         if (escrito.isBlank()) sugerencias
         else sugerencias.filter {
             it.contains(escrito, ignoreCase = true) || Contenido.t(it).contains(escrito, ignoreCase = true)
@@ -391,7 +392,7 @@ private fun FilaEjercicio(
     }
     // Lo escrito a mano no se pierde en el desplegable: se ofrece añadirlo tal cual.
     val puedeCrear = escrito.isNotBlank() &&
-        sugerencias.none { it.equals(fila.name, true) || Contenido.t(it).equals(escrito.trim(), true) }
+        sugerencias.none { it.equals(fila.name.trim(), true) || Contenido.t(it).equals(escrito, true) }
     val mostrar = abierto && (coincidencias.isNotEmpty() || puedeCrear)
 
     val forma = RoundedCornerShape(16.dp)
@@ -416,8 +417,8 @@ private fun FilaEjercicio(
                 modifier = Modifier.weight(1f)
             ) {
                 OutlinedTextFieldSinBorde(
-                    value = escrito,
-                    onValueChange = { alEscribir(it); abierto = true },
+                    value = campo.texto,
+                    onValueChange = { campo.escribir(it); abierto = true },
                     label = stringResource(R.string.mot_free_exercise),
                     // Dos líneas: "Prensa de piernas (recorrido corto)" no cabe en una, y
                     // cortarlo obliga a adivinar cuál de los dos parecidos es.
@@ -430,12 +431,12 @@ private fun FilaEjercicio(
                     coincidencias.take(8).forEach { nombre ->
                         DropdownMenuItem(
                             text = { Text(Contenido.t(nombre)) },
-                            onClick = { onChange(fila.copy(name = nombre)); abierto = false }
+                            onClick = { campo.elegir(nombre); abierto = false }
                         )
                     }
                     if (puedeCrear) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.mot_free_add_named, escrito.trim())) },
+                            text = { Text(stringResource(R.string.mot_free_add_named, escrito)) },
                             onClick = { abierto = false }
                         )
                     }

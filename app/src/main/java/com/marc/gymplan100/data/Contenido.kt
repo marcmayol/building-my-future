@@ -49,7 +49,7 @@ object Contenido {
                     context.applicationContext.assets.open(fichero).bufferedReader().use { it.readText() }
                 )
             }.getOrElse { emptyMap() }
-            inverso = leer("en/inverso.json")
+            inverso = leer("en/inverso.json").mapKeys { it.key.lowercase() }
             dic = leer("en/contenido.json")
         }
     }
@@ -57,7 +57,7 @@ object Contenido {
     /** Para los tests, que no tienen assets. */
     fun set(ingles: Boolean, dic: Map<String, String>, inverso: Map<String, String> = emptyMap()) {
         this.dic = dic
-        this.inverso = inverso
+        this.inverso = inverso.mapKeys { it.key.lowercase() }
         this.ingles = ingles
     }
 
@@ -91,7 +91,8 @@ object Contenido {
      */
     fun clave(texto: String): String {
         if (!ingles || texto.isBlank()) return texto
-        return inverso?.get(texto.trim()) ?: texto
+        // Sin distinguir mayúsculas: «leg press» también es «Prensa de piernas».
+        return inverso?.get(texto.trim().lowercase()) ?: texto
     }
 
     /** Lo que se genera al leer un plan («Día 3», «Semanas 1-4»…), que no está en ningún fichero. */

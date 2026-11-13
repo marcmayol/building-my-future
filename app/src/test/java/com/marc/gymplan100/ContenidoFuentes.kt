@@ -69,6 +69,9 @@ object ContenidoFuentes {
         return out.map { it.trim() }.filter { it.isNotEmpty() }.toSet()
     }
 
+    /** Nombres de los pasos y ejercicios de los entrenamientos especiales. */
+    fun nombresDeEspeciales(): Set<String> = especiales(soloNombres = true).map { it.trim() }.toSet()
+
     /** Textos de contenido que no son nombres de ejercicio ni esquemas. */
     fun textos(): Set<String> {
         val out = linkedSetOf<String>()
