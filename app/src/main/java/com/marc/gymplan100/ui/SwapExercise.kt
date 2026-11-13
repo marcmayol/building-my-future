@@ -245,7 +245,7 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
             // Lo que no está en el catálogo también vale: se apunta con su nombre, solo que
             // sin dibujo ni ficha (la ficha ofrecerá buscarlo en vídeo). Y se queda guardado
             // entre tus ejercicios para la próxima vez.
-            TextButton(onClick = { onPick(escrito) }) {
+            TextButton(onClick = { onPick(Contenido.clave(escrito)) }) {
                 Text(stringResource(R.string.ses_swap_log_as, escrito), maxLines = 2)
             }
         }

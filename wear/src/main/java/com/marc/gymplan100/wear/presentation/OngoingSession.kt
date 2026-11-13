@@ -111,7 +111,8 @@ object OngoingSession {
 
     private fun crearCanal(context: Context) {
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
-        if (manager.getNotificationChannel(CHANNEL_ID) != null) return
+        // Sin salir si ya existe: crearlo otra vez le pone el nombre en el idioma de ahora (el
+        // canal de quien venía de la versión en castellano se quedaría en castellano).
         val canal = NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.wear_channel),

@@ -23,8 +23,8 @@ import java.io.File
  * entrenamientos especiales. Los esquemas («3 x 12 por lado») van aparte: se traducen con
  * reglas, no con diccionario.
  *
- * Lo usa el test de cobertura; las fichas de `assets/fichas.json` tienen su propio fichero en
- * inglés y se comprueban por slug.
+ * Lo usa el test de cobertura. Las fichas de `assets/fichas.json` se traducen con el mismo
+ * diccionario y el test las recorre aparte.
  */
 object ContenidoFuentes {
 

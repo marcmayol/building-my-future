@@ -382,7 +382,7 @@ private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit)
     }
 
     if (abierto) {
-        val todos = remember { ExerciseImages.catalogNames() }
+        val todos = remember { ExerciseImages.catalogNames().sortedBy { Contenido.t(it).lowercase() } }
         val filtrados = remember(busqueda, todos) {
             if (busqueda.isBlank()) todos
             else todos.filter {

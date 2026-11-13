@@ -775,11 +775,14 @@ private fun ExerciseSheet(
                 .padding(horizontal = Space.screen)
                 .padding(bottom = Space.block)
         ) {
+            // Como en el entreno libre: «Leg press» se guarda como «Prensa de piernas» y así
+            // tiene dibujo, ficha e historial.
+            val (escrito, alEscribir) = campoDeContenido(ejercicio.nombre) { onChange(ejercicio.copy(nombre = it)) }
             EditorField(
                 label = stringResource(R.string.plan_editor_exercise_label),
-                value = ejercicio.nombre,
+                value = escrito,
                 placeholder = stringResource(R.string.plan_editor_exercise_placeholder),
-                onValue = { onChange(ejercicio.copy(nombre = it)) }
+                onValue = alEscribir
             )
             // Los que registraste en entrenos libres: tu plan es el sitio donde valen.
             val tuyos = remember(ejercicio.nombre) {

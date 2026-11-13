@@ -380,15 +380,18 @@ private fun FilaEjercicio(
 ) {
     var abierto by remember { mutableStateOf(false) }
     var enFoco by remember { mutableStateOf(false) }
-    val coincidencias = remember(fila.name, sugerencias) {
-        if (fila.name.isBlank()) sugerencias
+    // Se enseña en el idioma de la app y se guarda con la clave en castellano, para que
+    // «Leg press» siga sumando al historial de «Prensa de piernas».
+    val (escrito, alEscribir) = campoDeContenido(fila.name) { onChange(fila.copy(name = it)) }
+    val coincidencias = remember(escrito, fila.name, sugerencias) {
+        if (escrito.isBlank()) sugerencias
         else sugerencias.filter {
-            it.contains(fila.name, ignoreCase = true) || Contenido.t(it).contains(fila.name, ignoreCase = true)
+            it.contains(escrito, ignoreCase = true) || Contenido.t(it).contains(escrito, ignoreCase = true)
         }
     }
     // Lo escrito a mano no se pierde en el desplegable: se ofrece añadirlo tal cual.
-    val puedeCrear = fila.name.isNotBlank() &&
-        sugerencias.none { it.equals(fila.name, true) || Contenido.t(it).equals(fila.name, true) }
+    val puedeCrear = escrito.isNotBlank() &&
+        sugerencias.none { it.equals(fila.name, true) || Contenido.t(it).equals(escrito.trim(), true) }
     val mostrar = abierto && (coincidencias.isNotEmpty() || puedeCrear)
 
     val forma = RoundedCornerShape(16.dp)
@@ -413,10 +416,8 @@ private fun FilaEjercicio(
                 modifier = Modifier.weight(1f)
             ) {
                 OutlinedTextFieldSinBorde(
-                    // Se enseña en el idioma de la app y se guarda con la clave en castellano,
-                    // para que «Leg press» siga sumando al historial de «Prensa de piernas».
-                    value = Contenido.t(fila.name),
-                    onValueChange = { onChange(fila.copy(name = Contenido.clave(it))); abierto = true },
+                    value = escrito,
+                    onValueChange = { alEscribir(it); abierto = true },
                     label = stringResource(R.string.mot_free_exercise),
                     // Dos líneas: "Prensa de piernas (recorrido corto)" no cabe en una, y
                     // cortarlo obliga a adivinar cuál de los dos parecidos es.
@@ -434,7 +435,7 @@ private fun FilaEjercicio(
                     }
                     if (puedeCrear) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.mot_free_add_named, fila.name)) },
+                            text = { Text(stringResource(R.string.mot_free_add_named, escrito.trim())) },
                             onClick = { abierto = false }
                         )
                     }

@@ -44,19 +44,20 @@ object Contenido {
         if (dic != null) return
         synchronized(this) {
             if (dic != null) return
-            dic = runCatching {
+            fun leer(fichero: String): Map<String, String> = runCatching {
                 json.decodeFromString<Map<String, String>>(
-                    context.applicationContext.assets.open("en/contenido.json")
-                        .bufferedReader().use { it.readText() }
+                    context.applicationContext.assets.open(fichero).bufferedReader().use { it.readText() }
                 )
             }.getOrElse { emptyMap() }
+            inverso = leer("en/inverso.json")
+            dic = leer("en/contenido.json")
         }
     }
 
     /** Para los tests, que no tienen assets. */
-    fun set(ingles: Boolean, dic: Map<String, String>) {
+    fun set(ingles: Boolean, dic: Map<String, String>, inverso: Map<String, String> = emptyMap()) {
         this.dic = dic
-        this.inverso = null
+        this.inverso = inverso
         this.ingles = ingles
     }
 
@@ -78,16 +79,19 @@ object Contenido {
     private var inverso: Map<String, String>? = null
 
     /**
-     * La clave en castellano de un texto que se enseña traducido, para lo que el usuario
-     * escribe o elige en un campo que está pintado en inglés (el nombre de un ejercicio en el
-     * entreno libre): «Leg press» se guarda como «Prensa de piernas» y cuenta para su
-     * historial. Lo que no es una traducción conocida se guarda tal cual.
+     * La clave en castellano de un nombre de ejercicio que se enseña traducido, para lo que el
+     * usuario escribe en un campo pintado en inglés (el entreno libre, el editor de planes):
+     * «Leg press» se guarda como «Prensa de piernas» y cuenta para su historial. Lo que no es
+     * una traducción conocida se guarda tal cual.
+     *
+     * Sale de `assets/en/inverso.json` y no de dar la vuelta al diccionario: hay claves que
+     * comparten traducción («Remo sentado en polea» y «Remo en polea sentado» son «Seated
+     * cable row»), y de las dos tiene que ganar la que usan los planes, que es la que tiene
+     * historial.
      */
     fun clave(texto: String): String {
         if (!ingles || texto.isBlank()) return texto
-        val mapa = inverso ?: (dic.orEmpty().entries.reversed().associate { it.value to it.key })
-            .also { inverso = it }
-        return mapa[texto.trim()] ?: texto
+        return inverso?.get(texto.trim()) ?: texto
     }
 
     /** Lo que se genera al leer un plan («Día 3», «Semanas 1-4»…), que no está en ningún fichero. */

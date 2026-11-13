@@ -19,8 +19,11 @@ class ContenidoInglesTest {
     private val dic: Map<String, String> =
         Json.decodeFromString(File(ContenidoFuentes.assets, "en/contenido.json").readText())
 
+    private val inverso: Map<String, String> =
+        Json.decodeFromString(File(ContenidoFuentes.assets, "en/inverso.json").readText())
+
     @Before
-    fun ingles() = Contenido.set(ingles = true, dic = dic)
+    fun ingles() = Contenido.set(ingles = true, dic = dic, inverso = inverso)
 
     @After
     fun castellano() = Contenido.set(ingles = false, dic = emptyMap())
@@ -71,6 +74,17 @@ class ContenidoInglesTest {
         // Lo que no es una traducción conocida (un ejercicio tuyo) se queda como lo escribiste.
         assertEquals("Mi press raro", Contenido.clave("Mi press raro"))
         assertEquals("Mi press raro", Contenido.t("Mi press raro"))
+        // Dos claves con la misma traducción: gana la que usan los planes, que tiene historial.
+        assertEquals("Remo sentado en polea", Contenido.clave(Contenido.t("Remo en polea sentado")))
+    }
+
+    @Test
+    fun cada_nombre_de_los_planes_vuelve_a_su_clave() {
+        val planes = ContenidoFuentes.planesDeSerie().flatMap { it.exerciseNames }.toSet()
+        // Si dos nombres de los planes comparten traducción, solo uno puede volver: el test
+        // avisa para que se distingan en el diccionario.
+        val malos = planes.filter { Contenido.t(it) != it && Contenido.clave(Contenido.t(it)) != it }
+        assertTrue("No vuelven a su clave: $malos", malos.isEmpty())
     }
 
     @Test
