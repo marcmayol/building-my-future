@@ -132,7 +132,9 @@ fun WorkoutSessionScreen(
     LaunchedEffectTick { now = it }
 
     val s = session
-    if (s == null || s.dayNumber != dayNumber) {
+    // Una rutina especial lleva el número del día que toca, pero no es ese día: abrir el día
+    // con ella en marcha pintaba la rutina como si fuese la sesión del plan.
+    if (s == null || s.dayNumber != dayNumber || s.isRoutine) {
         StartPrompt(
             day = day,
             other = s,
@@ -1818,7 +1820,11 @@ private fun StartPrompt(
         if (other != null) {
             Spacer(Modifier.height(Space.x3))
             Text(
-                stringResource(R.string.ses_other_day_pending, other.dayNumber),
+                if (other.isRoutine || other.extra) {
+                    stringResource(R.string.ses_other_workout_pending)
+                } else {
+                    stringResource(R.string.ses_other_day_pending, other.dayNumber)
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error
             )

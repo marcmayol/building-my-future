@@ -241,7 +241,15 @@ fun PlansScreen(
             if (activeSession != null) {
                 item {
                     Text(
-                        stringResource(R.string.plan_session_half_done, activeSession!!.dayNumber),
+                        activeSession!!.let {
+                            // Una rutina especial o un extra llevan el número del día que toca,
+                            // pero no son ese día (el libre sí cuenta como su día).
+                            if (it.isRoutine || it.extra) {
+                                stringResource(R.string.plan_workout_half_done)
+                            } else {
+                                stringResource(R.string.plan_session_half_done, it.dayNumber)
+                            }
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier

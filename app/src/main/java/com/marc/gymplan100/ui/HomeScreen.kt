@@ -307,9 +307,20 @@ fun HomeScreen(
         item {
             val session = activeSession
             if (session != null) {
+                // Una rutina especial se guarda con el número del día que toca, pero no es ese
+                // día: decir «Día 27 · Tren inferior» y abrir la Militar al reanudar confundía.
+                val rutina = session.routineId?.let { viewModel.specialWorkouts.rutina(it) }
                 HeroEnCurso(
-                    dayNumber = session.dayNumber,
+                    title = if (session.isRoutine) {
+                        rutina?.let { Contenido.t(it.nombre) } ?: stringResource(R.string.ses_routine)
+                    } else {
+                        stringResource(R.string.ini_day_n, session.dayNumber)
+                    },
                     subtitle = when {
+                        session.isRoutine -> session.exerciseId
+                            ?.let { viewModel.specialWorkouts.ejercicio(it) }
+                            ?.let { Contenido.t(it.nombre) }
+                            .orEmpty()
                         session.extra -> stringResource(R.string.ini_home_extra_running)
                         session.special -> stringResource(R.string.ini_home_special_running)
                         else -> Contenido.t(PlanData.dayByNumber(session.dayNumber)?.template?.title.orEmpty())
@@ -385,7 +396,7 @@ fun HomeScreen(
 /** Héroe con entreno a medias: el degradado de marca avisa de que hay algo abierto. */
 @Composable
 private fun HeroEnCurso(
-    dayNumber: Int,
+    title: String,
     subtitle: String,
     onResume: () -> Unit
 ) {
@@ -407,7 +418,7 @@ private fun HeroEnCurso(
             color = onHero
         )
         Spacer(Modifier.height(Space.x2))
-        Text(stringResource(R.string.ini_day_n, dayNumber), style = styles.displayCard, color = onHero)
+        Text(title, style = styles.displayCard, color = onHero)
         if (subtitle.isNotBlank()) {
             Spacer(Modifier.height(Space.x1))
             Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = onHero)

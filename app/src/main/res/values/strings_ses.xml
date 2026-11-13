@@ -192,6 +192,7 @@
     <string name="ses_short_on_time">SHORT ON TIME?</string>
     <string name="ses_whole">Full</string>
     <string name="ses_other_day_pending">You have day %1$d half done: if you start this one, that one is discarded.</string>
+    <string name="ses_other_workout_pending">You have a workout in progress: if you start this day, it is discarded.</string>
     <string name="ses_start_express">Start express</string>
     <string name="ses_start_workout">Start workout</string>
     <string name="ses_special_workout">Special workout</string>

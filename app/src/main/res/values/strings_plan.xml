@@ -18,6 +18,7 @@
     <string name="plan_see_format">See format</string>
     <string name="plan_now_following">Now following “%1$s”</string>
     <string name="plan_session_half_done">Day %1$d is half done: finish or discard it before switching plans.</string>
+    <string name="plan_workout_half_done">You have a workout in progress: finish or discard it before switching plans.</string>
     <string name="plan_delete_title">Delete “%1$s”?</string>
     <string name="plan_delete_text">This deletes the plan along with the days, weights and workouts you logged in it. This can\'t be undone.</string>
     <string name="plan_deleted">Plan deleted</string>

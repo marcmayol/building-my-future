@@ -192,6 +192,7 @@
     <string name="ses_short_on_time">¿VAS JUSTO DE TIEMPO?</string>
     <string name="ses_whole">Entero</string>
     <string name="ses_other_day_pending">Tienes el día %1$d a medias: si empiezas este, aquel se descarta.</string>
+    <string name="ses_other_workout_pending">Tienes un entrenamiento a medias: si empiezas este día, se descarta.</string>
     <string name="ses_start_express">Empezar exprés</string>
     <string name="ses_start_workout">Empezar entrenamiento</string>
     <string name="ses_special_workout">Entrenamiento especial</string>
