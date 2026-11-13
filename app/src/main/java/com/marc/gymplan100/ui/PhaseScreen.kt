@@ -4,6 +4,7 @@ package com.marc.gymplan100.ui
 
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.Phase
 import androidx.compose.foundation.background
@@ -103,7 +104,7 @@ fun PhaseScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(Space.x1))
-                Text(phase.name, style = MaterialTheme.typography.headlineLarge)
+                Text(Contenido.t(phase.name), style = MaterialTheme.typography.headlineLarge)
                 Spacer(Modifier.height(Space.x3))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -142,8 +143,8 @@ fun PhaseScreen(
                 }
             }
 
-            item { PhaseSection(stringResource(R.string.plan_phase_goal), phase.description) }
-            item { PhaseSection(stringResource(R.string.plan_phase_progression), phase.progression) }
+            item { PhaseSection(stringResource(R.string.plan_phase_goal), Contenido.t(phase.description)) }
+            item { PhaseSection(stringResource(R.string.plan_phase_progression), Contenido.t(phase.progression)) }
 
             item {
                 Text(
@@ -176,7 +177,7 @@ fun PhaseScreen(
 @Composable
 fun phaseSpanText(phase: Phase): String {
     val days = PlanData.daysOfPhase(phase.number)
-    if (days.isEmpty()) return "${phase.range} · ${phase.weeks}"
+    if (days.isEmpty()) return "${Contenido.t(phase.range)} · ${Contenido.t(phase.weeks)}"
     val first = days.first().number
     val last = days.last().number
     val firstWeek = PlanData.phases.filter { it.number < phase.number }.sumOf { it.weeksCount } + 1
@@ -280,7 +281,7 @@ private fun DayRow(
                 Text(stringResource(R.string.plan_day_n, day.number), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    stringResource(R.string.plan_day_title_week, day.template.title, week),
+                    stringResource(R.string.plan_day_title_week, Contenido.t(day.template.title), week),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

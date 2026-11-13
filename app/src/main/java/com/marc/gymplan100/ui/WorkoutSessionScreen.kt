@@ -74,6 +74,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.texto
 import com.marc.gymplan100.data.ExpressPlan
@@ -308,7 +309,7 @@ private fun WarmupContent(
         contextCard = {
             SessionCard(label = stringResource(R.string.ses_today), dark = dark) {
                 Text(
-                    day.template.title,
+                    Contenido.t(day.template.title),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -335,13 +336,13 @@ private fun WarmupContent(
         // El calentamiento no tiene dibujo propio (es "6 min de lo que quieras"), así que el
         // hueco lo llena con qué se empieza: da tiempo a ir buscando la máquina.
         deHoy.firstOrNull()?.let {
-            SessionIllustration(it.name, label = stringResource(R.string.ses_starting_with, it.name.lowercase()))
+            SessionIllustration(it.name, label = stringResource(R.string.ses_starting_with, Contenido.t(it.name).lowercase()))
         }
         Countdown(
             text = if (!done) formatSecs(remaining) else "+${formatSecs(-remaining)}",
             caption = when {
-                s.warmupPaused -> stringResource(R.string.ses_paused_dot, day.template.warmup)
-                !done -> stringResource(R.string.ses_remaining_dot, day.template.warmup)
+                s.warmupPaused -> stringResource(R.string.ses_paused_dot, Contenido.t(day.template.warmup))
+                !done -> stringResource(R.string.ses_remaining_dot, Contenido.t(day.template.warmup))
                 else -> stringResource(R.string.ses_warmup_over)
             },
             captionColor = tintAccent(SessionTint.WARMUP)
@@ -518,7 +519,7 @@ private fun WorkingContent(
                             value = reps,
                             onValue = { reps = it; repsTouched = true },
                             hint = progression?.reason?.texto().orEmpty()
-                                .ifBlank { stringResource(R.string.ses_plan_asks, exercise.scheme) }
+                                .ifBlank { stringResource(R.string.ses_plan_asks, Contenido.esquema(exercise.scheme)) }
                         )
                     }
                 }
@@ -551,7 +552,7 @@ private fun WorkingContent(
         }
     ) {
         Text(
-            ExerciseImages.headlineName(exercise.name),
+            titularEjercicio(exercise.name),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2
@@ -559,8 +560,8 @@ private fun WorkingContent(
         Spacer(Modifier.height(Space.x1))
         Text(
             buildString {
-                append(exercise.scheme)
-                if (exercise.note.isNotBlank()) append(" · ${exercise.note}")
+                append(Contenido.esquema(exercise.scheme))
+                if (exercise.note.isNotBlank()) append(" · ${Contenido.t(exercise.note)}")
             },
             style = MaterialTheme.typography.bodyLarge,
             color = tintAccent(SessionTint.WORK)
@@ -568,7 +569,7 @@ private fun WorkingContent(
         if (delPlan != exercise.name) {
             Spacer(Modifier.height(Space.x1))
             Text(
-                stringResource(R.string.ses_instead_of, ExerciseImages.headlineName(delPlan)),
+                stringResource(R.string.ses_instead_of, titularEjercicio(delPlan)),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -577,7 +578,7 @@ private fun WorkingContent(
             Spacer(Modifier.height(Space.x1))
             Text(
                 if (siguienteDelGrupo != null)
-                    stringResource(R.string.ses_superset_chain, ExerciseImages.headlineName(siguienteDelGrupo))
+                    stringResource(R.string.ses_superset_chain, titularEjercicio(siguienteDelGrupo))
                 else stringResource(R.string.ses_superset_last),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -904,7 +905,7 @@ private fun TimedSetContent(
         )
         Spacer(Modifier.height(Space.block))
         Text(
-            exercise.name,
+            Contenido.t(exercise.name),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -912,8 +913,8 @@ private fun TimedSetContent(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 buildString {
-                    append(exercise.scheme)
-                    if (exercise.note.isNotBlank()) append(" · ${exercise.note}")
+                    append(Contenido.esquema(exercise.scheme))
+                    if (exercise.note.isNotBlank()) append(" · ${Contenido.t(exercise.note)}")
                 },
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1006,14 +1007,14 @@ private fun RestingContent(
                     dark = dark
                 ) {
                     Text(
-                        nextExercise.name,
+                        Contenido.t(nextExercise.name),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(Modifier.height(Space.x1))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            stringResource(R.string.ses_set_of_scheme, nextSetNumber, nextTotalSets, nextExercise.scheme),
+                            stringResource(R.string.ses_set_of_scheme, nextSetNumber, nextTotalSets, Contenido.esquema(nextExercise.scheme)),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f)
@@ -1105,7 +1106,7 @@ private fun RestingContent(
                 } else if (nextImageRes != null) {
                     Image(
                         painter = painterResource(nextImageRes),
-                        contentDescription = nextExercise?.name,
+                        contentDescription = nextExercise?.name?.let(Contenido::t),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1203,7 +1204,7 @@ private fun FreeLoggedCard(s: ActiveSession, dark: Boolean) {
         apuntados.takeLast(4).forEach { e ->
             Row(modifier = Modifier.fillMaxWidth().padding(top = Space.x1)) {
                 Text(
-                    e.name,
+                    Contenido.t(e.name),
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
@@ -1234,7 +1235,7 @@ private fun FreeWarmupContent(
     val done = remaining <= 0
     // En un extra no hay día del plan que mirar: el calentamiento es el de cada uno.
     val tuManera = stringResource(R.string.ses_your_way)
-    val queCalentar = if (s.extra) tuManera else day.template.warmup.ifBlank { tuManera }
+    val queCalentar = if (s.extra) tuManera else Contenido.t(day.template.warmup).ifBlank { tuManera }
     SessionShell(
         tint = SessionTint.WARMUP,
         dark = dark,
@@ -1312,7 +1313,7 @@ private fun FreeContent(
         if (actual != null && actual.name.isNotBlank()) {
             SessionIllustration(actual.name)
             Text(
-                ExerciseImages.headlineName(actual.name),
+                titularEjercicio(actual.name),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -1433,7 +1434,7 @@ private fun FreeRestContent(
                                     .padding(horizontal = Space.x3, vertical = Space.x2)
                             ) {
                                 Text(
-                                    nombre,
+                                    Contenido.t(nombre),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -1496,7 +1497,7 @@ private fun FreeRestContent(
         if (actual != null && !sinNombre && !s.restBetweenExercises) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    actual.name,
+                    Contenido.t(actual.name),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
@@ -1566,7 +1567,7 @@ private fun FinishedContent(
         .filter { it.weight.isNotBlank() || it.reps.isNotBlank() }
         .groupBy { it.exerciseIndex }
         .map { (idx, seriesDelEjercicio) ->
-            val nombre = s.exerciseAt(idx)?.name ?: stringResource(R.string.ses_exercise)
+            val nombre = s.exerciseAt(idx)?.name?.let(Contenido::t) ?: stringResource(R.string.ses_exercise)
             nombre to setsSummary(
                 seriesDelEjercicio.sortedBy { it.setNumber }.map { SetLog(it.weight, it.reps) },
                 stringResource(R.string.mot_warmup_short)
@@ -1600,7 +1601,7 @@ private fun FinishedContent(
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Text(
-                day.template.title,
+                Contenido.t(day.template.title),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -1760,7 +1761,7 @@ private fun StartPrompt(
         )
         Spacer(Modifier.height(Space.x2))
         Text(
-            day.template.title,
+            Contenido.t(day.template.title),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -1771,8 +1772,9 @@ private fun StartPrompt(
                 // Hay planes que ya escriben «6 min de calentamiento»: no se repite la palabra.
                 // El texto del plan es contenido (en castellano): se mira también la palabra
                 // castellana aunque la app esté en inglés.
-                " · " + day.template.warmup.let {
-                    if (it.contains("calentamiento", ignoreCase = true) ||
+                " · " + day.template.warmup.let { delPlan ->
+                    val it = Contenido.t(delPlan)
+                    if (delPlan.contains("calentamiento", ignoreCase = true) ||
                         it.contains(warmupWord, ignoreCase = true)
                     ) it else stringResource(R.string.ses_warmup_colon, it)
                 },
@@ -1883,7 +1885,7 @@ private fun describeExpress(day: TrainingDay, plan: ExpressPlan?, minutos: Int):
     val fuera = if (plan.dropped.isEmpty()) "" else
         " " + stringResource(
             R.string.ses_express_left_out,
-            plan.dropped.joinToString(", ") { ExerciseImages.headlineName(it) }
+            plan.dropped.joinToString(", ") { titularEjercicio(it) }
         )
     return stringResource(
         R.string.ses_express_summary,

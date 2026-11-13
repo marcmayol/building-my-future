@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wear_no_session">Sin entrenamiento en curso</string>
+    <string name="wear_start_day">Empezar · Día %1$d</string>
+    <string name="wear_start">Empezar entreno</string>
+    <string name="wear_set_of">Serie %1$d de %2$d</string>
+    <string name="wear_paused">En pausa</string>
+    <string name="wear_running">En curso</string>
+    <string name="wear_workout">Entrenamiento</string>
+    <string name="wear_swap">Máquina ocupada</string>
+    <string name="wear_channel">Entrenamiento en curso</string>
+    <string name="wear_channel_desc">Acceso rápido a la sesión desde la esfera del reloj.</string>
+</resources>

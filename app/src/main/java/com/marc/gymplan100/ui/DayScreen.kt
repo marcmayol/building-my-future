@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.R
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -134,12 +135,12 @@ fun DayScreen(
         ) {
             item {
                 Text(
-                    stringResource(R.string.ini_day_phase, day.phase.number, day.phase.name.uppercase()),
+                    stringResource(R.string.ini_day_phase, day.phase.number, Contenido.t(day.phase.name).uppercase()),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(Space.x1))
-                Text(template.title, style = MaterialTheme.typography.headlineLarge)
+                Text(Contenido.t(template.title), style = MaterialTheme.typography.headlineLarge)
                 Spacer(Modifier.height(Space.x1))
                 Text(
                     pluralStringResource(R.plurals.ini_exercises, template.exercises.size, template.exercises.size),
@@ -175,7 +176,7 @@ fun DayScreen(
                 ) { Text(stringResource(R.string.ini_day_free)) }
             }
 
-            item { SectionBlock(stringResource(R.string.ini_day_warmup), template.warmup) }
+            item { SectionBlock(stringResource(R.string.ini_day_warmup), Contenido.t(template.warmup)) }
 
             itemsIndexed(template.exercises) { index, exercise ->
                 val log = progress.logs["${day.number}-$index"]
@@ -208,7 +209,7 @@ fun DayScreen(
                 )
             }
 
-            item { SectionBlock(stringResource(R.string.ini_day_cooldown), template.cooldown) }
+            item { SectionBlock(stringResource(R.string.ini_day_cooldown), Contenido.t(template.cooldown)) }
 
             item { DayMuscleCard(template.exercises) }
 
@@ -383,10 +384,10 @@ private fun ExerciseCard(
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(exercise.name, style = MaterialTheme.typography.titleMedium)
+                Text(Contenido.t(exercise.name), style = MaterialTheme.typography.titleMedium)
                 if (doneAs != null) {
                     Text(
-                        stringResource(R.string.ini_day_done_as, doneAs),
+                        stringResource(R.string.ini_day_done_as, Contenido.t(doneAs)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -395,14 +396,14 @@ private fun ExerciseCard(
                 // El descanso, a la vista: antes no salía en ningún sitio hasta estar ya
                 // descansando, y quien lo buscaba antes de empezar no lo encontraba.
                 Text(
-                    rest?.let { stringResource(R.string.ini_day_scheme_rest, exercise.scheme, restLabel(it)) }
-                        ?: exercise.scheme,
+                    rest?.let { stringResource(R.string.ini_day_scheme_rest, Contenido.esquema(exercise.scheme), restLabel(it)) }
+                        ?: Contenido.esquema(exercise.scheme),
                     style = styles.tabular,
                     color = app.warmup
                 )
                 if (exercise.note.isNotEmpty()) {
                     Text(
-                        exercise.note,
+                        Contenido.t(exercise.note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.PasoMilitar
 import com.marc.gymplan100.data.Protocolo
@@ -86,8 +87,8 @@ fun RoutineSessionScreen(
     val rutina = viewModel.specialWorkouts.rutina(s.routineId ?: "")
     val isFixed = rutina?.esSecuenciaFija == true
     val title = when {
-        isFixed -> rutina?.nombre ?: stringResource(R.string.ses_routine)
-        else -> viewModel.specialWorkouts.ejercicio(s.exerciseId ?: "")?.nombre ?: stringResource(R.string.ses_fatburn_short)
+        isFixed -> rutina?.nombre?.let(Contenido::t) ?: stringResource(R.string.ses_routine)
+        else -> viewModel.specialWorkouts.ejercicio(s.exerciseId ?: "")?.nombre?.let(Contenido::t) ?: stringResource(R.string.ses_fatburn_short)
     }
 
     Scaffold(
@@ -170,8 +171,8 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
             color = MaterialTheme.colorScheme.primary
         )
     }
-    Text(nombre, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-    if (paso.notas.isNotBlank()) NoteCard(paso.notas)
+    Text(Contenido.t(nombre), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+    if (paso.notas.isNotBlank()) NoteCard(Contenido.t(paso.notas))
 
     when (s.phase) {
         SessionPhase.TIMED_SET -> {
@@ -190,7 +191,7 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
                 OutlinedButton(
                     onClick = { viewModel.chooseAlternative() },
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(stringResource(R.string.ses_instead, paso.alternativa.nombre)) }
+                ) { Text(stringResource(R.string.ses_instead, Contenido.t(paso.alternativa.nombre))) }
             }
             var reps by remember(s.stepIndex, s.setNumber) { mutableStateOf("") }
             OutlinedTextField(
@@ -242,7 +243,7 @@ private fun FatburnContent(s: ActiveSession, now: Long, viewModel: PlanViewModel
     val unitLabel = when {
         protocol.esSeries -> stringResource(R.string.ses_set_of, s.stepIndex + 1, s.totalUnits)
         s.totalUnits > 1 -> stringResource(R.string.ses_round_of, s.stepIndex + 1, s.totalUnits)
-        else -> protocol.nombre
+        else -> Contenido.t(protocol.nombre)
     }
     Etiqueta(unitLabel)
 
@@ -257,12 +258,12 @@ private fun FatburnContent(s: ActiveSession, now: Long, viewModel: PlanViewModel
         SessionPhase.WORKING -> {
             if (protocol.repsLabel.isNotBlank()) {
                 Text(
-                    stringResource(R.string.ses_target_reps, protocol.repsLabel),
+                    stringResource(R.string.ses_target_reps, Contenido.t(protocol.repsLabel)),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-            if (exercise.notas_forma.isNotBlank()) NoteCard(exercise.notas_forma)
+            if (exercise.notas_forma.isNotBlank()) NoteCard(Contenido.t(exercise.notas_forma))
             var reps by remember(s.stepIndex) { mutableStateOf("") }
             OutlinedTextField(
                 value = reps,
@@ -337,7 +338,7 @@ private fun TimerButtons(s: ActiveSession, viewModel: PlanViewModel) {
 private fun RepsTarget(paso: PasoMilitar) {
     val target = when {
         paso.reps.equals("AMRAP", ignoreCase = true) -> stringResource(R.string.ses_amrap)
-        paso.repsObjetivo.isNotBlank() -> stringResource(R.string.ses_target_reps, paso.repsObjetivo)
+        paso.repsObjetivo.isNotBlank() -> stringResource(R.string.ses_target_reps, Contenido.t(paso.repsObjetivo))
         else -> ""
     }
     if (target.isNotBlank()) {

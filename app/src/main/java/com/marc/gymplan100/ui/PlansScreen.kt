@@ -62,6 +62,7 @@ import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.PlanGoal
@@ -135,7 +136,7 @@ fun PlansScreen(
                         context.resources.getQuantityString(
                             R.plurals.plan_imported,
                             result.plan.totalDays,
-                            result.plan.name,
+                            Contenido.t(result.plan.name),
                             result.plan.totalDays
                         )
                     )
@@ -226,7 +227,7 @@ fun PlansScreen(
                     onActivate = {
                         viewModel.activatePlan(plan.id)
                         scope.launch {
-                            snackbar.showSnackbar(context.getString(R.string.plan_now_following, plan.name))
+                            snackbar.showSnackbar(context.getString(R.string.plan_now_following, Contenido.t(plan.name)))
                         }
                     },
                     onEdit = {
@@ -261,7 +262,7 @@ fun PlansScreen(
     planToDelete?.let { plan ->
         AlertDialog(
             onDismissRequest = { planToDelete = null },
-            title = { Text(stringResource(R.string.plan_delete_title, plan.name)) },
+            title = { Text(stringResource(R.string.plan_delete_title, Contenido.t(plan.name))) },
             text = {
                 Text(stringResource(R.string.plan_delete_text))
             },
@@ -354,7 +355,7 @@ private fun PlanCard(
                 .background(planRailColor(estado))
         )
     Column(modifier = Modifier.padding(Space.x4)) {
-        Text(plan.name, style = MaterialTheme.typography.titleMedium)
+        Text(Contenido.t(plan.name), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(Space.x2))
         // Los distintivos en FlowRow: un plan terminado que se está repitiendo lleva dos, y
         // con el texto del sistema grande el segundo baja de línea en vez de recortarse.
@@ -388,7 +389,7 @@ private fun PlanCard(
             // Recortada a propósito: los planes de serie traen su descripción entera y, sin
             // tope, cada tarjeta ocupaba una pantalla y la lista no había quien la bajara.
             Text(
-                plan.description,
+                Contenido.t(plan.description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 3,

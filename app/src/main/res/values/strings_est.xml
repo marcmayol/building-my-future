@@ -127,6 +127,7 @@
     </plurals>
     <string name="est_pr_kg">PR %1$s kg</string>
     <string name="est_buscar_youtube">Search on YouTube</string>
+    <string name="est_video_busqueda">%1$s form</string>
     <string name="est_sin_ficha_cardio">A cardio block has no technique to check: pick any machine (treadmill, bike, elliptical or rower) and keep the pace the plan asks for from start to finish.</string>
     <string name="est_sin_ficha_con_imagen">There\'s no guide for this exercise yet. Look at the picture and do the movement with control, a neutral back and no momentum.</string>
     <string name="est_sin_ficha">This exercise isn\'t in the app\'s catalog, so there\'s no guide or illustration. The video button above searches YouTube for it; do it with control, a neutral back and no momentum.</string>

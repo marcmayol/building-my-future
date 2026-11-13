@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
 import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Contenido
 import java.util.Locale
 
 /** En qué idioma se ve la app: el del móvil, o uno fijo. */
@@ -55,11 +56,15 @@ object AppLanguage {
      * sistema.
      */
     fun wrap(context: Context): Context {
-        val tag = mode(context).tag ?: return context
-        val locale = Locale.forLanguageTag(tag)
-        val config = Configuration(context.resources.configuration)
-        config.setLocales(LocaleList(locale))
-        return context.createConfigurationContext(config)
+        val envuelto = mode(context).tag?.let { tag ->
+            val config = Configuration(context.resources.configuration)
+            config.setLocales(LocaleList(Locale.forLanguageTag(tag)))
+            context.createConfigurationContext(config)
+        } ?: context
+        // El contenido de serie (ejercicios, planes, fichas) se traduce sin contexto: hay que
+        // decirle en qué idioma se está pintando.
+        Contenido.sync(envuelto)
+        return envuelto
     }
 
     /**

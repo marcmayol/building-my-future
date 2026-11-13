@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.R
@@ -135,7 +136,7 @@ fun PlanFinishedScreen(
                 )
                 Spacer(Modifier.height(Space.x3))
                 Text(
-                    plan.name,
+                    Contenido.t(plan.name),
                     style = MaterialTheme.typography.displaySmall.copy(fontSize = 40.sp)
                 )
             }
@@ -215,7 +216,7 @@ fun PlanFinishedScreen(
                     val (nombre, ini, fin) = subidas[i]
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            nombre,
+                            Contenido.t(nombre),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f)
                         )
@@ -245,7 +246,7 @@ fun PlanFinishedScreen(
             if (siguiente != null) {
                 item {
                     MotiveCard(
-                        name = siguiente.plan.name,
+                        name = Contenido.t(siguiente.plan.name),
                         meta = stringResource(
                             R.string.est_meta_plan,
                             pluralStringResource(R.plurals.est_n_dias, siguiente.plan.totalDays, siguiente.plan.totalDays),
@@ -267,7 +268,7 @@ fun PlanFinishedScreen(
             if (ultimaFase != null) {
                 item {
                     DecisionRow(
-                        title = stringResource(R.string.est_repetir_fase, ultimaFase.name),
+                        title = stringResource(R.string.est_repetir_fase, Contenido.t(ultimaFase.name)),
                         explanation = PlanData.daysOfPhase(ultimaFase.number).size.let { n ->
                             pluralStringResource(R.plurals.est_ultima_fase, n, n)
                         },

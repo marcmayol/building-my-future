@@ -51,6 +51,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.PlanAdvisor
@@ -250,7 +251,7 @@ fun WelcomeScreen(
                         }
                         item {
                             MotiveCard(
-                                name = mejor.plan.name,
+                                name = Contenido.t(mejor.plan.name),
                                 meta = planMeta(mejor.plan.totalDays, mejor.plan.daysPerWeek),
                                 motive = mejor.reason.texto(),
                                 actionLabel = empezarConEste,
@@ -270,7 +271,7 @@ fun WelcomeScreen(
                             items(resultado.alternatives.size) { i ->
                                 val alt = resultado.alternatives[i]
                                 MotiveCard(
-                                    name = alt.plan.name,
+                                    name = Contenido.t(alt.plan.name),
                                     meta = planMeta(alt.plan.totalDays, alt.plan.daysPerWeek),
                                     motive = alt.reason.texto(),
                                     actionLabel = empezarConEste,
@@ -286,7 +287,7 @@ fun WelcomeScreen(
                                         R.string.ayu_welcome_addons,
                                         resultado.addOns.joinToString(
                                             stringResource(R.string.ayu_welcome_o)
-                                        ) { it.name }
+                                        ) { Contenido.t(it.name) }
                                     ),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -310,7 +311,7 @@ fun WelcomeScreen(
                             items(resultado.addOns.size) { i ->
                                 val extra = resultado.addOns[i]
                                 MotiveCard(
-                                    name = extra.name,
+                                    name = Contenido.t(extra.name),
                                     meta = planMeta(extra.totalDays, extra.daysPerWeek),
                                     motive = stringResource(R.string.ayu_welcome_bloque_corto),
                                     actionLabel = empezarConEste,
@@ -475,7 +476,7 @@ private fun NadaEncaja(resultado: PlanAdvisor.Result) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(Space.x2))
-            Text(cercano.plan.name, style = MaterialTheme.typography.titleLarge)
+            Text(Contenido.t(cercano.plan.name), style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(Space.x1))
             Text(
                 cercano.reason.texto(),

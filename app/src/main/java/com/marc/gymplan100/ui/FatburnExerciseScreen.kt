@@ -42,6 +42,7 @@ import com.marc.gymplan100.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.Protocolo
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.Space
@@ -68,7 +69,7 @@ fun FatburnExerciseScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(exercise.nombre, style = MaterialTheme.typography.headlineSmall)
+                    Text(Contenido.t(exercise.nombre), style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -135,7 +136,7 @@ fun FatburnExerciseScreen(
                         )
                         Spacer(Modifier.height(Space.x1))
                         exercise.progresiones.forEach {
-                            Text("· $it", style = MaterialTheme.typography.bodyLarge)
+                            Text("· ${Contenido.t(it)}", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
@@ -150,7 +151,7 @@ fun FatburnExerciseScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(Space.x1))
-                        Text(exercise.notas_forma, style = MaterialTheme.typography.bodyLarge)
+                        Text(Contenido.t(exercise.notas_forma), style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }
@@ -160,7 +161,7 @@ fun FatburnExerciseScreen(
                 Button(
                     onClick = {
                         val status = viewModel.exerciseFrequency(exercise)
-                        if (status.reached) warning = exercise.aviso_frecuencia
+                        if (status.reached) warning = Contenido.t(exercise.aviso_frecuencia)
                         else {
                             selected?.let { viewModel.startFatburnSession(exercise, it); onStarted() }
                         }
@@ -217,7 +218,7 @@ private fun ProtocolRow(
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = selected, onClick = onSelect)
             Spacer(Modifier.width(Space.x2))
-            Text(protocol.nombre, style = MaterialTheme.typography.titleMedium)
+            Text(Contenido.t(protocol.nombre), style = MaterialTheme.typography.titleMedium)
         }
         Spacer(Modifier.height(Space.x1))
         Text(
@@ -228,7 +229,7 @@ private fun ProtocolRow(
         if (protocol.nota.isNotBlank()) {
             Spacer(Modifier.height(2.dp))
             Text(
-                protocol.nota,
+                Contenido.t(protocol.nota),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -246,7 +247,7 @@ fun protocolSummary(p: Protocolo): String = when {
         else "${p.descanso_seg_min}-${p.descanso_seg_max}s"
         pluralStringResource(R.plurals.ses_protocol_intervals, p.numRondas, trabajo, descanso, p.numRondas)
     }
-    p.esSeries -> pluralStringResource(R.plurals.ses_protocol_sets, p.numSeries, p.numSeries, p.repsLabel)
+    p.esSeries -> pluralStringResource(R.plurals.ses_protocol_sets, p.numSeries, p.numSeries, Contenido.t(p.repsLabel))
     p.esTiempoUnico -> stringResource(R.string.ses_protocol_hold, p.duracion_inicial_seg)
-    else -> p.repsLabel.ifBlank { stringResource(R.string.ses_protocol) }
+    else -> Contenido.t(p.repsLabel).ifBlank { stringResource(R.string.ses_protocol) }
 }

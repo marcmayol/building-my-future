@@ -14,6 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.marc.gymplan100.MainActivity
 import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.data.ProgressRepository
@@ -199,7 +200,8 @@ object TrainingReminder {
         )
         // El contexto del receiver no sabe el idioma elegido en la app: se le pide a AppLanguage.
         val textos = AppLanguage.wrap(context)
-        val cuerpo = textos.getString(R.string.ini_day_n_title, dayNumber, title)
+        // El título es el del plan, en castellano: se traduce después de [AppLanguage.wrap].
+        val cuerpo = textos.getString(R.string.ini_day_n_title, dayNumber, Contenido.t(title))
         val notif = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(textos.getString(R.string.ini_reminder_title))

@@ -50,6 +50,7 @@ import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.ExerciseGroup
 import com.marc.gymplan100.data.ExerciseGroups
 import com.marc.gymplan100.data.MyExercises
@@ -242,7 +243,7 @@ private fun ExerciseWeightRow(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(name, style = MaterialTheme.typography.titleMedium)
+                Text(Contenido.t(name), style = MaterialTheme.typography.titleMedium)
                 if (pr != null && pr > 0f) {
                     Text(
                         stringResource(R.string.est_pr_kg, formatPr(pr)),

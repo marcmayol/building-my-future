@@ -3,6 +3,7 @@ package com.marc.gymplan100.wear
 import android.content.Context
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.R
@@ -98,7 +99,7 @@ object WearBridge {
             map.putString(
                 KEY_EXERCISE,
                 if (libre) tituloLibre(textos, session)
-                else exercise?.name ?: textos.getString(R.string.ini_wear_workout)
+                else exercise?.name?.let(Contenido::t) ?: textos.getString(R.string.ini_wear_workout)
             )
             map.putInt(KEY_SET_NUMBER, if (libre) 0 else session.setNumber)
             map.putInt(KEY_TOTAL_SETS, total)

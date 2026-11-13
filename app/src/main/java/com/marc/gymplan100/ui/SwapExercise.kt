@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.R
 import androidx.compose.ui.unit.dp
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.CatalogEntry
 import com.marc.gymplan100.data.ExerciseCatalog
 import com.marc.gymplan100.data.ExerciseImages
@@ -68,8 +69,8 @@ fun SwapSection(
     Column(verticalArrangement = Arrangement.spacedBy(Space.x2)) {
         if (cambiado) {
             Text(
-                if (remembered) stringResource(R.string.ses_swap_doing_remembered, currentName, planName)
-                else stringResource(R.string.ses_swap_doing, currentName, planName),
+                if (remembered) stringResource(R.string.ses_swap_doing_remembered, Contenido.t(currentName), Contenido.t(planName))
+                else stringResource(R.string.ses_swap_doing, Contenido.t(currentName), Contenido.t(planName)),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -89,11 +90,11 @@ fun SwapSection(
             if (entrada == null) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("•", style = MaterialTheme.typography.bodyMedium)
-                    Text(texto, style = MaterialTheme.typography.bodyMedium)
+                    Text(Contenido.t(texto), style = MaterialTheme.typography.bodyMedium)
                 }
             } else {
                 AlternativeRow(
-                    title = texto.trimEnd('.'),
+                    title = Contenido.t(texto).trimEnd('.'),
                     entry = entrada,
                     onPick = { onSwap(entrada.nombre, recordar) }
                 )
@@ -142,7 +143,7 @@ private fun AlternativeRow(title: String, entry: CatalogEntry?, onPick: () -> Un
         if (dibujo != null) {
             Image(
                 painter = painterResource(dibujo),
-                contentDescription = nombre,
+                contentDescription = Contenido.t(nombre),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(width = 84.dp, height = 56.dp)
@@ -193,7 +194,12 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
         if (q.isEmpty()) {
             ExerciseCatalog.all.filter { it.grupo == grupo && it.nombre != currentName }.take(12)
         } else {
-            ExerciseCatalog.all.filter { e -> ExerciseCatalog.tokens(e.nombre).let { t -> q.all { p -> t.any { it.startsWith(p) } } } }
+            // Se busca por el nombre en castellano y por el que se enseña (en inglés, si toca).
+            ExerciseCatalog.all.filter { e ->
+                listOf(e.nombre, Contenido.t(e.nombre)).any { n ->
+                    ExerciseCatalog.tokens(n).let { t -> q.all { p -> t.any { it.startsWith(p) } } }
+                }
+            }
                 .take(20)
         }
     }
@@ -227,11 +233,13 @@ internal fun SwapSearch(currentName: String, onPick: (String) -> Unit) {
             )
         }
         resultados.forEach { e ->
-            AlternativeRow(title = e.nombre, entry = e, onPick = { onPick(e.nombre) })
+            AlternativeRow(title = Contenido.t(e.nombre), entry = e, onPick = { onPick(e.nombre) })
         }
         val escrito = texto.trim()
         if (escrito.isNotEmpty() &&
-            resultados.none { it.nombre.equals(escrito, ignoreCase = true) } &&
+            resultados.none {
+                it.nombre.equals(escrito, ignoreCase = true) || Contenido.t(it.nombre).equals(escrito, ignoreCase = true)
+            } &&
             tuyos.none { it.equals(escrito, ignoreCase = true) }
         ) {
             // Lo que no está en el catálogo también vale: se apunta con su nombre, solo que

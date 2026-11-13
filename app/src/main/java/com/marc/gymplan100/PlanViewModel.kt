@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.Achievements
 import com.marc.gymplan100.data.ActiveSession
 import com.marc.gymplan100.data.Celebration
@@ -1564,7 +1565,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val title = when {
             session.routineId == SpecialWorkoutsLoader.MILITAR_ID -> t.getString(R.string.mot_hc_military)
             session.routineId != null -> {
-                val exName = specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre
+                val exName = specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre?.let(Contenido::t)
                 t.getString(
                     R.string.mot_hc_fatburn_exercise,
                     exName ?: t.getString(R.string.mot_hc_exercise_fallback)
@@ -1574,7 +1575,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             else -> t.getString(
                 R.string.mot_hc_day,
                 session.dayNumber,
-                day?.template?.title ?: t.getString(R.string.mot_hc_workout)
+                day?.template?.title?.let(Contenido::t) ?: t.getString(R.string.mot_hc_workout)
             )
         }
         val notes = buildWorkoutNotes(session, record, day)
@@ -1622,7 +1623,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         val sb = StringBuilder()
         if (session.isRoutine) {
             val name = if (session.routineId == SpecialWorkoutsLoader.MILITAR_ID) t.getString(R.string.mot_hc_military)
-            else specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre ?: t.getString(R.string.mot_hc_fatburn)
+            else specialWorkouts.ejercicio(session.exerciseId ?: "")?.nombre?.let(Contenido::t) ?: t.getString(R.string.mot_hc_fatburn)
             sb.append("$name.\n")
         } else if (session.special || day == null) {
             sb.append(t.getString(R.string.mot_hc_free_guided) + "\n")
@@ -1635,7 +1636,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
                 else sets.joinToString(", ") { s ->
                     if (s.weight.isBlank()) "—" else "${s.weight} kg"
                 }
-                sb.append("• ${ex.name} (${ex.scheme}): $detail\n")
+                sb.append("• ${Contenido.t(ex.name)} (${Contenido.esquema(ex.scheme)}): $detail\n")
             }
         }
         val mins = record.durationSeconds / 60

@@ -73,6 +73,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.ExerciseKind
 import com.marc.gymplan100.data.LoggedExercise
 import com.marc.gymplan100.data.MyExercises
@@ -381,10 +382,13 @@ private fun FilaEjercicio(
     var enFoco by remember { mutableStateOf(false) }
     val coincidencias = remember(fila.name, sugerencias) {
         if (fila.name.isBlank()) sugerencias
-        else sugerencias.filter { it.contains(fila.name, ignoreCase = true) }
+        else sugerencias.filter {
+            it.contains(fila.name, ignoreCase = true) || Contenido.t(it).contains(fila.name, ignoreCase = true)
+        }
     }
     // Lo escrito a mano no se pierde en el desplegable: se ofrece añadirlo tal cual.
-    val puedeCrear = fila.name.isNotBlank() && sugerencias.none { it.equals(fila.name, true) }
+    val puedeCrear = fila.name.isNotBlank() &&
+        sugerencias.none { it.equals(fila.name, true) || Contenido.t(it).equals(fila.name, true) }
     val mostrar = abierto && (coincidencias.isNotEmpty() || puedeCrear)
 
     val forma = RoundedCornerShape(16.dp)
@@ -409,8 +413,10 @@ private fun FilaEjercicio(
                 modifier = Modifier.weight(1f)
             ) {
                 OutlinedTextFieldSinBorde(
-                    value = fila.name,
-                    onValueChange = { onChange(fila.copy(name = it)); abierto = true },
+                    // Se enseña en el idioma de la app y se guarda con la clave en castellano,
+                    // para que «Leg press» siga sumando al historial de «Prensa de piernas».
+                    value = Contenido.t(fila.name),
+                    onValueChange = { onChange(fila.copy(name = Contenido.clave(it))); abierto = true },
                     label = stringResource(R.string.mot_free_exercise),
                     // Dos líneas: "Prensa de piernas (recorrido corto)" no cabe en una, y
                     // cortarlo obliga a adivinar cuál de los dos parecidos es.
@@ -422,7 +428,7 @@ private fun FilaEjercicio(
                 ExposedDropdownMenu(expanded = mostrar, onDismissRequest = { abierto = false }) {
                     coincidencias.take(8).forEach { nombre ->
                         DropdownMenuItem(
-                            text = { Text(nombre) },
+                            text = { Text(Contenido.t(nombre)) },
                             onClick = { onChange(fila.copy(name = nombre)); abierto = false }
                         )
                     }
@@ -439,7 +445,7 @@ private fun FilaEjercicio(
                     Icons.Filled.Close,
                     contentDescription = stringResource(
                         R.string.mot_free_remove_named,
-                        fila.name.ifBlank { stringResource(R.string.mot_free_this_exercise) }
+                        Contenido.t(fila.name).ifBlank { stringResource(R.string.mot_free_this_exercise) }
                     ),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)

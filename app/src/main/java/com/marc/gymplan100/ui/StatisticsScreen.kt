@@ -57,6 +57,7 @@ import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.AppLanguage
 import androidx.compose.foundation.Canvas
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.data.SessionRecord
 import com.marc.gymplan100.data.MuscleLoad
@@ -372,7 +373,7 @@ private fun ProgressionSection(
                 FilterChip(
                     selected = name == selected,
                     onClick = { selected = name },
-                    label = { Text(name) }
+                    label = { Text(Contenido.t(name)) }
                 )
             }
         }
@@ -801,7 +802,7 @@ private fun RecordsSection(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                r.exercise,
+                                Contenido.t(r.exercise),
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.weight(1f)
                             )

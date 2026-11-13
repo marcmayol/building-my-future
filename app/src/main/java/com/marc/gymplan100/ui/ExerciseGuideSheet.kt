@@ -55,6 +55,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import com.marc.gymplan100.data.ExerciseAliases
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.ExerciseGuides
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.ExerciseKind
@@ -91,6 +92,9 @@ fun ExerciseGuideSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val guide = ExerciseGuides.forName(LocalContext.current, exerciseName)
+    // La ficha se lee en castellano (las alternativas se enlazan con el catálogo por sus
+    // palabras) y se pinta en el idioma de la app.
+    val ficha = guide?.let(Contenido::ficha)
     val imageRes = ExerciseImages.forName(LocalContext.current, exerciseName, LocalIsFemale.current)
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -101,13 +105,13 @@ fun ExerciseGuideSheet(
                 .padding(start = 20.dp, end = 20.dp, bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text(exerciseName, style = MaterialTheme.typography.headlineMedium)
+            Text(Contenido.t(exerciseName), style = MaterialTheme.typography.headlineMedium)
             Text(
                 // El esquema y el músculo principal en una línea: es lo que se mira de reojo
                 // cuando ya sabes hacer el ejercicio y solo quieres confirmar.
                 buildString {
-                    append(scheme)
-                    guide?.muscles?.substringBefore(",")?.trim()?.takeIf { it.isNotBlank() }
+                    append(Contenido.esquema(scheme))
+                    ficha?.muscles?.substringBefore(",")?.trim()?.takeIf { it.isNotBlank() }
                         ?.let { append(" · ${it.lowercase()}") }
                 },
                 style = MaterialTheme.typography.bodyLarge,
@@ -122,7 +126,7 @@ fun ExerciseGuideSheet(
             } else if (imageRes != null) {
                 Image(
                     painter = painterResource(imageRes),
-                    contentDescription = exerciseName,
+                    contentDescription = Contenido.t(exerciseName),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -136,7 +140,8 @@ fun ExerciseGuideSheet(
             // Más robusto que un enlace fijo (los vídeos se borran/privatizan). Va al final de
             // la ficha, salvo cuando no hay ficha: entonces es la única salida y sube arriba.
             val context = LocalContext.current
-            val videoQuery = guide?.videoQuery?.takeIf { it.isNotBlank() } ?: "$exerciseName técnica"
+            val videoQuery = ficha?.videoQuery?.takeIf { it.isNotBlank() }
+                ?: stringResource(R.string.est_video_busqueda, Contenido.t(exerciseName))
             val abrirVideo = {
                 val url = "https://www.youtube.com/results?search_query=" +
                     URLEncoder.encode(videoQuery, "UTF-8")
@@ -185,8 +190,9 @@ fun ExerciseGuideSheet(
                 return@Column
             }
 
+            val textos = ficha ?: return@Column
             GuideSection(stringResource(R.string.est_musculos_que_trabaja)) {
-                Text(guide.muscles, style = MaterialTheme.typography.bodyMedium)
+                Text(textos.muscles, style = MaterialTheme.typography.bodyMedium)
                 val targets = MuscleTargets.forName(exerciseName)
                 if (targets != null) {
                     // Principal y secundario usan los tokens de estado: el mismo código de
@@ -243,7 +249,7 @@ fun ExerciseGuideSheet(
             }
 
             GuideSection(stringResource(R.string.est_como_se_hace)) {
-                Text(guide.howTo, style = MaterialTheme.typography.bodyMedium)
+                Text(textos.howTo, style = MaterialTheme.typography.bodyMedium)
             }
 
             // Estas dos se consultan de vez en cuando, no en cada serie: van plegadas para que
@@ -252,7 +258,7 @@ fun ExerciseGuideSheet(
             if (guide.mistakes.isNotEmpty()) {
                 CollapsibleSection(stringResource(R.string.est_errores_tipicos)) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        guide.mistakes.forEach { Bullet(it) }
+                        textos.mistakes.forEach { Bullet(it) }
                     }
                 }
             }
@@ -266,7 +272,7 @@ fun ExerciseGuideSheet(
             } else if (guide.alternatives.isNotEmpty()) {
                 CollapsibleSection(stringResource(R.string.est_si_esta_ocupada)) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        guide.alternatives.forEach { Bullet(it) }
+                        textos.alternatives.forEach { Bullet(it) }
                     }
                 }
             }
@@ -359,7 +365,7 @@ private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit)
 
     if (actual != null) {
         Text(
-            stringResource(R.string.est_se_comporta_como, actual),
+            stringResource(R.string.est_se_comporta_como, Contenido.t(actual)),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )
@@ -379,7 +385,10 @@ private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit)
         val todos = remember { ExerciseImages.catalogNames() }
         val filtrados = remember(busqueda, todos) {
             if (busqueda.isBlank()) todos
-            else todos.filter { it.contains(busqueda.trim(), ignoreCase = true) }
+            else todos.filter {
+                it.contains(busqueda.trim(), ignoreCase = true) ||
+                    Contenido.t(it).contains(busqueda.trim(), ignoreCase = true)
+            }
         }
         ModalBottomSheet(onDismissRequest = { abierto = false }) {
             Column(
@@ -402,7 +411,7 @@ private fun SelectorDeParecido(exerciseName: String, onAlias: (String?) -> Unit)
                         onClick = { onAlias(nombre); abierto = false },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(nombre, modifier = Modifier.fillMaxWidth())
+                        Text(Contenido.t(nombre), modifier = Modifier.fillMaxWidth())
                     }
                 }
                 if (filtrados.isEmpty()) {

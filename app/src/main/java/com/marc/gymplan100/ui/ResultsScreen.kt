@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.PermissionController
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.R
 import androidx.compose.ui.platform.LocalContext
@@ -243,7 +244,7 @@ private fun ExtraBlock(record: SessionRecord) {
             Spacer(Modifier.height(Space.x3))
             apuntado.forEach { ejercicio ->
                 ExerciseResultRow(
-                    name = ejercicio.name,
+                    name = Contenido.t(ejercicio.name),
                     weight = ejercicio.weight,
                     sets = ejercicio.setsOrSingle,
                     conReps = true
@@ -288,7 +289,7 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
                 Text(stringResource(R.string.est_dia_titulo, dayNumber), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    day.template.title,
+                    Contenido.t(day.template.title),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -325,7 +326,7 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
                 Spacer(Modifier.height(Space.x2))
                 apuntado.forEach { ejercicio ->
                     ExerciseResultRow(
-                        name = ejercicio.name,
+                        name = Contenido.t(ejercicio.name),
                         weight = ejercicio.weight,
                         sets = ejercicio.setsOrSingle,
                         conReps = true
@@ -338,8 +339,8 @@ private fun ResultBlock(dayNumber: Int, record: SessionRecord?, progress: Progre
                 val hecho = log?.doneAs?.takeIf { it.isNotBlank() }
                 ExerciseResultRow(
                     // Lo que se hizo de verdad, con el del plan entre paréntesis para no perderse.
-                    name = if (hecho != null) stringResource(R.string.est_en_lugar_de, hecho, exercise.name)
-                    else exercise.name,
+                    name = if (hecho != null) stringResource(R.string.est_en_lugar_de, Contenido.t(hecho), Contenido.t(exercise.name))
+                    else Contenido.t(exercise.name),
                     weight = log?.weight.orEmpty(),
                     sets = log?.filledSets.orEmpty(),
                     conReps = false

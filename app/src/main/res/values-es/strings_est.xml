@@ -127,6 +127,7 @@
     </plurals>
     <string name="est_pr_kg">PR %1$s kg</string>
     <string name="est_buscar_youtube">Buscarlo en YouTube</string>
+    <string name="est_video_busqueda">%1$s técnica</string>
     <string name="est_sin_ficha_cardio">Un bloque de cardio no tiene técnica que mirar: elige la máquina que quieras (cinta, bici, elíptica o remo) y mantén el ritmo que pide el plan de principio a fin.</string>
     <string name="est_sin_ficha_con_imagen">Todavía no hay ficha para este ejercicio. Fíjate en la imagen y haz el movimiento controlando el peso, con la espalda neutra y sin impulso.</string>
     <string name="est_sin_ficha">Este ejercicio no está en el catálogo de la app, así que no hay ficha ni ilustración. El vídeo de aquí arriba te lo busca en YouTube; hazlo controlando el peso, con la espalda neutra y sin impulso.</string>

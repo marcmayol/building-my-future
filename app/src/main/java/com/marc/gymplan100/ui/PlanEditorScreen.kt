@@ -66,6 +66,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.DiaDto
 import com.marc.gymplan100.data.EjercicioDto
 import com.marc.gymplan100.data.FaseDto
@@ -425,7 +426,7 @@ private fun PlanLevel(
         itemsIndexedCompat(plan.fases) { index, fase ->
             NavRow(
                 leading = "${index + 1}",
-                title = fase.nombre.ifBlank { stringResource(R.string.plan_phase_n, index + 1) },
+                title = Contenido.t(fase.nombre).ifBlank { stringResource(R.string.plan_phase_n, index + 1) },
                 subtitle = pluralStringResource(R.plurals.plan_weeks_count, fase.semanas, fase.semanas) + " · " +
                     pluralStringResource(R.plurals.plan_days_count, fase.dias.size, fase.dias.size),
                 error = errors.byPhase[index]?.text(),
@@ -563,10 +564,10 @@ private fun PhaseLevel(
         itemsIndexedCompat(fase.dias) { index, dia ->
             NavRow(
                 leading = "${index + 1}",
-                title = dia.titulo.ifBlank { dia.dia.ifBlank { stringResource(R.string.plan_day_n, index + 1) } },
+                title = Contenido.t(dia.titulo).ifBlank { Contenido.t(dia.dia).ifBlank { stringResource(R.string.plan_day_n, index + 1) } },
                 subtitle = pluralStringResource(
                     R.plurals.plan_exercises_count, dia.ejercicios.size, dia.ejercicios.size
-                ) + if (dia.calentamiento.isNotBlank()) " · ${dia.calentamiento}" else "",
+                ) + if (dia.calentamiento.isNotBlank()) " · ${Contenido.t(dia.calentamiento)}" else "",
                 error = errors.byDay[phaseIndex to index]?.text(),
                 canUp = index > 0,
                 canDown = index < fase.dias.lastIndex,
@@ -692,14 +693,14 @@ private fun DayLevel(
                     )
                     Spacer(Modifier.size(Space.x3))
                     Text(
-                        ejercicio.nombre.ifBlank { stringResource(R.string.plan_editor_unnamed_exercise) },
+                        Contenido.t(ejercicio.nombre).ifBlank { stringResource(R.string.plan_editor_unnamed_exercise) },
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (ejercicio.nombre.isBlank())
                             MaterialTheme.colorScheme.onSurfaceVariant
                         else MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f)
                     )
-                    SchemeChip(ejercicio.esquema, isError = problem != null)
+                    SchemeChip(Contenido.esquema(ejercicio.esquema), isError = problem != null)
                     IconButton(
                         onClick = {
                             editDay { it.copy(ejercicios = it.ejercicios.moved(index, -1)) }
@@ -792,7 +793,7 @@ private fun ExerciseSheet(
                     tuyos.forEach { nombre ->
                         SuggestionChip(
                             onClick = { onChange(ejercicio.copy(nombre = nombre)) },
-                            label = { Text(nombre, style = MaterialTheme.typography.bodyMedium, maxLines = 2) }
+                            label = { Text(Contenido.t(nombre), style = MaterialTheme.typography.bodyMedium, maxLines = 2) }
                         )
                     }
                 }

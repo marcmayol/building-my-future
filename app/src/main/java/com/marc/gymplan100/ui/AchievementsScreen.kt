@@ -37,6 +37,7 @@ import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.Achievement
 import com.marc.gymplan100.data.Achievements
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
@@ -197,7 +198,7 @@ internal fun achievementTitle(a: Achievement): String = when (a.id) {
     "half" -> stringResource(R.string.ayu_logro_half_title)
     "threequarter" -> stringResource(R.string.ayu_logro_threequarter_title)
     "complete" -> stringResource(R.string.ayu_logro_complete_title)
-    else -> stringResource(R.string.ayu_logro_phase_title, a.phaseName)
+    else -> stringResource(R.string.ayu_logro_phase_title, Contenido.t(a.phaseName))
 }
 
 /** Descripción de un logro en el idioma en uso, a partir de su id. */

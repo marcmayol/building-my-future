@@ -57,6 +57,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Contenido
+import com.marc.gymplan100.data.ExerciseImages
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -447,3 +449,13 @@ fun SessionCard(
 // El botón de stepper vive en Steppers.kt: lo usan también el editor de planes y la pantalla
 // de planes, que no dependen de este armazón de sesión.
 
+
+/**
+ * El nombre de un ejercicio para un titular, en el idioma de la app. A un compuesto se le
+ * quita el paréntesis con la lista de movimientos, como hace [ExerciseImages.headlineName],
+ * pero sobre el texto ya traducido.
+ */
+internal fun titularEjercicio(name: String): String {
+    val visible = Contenido.t(name)
+    return if (ExerciseImages.isCompound(name)) visible.substringBefore(" (").trim() else visible
+}

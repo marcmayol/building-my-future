@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -112,12 +113,12 @@ fun SpecialMenuScreen(
             item {
                 OptionCard(
                     emoji = "🎖️",
-                    title = militar?.nombre ?: stringResource(R.string.ses_special_military_title),
-                    subtitle = militar?.descripcion
+                    title = militar?.nombre?.let(Contenido::t) ?: stringResource(R.string.ses_special_military_title),
+                    subtitle = militar?.descripcion?.let(Contenido::t)
                         ?: stringResource(R.string.ses_special_military_sub),
                     onClick = {
                         val status = viewModel.militaryFrequency()
-                        if (status.reached && militar != null) militaryWarning = militar.aviso_frecuencia
+                        if (status.reached && militar != null) militaryWarning = Contenido.t(militar.aviso_frecuencia)
                         else onOpenMilitary()
                     }
                 )
@@ -133,12 +134,12 @@ fun SpecialMenuScreen(
             item {
                 OptionCard(
                     emoji = "🧘",
-                    title = altura?.nombre ?: stringResource(R.string.ses_special_posture_title),
-                    subtitle = altura?.descripcion
+                    title = altura?.nombre?.let(Contenido::t) ?: stringResource(R.string.ses_special_posture_title),
+                    subtitle = altura?.descripcion?.let(Contenido::t)
                         ?: stringResource(R.string.ses_special_posture_sub),
                     onClick = {
                         val status = viewModel.postureFrequency()
-                        if (status.reached && altura != null) postureWarning = altura.aviso_frecuencia
+                        if (status.reached && altura != null) postureWarning = Contenido.t(altura.aviso_frecuencia)
                         else onOpenPosture()
                     }
                 )

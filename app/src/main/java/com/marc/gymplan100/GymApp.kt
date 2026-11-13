@@ -3,6 +3,7 @@ package com.marc.gymplan100
 import android.app.Application
 import com.marc.gymplan100.data.ExerciseCatalog
 import com.marc.gymplan100.data.PlanStore
+import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.update.Updates
 
 class GymApp : Application() {
@@ -15,6 +16,9 @@ class GymApp : Application() {
         // El catálogo también: lo que se hace en lugar de un ejercicio saca de ahí su dibujo y
         // sus músculos, y eso se pregunta desde sitios sin contexto (el mapa muscular).
         ExerciseCatalog.load(this)
+        // Y en qué idioma se pinta el contenido de serie, por si el proceso arranca sin
+        // actividad (un aviso, el reloj).
+        AppLanguage.wrap(this)
         // Comprobación periódica en segundo plano. En la variante de Play no hace nada:
         // allí actualiza la tienda y la app no puede instalarse a sí misma.
         Updates.onAppCreate(this)

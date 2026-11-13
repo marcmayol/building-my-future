@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.wear.R
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -102,7 +104,8 @@ data class WearState(
     val primaryLabel: String = "",
     val canSwap: Boolean = false,
     /** Etiqueta del botón de cambio de ejercicio (la cocina el móvil según el contexto). */
-    val swapLabel: String = "Máquina ocupada",
+    /** Vacío = el texto por defecto del reloj ([R.string.wear_swap]). */
+    val swapLabel: String = "",
     val paused: Boolean = false,
     val endTime: Long = 0L,
     /** Inicio de la sesión (epoch ms) cuando es cronómetro libre; 0 en las sesiones guiadas. */
@@ -161,7 +164,7 @@ fun WearApp(ambient: State<Boolean>, ambientTick: State<Int>) {
                 if (!state.active) {
                     item {
                         Text(
-                            text = "Sin entrenamiento en curso",
+                            text = stringResource(R.string.wear_no_session),
                             modifier = Modifier.fillMaxWidth().padding(horizontal = textPadding),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.title3,
@@ -170,8 +173,8 @@ fun WearApp(ambient: State<Boolean>, ambientTick: State<Int>) {
                     }
                     if (!isAmbient) {
                         item {
-                            val label = if (state.nextDay > 0) "Empezar · Día ${state.nextDay}"
-                            else "Empezar entreno"
+                            val label = if (state.nextDay > 0) stringResource(R.string.wear_start_day, state.nextDay)
+                            else stringResource(R.string.wear_start)
                             WearChip(label, chipPadding, primary = true) { sendCommand(context, CMD_START) }
                         }
                     }
@@ -239,7 +242,7 @@ private fun ScalingLazyListScope.sessionItems(
             if (state.totalSets > 0) {
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = "Serie ${state.setNumber} de ${state.totalSets}",
+                    text = stringResource(R.string.wear_set_of, state.setNumber, state.totalSets),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.caption1,
                     color = subColor
@@ -256,7 +259,7 @@ private fun ScalingLazyListScope.sessionItems(
                 Elapsed(startTime = state.startTime, isAmbient = isAmbient, ambientTick = ambientTick, color = titleColor)
             } else if (state.paused) {
                 Spacer(Modifier.height(4.dp))
-                Text("En pausa", style = MaterialTheme.typography.title2, color = titleColor)
+                Text(stringResource(R.string.wear_paused), style = MaterialTheme.typography.title2, color = titleColor)
             }
         }
     }
@@ -267,7 +270,7 @@ private fun ScalingLazyListScope.sessionItems(
             item { WearChip(state.primaryLabel, chipPadding, primary = true, onClick = onPrimary) }
         }
         if (state.canSwap) {
-            item { WearChip(state.swapLabel, chipPadding, primary = false, onClick = onSwap) }
+            item { WearChip(state.swapLabel.ifBlank { stringResource(R.string.wear_swap) }, chipPadding, primary = false, onClick = onSwap) }
         }
     }
 }

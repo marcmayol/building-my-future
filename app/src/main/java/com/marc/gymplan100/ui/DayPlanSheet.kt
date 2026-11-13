@@ -4,6 +4,7 @@ package com.marc.gymplan100.ui
 
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -75,7 +76,7 @@ fun DayPlanSheet(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                stringResource(R.string.plan_sheet_overline, day.number, day.template.title.uppercase()),
+                stringResource(R.string.plan_sheet_overline, day.number, Contenido.t(day.template.title).uppercase()),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -83,7 +84,7 @@ fun DayPlanSheet(
 
             if (day.template.warmup.isNotBlank()) {
                 Text(
-                    stringResource(R.string.plan_sheet_warmup, day.template.warmup),
+                    stringResource(R.string.plan_sheet_warmup, Contenido.t(day.template.warmup)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -124,7 +125,7 @@ fun DayPlanSheet(
             if (day.template.cooldown.isNotBlank()) {
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    stringResource(R.string.plan_sheet_cooldown, day.template.cooldown),
+                    stringResource(R.string.plan_sheet_cooldown, Contenido.t(day.template.cooldown)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -182,7 +183,7 @@ private fun PlanRow(
             if (imageRes != null) {
                 Image(
                     painter = painterResource(imageRes),
-                    contentDescription = exercise.name,
+                    contentDescription = Contenido.t(exercise.name),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(64.dp)
@@ -228,7 +229,7 @@ private fun PlanRow(
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                exercise.name,
+                Contenido.t(exercise.name),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
                 textDecoration = if (isSkipped) TextDecoration.LineThrough else null,
@@ -239,7 +240,7 @@ private fun PlanRow(
                 if (isSkipped) {
                     pluralStringResource(R.plurals.plan_sheet_sets_skipped, totalSets, doneSets, totalSets)
                 } else {
-                    pluralStringResource(R.plurals.plan_sheet_sets, totalSets, exercise.scheme, doneSets, totalSets)
+                    pluralStringResource(R.plurals.plan_sheet_sets, totalSets, Contenido.esquema(exercise.scheme), doneSets, totalSets)
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = if (isCurrent) accent else MaterialTheme.colorScheme.onSurfaceVariant

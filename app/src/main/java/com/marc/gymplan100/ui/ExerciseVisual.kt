@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.ui.theme.LocalAppColors
 import com.marc.gymplan100.ui.theme.Space
@@ -61,7 +62,7 @@ fun ExerciseVisual(
     val imageRes = ExerciseImages.forName(context, exerciseName, female) ?: return
     Image(
         painter = painterResource(imageRes),
-        contentDescription = exerciseName,
+        contentDescription = Contenido.t(exerciseName),
         contentScale = ContentScale.Fit,
         modifier = modifier
             .fillMaxWidth()
@@ -96,7 +97,7 @@ fun CompoundMoveList(exerciseName: String, modifier: Modifier = Modifier) {
             ) {
                 Image(
                     painter = painterResource(move.drawable),
-                    contentDescription = move.label,
+                    contentDescription = Contenido.t(move.label),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(width = 116.dp, height = 78.dp)
@@ -121,14 +122,14 @@ fun CompoundMoveList(exerciseName: String, modifier: Modifier = Modifier) {
                         }
                         Spacer(Modifier.width(Space.x2))
                         Text(
-                            move.label,
+                            Contenido.t(move.label),
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.weight(1f)
                         )
                     }
                     if (move.dose != null) {
                         Text(
-                            move.dose,
+                            Contenido.esquema(move.dose),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(start = 30.dp)

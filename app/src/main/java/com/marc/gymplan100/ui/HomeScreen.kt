@@ -64,6 +64,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.material3.TextButton
 import java.text.SimpleDateFormat
 import java.util.Date
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.GymApp
 import com.marc.gymplan100.PlanViewModel
 import com.marc.gymplan100.R
@@ -203,12 +204,12 @@ fun HomeScreen(
                 val cabecera = if (activePlan.builtin) {
                     stringResource(R.string.ini_home_builtin_plan, total)
                 } else {
-                    activePlan.name.uppercase()
+                    Contenido.t(activePlan.name).uppercase()
                 }
                 Text(
                     currentPhase?.let {
                         // Una fase sin nombre propio se llama «Fase 1»: no repetirlo dos veces.
-                        val nombre = it.name.trim()
+                        val nombre = Contenido.t(it.name).trim()
                         val generico = nombre.isEmpty() ||
                             Regex("""(fase|phase)\s*${it.number}""", RegexOption.IGNORE_CASE).matches(nombre)
                         stringResource(
@@ -311,7 +312,7 @@ fun HomeScreen(
                     subtitle = when {
                         session.extra -> stringResource(R.string.ini_home_extra_running)
                         session.special -> stringResource(R.string.ini_home_special_running)
-                        else -> PlanData.dayByNumber(session.dayNumber)?.template?.title.orEmpty()
+                        else -> Contenido.t(PlanData.dayByNumber(session.dayNumber)?.template?.title.orEmpty())
                     },
                     onResume = { onResumeSession(session.dayNumber) }
                 )
@@ -319,7 +320,7 @@ fun HomeScreen(
                 // Plan acabado: seguir diciendo "hoy te toca" el último día sería empujar a
                 // repetir sin querer. Aquí se enseña el final y se manda a elegir qué sigue.
                 HeroTerminado(
-                    planName = activePlan.name,
+                    planName = Contenido.t(activePlan.name),
                     total = total,
                     finishedAt = progress.finishedAt,
                     weeks = progress.startedAt.takeIf { it > 0L }?.let { ini ->
@@ -335,7 +336,7 @@ fun HomeScreen(
                     subtitle = nextTemplate?.let {
                         stringResource(
                             R.string.ini_title_dot_detail,
-                            it.title,
+                            Contenido.t(it.title),
                             pluralStringResource(R.plurals.ini_exercises, it.exercises.size, it.exercises.size)
                         )
                     }.orEmpty(),
@@ -685,7 +686,7 @@ private fun PhaseRow(
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                "${phase.number} · ${phase.name}",
+                "${phase.number} · ${Contenido.t(phase.name)}",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )

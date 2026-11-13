@@ -45,6 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.R
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -165,7 +166,7 @@ fun SettingsScreen(
                     Text(
                         stringResource(
                             R.string.ini_set_plan_body,
-                            activePlan.name,
+                            Contenido.t(activePlan.name),
                             pluralStringResource(R.plurals.ini_days, activePlan.totalDays, activePlan.totalDays)
                         ),
                         style = MaterialTheme.typography.bodyMedium,

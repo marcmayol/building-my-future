@@ -47,11 +47,11 @@ object OngoingSession {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val titulo = state.exercise.ifBlank { "Entrenamiento" }
+        val titulo = state.exercise.ifBlank { context.getString(R.string.wear_workout) }
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_ongoing)
             .setContentTitle(titulo)
-            .setContentText(textoDeApoyo(state))
+            .setContentText(textoDeApoyo(context, state))
             .setContentIntent(abrir)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -62,7 +62,7 @@ object OngoingSession {
         OngoingActivity.Builder(context, NOTIFICATION_ID, builder)
             .setStaticIcon(R.drawable.ic_ongoing)
             .setTouchIntent(abrir)
-            .setStatus(estado(state))
+            .setStatus(estado(context, state))
             .build()
             .apply(context)
 
@@ -80,7 +80,7 @@ object OngoingSession {
      * Lo que se lee en el chip. Con cuenta atrás en marcha la dibuja el propio sistema
      * ([Status.TimerPart]), así que corre al segundo sin que la app esté despierta.
      */
-    private fun estado(state: WearState): Status {
+    private fun estado(context: Context, state: WearState): Status {
         val builder = Status.Builder()
         val corriendo = state.endTime > 0L && !state.paused
         if (corriendo) {
@@ -96,17 +96,17 @@ object OngoingSession {
         } else {
             builder.addTemplate("#ejercicio# · #serie#")
             builder.addTemplate("#ejercicio#")
-            builder.addPart("serie", Status.TextPart(textoDeApoyo(state)))
+            builder.addPart("serie", Status.TextPart(textoDeApoyo(context, state)))
         }
-        builder.addPart("ejercicio", Status.TextPart(state.exercise.ifBlank { "Entrenamiento" }))
+        builder.addPart("ejercicio", Status.TextPart(state.exercise.ifBlank { context.getString(R.string.wear_workout) }))
         return builder.build()
     }
 
     /** Serie en curso, o el aviso de pausa si el temporizador está parado. */
-    private fun textoDeApoyo(state: WearState): String = when {
-        state.paused -> "En pausa"
-        state.totalSets > 0 -> "Serie ${state.setNumber} de ${state.totalSets}"
-        else -> "En curso"
+    private fun textoDeApoyo(context: Context, state: WearState): String = when {
+        state.paused -> context.getString(R.string.wear_paused)
+        state.totalSets > 0 -> context.getString(R.string.wear_set_of, state.setNumber, state.totalSets)
+        else -> context.getString(R.string.wear_running)
     }
 
     private fun crearCanal(context: Context) {
@@ -114,10 +114,10 @@ object OngoingSession {
         if (manager.getNotificationChannel(CHANNEL_ID) != null) return
         val canal = NotificationChannel(
             CHANNEL_ID,
-            "Entrenamiento en curso",
+            context.getString(R.string.wear_channel),
             NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "Acceso rápido a la sesión desde la esfera del reloj."
+            description = context.getString(R.string.wear_channel_desc)
             setShowBadge(false)
             enableVibration(false)
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC

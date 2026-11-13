@@ -34,6 +34,7 @@ import com.marc.gymplan100.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.PlanViewModel
+import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.EjercicioCatalogo
 import com.marc.gymplan100.ui.theme.LocalAppTextStyles
 import com.marc.gymplan100.ui.theme.Space
@@ -115,7 +116,7 @@ private fun FatburnRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(exercise.nombre, style = MaterialTheme.typography.titleMedium)
+            Text(Contenido.t(exercise.nombre), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(2.dp))
             Text(
                 stringResource(R.string.ses_fatburn_recommended, freq.min, freq.max),
