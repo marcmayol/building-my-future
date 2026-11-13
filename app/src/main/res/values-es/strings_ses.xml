@@ -237,4 +237,8 @@
     <string name="ses_group_core">Core</string>
     <string name="ses_group_cardio">Cardio</string>
     <string name="ses_group_other">Otros</string>
+    <string name="ses_replace_title">¿Empezar otra cosa?</string>
+    <string name="ses_replace_day">Tienes el día %1$d a medias. Si empiezas esto, se pierde lo que llevas hoy.</string>
+    <string name="ses_replace_other">Tienes un entreno en marcha. Si empiezas esto, se pierde.</string>
+    <string name="ses_replace_confirm">Descartar y empezar</string>
 </resources>

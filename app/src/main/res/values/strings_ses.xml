@@ -237,4 +237,8 @@
     <string name="ses_group_core">Core</string>
     <string name="ses_group_cardio">Cardio</string>
     <string name="ses_group_other">Other</string>
+    <string name="ses_replace_title">Start something else?</string>
+    <string name="ses_replace_day">Day %1$d is half done. If you start this, what you\'ve done today is lost.</string>
+    <string name="ses_replace_other">You have a workout in progress. If you start this, it\'s lost.</string>
+    <string name="ses_replace_confirm">Discard and start</string>
 </resources>

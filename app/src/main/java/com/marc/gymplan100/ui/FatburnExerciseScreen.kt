@@ -30,6 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +66,15 @@ fun FatburnExerciseScreen(
 
     var selected by remember { mutableStateOf(exercise.protocolos.firstOrNull()) }
     var warning by remember { mutableStateOf<String?>(null) }
+    val active by viewModel.activeSession.collectAsState()
+    // Hay otra sesión en curso y empezar esta la descartaría: se pregunta antes.
+    var preguntar by remember { mutableStateOf(false) }
+    fun arrancar() {
+        selected?.let { viewModel.startFatburnSession(exercise, it); onStarted() }
+    }
+    fun empezar() {
+        if (active == null) arrancar() else preguntar = true
+    }
 
     Scaffold(
         topBar = {
@@ -163,7 +174,7 @@ fun FatburnExerciseScreen(
                         val status = viewModel.exerciseFrequency(exercise)
                         if (status.reached) warning = Contenido.t(exercise.aviso_frecuencia)
                         else {
-                            selected?.let { viewModel.startFatburnSession(exercise, it); onStarted() }
+                            empezar()
                         }
                     },
                     enabled = selected != null,
@@ -180,12 +191,23 @@ fun FatburnExerciseScreen(
         }
     }
 
+    if (preguntar) {
+        active?.let { enCurso ->
+            ReplaceSessionDialog(
+                active = enCurso,
+                onReplace = { preguntar = false; arrancar() },
+                onCancel = { preguntar = false }
+            )
+        }
+    }
+    LaunchedEffect(active == null) { if (active == null) preguntar = false }
+
     warning?.let { text ->
         FrequencyWarningDialog(
             text = text,
             onContinue = {
                 warning = null
-                selected?.let { viewModel.startFatburnSession(exercise, it); onStarted() }
+                empezar()
             },
             onCancel = { warning = null }
         )

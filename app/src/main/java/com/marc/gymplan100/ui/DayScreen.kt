@@ -42,6 +42,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -105,6 +106,8 @@ fun DayScreen(
     val completed = day.number in progress.completedDays
     // Ejercicio cuya ficha se está mostrando, o null.
     var guideFor by remember { mutableStateOf<Exercise?>(null) }
+    // Hay otra sesión en marcha (otro día, una rutina, un extra) y el libre la descartaría.
+    var preguntarLibre by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -168,7 +171,7 @@ fun DayScreen(
                 // Alternativa al guiado: cronómetro libre (sin series ni pesos) que SÍ cuenta
                 // como el día del plan. Para cuando entrenas a tu aire pero quieres el registro.
                 OutlinedButton(
-                    onClick = { onStartFreeSession(day.number) },
+                    onClick = { if (active == null) onStartFreeSession(day.number) else preguntarLibre = true },
                     shape = CircleShape,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -254,6 +257,17 @@ fun DayScreen(
                 onAlias = { viewModel.setExerciseAlias(ex.name, it) }
             )
         }
+
+        val otra = active
+        if (preguntarLibre && otra != null) {
+            ReplaceSessionDialog(
+                active = otra,
+                onReplace = { preguntarLibre = false; onStartFreeSession(day.number) },
+                onCancel = { preguntarLibre = false }
+            )
+        }
+        // Si la otra sesión se acaba con la pregunta abierta, la pregunta se olvida.
+        LaunchedEffect(otra == null) { if (otra == null) preguntarLibre = false }
     }
 }
 

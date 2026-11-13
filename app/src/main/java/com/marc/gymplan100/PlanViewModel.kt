@@ -969,14 +969,19 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Inicia la Rutina Militar (secuencia guiada de pasos). Descarta cualquier sesión en curso. */
+    /**
+     * Inicia la Rutina Militar (secuencia guiada de pasos). Descarta cualquier otra sesión en
+     * curso (la pantalla pregunta antes); si la Militar ya estaba en marcha, sigue donde iba.
+     */
     fun startMilitarySession() = startFixedRoutine(specialWorkouts.militar)
 
-    /** Inicia la Rutina Altura y Postura (secuencia guiada de 5 pasos con series). */
+    /** Inicia la Rutina Altura y Postura (secuencia guiada de 5 pasos con series). Igual que la Militar. */
     fun startPostureSession() = startFixedRoutine(specialWorkouts.altura)
 
     private fun startFixedRoutine(rutina: com.marc.gymplan100.data.Rutina?) {
         if (rutina == null) return
+        // Volver a abrirla desde Especiales no la reinicia: se perderían los pasos ya hechos.
+        if (_active.value?.routineId == rutina.id) return
         RestReminder.cancel(getApplication())
         val now = System.currentTimeMillis()
         val session = SpecialSessionEngine.startFixedSequence(rutina, nextDay(), now)

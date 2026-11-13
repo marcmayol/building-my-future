@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Contenido
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.ui.theme.Space
@@ -56,7 +57,7 @@ fun SkipExerciseSheet(
             verticalArrangement = Arrangement.spacedBy(Space.x3)
         ) {
             Text(
-                exerciseName.uppercase(),
+                Contenido.t(exerciseName).uppercase(),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
