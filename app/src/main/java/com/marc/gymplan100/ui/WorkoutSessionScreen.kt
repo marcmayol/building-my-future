@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +28,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -1731,6 +1734,7 @@ private fun ResultTile(
  * [other] es la sesión de OTRO día que haya a medias: empezar esta la descarta, y se avisa
  * antes. [expressFor] recorta el día a los minutos que se le pasen (null = entero ya cabe).
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun StartPrompt(
     day: TrainingDay,
@@ -1750,8 +1754,11 @@ private fun StartPrompt(
     val warmupWord = stringResource(R.string.ses_warmup_word)
 
     Column(
+        // Las barras del sistema, aparte: el Scaffold de la app no las descuenta y, con la letra
+        // al 150 %, el «Día 1» quedaba debajo de la hora y «Volver» encima de la barra de gestos.
         modifier = Modifier
             .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars)
             .verticalScroll(rememberScrollState())
             .padding(Space.screen),
         verticalArrangement = Arrangement.Center
@@ -1792,7 +1799,9 @@ private fun StartPrompt(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(Space.x2))
-            Row(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
+            // FlowRow y no Row: con la letra al 150 % en 360 dp los tres chips no caben en una
+            // línea y el último se quedaba en «30». Así baja entero a la siguiente.
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(Space.x2)) {
                 FilterChip(
                     selected = minutos == null,
                     onClick = { minutos = null },
