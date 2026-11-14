@@ -5,6 +5,9 @@ package com.marc.gymplan100.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,6 +51,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.runtime.mutableFloatStateOf
 import com.marc.gymplan100.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -321,16 +331,62 @@ private fun CountdownCircle(elapsed: Int, target: Int) {
     }
 }
 
+/**
+ * «-10 s / Pausa / +10 s». Con la letra al 150 % en un móvil de 360 dp, «Reanudar» se comía
+ * el ancho y «+10 s» acababa en vertical («+ / 1 / 0»). Ahora los laterales ocupan lo que
+ * mide su texto, sin partirlo, y el central se queda con el resto. Si aun así el central no
+ * cabe (letra al 200 %), encogen los tres a la vez, como en EffortChips: así los laterales
+ * le dejan sitio y la fila no se ve desigual.
+ */
 @Composable
 private fun TimerButtons(s: ActiveSession, viewModel: PlanViewModel) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        OutlinedButton(onClick = { viewModel.adjustTimedSet(-10) }) { Text("-10 s") }
-        if (s.timedPaused) {
-            OutlinedButton(onClick = { viewModel.resumeTimedSet() }) { Text(stringResource(R.string.ses_resume)) }
-        } else {
-            OutlinedButton(onClick = { viewModel.pauseTimedSet() }) { Text(stringResource(R.string.ses_pause)) }
+    val central = if (s.timedPaused) stringResource(R.string.ses_resume) else stringResource(R.string.ses_pause)
+    val escala = LocalDensity.current.fontScale
+    val ancho = LocalConfiguration.current.screenWidthDp
+    // Se vuelve a medir desde el tamaño normal si cambia el texto, la letra o el ancho.
+    var factor by remember(central, escala, ancho) { mutableFloatStateOf(1f) }
+    var cabe by remember(central, escala, ancho, factor) { mutableStateOf(false) }
+    val texto: @Composable (String, ((TextLayoutResult) -> Unit)?) -> Unit = { t, medir ->
+        // El estilo que pone el botón a su etiqueta, leído aquí dentro.
+        val estilo = LocalTextStyle.current
+        Text(
+            t,
+            maxLines = 1,
+            softWrap = false,
+            style = if (estilo.fontSize.type == TextUnitType.Sp) estilo.copy(fontSize = estilo.fontSize * factor) else estilo,
+            // No se pinta mientras no quepa: evita ver el corte un instante.
+            modifier = Modifier.drawWithContent { if (cabe) drawContent() },
+            onTextLayout = medir ?: {}
+        )
+    }
+    val relleno = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        // Los tres igual de altos.
+        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
+    ) {
+        OutlinedButton(onClick = { viewModel.adjustTimedSet(-10) }, contentPadding = relleno, modifier = Modifier.fillMaxHeight()) {
+            texto("-10 s", null)
         }
-        OutlinedButton(onClick = { viewModel.adjustTimedSet(10) }) { Text("+10 s") }
+        OutlinedButton(
+            onClick = { if (s.timedPaused) viewModel.resumeTimedSet() else viewModel.pauseTimedSet() },
+            contentPadding = relleno,
+            modifier = Modifier.weight(1f).fillMaxHeight()
+        ) {
+            texto(central) { layout ->
+                // Ni con la letra al máximo baja de la mitad: antes, cortado que ilegible.
+                // Sin letra en sp el factor no se aplica: bajarlo solo dejaría el texto sin pintar.
+                val sp = layout.layoutInput.style.fontSize.type == TextUnitType.Sp
+                if (layout.didOverflowWidth && sp && factor > 0.5f) {
+                    factor = (factor * 0.9f).coerceAtLeast(0.5f)
+                } else {
+                    cabe = true
+                }
+            }
+        }
+        OutlinedButton(onClick = { viewModel.adjustTimedSet(10) }, contentPadding = relleno, modifier = Modifier.fillMaxHeight()) {
+            texto("+10 s", null)
+        }
     }
 }
 
