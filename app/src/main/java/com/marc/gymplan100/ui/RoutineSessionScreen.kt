@@ -186,8 +186,9 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
 
     when (s.phase) {
         SessionPhase.TIMED_SET -> {
-            val target = if (usingAlt) paso.alternativa!!.duracion_seg else paso.objetivoSeg
-            CountdownCircle(elapsed = s.timedElapsed(now), target = target)
+            // El objetivo de la sesión, no el del paso: «±10 s» (adjustTimedSet) lo cambia ahí y es
+            // el que usan el aviso y el reloj. El motor lo fija desde el paso al empezar la serie.
+            CountdownCircle(elapsed = s.timedElapsed(now), target = s.timedTargetSeconds)
             TimerButtons(s, viewModel)
             PrimaryAdvance(if (hasSeries) stringResource(R.string.ses_set_done) else stringResource(R.string.ses_next_step)) {
                 viewModel.completeFixedSerie("")
