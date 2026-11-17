@@ -38,11 +38,17 @@ fun AppLanguage.wrap(context: Context): Context {
     // El contenido de serie (ejercicios, planes, fichas) se traduce sin contexto: hay que
     // decirle en qué idioma se está pintando.
     Contenido.sync(envuelto)
-    // Los textos de :shared (Compose Multiplatform) no miran el contexto sino
-    // Locale.getDefault(): se pone el idioma que ya han resuelto los recursos de Android
-    // para que las dos partes hablen igual (con [catalán, español], español).
+    // Los textos de :shared (Compose Multiplatform) no miran el contexto sino el primero de
+    // LocaleList.getDefault() (Locale.current de Compose): se pone delante el idioma que ya
+    // han resuelto los recursos de Android para que las dos partes hablen igual (con
+    // [catalán, español], español). Con solo Locale.setDefault no basta: en Android 14 la
+    // lista seguía siendo [ca_ES, es_ES] y Compose pintaba en inglés.
     val resuelto = locale(envuelto)
-    if (Locale.getDefault() != resuelto) Locale.setDefault(resuelto)
+    if (LocaleList.getDefault()[0] != resuelto || Locale.getDefault() != resuelto) {
+        val sistema = envuelto.resources.configuration.locales
+        val resto = (0 until sistema.size()).map { sistema[it] }.filter { it != resuelto }
+        LocaleList.setDefault(LocaleList(resuelto, *resto.toTypedArray()))
+    }
     return envuelto
 }
 
