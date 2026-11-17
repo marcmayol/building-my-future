@@ -2,6 +2,8 @@
 
 package com.marc.gymplan100.ui
 
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toKotlinLocalDate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -85,7 +87,7 @@ fun StatisticsScreen(
     val cargaMuscular = remember(progress, diasRecientes) { MuscleLoad.byGroup(progress, diasRecientes) }
     val volume = remember(progress) { Statistics.totalVolume(progress) }
     val weeks = remember(history) { Statistics.workoutsPerWeek(history, weeks = 10) }
-    val trained = remember(history) { Statistics.trainedDays(history) }
+    val trained = remember(history) { Statistics.trainedDays(history).map { it.toJavaLocalDate() }.toSet() }
     val records = remember(progress) { Statistics.personalRecords(progress) }
     val longest = remember(history) { Statistics.longestSession(history) }
     val productive = remember(history) { Statistics.mostProductiveSession(history) }
@@ -510,8 +512,9 @@ private fun ConsistencySection(
 ) {
     Column {
         val today = LocalDate.now()
-        val thisWeek = Statistics.workoutsBetween(history, Statistics.weekStart(today), today)
-        val thisMonth = Statistics.workoutsBetween(history, today.withDayOfMonth(1), today)
+        val hoy = today.toKotlinLocalDate()
+        val thisWeek = Statistics.workoutsBetween(history, Statistics.weekStart(hoy), hoy)
+        val thisMonth = Statistics.workoutsBetween(history, today.withDayOfMonth(1).toKotlinLocalDate(), hoy)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatTile("$thisWeek", stringResource(R.string.est_esta_semana), Modifier.weight(1f))
             StatTile("$thisMonth", stringResource(R.string.est_este_mes), Modifier.weight(1f))
@@ -583,7 +586,7 @@ private fun WeeklyBars(weeks: List<Statistics.WeekCount>) {
                 Spacer(Modifier.height(4.dp))
                 Text(
                     if (esLaActual) stringResource(R.string.est_semana_esta)
-                    else stringResource(R.string.est_semana_fecha, wc.weekStart.dayOfMonth, wc.weekStart.monthValue),
+                    else stringResource(R.string.est_semana_fecha, wc.weekStart.dayOfMonth, wc.weekStart.monthNumber),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = if (esLaActual) FontWeight.Bold else FontWeight.Normal,
                     color = if (esLaActual) MaterialTheme.colorScheme.primary
@@ -598,7 +601,7 @@ private fun WeeklyBars(weeks: List<Statistics.WeekCount>) {
 @Composable
 private fun Heatmap(trained: Set<LocalDate>, weeks: Int = 13) {
     val today = LocalDate.now()
-    val gridStart = Statistics.weekStart(today).minusWeeks((weeks - 1).toLong())
+    val gridStart = Statistics.weekStart(today.toKotlinLocalDate()).toJavaLocalDate().minusWeeks((weeks - 1).toLong())
     val on = MaterialTheme.colorScheme.primary
     val off = MaterialTheme.colorScheme.surfaceVariant
 

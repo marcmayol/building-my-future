@@ -9,20 +9,25 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.LocalDate
-import java.time.ZoneId
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.TimeZone
 
 /** Tests de la lógica de frecuencia semanal (funciones puras, semana lunes-domingo). */
 class WeeklyFrequencyTest {
 
-    private val zone: ZoneId = ZoneId.of("Europe/Madrid")
+    private val zone: TimeZone = TimeZone.of("Europe/Madrid")
     // Miércoles arbitrario; la semana natural se deriva con Statistics.weekStart (lunes).
-    private val today: LocalDate = LocalDate.of(2026, 7, 22)
+    private val today: LocalDate = LocalDate(2026, 7, 22)
     private val monday: LocalDate = Statistics.weekStart(today)       // lunes de esta semana
-    private val lastSunday: LocalDate = monday.minusDays(1)           // domingo de la semana pasada
+    private val lastSunday: LocalDate = monday.minus(1, DateTimeUnit.DAY)           // domingo de la semana pasada
 
     private fun millisAt(date: LocalDate): Long =
-        date.atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
+        date.atTime(12, 0).toInstant(zone).toEpochMilliseconds()
 
     private fun militar(date: LocalDate, completed: Boolean) = SessionRecord(
         dayNumber = 0,
@@ -54,7 +59,7 @@ class WeeklyFrequencyTest {
     }
 
     @Test fun `el domingo de esta semana si cuenta`() {
-        val sundayThisWeek = monday.plusDays(6)
+        val sundayThisWeek = monday.plus(6, DateTimeUnit.DAY)
         val history = listOf(militar(sundayThisWeek, completed = true))
         val status = WeeklyFrequency.militaryStatus(history, freq3, sundayThisWeek, zone)
         assertEquals(1, status.count)
@@ -63,8 +68,8 @@ class WeeklyFrequencyTest {
     @Test fun `militar abandonada no cuenta para la frecuencia`() {
         val history = listOf(
             militar(monday, completed = true),
-            militar(monday.plusDays(1), completed = false), // abandonada
-            militar(monday.plusDays(2), completed = true)
+            militar(monday.plus(1, DateTimeUnit.DAY), completed = false), // abandonada
+            militar(monday.plus(2, DateTimeUnit.DAY), completed = true)
         )
         val status = WeeklyFrequency.militaryStatus(history, freq3, today, zone)
         assertEquals(2, status.count)
@@ -74,8 +79,8 @@ class WeeklyFrequencyTest {
     @Test fun `alcanzar el maximo dispara el aviso`() {
         val history = listOf(
             militar(monday, completed = true),
-            militar(monday.plusDays(1), completed = true),
-            militar(monday.plusDays(2), completed = true)
+            militar(monday.plus(1, DateTimeUnit.DAY), completed = true),
+            militar(monday.plus(2, DateTimeUnit.DAY), completed = true)
         )
         val status = WeeklyFrequency.militaryStatus(history, freq3, today, zone)
         assertEquals(3, status.count)
@@ -83,7 +88,7 @@ class WeeklyFrequencyTest {
     }
 
     @Test fun `por debajo del maximo no avisa`() {
-        val history = listOf(militar(monday, completed = true), militar(monday.plusDays(1), completed = true))
+        val history = listOf(militar(monday, completed = true), militar(monday.plus(1, DateTimeUnit.DAY), completed = true))
         assertFalse(WeeklyFrequency.militaryStatus(history, freq3, today, zone).reached)
     }
 
@@ -92,8 +97,8 @@ class WeeklyFrequencyTest {
         val cuerda = EjercicioCatalogo(id = "saltar_cuerda", frecuencia_semanal = FrecuenciaSemanal(2, 3))
         val history = listOf(
             quema(monday, "burpees_hiit"),
-            quema(monday.plusDays(1), "burpees_hiit"),
-            quema(monday.plusDays(2), "saltar_cuerda")
+            quema(monday.plus(1, DateTimeUnit.DAY), "burpees_hiit"),
+            quema(monday.plus(2, DateTimeUnit.DAY), "saltar_cuerda")
         )
         val burpeesStatus = WeeklyFrequency.exerciseStatus(history, burpees, today, zone)
         val cuerdaStatus = WeeklyFrequency.exerciseStatus(history, cuerda, today, zone)
@@ -132,8 +137,8 @@ class WeeklyFrequencyTest {
 
     @Test fun `altura no avisa haciendola en dias distintos de la misma semana`() {
         // Lun..Sab hechas; el domingo (7º día, aún sin hacer) no debe avisar: contador diario 0.
-        val history = (0..5).map { altura(monday.plusDays(it.toLong())) }
-        val sunday = monday.plusDays(6)
+        val history = (0..5).map { altura(monday.plus(it, DateTimeUnit.DAY)) }
+        val sunday = monday.plus(6, DateTimeUnit.DAY)
         val status = alturaStatus(history, sunday)
         assertEquals(6, WeeklyFrequency.routineSessionsThisWeek(history, alturaId, sunday, zone))
         assertEquals(0, status.count)      // hoy (domingo) aún no se ha hecho
@@ -150,8 +155,8 @@ class WeeklyFrequencyTest {
 
     @Test fun `altura no avisa el primer intento del dia aunque la semana este llena`() {
         // 7 sesiones en días distintos (semana "llena"), pero hoy es un día nuevo sin sesión.
-        val history = (0..6).map { altura(monday.plusDays(it.toLong())) }
-        val nextMonday = monday.plusWeeks(1)
+        val history = (0..6).map { altura(monday.plus(it, DateTimeUnit.DAY)) }
+        val nextMonday = monday.plus(1, DateTimeUnit.WEEK)
         val status = alturaStatus(history, nextMonday)
         assertEquals(0, status.count)
         assertFalse(status.reached)

@@ -1,9 +1,14 @@
 package com.marc.gymplan100.data
 
-import java.time.DayOfWeek
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 
 /**
  * Cálculos de estadísticas a partir del progreso y del histórico de sesiones.
@@ -31,7 +36,7 @@ object Statistics {
     )
 
     fun summary(progress: ProgressState, history: List<SessionRecord>): Summary {
-        val days = progress.completedDays.filter { it in 1..PlanData.TOTAL_DAYS }.toSortedSet()
+        val days = progress.completedDays.filter { it in 1..PlanData.TOTAL_DAYS }.sorted().toSet()
         return Summary(
             completedDays = days.size,
             totalDays = PlanData.TOTAL_DAYS,
@@ -48,7 +53,7 @@ object Statistics {
     /** Racha más larga de días CONSECUTIVOS del plan completados. */
     fun bestStreak(days: Set<Int>): Int {
         if (days.isEmpty()) return 0
-        val sorted = days.toSortedSet()
+        val sorted = days.sorted().toSet()
         var best = 1
         var run = 1
         var prev = sorted.first()
@@ -88,7 +93,7 @@ object Statistics {
      * bajada de fuerza, y la gráfica dibujaba un diente de sierra que no había pasado.
      */
     fun weightProgression(progress: ProgressState): Map<String, List<WeightPoint>> {
-        val out = sortedMapOf<String, MutableList<WeightPoint>>()
+        val out = mutableMapOf<String, MutableList<WeightPoint>>()
         for ((key, log) in progress.logs) {
             val w = parseWeight(log.weight) ?: continue
             val dash = key.indexOf('-')
@@ -99,7 +104,7 @@ object Statistics {
                 ?.let { log.nameFor(it) } ?: continue
             out.getOrPut(name) { mutableListOf() }.add(WeightPoint(day, w))
         }
-        return out.mapValues { (_, v) -> v.sortedBy { it.day } }
+        return out.keys.sorted().associateWith { k -> out.getValue(k).sortedBy { it.day } }
     }
 
     // --------------------------------------------------- Fuerza estimada (1RM) y volumen
@@ -145,7 +150,7 @@ object Statistics {
      * que valga, y rellenar el hueco con una suposición sería dibujar un progreso inventado.
      */
     fun oneRmProgression(progress: ProgressState): Map<String, List<WeightPoint>> {
-        val out = sortedMapOf<String, MutableList<WeightPoint>>()
+        val out = mutableMapOf<String, MutableList<WeightPoint>>()
         for ((key, log) in progress.logs) {
             // Solo las series de trabajo: calentar mucho no te hace mas fuerte.
             val best = bestOneRm(log.workingSets) ?: continue
@@ -157,7 +162,7 @@ object Statistics {
                 ?.let { log.nameFor(it) } ?: continue
             out.getOrPut(name) { mutableListOf() }.add(WeightPoint(day, best))
         }
-        return out.mapValues { (_, v) -> v.sortedBy { it.day } }
+        return out.keys.sorted().associateWith { k -> out.getValue(k).sortedBy { it.day } }
     }
 
     /**
@@ -179,14 +184,14 @@ object Statistics {
      * que es preferible a inventarles un número.
      */
     fun volumeByDay(progress: ProgressState): Map<Int, Float> {
-        val out = sortedMapOf<Int, Float>()
+        val out = mutableMapOf<Int, Float>()
         for ((key, log) in progress.logs) {
             val v = volume(log.workingSets)
             if (v <= 0f) continue
             val day = key.substringBefore('-').toIntOrNull() ?: continue
             out[day] = (out[day] ?: 0f) + v
         }
-        return out
+        return out.keys.sorted().associateWith { out.getValue(it) }
     }
 
     /** Kilos movidos en total, sumando todos los días con desglose. */
@@ -208,17 +213,17 @@ object Statistics {
     fun activeKcal(weightKg: Int, seconds: Int): Int? {
         if (weightKg <= 0 || seconds <= 0) return null
         val minutos = seconds / 60.0
-        return Math.round(MET_FUERZA * 3.5 * weightKg / 200.0 * minutos).toInt().takeIf { it > 0 }
+        return kotlin.math.floor(MET_FUERZA * 3.5 * weightKg / 200.0 * minutos + 0.5).toInt().takeIf { it > 0 }
     }
 
     // ------------------------------------------------------------------- Constancia
 
-    private fun millisToDate(millis: Long, zone: ZoneId): LocalDate =
-        Instant.ofEpochMilli(millis).atZone(zone).toLocalDate()
+    private fun millisToDate(millis: Long, zone: TimeZone): LocalDate =
+        Instant.fromEpochMilliseconds(millis).toLocalDateTime(zone).date
 
     /** Lunes de la semana a la que pertenece [date]. */
     fun weekStart(date: LocalDate): LocalDate =
-        date.minusDays((date.dayOfWeek.value - DayOfWeek.MONDAY.value).toLong())
+        date.minus(date.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
 
     data class WeekCount(val weekStart: LocalDate, val count: Int)
 
@@ -226,13 +231,13 @@ object Statistics {
     fun workoutsPerWeek(
         history: List<SessionRecord>,
         weeks: Int = 10,
-        zone: ZoneId = ZoneId.systemDefault(),
-        today: LocalDate = LocalDate.now(zone)
+        zone: TimeZone = TimeZone.currentSystemDefault(),
+        today: LocalDate = Clock.System.todayIn(zone)
     ): List<WeekCount> {
         val counts = history.groupingBy { weekStart(millisToDate(it.endMillis, zone)) }.eachCount()
         val currentWeek = weekStart(today)
         return (weeks - 1 downTo 0).map { back ->
-            val ws = currentWeek.minusWeeks(back.toLong())
+            val ws = currentWeek.minus(back, DateTimeUnit.WEEK)
             WeekCount(ws, counts[ws] ?: 0)
         }
     }
@@ -252,7 +257,7 @@ object Statistics {
     /** Días de calendario con al menos un entreno. */
     fun trainedDays(
         history: List<SessionRecord>,
-        zone: ZoneId = ZoneId.systemDefault()
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Set<LocalDate> = history.map { millisToDate(it.endMillis, zone) }.toSet()
 
     /** Cuenta entrenos cuya fecha cae en el rango [from, to] inclusive. */
@@ -260,10 +265,10 @@ object Statistics {
         history: List<SessionRecord>,
         from: LocalDate,
         to: LocalDate,
-        zone: ZoneId = ZoneId.systemDefault()
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Int = history.count {
         val d = millisToDate(it.endMillis, zone)
-        !d.isBefore(from) && !d.isAfter(to)
+        d >= from && d <= to
     }
 
     // ---------------------------------------------------------------------- Records

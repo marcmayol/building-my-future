@@ -3,7 +3,12 @@ package com.marc.gymplan100
 import com.marc.gymplan100.data.Statistics
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.time.LocalDate
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
 
 /**
  * La gráfica de entrenos por semana tiene que leerse sin explicación.
@@ -14,11 +19,11 @@ import java.time.LocalDate
  */
 class StatisticsWeeksTest {
 
-    private val lunes = LocalDate.of(2026, 5, 18)
+    private val lunes = LocalDate(2026, 5, 18)
 
     private fun semanas(vararg cuentas: Int): List<Statistics.WeekCount> =
         cuentas.mapIndexed { i, n ->
-            Statistics.WeekCount(lunes.plusWeeks(i.toLong()), n)
+            Statistics.WeekCount(lunes.plus(i, DateTimeUnit.WEEK), n)
         }
 
     @Test

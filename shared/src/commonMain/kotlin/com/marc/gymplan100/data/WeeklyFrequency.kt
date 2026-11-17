@@ -1,8 +1,14 @@
 package com.marc.gymplan100.data
 
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 
 /**
  * Conteo de sesiones registradas en la semana natural en curso (lunes-domingo, zona del
@@ -29,19 +35,19 @@ object WeeklyFrequency {
         val reached: Boolean
     )
 
-    private fun dateOf(millis: Long, zone: ZoneId): LocalDate =
-        Instant.ofEpochMilli(millis).atZone(zone).toLocalDate()
+    private fun dateOf(millis: Long, zone: TimeZone): LocalDate =
+        Instant.fromEpochMilliseconds(millis).toLocalDateTime(zone).date
 
     /** ¿La sesión cae en la misma semana natural que [today]? */
-    private fun inCurrentWeek(record: SessionRecord, today: LocalDate, zone: ZoneId): Boolean =
+    private fun inCurrentWeek(record: SessionRecord, today: LocalDate, zone: TimeZone): Boolean =
         Statistics.weekStart(dateOf(record.endMillis, zone)) == Statistics.weekStart(today)
 
     /** Sesiones COMPLETADAS de una rutina (secuencia fija) esta semana. */
     fun routineSessionsThisWeek(
         history: List<SessionRecord>,
         routineId: String,
-        today: LocalDate = LocalDate.now(),
-        zone: ZoneId = ZoneId.systemDefault()
+        today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Int = history.count {
         it.routineId == routineId && it.routineCompleted && inCurrentWeek(it, today, zone)
     }
@@ -50,8 +56,8 @@ object WeeklyFrequency {
     fun routineSessionsToday(
         history: List<SessionRecord>,
         routineId: String,
-        today: LocalDate = LocalDate.now(),
-        zone: ZoneId = ZoneId.systemDefault()
+        today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Int = history.count {
         it.routineId == routineId && it.routineCompleted && dateOf(it.endMillis, zone) == today
     }
@@ -67,8 +73,8 @@ object WeeklyFrequency {
         frecuencia: FrecuenciaSemanal,
         daily: Boolean = false,
         dailyMax: Int = 0,
-        today: LocalDate = LocalDate.now(),
-        zone: ZoneId = ZoneId.systemDefault()
+        today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Status {
         return if (daily) {
             val count = routineSessionsToday(history, routineId, today, zone)
@@ -82,16 +88,16 @@ object WeeklyFrequency {
     /** Sesiones de la Rutina Militar COMPLETADAS esta semana. */
     fun militarySessionsThisWeek(
         history: List<SessionRecord>,
-        today: LocalDate = LocalDate.now(),
-        zone: ZoneId = ZoneId.systemDefault()
+        today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Int = routineSessionsThisWeek(history, SpecialWorkoutsLoader.MILITAR_ID, today, zone)
 
     /** Sesiones registradas esta semana de un ejercicio concreto de quema grasa. */
     fun exerciseSessionsThisWeek(
         history: List<SessionRecord>,
         exerciseId: String,
-        today: LocalDate = LocalDate.now(),
-        zone: ZoneId = ZoneId.systemDefault()
+        today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Int = history.count {
         it.exerciseId == exerciseId && inCurrentWeek(it, today, zone)
     }
@@ -100,8 +106,8 @@ object WeeklyFrequency {
     fun militaryStatus(
         history: List<SessionRecord>,
         frecuencia: FrecuenciaSemanal,
-        today: LocalDate = LocalDate.now(),
-        zone: ZoneId = ZoneId.systemDefault()
+        today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Status {
         val count = militarySessionsThisWeek(history, today, zone)
         return Status(count, frecuencia.max, frecuencia.max > 0 && count >= frecuencia.max)
@@ -111,8 +117,8 @@ object WeeklyFrequency {
     fun exerciseStatus(
         history: List<SessionRecord>,
         exercise: EjercicioCatalogo,
-        today: LocalDate = LocalDate.now(),
-        zone: ZoneId = ZoneId.systemDefault()
+        today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+        zone: TimeZone = TimeZone.currentSystemDefault()
     ): Status {
         val count = exerciseSessionsThisWeek(history, exercise.id, today, zone)
         val max = exercise.frecuencia_semanal.max
