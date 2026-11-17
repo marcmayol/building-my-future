@@ -26,7 +26,6 @@ import com.marc.gymplan100.ui.GymNavHost
 import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.ui.theme.AppTheme
 import com.marc.gymplan100.ui.theme.GymPlanTheme
-import com.marc.gymplan100.ui.theme.LanguageMode
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSBundle
 import platform.Foundation.NSLocale
@@ -61,11 +60,18 @@ fun iniciarApp() {
  */
 fun aplicarIdioma() {
     val defaults = NSUserDefaults.standardUserDefaults
-    when (val modo = AppLanguage.mode(IosContext)) {
-        LanguageMode.SISTEMA -> defaults.removeObjectForKey("AppleLanguages")
-        else -> defaults.setObject(listOf(modo.tag), "AppleLanguages")
-    }
-    val preferido = (NSLocale.preferredLanguages.firstOrNull() as? String) ?: "en"
+    // Se quita lo que guardó la app para leer la lista de idiomas del sistema (dominio global).
+    defaults.removeObjectForKey("AppleLanguages")
+    val sistema = (defaults.arrayForKey("AppleLanguages") ?: NSLocale.preferredLanguages)
+        .mapNotNull { it as? String }
+    val modo = AppLanguage.mode(IosContext)
+    // Como en Android: con el móvil en [catalán, español] la app sale en español, no en inglés.
+    // Se elige el primer idioma de la lista que la app tiene (es o en) y se pone delante, porque
+    // Compose y sus recursos solo miran el primero de NSLocale.preferredLanguages.
+    val preferido = modo.tag
+        ?: sistema.firstOrNull { it.startsWith("es") || it.startsWith("en") }
+        ?: "en"
+    defaults.setObject(listOf(preferido) + sistema.filter { it != preferido }, "AppleLanguages")
     // Cualquier variante de español ve la app en español; cualquier otro idioma, en inglés.
     val idioma = if (preferido.startsWith("es")) "es" else "en"
     localeApp = NSLocale(localeIdentifier = preferido)
