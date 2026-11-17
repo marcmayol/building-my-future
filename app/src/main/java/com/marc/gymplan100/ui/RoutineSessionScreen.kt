@@ -198,11 +198,12 @@ private fun FixedSequenceContent(s: ActiveSession, now: Long, viewModel: PlanVie
         SessionPhase.WORKING -> {
             RepsTarget(paso)
             // Alternativa (solo en el paso de burpees de la militar): jumping jacks por tiempo.
-            if (paso.alternativa != null && !usingAlt) {
+            val alternativa = paso.alternativa
+            if (alternativa != null && !usingAlt) {
                 OutlinedButton(
                     onClick = { viewModel.chooseAlternative() },
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(stringResource(R.string.ses_instead, Contenido.t(paso.alternativa.nombre))) }
+                ) { Text(stringResource(R.string.ses_instead, Contenido.t(alternativa.nombre))) }
             }
             var reps by remember(s.stepIndex, s.setNumber) { mutableStateOf("") }
             OutlinedTextField(

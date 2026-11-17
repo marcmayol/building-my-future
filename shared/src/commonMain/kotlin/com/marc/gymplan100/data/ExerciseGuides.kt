@@ -1,6 +1,7 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
+import kotlin.concurrent.Volatile
+
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -842,27 +843,22 @@ object ExerciseGuides {
     @Volatile
     private var catalogo: Map<String, ExerciseGuide>? = null
 
-    private fun catalogo(context: Context): Map<String, ExerciseGuide> {
+    private fun catalogo(): Map<String, ExerciseGuide> {
         catalogo?.let { return it }
-        synchronized(this) {
-            catalogo?.let { return it }
-            val leido = runCatching {
-                val raw = context.applicationContext.assets.open("fichas.json")
-                    .bufferedReader().use { it.readText() }
-                Json { ignoreUnknownKeys = true }
-                    .decodeFromString<Map<String, ExerciseGuide>>(raw)
-            }.getOrElse { emptyMap() }
-            catalogo = leido
-            return leido
-        }
+        val leido = runCatching {
+            Json { ignoreUnknownKeys = true }
+                .decodeFromString<Map<String, ExerciseGuide>>(Datos.leer("fichas.json"))
+        }.getOrElse { emptyMap() }
+        catalogo = leido
+        return leido
     }
 
     /**
      * Ficha del ejercicio: primero la escrita a mano, y si no hay, la del catálogo a través
      * del slug de su ilustración. Null si no sabemos nada de ese ejercicio.
      */
-    fun forName(context: Context, name: String): ExerciseGuide? =
-        map[name] ?: ExerciseImages.slugFor(name)?.let { catalogo(context)[it] }
+    fun forNameConCatalogo(name: String): ExerciseGuide? =
+        map[name] ?: ExerciseImages.slugFor(name)?.let { catalogo()[it] }
 
     /** Solo la escrita a mano, para donde no hay contexto a mano. */
     fun forName(name: String): ExerciseGuide? = map[ExerciseAliases.resolve(name)]

@@ -1,7 +1,10 @@
 package com.marc.gymplan100
 
 import android.app.Application
+import com.marc.gymplan100.data.Datos
 import com.marc.gymplan100.data.ExerciseCatalog
+import com.marc.gymplan100.data.leerAsset
+import com.marc.gymplan100.data.load
 import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.ui.theme.AppLanguage
 import com.marc.gymplan100.update.Updates
@@ -10,6 +13,8 @@ class GymApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // La lógica común (:shared) lee sus ficheros de datos por aquí: en Android, los assets.
+        Datos.lector = { ruta -> leerAsset(ruta) }
         // Deja cargado el plan activo antes que nada: el proceso también arranca desde el
         // servicio del reloj o el aviso de descanso, y allí ya se pregunta por el plan.
         PlanStore.load(this)

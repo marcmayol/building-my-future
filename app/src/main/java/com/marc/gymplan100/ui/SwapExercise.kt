@@ -1,5 +1,6 @@
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.data.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.data.Contenido
 import com.marc.gymplan100.data.CatalogEntry
 import com.marc.gymplan100.data.ExerciseCatalog
+import com.marc.gymplan100.data.groupLabelRes
 import com.marc.gymplan100.data.ExerciseImages
 import com.marc.gymplan100.data.MyExercises
 import com.marc.gymplan100.ui.theme.Space

@@ -2,6 +2,7 @@
 
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.data.*
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image

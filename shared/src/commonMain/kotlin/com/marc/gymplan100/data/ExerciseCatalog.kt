@@ -1,9 +1,9 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
+import kotlin.concurrent.Volatile
+
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.text.Normalizer
 
 /** Un ejercicio del catálogo de exercise-api, tal y como viene en `assets/catalogo.json`. */
 @Serializable
@@ -34,15 +34,16 @@ object ExerciseCatalog {
     @Volatile
     private var byName: Map<String, CatalogEntry> = emptyMap()
 
-    fun load(context: Context) {
+    /** Carga el catálogo desde el texto de `catalogo.json` (cada plataforma lo lee a su manera). */
+    fun load(json: String) {
         if (entries.isNotEmpty()) return
         val leido = runCatching {
-            val raw = context.applicationContext.assets.open("catalogo.json")
-                .bufferedReader().use { it.readText() }
-            Json { ignoreUnknownKeys = true }.decodeFromString<List<CatalogEntry>>(raw)
+            Json { ignoreUnknownKeys = true }.decodeFromString<List<CatalogEntry>>(json)
         }.getOrElse { emptyList() }
         set(leido)
     }
+
+    val cargado: Boolean get() = entries.isNotEmpty()
 
     /** Para los tests, que no tienen assets. */
     fun set(values: List<CatalogEntry>) {
@@ -55,19 +56,6 @@ object ExerciseCatalog {
     fun forName(name: String): CatalogEntry? = byName[name.trim()]
 
     fun forSlug(slug: String): CatalogEntry? = entries.firstOrNull { it.slug == slug }
-
-    /** Nombre del grupo en el idioma de la app, para los títulos de sección. */
-    @androidx.annotation.StringRes
-    fun groupLabelRes(grupo: String): Int = when (grupo) {
-        "chest" -> com.marc.gymplan100.R.string.ses_group_chest
-        "back" -> com.marc.gymplan100.R.string.ses_group_back
-        "shoulders" -> com.marc.gymplan100.R.string.ses_group_shoulders
-        "arms" -> com.marc.gymplan100.R.string.ses_group_arms
-        "legs" -> com.marc.gymplan100.R.string.ses_group_legs
-        "core" -> com.marc.gymplan100.R.string.ses_group_core
-        "cardio" -> com.marc.gymplan100.R.string.ses_group_cardio
-        else -> com.marc.gymplan100.R.string.ses_group_other
-    }
 
     /** Nombre del grupo en español (sin Context; lo que se pinta usa [groupLabelRes]). */
     fun groupLabel(grupo: String): String = when (grupo) {
@@ -108,9 +96,8 @@ object ExerciseCatalog {
         "si", "sin", "por", "para", "que", "se", "tu", "lo", "mas", "muy", "hay", "no", "es"
     )
 
-    internal fun tokens(text: String): Set<String> =
-        Normalizer.normalize(text.lowercase(), Normalizer.Form.NFD)
-            .replace(Regex("""\p{Mn}+"""), "")
+    fun tokens(text: String): Set<String> =
+        quitarTildes(text.lowercase())
             .split(Regex("""[^a-z0-9]+"""))
             .filter { it.isNotBlank() && it !in vacias }
             .map { raiz(it) }

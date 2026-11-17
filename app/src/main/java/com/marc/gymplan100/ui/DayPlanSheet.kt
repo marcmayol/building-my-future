@@ -2,6 +2,7 @@
 
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.data.*
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.marc.gymplan100.data.Contenido

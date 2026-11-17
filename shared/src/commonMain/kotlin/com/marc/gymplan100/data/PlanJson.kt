@@ -183,7 +183,7 @@ object PlanCodec {
     }
 
     /** Lee el texto de un archivo .json y lo convierte en plan. */
-    fun parseJson(text: String, now: Long = System.currentTimeMillis()): PlanImport {
+    fun parseJson(text: String, now: Long = ahoraMs()): PlanImport {
         if (text.isBlank()) return PlanImport.Error(PlanProblem.EmptyFile)
         val dto = runCatching { json.decodeFromString<PlanDto>(text) }.getOrElse {
             return PlanImport.Error(PlanProblem.InvalidJson)
@@ -241,7 +241,7 @@ object PlanCodec {
      * Convierte y valida. Las fases son opcionales: si el plan trae días sueltos, se envuelven
      * en una fase única para que las pantallas de fases, estadísticas y logros sigan valiendo.
      */
-    fun fromDto(dto: PlanDto, now: Long = System.currentTimeMillis()): PlanImport {
+    fun fromDto(dto: PlanDto, now: Long = ahoraMs()): PlanImport {
         val name = dto.nombre.trim()
         if (name.isEmpty()) return PlanImport.Error(PlanProblem.NoName)
 

@@ -271,7 +271,7 @@ fun parseKg(raw: String): Double? =
 fun formatKg(value: Double): String {
     val v = value.coerceIn(0.0, 500.0)
     return if (v % 1.0 == 0.0) v.toInt().toString()
-    else "%.1f".format(v).replace('.', ',')
+    else unDecimal(v).replace('.', ',')
 }
 
 /**
@@ -388,8 +388,7 @@ object RestDefaults {
      * elevación), que a las mismas repeticiones se recuperan antes.
      */
     fun isBigLift(name: String): Boolean {
-        val n = java.text.Normalizer.normalize(name.lowercase(), java.text.Normalizer.Form.NFD)
-            .replace(Regex("""\p{Mn}+"""), "")
+        val n = quitarTildes(name.lowercase())
         val aislado = listOf("curl", "extension", "apertura", "elevacion", "pec deck", "patada",
             "pajaro", "face pull", "gemelo", "abduc", "aduc", "encogimiento", "frances")
         if (aislado.any { n.contains(it) }) return false

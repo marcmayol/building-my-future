@@ -1,5 +1,6 @@
 package com.marc.gymplan100
 
+import com.marc.gymplan100.data.*
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -542,7 +543,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             // Tras un plan duro, lo natural es sostener lo ganado.
             PlanGoal.MUSCLE, PlanGoal.STRENGTH -> PlanGoal.MAINTAIN
             null -> return null
-            else -> terminado.goal
+            else -> terminado.goal!!
         }
         val dias = terminado.daysPerWeek.takeIf { it > 0 } ?: 3
         val respuestas = PlanAdvisor.Answers(
@@ -1519,8 +1520,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
             // Las secuencias fijas (militar, altura y postura) cuentan para la frecuencia solo si se
             // completaron (finalizar aparece al llegar al último paso). La quema grasa cuenta por
             // ejercicio (usa exerciseId, no este flag).
-            routineCompleted = s.routineId != null &&
-                specialWorkouts.rutina(s.routineId)?.esSecuenciaFija == true,
+            routineCompleted = s.routineId?.let { specialWorkouts.rutina(it)?.esSecuenciaFija } == true,
             logged = logged
         )
         viewModelScope.launch { repo.appendHistory(record) }

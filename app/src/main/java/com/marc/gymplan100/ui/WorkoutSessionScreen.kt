@@ -2,6 +2,7 @@
 
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.data.*
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image

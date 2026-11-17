@@ -21,5 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "GymPlan100"
 include(":app")
+include(":shared")
 include(":wear")
 include(":actualizador")

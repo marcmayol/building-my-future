@@ -1,5 +1,7 @@
 package com.marc.gymplan100.data
 
+import kotlin.concurrent.Volatile
+
 /**
  * "Este ejercicio mío es como este del catálogo".
  *

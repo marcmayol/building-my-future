@@ -1,6 +1,5 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -278,7 +277,6 @@ object SpecialWorkoutsLoader {
     /** Parsea el contenido del JSON. Separado de [load] para poder testearlo sin Context. */
     fun parse(text: String): SpecialWorkoutsData = json.decodeFromString(text)
 
-    /** Lee el asset del APK y lo parsea. */
-    fun load(context: Context): SpecialWorkoutsData =
-        context.assets.open(ASSET).bufferedReader().use { parse(it.readText()) }
+    /** Lee el fichero de la app y lo parsea. */
+    fun load(): SpecialWorkoutsData = parse(Datos.leer(ASSET))
 }

@@ -1,7 +1,7 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
-import com.marc.gymplan100.R
+import kotlin.concurrent.Volatile
+
 import kotlinx.serialization.json.Json
 
 /**
@@ -33,25 +33,19 @@ object Contenido {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    /** Lee el idioma resuelto de [context] (el ya envuelto con el de la app). */
-    fun sync(context: Context) {
-        val en = runCatching { context.getString(R.string.idioma_codigo) == "en" }.getOrDefault(false)
-        if (en) cargar(context)
+    /** Pone el idioma del contenido: [en] si la app se ve en inglés. */
+    fun sync(en: Boolean) {
+        if (en) cargar()
         ingles = en
     }
 
-    private fun cargar(context: Context) {
+    private fun cargar() {
         if (dic != null) return
-        synchronized(this) {
-            if (dic != null) return
-            fun leer(fichero: String): Map<String, String> = runCatching {
-                json.decodeFromString<Map<String, String>>(
-                    context.applicationContext.assets.open(fichero).bufferedReader().use { it.readText() }
-                )
-            }.getOrElse { emptyMap() }
-            inverso = leer("en/inverso.json").mapKeys { it.key.lowercase() }
-            dic = leer("en/contenido.json")
-        }
+        fun leer(fichero: String): Map<String, String> = runCatching {
+            json.decodeFromString<Map<String, String>>(Datos.leer(fichero))
+        }.getOrElse { emptyMap() }
+        inverso = leer("en/inverso.json").mapKeys { it.key.lowercase() }
+        dic = leer("en/contenido.json")
     }
 
     /** Para los tests, que no tienen assets. */

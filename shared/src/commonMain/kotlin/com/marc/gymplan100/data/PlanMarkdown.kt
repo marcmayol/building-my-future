@@ -114,7 +114,7 @@ object PlanMarkdownParser {
     }
 
     /** Convierte el texto en plan, o explica por qué no se puede. */
-    fun parse(text: String, now: Long = System.currentTimeMillis()): PlanImport {
+    fun parse(text: String, now: Long = ahoraMs()): PlanImport {
         if (text.isBlank()) return PlanImport.Error(PlanProblem.EmptyFile)
 
         var planName = ""

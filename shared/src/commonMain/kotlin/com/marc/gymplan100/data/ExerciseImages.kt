@@ -1,6 +1,5 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
 
 /**
  * Ilustración de referencia de cada ejercicio, en versión masculina (`_m`) y femenina (`_f`).
@@ -276,41 +275,23 @@ object ExerciseImages {
         ),
     )
 
-    private fun drawableFor(context: Context, slug: String, female: Boolean): Int {
-        val res = "ex_" + slug.replace('-', '_') + if (female) "_f" else "_m"
-        return context.resources.getIdentifier(res, "drawable", context.packageName)
-    }
+    /** Nombre del dibujo de un slug: «ex_bench_press_f». Cada plataforma lo busca a su manera. */
+    fun nombreDibujo(slug: String, female: Boolean): String =
+        "ex_" + slug.replace('-', '_') + if (female) "_f" else "_m"
 
     /**
-     * Drawable de la ilustración del ejercicio para el género indicado (femenino si [female],
-     * masculino en caso contrario), o null si el ejercicio no tiene imagen.
+     * Slug con dibujo propio de este ejercicio: lo que el plan nombra manda; si no, el
+     * catálogo, que es de donde salen los ejercicios que se eligen en lugar del del plan.
+     * Un ejercicio de un plan propio puede tener un alias: «se parece a este del catálogo».
      */
-    fun forName(context: Context, rawName: String, female: Boolean): Int? {
-        // Un ejercicio de un plan propio puede tener un alias: "se parece a este del catalogo".
+    fun slugPropio(rawName: String): String? {
         val name = ExerciseAliases.resolve(rawName)
-        // Lo que el plan nombra manda; si no, el catálogo, que es de donde salen los
-        // ejercicios que se eligen en lugar del del plan.
-        (nameToSlug[name] ?: ExerciseCatalog.forName(name)?.slug)?.let { slug ->
-            val id = drawableFor(context, slug, female)
-            if (id != 0) return id
-        }
-        // Un compuesto no tiene imagen propia. Vale la del primer movimiento para las
-        // miniaturas de 64 dp (la lista del día), donde no cabe nada más; donde hay sitio se
-        // pintan todos con [circuitMoves], que para eso el circuito son tres cosas.
-        return circuitMoves(context, name, female).firstOrNull()?.drawable
+        return nameToSlug[name] ?: ExerciseCatalog.forName(name)?.slug
     }
 
-    /**
-     * Movimientos de un ejercicio compuesto ya resueltos a drawable, en orden y solo los que
-     * tienen ilustración. Vacío si el nombre no es un compuesto conocido.
-     */
-    fun circuitMoves(context: Context, rawName: String, female: Boolean): List<ResolvedMove> {
-        val moves = nameToCompoundMoves[ExerciseAliases.resolve(rawName)] ?: return emptyList()
-        return moves.mapNotNull { move ->
-            val id = drawableFor(context, move.slug, female)
-            if (id != 0) ResolvedMove(move.label, move.dose, id) else null
-        }
-    }
+    /** Movimientos de un compuesto, en orden, o vacío si no es un compuesto conocido. */
+    fun movimientos(rawName: String): List<CompoundMove> =
+        nameToCompoundMoves[ExerciseAliases.resolve(rawName)] ?: emptyList()
 
     /** ¿Es un circuito o una superserie, es decir, varios movimientos en un solo ejercicio? */
     fun isCompound(name: String): Boolean =

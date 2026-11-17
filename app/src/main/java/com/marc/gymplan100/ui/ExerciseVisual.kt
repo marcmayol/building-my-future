@@ -1,5 +1,6 @@
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.data.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -127,9 +128,9 @@ fun CompoundMoveList(exerciseName: String, modifier: Modifier = Modifier) {
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    if (move.dose != null) {
+                    move.dose?.let { dose ->
                         Text(
-                            Contenido.esquema(move.dose),
+                            Contenido.esquema(dose),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(start = 30.dp)

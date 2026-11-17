@@ -1,5 +1,7 @@
 package com.marc.gymplan100.data
 
+import kotlin.concurrent.Volatile
+
 /**
  * Los ejercicios que te has inventado tú y los que haces con tu peso.
  *

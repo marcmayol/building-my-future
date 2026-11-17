@@ -1,5 +1,7 @@
 package com.marc.gymplan100.data
 
+import kotlin.concurrent.Volatile
+
 /**
  * Ventana al plan ACTIVO.
  *

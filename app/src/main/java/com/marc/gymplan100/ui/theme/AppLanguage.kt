@@ -1,5 +1,6 @@
 package com.marc.gymplan100.ui.theme
 
+import com.marc.gymplan100.data.*
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
