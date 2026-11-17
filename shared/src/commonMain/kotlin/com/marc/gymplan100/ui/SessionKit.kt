@@ -1,5 +1,13 @@
 package com.marc.gymplan100.ui
 
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.IntrinsicMeasurable
 import com.marc.gymplan100.plataforma.anchoPantallaDp
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
@@ -252,7 +260,12 @@ private fun ContenidoYTarjeta(
 ) {
     Layout(contents = listOf(content, card), modifier = modifier) { (contenido, tarjeta), c ->
         val alto = c.maxHeight
-        val minimo = CONTENIDO_MINIMO.roundToPx().coerceAtMost(alto)
+        // Lo que el contenido necesita de verdad (título y cifra; los dibujos van en [SiCabe] y
+        // no cuentan): en un móvil bajo, reservar siempre CONTENIDO_MINIMO dejaba la tarjeta
+        // cortada (las repeticiones por debajo) aunque arriba solo hubiera aire o un dibujo
+        // encogido a una tira.
+        val necesita = contenido.firstOrNull()?.minIntrinsicHeight(c.maxWidth) ?: 0
+        val minimo = minOf(CONTENIDO_MINIMO.roundToPx(), necesita).coerceAtMost(alto)
         val t = tarjeta.firstOrNull()?.measure(
             c.copy(minWidth = 0, minHeight = 0, maxHeight = (alto - minimo).coerceAtLeast(0))
         )
@@ -269,6 +282,33 @@ private fun ContenidoYTarjeta(
 }
 
 private val CONTENIDO_MINIMO = 180.dp
+
+/**
+ * Un dibujo que solo se pinta si le queda al menos [minimo] de alto. Por debajo no pinta nada:
+ * una ilustración encogida a una tira de 20 px no sirve y quita sitio a lo que sí hace falta.
+ * Para quien mide lo que necesita (intrínsecos) cuenta como 0: es lo primero que se sacrifica.
+ */
+@Composable
+fun SiCabe(minimo: Dp, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(content = content, modifier = modifier, measurePolicy = object : MeasurePolicy {
+        override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
+            if (constraints.hasBoundedHeight && constraints.maxHeight < minimo.roundToPx()) {
+                return layout(constraints.minWidth, constraints.minHeight) {}
+            }
+            val hijos = measurables.map { it.measure(constraints) }
+            val ancho = (hijos.maxOfOrNull { it.width } ?: 0).coerceIn(constraints.minWidth, constraints.maxWidth)
+            val alto = (hijos.maxOfOrNull { it.height } ?: 0).coerceIn(constraints.minHeight, constraints.maxHeight)
+            return layout(ancho, alto) { hijos.forEach { it.place(0, 0) } }
+        }
+
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(measurables: List<IntrinsicMeasurable>, width: Int) = 0
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(measurables: List<IntrinsicMeasurable>, height: Int) = 0
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(measurables: List<IntrinsicMeasurable>, width: Int) =
+            measurables.maxOfOrNull { it.maxIntrinsicHeight(width) } ?: 0
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(measurables: List<IntrinsicMeasurable>, height: Int) =
+            measurables.maxOfOrNull { it.maxIntrinsicWidth(height) } ?: 0
+    })
+}
 
 /** Botón secundario en píldora: vive sobre el fondo teñido, así que va con borde, no relleno. */
 @Composable

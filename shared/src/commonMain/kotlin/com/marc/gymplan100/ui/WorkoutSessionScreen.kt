@@ -366,23 +366,29 @@ private fun WarmupContent(
 @Composable
 private fun ColumnScope.SessionIllustration(exerciseName: String, label: String? = null) {
     if (!ExerciseImages.hasVisual(exerciseName)) return
-    Column(
+    SiCabe(
+        minimo = 110.dp,
         modifier = Modifier
             .fillMaxWidth()
             .weight(1f)
-            .padding(bottom = Space.x4),
-        verticalArrangement = Arrangement.Bottom
     ) {
-        if (label != null) {
-            Text(
-                label,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                modifier = Modifier.padding(bottom = Space.x2)
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = Space.x4),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            if (label != null) {
+                Text(
+                    label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    modifier = Modifier.padding(bottom = Space.x2)
+                )
+            }
+            ExerciseVisual(exerciseName, imageHeight = 150.dp, modifier = Modifier.weight(1f, fill = false))
         }
-        ExerciseVisual(exerciseName, imageHeight = 150.dp)
     }
 }
 
@@ -591,10 +597,15 @@ private fun WorkingContent(
             )
         }
         if (imageRes != null) {
-            Spacer(Modifier.height(Space.x4))
             // Un circuito son varios movimientos: en mitad de la serie es justo cuando hace
-            // falta ver los tres y en qué orden, no solo la plancha del principio.
-            ExerciseVisual(exercise.name, imageHeight = 150.dp)
+            // falta ver los tres y en qué orden, no solo la plancha del principio. En un móvil
+            // bajo, si no cabe a un tamaño que se vea, se quita y su sitio va a la tarjeta.
+            SiCabe(minimo = 96.dp) {
+                Column {
+                    Spacer(Modifier.height(Space.x4))
+                    ExerciseVisual(exercise.name, imageHeight = 150.dp)
+                }
+            }
         } else {
             // Un plan propio puede traer ejercicios que no están en el catálogo: se dice con
             // palabras en vez de dejar un hueco.
@@ -1089,10 +1100,15 @@ private fun RestingContent(
         var verMusculos by rememberSaveable(nextExercise?.name) { mutableStateOf(false) }
         val mostrarMapa = nextTargets != null && (verMusculos || nextImageRes == null)
         if (nextImageRes != null || nextTargets != null) {
-            Column(
+            SiCabe(
+                minimo = 120.dp,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
+            ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(bottom = Space.x2),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
@@ -1129,6 +1145,7 @@ private fun RestingContent(
                         Text(if (verMusculos) stringResource(Res.string.ses_see_exercise) else stringResource(Res.string.ses_see_muscles))
                     }
                 }
+            }
             }
         }
         // De dónde sale el descanso, en pocas palabras: tres minutos sin explicación parecen
