@@ -1,0 +1,74 @@
+# Proyecto de Xcode de Building My Future para iPhone. Se genera con `xcodegen` desde esta
+# carpeta; el .xcodeproj no se versiona.
+name: BuildingMyFuture
+options:
+  bundleIdPrefix: com.marcmayol
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    # La versión sale de gradle.properties (appVersionName / appVersionCode) en la fase «Versión».
+    MARKETING_VERSION: "0.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  BuildingMyFuture:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+      # Los mismos ficheros de datos que Android (catálogo, fichas, planes, traducciones):
+      # una sola copia, en app/src/main/assets, que va al bundle como carpeta «assets».
+      - path: ../app/src/main/assets
+        type: folder
+        buildPhase: resources
+    info:
+      path: iosApp/Info.plist
+      properties:
+        CFBundleDisplayName: Building My Future
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [es, en]
+        UILaunchScreen:
+          UIColorName: ""
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIApplicationSupportsIndirectInputEvents: true
+        CADisableMinimumFrameDurationOnPhone: true
+        ITSAppUsesNonExemptEncryption: false
+        LSApplicationQueriesSchemes: [youtube]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.marcmayol.buildingmyfuture
+        PRODUCT_NAME: BuildingMyFuture
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        FRAMEWORK_SEARCH_PATHS: [$(inherited), "$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"]
+    preBuildScripts:
+      - name: Compilar Kotlin
+        basedOnDependencyAnalysis: false
+        script: |
+          # Xcode no lee el perfil de la terminal: hay que decirle dónde está Java.
+          if [ -z "$JAVA_HOME" ]; then
+            for j in /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home "$(/usr/libexec/java_home 2>/dev/null)"; do
+              if [ -x "$j/bin/java" ]; then export JAVA_HOME="$j"; break; fi
+            done
+          fi
+          "$SRCROOT/../gradlew" -p "$SRCROOT/.." :shared:embedAndSignAppleFrameworkForXcode
+    postBuildScripts:
+      - name: Versión
+        basedOnDependencyAnalysis: false
+        # Con el Info.plist como entrada, Xcode la ejecuta después de generarlo (si no, lo sobrescribe).
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
+        script: |
+          # Una sola fuente de la versión para Android e iOS: gradle.properties.
+          props="$SRCROOT/../gradle.properties"
+          name=$(sed -n 's/^appVersionName=//p' "$props")
+          code=$(sed -n 's/^appVersionCode=//p' "$props")
+          plist="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $name" "$plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $code" "$plist"
