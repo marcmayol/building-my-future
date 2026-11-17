@@ -9,6 +9,7 @@ import com.marc.gymplan100.data.PlanData
 import com.marc.gymplan100.R
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.ui.theme.AppLanguage
+import com.marc.gymplan100.ui.theme.wrap
 
 /**
  * Puente con el reloj (Wear OS / Google Pixel Watch).

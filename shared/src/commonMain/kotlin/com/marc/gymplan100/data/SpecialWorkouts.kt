@@ -278,5 +278,7 @@ object SpecialWorkoutsLoader {
     fun parse(text: String): SpecialWorkoutsData = json.decodeFromString(text)
 
     /** Lee el fichero de la app y lo parsea. */
+    fun load(context: PlatformContext): SpecialWorkoutsData = load()
+
     fun load(): SpecialWorkoutsData = parse(Datos.leer(ASSET))
 }

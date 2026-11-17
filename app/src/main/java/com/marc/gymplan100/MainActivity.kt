@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.marc.gymplan100.ui.GymNavHost
 import com.marc.gymplan100.ui.theme.AppLanguage
+import com.marc.gymplan100.ui.theme.wrap
 import com.marc.gymplan100.ui.theme.AppTheme
 import com.marc.gymplan100.ui.theme.GymPlanTheme
 import com.marc.gymplan100.update.Updates

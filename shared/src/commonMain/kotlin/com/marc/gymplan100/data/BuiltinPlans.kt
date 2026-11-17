@@ -27,6 +27,10 @@ object BuiltinPlans {
     // Sin cerrojo: si dos hilos llegan a la vez, los dos leen lo mismo y gana cualquiera.
     fun all(): List<TrainingPlan> = cache ?: load().also { cache = it }
 
+    fun all(context: PlatformContext): List<TrainingPlan> = all()
+
+    fun byId(context: PlatformContext, id: String): TrainingPlan? = byId(id)
+
     fun byId(id: String): TrainingPlan? = all().firstOrNull { it.id == id }
 
     private fun load(): List<TrainingPlan> {

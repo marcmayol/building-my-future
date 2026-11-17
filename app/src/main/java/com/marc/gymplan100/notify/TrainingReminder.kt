@@ -20,6 +20,7 @@ import com.marc.gymplan100.data.PlanStore
 import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.ui.theme.AppLanguage
+import com.marc.gymplan100.ui.theme.wrap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

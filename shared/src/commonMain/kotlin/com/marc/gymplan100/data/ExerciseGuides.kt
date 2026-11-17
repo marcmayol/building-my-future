@@ -857,6 +857,8 @@ object ExerciseGuides {
      * Ficha del ejercicio: primero la escrita a mano, y si no hay, la del catálogo a través
      * del slug de su ilustración. Null si no sabemos nada de ese ejercicio.
      */
+    fun forName(context: PlatformContext, name: String): ExerciseGuide? = forNameConCatalogo(name)
+
     fun forNameConCatalogo(name: String): ExerciseGuide? =
         map[name] ?: ExerciseImages.slugFor(name)?.let { catalogo()[it] }
 

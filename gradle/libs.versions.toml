@@ -3,6 +3,8 @@ agp = "8.11.2"
 kotlin = "2.1.21"
 composeMultiplatform = "1.8.2"
 datetime = "0.6.2"
+navigationMp = "2.9.0-beta03"
+lifecycleMp = "2.9.1"
 coroutines = "1.10.2"
 coreKtx = "1.13.1"
 lifecycle = "2.8.7"
@@ -44,6 +46,10 @@ androidx-health-connect-client = { group = "androidx.health.connect", name = "co
 play-review = { group = "com.google.android.play", name = "review", version.ref = "playReview" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+jb-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationMp" }
+jb-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleMp" }
+jb-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleMp" }
+compose-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "composeMultiplatform" }
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }

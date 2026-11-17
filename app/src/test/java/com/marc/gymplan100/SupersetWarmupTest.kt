@@ -1,6 +1,7 @@
 package com.marc.gymplan100
 
 import com.marc.gymplan100.data.ActiveSession
+import com.marc.gymplan100.shared.ini_backup_err_other_app
 import com.marc.gymplan100.data.Backup
 import com.marc.gymplan100.data.BackupFile
 import com.marc.gymplan100.data.CompletedSet
@@ -214,7 +215,7 @@ class SupersetWarmupTest {
         val raw = "{\"app\":\"otra-cosa\",\"progreso\":{\"a\":\"b\"}}"
         val leida = Backup.parse(raw)
         assertTrue(leida is Backup.Result.Error)
-        assertTrue((leida as Backup.Result.Error).message == com.marc.gymplan100.R.string.ini_backup_err_other_app)
+        assertTrue((leida as Backup.Result.Error).message == com.marc.gymplan100.shared.Res.string.ini_backup_err_other_app)
     }
 
     @Test

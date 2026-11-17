@@ -1,5 +1,9 @@
 package com.marc.gymplan100.data
 
+import com.marc.gymplan100.shared.Res
+import com.marc.gymplan100.shared.allDrawableResources
+import org.jetbrains.compose.resources.DrawableResource
+
 
 /**
  * Ilustración de referencia de cada ejercicio, en versión masculina (`_m`) y femenina (`_f`).
@@ -231,7 +235,7 @@ object ExerciseImages {
     data class CompoundMove(val label: String, val slug: String, val dose: String? = null)
 
     /** Un movimiento ya resuelto a drawable, listo para pintar. */
-    data class ResolvedMove(val label: String, val dose: String?, val drawable: Int)
+    data class ResolvedMove(val label: String, val dose: String?, val drawable: DrawableResource)
 
     /**
      * Movimientos ilustrables de cada ejercicio **compuesto** (circuitos y superseries), en
@@ -292,6 +296,30 @@ object ExerciseImages {
     /** Movimientos de un compuesto, en orden, o vacío si no es un compuesto conocido. */
     fun movimientos(rawName: String): List<CompoundMove> =
         nameToCompoundMoves[ExerciseAliases.resolve(rawName)] ?: emptyList()
+
+    private fun dibujo(slug: String, female: Boolean): DrawableResource? =
+        Res.allDrawableResources[nombreDibujo(slug, female)]
+
+    /**
+     * Dibujo del ejercicio para el género indicado (femenino si [female], masculino si no),
+     * o null si el ejercicio no tiene imagen.
+     */
+    fun forName(context: PlatformContext, rawName: String, female: Boolean): DrawableResource? {
+        slugPropio(rawName)?.let { slug -> dibujo(slug, female)?.let { return it } }
+        // Un compuesto no tiene imagen propia. Vale la del primer movimiento para las
+        // miniaturas de 64 dp (la lista del día), donde no cabe nada más; donde hay sitio se
+        // pintan todos con [circuitMoves], que para eso el circuito son tres cosas.
+        return circuitMoves(context, rawName, female).firstOrNull()?.drawable
+    }
+
+    /**
+     * Movimientos de un ejercicio compuesto ya resueltos a dibujo, en orden y solo los que
+     * tienen ilustración. Vacío si el nombre no es un compuesto conocido.
+     */
+    fun circuitMoves(context: PlatformContext, rawName: String, female: Boolean): List<ResolvedMove> =
+        movimientos(rawName).mapNotNull { move ->
+            dibujo(move.slug, female)?.let { ResolvedMove(move.label, move.dose, it) }
+        }
 
     /** ¿Es un circuito o una superserie, es decir, varios movimientos en un solo ejercicio? */
     fun isCompound(name: String): Boolean =

@@ -1,0 +1,63 @@
+package com.marc.gymplan100.ui.theme
+
+import android.content.Context
+import android.content.res.Configuration
+import android.os.LocaleList
+import com.marc.gymplan100.R
+import com.marc.gymplan100.data.Contenido
+import com.marc.gymplan100.data.sync
+import java.util.Locale
+
+/**
+ * Cómo se aplica en Android el idioma de la app ([AppLanguage], en :shared).
+ *
+ * Los textos viven en `res/values` (inglés, el que sale por defecto) y `res/values-es`
+ * (español). En automático manda el móvil: cualquier variante de español ve la app en
+ * español y cualquier otro idioma en inglés, que es lo que pidió Marc. Ojo: Android mira
+ * toda la lista de idiomas del móvil, así que uno en catalán con el español de segundo
+ * idioma ve la app en español; con solo catalán, en inglés.
+ *
+ * Elegir uno fijo no pasa por las APIs de idioma por app de Android 13 ni por AppCompat: la
+ * actividad es una ComponentActivity y la app arranca en Android 8. Se guarda en
+ * SharedPreferences, como el tema, porque hay que saberlo antes de crear la actividad, y
+ * se aplica envolviendo el contexto ([wrap]). Lo que se pinta fuera de la actividad
+ * (notificaciones, el aviso de descanso, el reloj) pide sus textos a [wrap] también, porque
+ * el contexto de la aplicación no se entera del cambio hasta que muere el proceso.
+ */
+
+/**
+ * El contexto con el idioma elegido. En automático devuelve el mismo, que ya sigue al
+ * sistema.
+ */
+fun AppLanguage.wrap(context: Context): Context {
+    val envuelto = mode(context).tag?.let { tag ->
+        val config = Configuration(context.resources.configuration)
+        config.setLocales(LocaleList(Locale.forLanguageTag(tag)))
+        context.createConfigurationContext(config)
+    } ?: context
+    // El contenido de serie (ejercicios, planes, fichas) se traduce sin contexto: hay que
+    // decirle en qué idioma se está pintando.
+    Contenido.sync(envuelto)
+    // Los textos de :shared (Compose Multiplatform) no miran el contexto sino
+    // Locale.getDefault(): se pone el idioma que ya han resuelto los recursos de Android
+    // para que las dos partes hablen igual (con [catalán, español], español).
+    val resuelto = locale(envuelto)
+    if (Locale.getDefault() != resuelto) Locale.setDefault(resuelto)
+    return envuelto
+}
+
+/**
+ * El idioma con el que se está pintando, para fechas y números escritos. En automático,
+ * con el móvil en un idioma que la app no tiene (alemán, catalán…), los textos salen en
+ * inglés y las fechas tienen que salir en inglés también, no «März 8».
+ */
+fun AppLanguage.locale(context: Context): Locale {
+    // El idioma que han resuelto los recursos (values o values-es), no el primero del
+    // móvil: con [catalán, español] Android pinta en español.
+    val idioma = context.getString(R.string.idioma_codigo)
+    val locales = context.resources.configuration.locales
+    for (i in 0 until locales.size()) {
+        if (locales[i].language == idioma) return locales[i] // conserva la región (es-MX…)
+    }
+    return Locale.forLanguageTag(idioma)
+}

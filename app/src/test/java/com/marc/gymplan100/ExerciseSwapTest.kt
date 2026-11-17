@@ -68,7 +68,7 @@ class ExerciseSwapTest {
         val sinDibujo = ExerciseCatalog.all.filterNot { e ->
             listOf("m", "f").all { g ->
                 listOf("jpg", "webp").any { ext ->
-                    File("src/main/res/drawable-nodpi/ex_${e.slug.replace('-', '_')}_$g.$ext").exists()
+                    File("../shared/src/commonMain/composeResources/drawable/ex_${e.slug.replace('-', '_')}_$g.$ext").exists()
                 }
             }
         }.map { it.slug }

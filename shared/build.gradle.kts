@@ -26,9 +26,14 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
+            api(compose.foundation)
+            api(compose.material3)
+            api(compose.ui)
+            api(compose.materialIconsExtended)
+            api(libs.jb.navigation.compose)
+            api(libs.jb.lifecycle.viewmodel.compose)
+            api(libs.jb.lifecycle.runtime.compose)
+            implementation(libs.compose.backhandler)
             api(compose.components.resources)
             api(libs.kotlinx.serialization.json)
             api(libs.kotlinx.datetime)

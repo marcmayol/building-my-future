@@ -1,0 +1,461 @@
+package com.marc.gymplan100.ui
+
+import com.marc.gymplan100.plataforma.anchoPantallaDp
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.layout.Layout
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import org.jetbrains.compose.resources.stringResource
+import com.marc.gymplan100.shared.*
+import com.marc.gymplan100.data.Contenido
+import com.marc.gymplan100.data.ExerciseImages
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.marc.gymplan100.ui.theme.LocalAppColors
+import com.marc.gymplan100.ui.theme.LocalAppTextStyles
+import com.marc.gymplan100.ui.theme.Space
+import com.marc.gymplan100.ui.theme.Touch
+import com.marc.gymplan100.ui.theme.stateHalo
+import kotlinx.coroutines.delay
+
+/**
+ * Piezas comunes de la sesión guiada.
+ *
+ * La idea del rediseño: **el estado tiñe la pantalla**. Ámbar preparas, naranja trabajas,
+ * magenta esperas. Así, a un brazo de distancia y de reojo, el color ya dice si toca darle o
+ * estás descansando, sin leer una palabra. Cada estado tiene un único gesto principal, siempre
+ * en el mismo sitio: lo demás vive encima y se lee como secundario.
+ */
+
+/** Los cuatro ambientes de la sesión. */
+enum class SessionTint { WARMUP, WORK, REST, NEUTRAL }
+
+@Composable
+private fun tintSurface(tint: SessionTint): Color {
+    val c = LocalAppColors.current
+    return when (tint) {
+        SessionTint.WARMUP -> c.warmupSurface
+        SessionTint.WORK -> c.workSurface
+        SessionTint.REST -> c.restSurface
+        SessionTint.NEUTRAL -> MaterialTheme.colorScheme.background
+    }
+}
+
+@Composable
+fun tintAccent(tint: SessionTint): Color {
+    val c = LocalAppColors.current
+    return when (tint) {
+        SessionTint.WARMUP -> c.warmup
+        SessionTint.WORK -> c.work
+        SessionTint.REST -> c.rest
+        SessionTint.NEUTRAL -> MaterialTheme.colorScheme.primary
+    }
+}
+
+/**
+ * Armazón de un estado de la sesión: fondo teñido, cabecera, contenido y barra de acción.
+ *
+ * [content] recibe el espacio que sobra: la cifra o el ejercicio van ahí, alineados a la
+ * izquierda. La barra inferior no se mueve nunca de sitio; entre estados solo cambia de
+ * etiqueta y de color, para que el pulgar no tenga que buscarla.
+ */
+@Composable
+fun SessionShell(
+    tint: SessionTint,
+    dark: Boolean,
+    stateLabel: String,
+    context: String,
+    onExit: () -> Unit,
+    secondaries: @Composable RowScope.() -> Unit = {},
+    contextCard: @Composable ColumnScope.() -> Unit = {},
+    primary: @Composable ColumnScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val surface by animateColorAsState(
+        targetValue = tintSurface(tint),
+        animationSpec = tween(260),
+        label = "tinte de estado"
+    )
+    val accent = tintAccent(tint)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(surface)
+    ) {
+        // El halo es un degradado radial, no una imagen: en oscuro da profundidad al color de
+        // estado sin ensuciar el texto. En claro el tinte ya vive en la superficie.
+        if (dark) {
+            // El alto tiene que superar el radio del degradado (900 px): si se queda corto, el
+            // halo se corta en seco a media pantalla y se ve la costura.
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(700.dp)
+                    .background(stateHalo(accent, true))
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars)
+                .padding(horizontal = Space.screen)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = Space.x3, bottom = Space.x2),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextoQueCabe(
+                    stateLabel.uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = accent,
+                    modifier = Modifier.weight(1f)
+                )
+                if (context.isNotBlank()) {
+                    // Nunca más de la mitad: si se lo come todo, el estado desaparece y la X
+                    // de salir se queda en nada.
+                    TextoQueCabe(
+                        context,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.widthIn(max = (anchoPantallaDp() * 0.4f).dp)
+                    )
+                }
+                // La ayuda, a mano también entrenando: se abre encima y el entreno sigue igual.
+                LocalOpenHelp.current?.let { abrir ->
+                    IconButton(onClick = abrir, modifier = Modifier.size(40.dp)) {
+                        Icon(
+                            Icons.Filled.Info,
+                            contentDescription = stringResource(Res.string.ses_help),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                IconButton(onClick = onExit, modifier = Modifier.size(40.dp)) {
+                    Icon(
+                        Icons.Filled.Close,
+                        contentDescription = stringResource(Res.string.ses_exit_workout),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            ContenidoYTarjeta(
+                modifier = Modifier.weight(1f),
+                // El contenido se apoya en la parte baja: así la cifra queda a la altura de los
+                // ojos cuando el móvil está en el banco, y el aire sobrante se va arriba.
+                content = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = Space.block),
+                        verticalArrangement = Arrangement.Bottom,
+                        content = content
+                    )
+                },
+                card = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                        content = contextCard
+                    )
+                }
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = Space.x3, bottom = Space.x3),
+                horizontalArrangement = Arrangement.spacedBy(Space.x2),
+                content = secondaries
+            )
+
+            primary()
+        }
+    }
+}
+
+/**
+ * El hueco entre la cabecera y los botones: arriba el contenido (ejercicio y cifra), debajo la
+ * tarjeta de contexto.
+ *
+ * La tarjeta se queda lo que necesita, pero nunca tanto como para dejar al contenido sin
+ * [CONTENIDO_MINIMO]: con la letra al 150 % en 360 dp, el descanso del libre («¿Cómo ha ido?»
+ * + repeticiones) se comía la pantalla y la cuenta atrás quedaba en 8 px. Si no cabe entera,
+ * la tarjeta se desplaza por dentro; la cifra encoge lo que haga falta en el resto.
+ */
+@Composable
+private fun ContenidoYTarjeta(
+    modifier: Modifier,
+    content: @Composable () -> Unit,
+    card: @Composable () -> Unit,
+) {
+    Layout(contents = listOf(content, card), modifier = modifier) { (contenido, tarjeta), c ->
+        val alto = c.maxHeight
+        val minimo = CONTENIDO_MINIMO.roundToPx().coerceAtMost(alto)
+        val t = tarjeta.firstOrNull()?.measure(
+            c.copy(minWidth = 0, minHeight = 0, maxHeight = (alto - minimo).coerceAtLeast(0))
+        )
+        val altoTarjeta = t?.height ?: 0
+        val altoContenido = (alto - altoTarjeta).coerceAtLeast(0)
+        val ct = contenido.firstOrNull()?.measure(
+            c.copy(minWidth = 0, minHeight = altoContenido, maxHeight = altoContenido)
+        )
+        layout(c.maxWidth, alto) {
+            ct?.place(0, 0)
+            t?.place(0, altoContenido)
+        }
+    }
+}
+
+private val CONTENIDO_MINIMO = 180.dp
+
+/** Botón secundario en píldora: vive sobre el fondo teñido, así que va con borde, no relleno. */
+@Composable
+fun RowScope.SessionSecondary(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val outline = LocalAppColors.current.onTintOutline
+    Box(
+        modifier = modifier
+            .weight(1f)
+            .heightIn(min = Touch.min)
+            .clip(CircleShape)
+            .border(1.5.dp, outline, CircleShape)
+            .background(Color.Transparent)
+            .clickable(onClick = onClick)
+            .padding(horizontal = Space.x2, vertical = Space.x3),
+        contentAlignment = Alignment.Center
+    ) {
+        TextoQueCabe(
+            text,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+/**
+ * El gesto principal del estado. En oscuro va en blanco (máximo contraste sobre el tinte);
+ * en claro, en el color del estado. Con [alert] pulsa para avisar de que el descanso ya acabó.
+ */
+@Composable
+fun SessionPrimary(
+    text: String,
+    onClick: () -> Unit,
+    dark: Boolean,
+    tint: SessionTint,
+    alert: Boolean = false,
+    enabled: Boolean = true,
+    gradient: Brush? = null,
+) {
+    val accent = tintAccent(tint)
+    val container = if (dark) Color.White else accent
+    val onContainer = if (dark) Color(0xFF1A1013) else Color.White
+
+    val pulse = if (alert) {
+        val transition = rememberInfiniteTransition(label = "aviso")
+        transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(1200), RepeatMode.Reverse),
+            label = "halo"
+        ).value
+    } else 0f
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = Space.x3)
+    ) {
+        if (alert) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Touch.primaryInSession)
+                    .clip(CircleShape)
+                    .background(accent.copy(alpha = 0.25f + 0.25f * pulse))
+            )
+        }
+        Button(
+            onClick = onClick,
+            enabled = enabled,
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (gradient == null) container else Color.Transparent,
+                contentColor = onContainer
+            ),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = Touch.primaryInSession)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = Touch.primaryInSession)
+                    .then(if (gradient != null) Modifier.background(gradient, CircleShape) else Modifier),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = onContainer,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = Space.x4, vertical = Space.x3)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * La cifra del cronómetro. Tabular para que no baile al cambiar de dígito, y a la mitad del
+ * tamaño que proponía el diseño: a él le resultaba excesiva y se comía el margen lateral.
+ */
+@Composable
+fun Countdown(
+    text: String,
+    caption: String,
+    captionColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val styles = LocalAppTextStyles.current
+    val fontScale = LocalDensity.current.fontScale
+    Column(modifier = modifier) {
+        // Con la letra grande y varias tarjetas debajo (el descanso del libre) no siempre queda
+        // alto para la cifra: con weight se mide después del pie, que conserva su sitio, y la
+        // cifra encoge en vez de salir recortada por arriba y por abajo.
+        TextoQueCabe(
+            text,
+            style = if (fontScale > 1.3f) styles.countdownCompact else styles.countdown,
+            color = MaterialTheme.colorScheme.onSurface,
+            medirDeNuevoCon = fontScale,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        Spacer(Modifier.height(Space.x1))
+        Text(
+            caption,
+            style = MaterialTheme.typography.titleMedium,
+            color = captionColor,
+        )
+    }
+}
+
+/** Barra de progreso del descanso: 8 dp, color del estado. */
+@Composable
+fun SessionProgress(fraction: Float, tint: SessionTint) {
+    LinearProgressIndicator(
+        progress = { fraction.coerceIn(0f, 1f) },
+        color = tintAccent(tint),
+        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+        strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(8.dp)
+            .clip(CircleShape)
+    )
+}
+
+/** Tarjeta de contexto: lo que toca, lo que viene, sin robarle protagonismo a la cifra. */
+@Composable
+fun SessionCard(
+    label: String,
+    dark: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val bg = if (dark) Color.White.copy(alpha = 0.08f)
+    else MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(bg)
+            .padding(Space.x4)
+    ) {
+        if (label.isNotBlank()) {
+            Text(
+                label.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(Space.x2))
+        }
+        content()
+    }
+}
+
+// El botón de stepper vive en Steppers.kt: lo usan también el editor de planes y la pantalla
+// de planes, que no dependen de este armazón de sesión.
+
+
+/**
+ * El nombre de un ejercicio para un titular, en el idioma de la app. A un compuesto se le
+ * quita el paréntesis con la lista de movimientos, como hace [ExerciseImages.headlineName],
+ * pero sobre el texto ya traducido.
+ */
+fun titularEjercicio(name: String): String {
+    val visible = Contenido.t(name)
+    return if (ExerciseImages.isCompound(name)) visible.substringBefore(" (").trim() else visible
+}

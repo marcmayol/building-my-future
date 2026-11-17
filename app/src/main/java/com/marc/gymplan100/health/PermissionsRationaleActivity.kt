@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.marc.gymplan100.R
 import com.marc.gymplan100.ui.theme.AppLanguage
+import com.marc.gymplan100.ui.theme.wrap
 import com.marc.gymplan100.ui.theme.GymPlanTheme
 
 /**

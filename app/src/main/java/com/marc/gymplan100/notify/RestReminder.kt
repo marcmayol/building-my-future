@@ -26,6 +26,7 @@ import com.marc.gymplan100.data.ProgressRepository
 import com.marc.gymplan100.data.SessionEngine
 import com.marc.gymplan100.data.SessionPhase
 import com.marc.gymplan100.ui.theme.AppLanguage
+import com.marc.gymplan100.ui.theme.wrap
 import com.marc.gymplan100.wear.WearBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

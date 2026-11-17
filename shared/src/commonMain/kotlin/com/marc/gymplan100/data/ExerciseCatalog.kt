@@ -1,5 +1,8 @@
 package com.marc.gymplan100.data
 
+import com.marc.gymplan100.shared.*
+import org.jetbrains.compose.resources.StringResource
+
 import kotlin.concurrent.Volatile
 
 import kotlinx.serialization.Serializable
@@ -56,6 +59,18 @@ object ExerciseCatalog {
     fun forName(name: String): CatalogEntry? = byName[name.trim()]
 
     fun forSlug(slug: String): CatalogEntry? = entries.firstOrNull { it.slug == slug }
+
+    /** Nombre del grupo en el idioma de la app, para los títulos de sección. */
+    fun groupLabelRes(grupo: String): StringResource = when (grupo) {
+        "chest" -> Res.string.ses_group_chest
+        "back" -> Res.string.ses_group_back
+        "shoulders" -> Res.string.ses_group_shoulders
+        "arms" -> Res.string.ses_group_arms
+        "legs" -> Res.string.ses_group_legs
+        "core" -> Res.string.ses_group_core
+        "cardio" -> Res.string.ses_group_cardio
+        else -> Res.string.ses_group_other
+    }
 
     /** Nombre del grupo en español (sin Context; lo que se pinta usa [groupLabelRes]). */
     fun groupLabel(grupo: String): String = when (grupo) {
