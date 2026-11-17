@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -169,6 +170,9 @@ fun SessionShell(
                     modifier = Modifier.weight(1f)
                 )
                 if (context.isNotBlank()) {
+                    // Sin este hueco, en pantallas estrechas o con letra grande los dos rótulos
+                    // se tocaban («DESCANSO1 de 5»).
+                    Spacer(Modifier.width(Space.x2))
                     // Nunca más de la mitad: si se lo come todo, el estado desaparece y la X
                     // de salir se queda en nada.
                     TextoQueCabe(
