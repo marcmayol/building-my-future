@@ -16,7 +16,7 @@
     <string name="est_racha_empieza">Start a new one today.</string>
     <string name="est_entrenos_semana">Workouts per week</string>
     <string name="est_entrenos_semana_explicacion">Each bar is a Monday-to-Sunday week, oldest to current. Below, the Monday it starts on.</string>
-    <string name="est_dias_porcentaje">days · %1$d%%</string>
+    <string name="est_dias_porcentaje">days · %1$d%</string>
     <string name="est_entrenos_extra">workouts · %1$d extra</string>
     <string name="est_entrenos">workouts</string>
     <string name="est_tiempo_total">total time</string>

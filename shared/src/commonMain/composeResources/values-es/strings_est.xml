@@ -16,7 +16,7 @@
     <string name="est_racha_empieza">Empieza una nueva hoy mismo.</string>
     <string name="est_entrenos_semana">Entrenos por semana</string>
     <string name="est_entrenos_semana_explicacion">Cada barra es una semana de lunes a domingo, de la más antigua a la de hoy. Debajo, el lunes con el que empieza.</string>
-    <string name="est_dias_porcentaje">días · %1$d%%</string>
+    <string name="est_dias_porcentaje">días · %1$d%</string>
     <string name="est_entrenos_extra">entrenos · %1$d extra</string>
     <string name="est_entrenos">entrenos</string>
     <string name="est_tiempo_total">tiempo total</string>

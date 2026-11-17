@@ -23,9 +23,12 @@ val textosCompartidos = tasks.register<Sync>("textosCompartidos") {
         include("values*/strings_*.xml")
         // La fuente lleva ' y " tal cual (Compose Multiplatform no quita las barras); Android
         // los quiere escapados. Solo en el texto, no en los atributos (name="…").
+        // Lo mismo con «%» suelto: Compose Multiplatform lo pinta tal cual (con «%%» saldría
+        // doble), pero String.format de Android necesita «%%».
         filter { linea ->
             linea.replace(Regex(">([^<]*)<")) { m ->
-                ">" + m.groupValues[1].replace("'", "\\'").replace("\"", "\\\"") + "<"
+                ">" + m.groupValues[1].replace("'", "\\'").replace("\"", "\\\"")
+                    .replace(Regex("%(?![0-9]+\\$)"), "%%") + "<"
             }
         }
     }

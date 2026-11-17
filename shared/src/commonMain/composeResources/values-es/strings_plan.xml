@@ -76,7 +76,7 @@
     <string name="plan_phase_span_days">Días %1$d al %2$d</string>
     <string name="plan_phase_span_week">Semana %1$d</string>
     <string name="plan_phase_span_weeks">Semanas %1$d-%2$d</string>
-    <string name="plan_percent">%1$d %%</string>
+    <string name="plan_percent">%1$d %</string>
     <string name="plan_phase_goal">OBJETIVO</string>
     <string name="plan_phase_progression">PROGRESIÓN</string>
     <string name="plan_phase_days">DÍAS</string>

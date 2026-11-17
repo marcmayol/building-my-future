@@ -5,7 +5,7 @@
     <string name="ini_day_n">Día %1$d</string>
     <string name="ini_day_n_title">Día %1$d · %2$s</string>
     <string name="ini_title_dot_detail">%1$s · %2$s</string>
-    <string name="ini_percent">%1$d %%</string>
+    <string name="ini_percent">%1$d %</string>
     <plurals name="ini_days">
         <item quantity="one">%1$d día</item>
         <item quantity="other">%1$d días</item>
@@ -228,7 +228,7 @@
     <string name="ini_upd_update_to">Actualizar a la %1$s</string>
     <string name="ini_upd_checking">Buscando…</string>
     <string name="ini_upd_up_to_date">Estás al día ✓</string>
-    <string name="ini_upd_downloading">Descargando… %1$d%%</string>
+    <string name="ini_upd_downloading">Descargando… %1$d%</string>
     <string name="ini_upd_verifying">Comprobando la copia…</string>
     <string name="ini_upd_err_offline">Sin conexión. Inténtalo más tarde.</string>
     <string name="ini_upd_err_check">No se pudo consultar si hay versión nueva.</string>
@@ -237,7 +237,7 @@
     <string name="ini_upd_err_install">No se pudo instalar.</string>
     <string name="ini_upd_available">Versión %1$s disponible</string>
     <string name="ini_upd_update">Actualizar</string>
-    <string name="ini_upd_banner_downloading">Descargando la nueva versión… %1$d%%</string>
+    <string name="ini_upd_banner_downloading">Descargando la nueva versión… %1$d%</string>
     <string name="ini_upd_banner_verifying">Comprobando que la copia es íntegra…</string>
     <!-- Pausa del recordatorio («vacaciones»): la fecha es el último día en silencio. -->
     <string name="ini_set_pause">Pausar hasta el…</string>

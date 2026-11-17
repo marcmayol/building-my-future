@@ -5,7 +5,7 @@
     <string name="ini_day_n">Day %1$d</string>
     <string name="ini_day_n_title">Day %1$d · %2$s</string>
     <string name="ini_title_dot_detail">%1$s · %2$s</string>
-    <string name="ini_percent">%1$d%%</string>
+    <string name="ini_percent">%1$d%</string>
     <plurals name="ini_days">
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>
@@ -229,7 +229,7 @@
     <string name="ini_upd_update_to">Update to %1$s</string>
     <string name="ini_upd_checking">Checking…</string>
     <string name="ini_upd_up_to_date">You're up to date ✓</string>
-    <string name="ini_upd_downloading">Downloading… %1$d%%</string>
+    <string name="ini_upd_downloading">Downloading… %1$d%</string>
     <string name="ini_upd_verifying">Verifying the download…</string>
     <string name="ini_upd_err_offline">No connection. Try again later.</string>
     <string name="ini_upd_err_check">Couldn't check for a new version.</string>
@@ -238,7 +238,7 @@
     <string name="ini_upd_err_install">Couldn't install.</string>
     <string name="ini_upd_available">Version %1$s available</string>
     <string name="ini_upd_update">Update</string>
-    <string name="ini_upd_banner_downloading">Downloading the new version… %1$d%%</string>
+    <string name="ini_upd_banner_downloading">Downloading the new version… %1$d%</string>
     <string name="ini_upd_banner_verifying">Checking the download is intact…</string>
     <!-- Reminder pause ("holidays"): the date is the last silent day. -->
     <string name="ini_set_pause">Pause until…</string>
