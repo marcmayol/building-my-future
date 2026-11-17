@@ -11,8 +11,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.LocalDate
-import java.time.ZoneId
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.TimeZone
 
 /**
  * Lo que se ha llevado cada músculo.
@@ -23,8 +26,8 @@ import java.time.ZoneId
  */
 class MuscleLoadTest {
 
-    private val zona: ZoneId = ZoneId.of("UTC")
-    private val hoy: LocalDate = LocalDate.of(2026, 8, 25)
+    private val zona: TimeZone = TimeZone.UTC
+    private val hoy: LocalDate = LocalDate(2026, 8, 25)
 
     /** Un día del plan que empieza por prensa de piernas. */
     private val dia = PlanData.days.first { d ->
@@ -90,8 +93,8 @@ class MuscleLoadTest {
 
     private fun sesion(dayNumber: Int, fecha: LocalDate, extra: Boolean = false) = SessionRecord(
         dayNumber = dayNumber,
-        startMillis = fecha.atStartOfDay(zona).toInstant().toEpochMilli(),
-        endMillis = fecha.atStartOfDay(zona).toInstant().toEpochMilli(),
+        startMillis = fecha.atStartOfDayIn(zona).toEpochMilliseconds(),
+        endMillis = fecha.atStartOfDayIn(zona).toEpochMilliseconds(),
         totalSets = 6,
         totalRestSeconds = 0,
         extra = extra
@@ -101,8 +104,8 @@ class MuscleLoadTest {
     fun `la semana son los siete ultimos dias de calendario`() {
         val historial = listOf(
             sesion(10, hoy),
-            sesion(9, hoy.minusDays(6)),
-            sesion(8, hoy.minusDays(7))   // justo fuera
+            sesion(9, hoy.minus(6, DateTimeUnit.DAY)),
+            sesion(8, hoy.minus(7, DateTimeUnit.DAY))   // justo fuera
         )
         val dias = MuscleLoad.recentDays(historial, days = 7, zone = zona, today = hoy)
         assertTrue(10 in dias)

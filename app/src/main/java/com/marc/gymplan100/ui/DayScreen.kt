@@ -307,7 +307,7 @@ private fun DayMuscleCard(exercises: List<Exercise>) {
         Spacer(Modifier.height(Space.x2))
         // Los tres que más se llevan; el resto ya se ve en el dibujo.
         Text(
-            LocalContext.current.let { ctx -> cargas.take(3).joinToString(" · ") { MuscleLoad.label(ctx, it.group) } },
+            cargas.take(3).map { MuscleLoad.etiqueta(it.group) }.joinToString(" · "),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )

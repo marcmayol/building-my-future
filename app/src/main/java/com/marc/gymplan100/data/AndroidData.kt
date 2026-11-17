@@ -70,3 +70,7 @@ fun ExerciseImages.circuitMoves(context: Context, rawName: String, female: Boole
         val id = dibujo(context, move.slug, female)
         if (id != 0) ExerciseImages.ResolvedMove(move.label, move.dose, id) else null
     }
+
+/** Series con el separador decimal del idioma en uso: «4,5» en español, «4.5» en inglés. */
+fun MuscleLoad.formatSets(sets: Float, locale: java.util.Locale): String =
+    if (sets % 1f == 0f) sets.toInt().toString() else String.format(locale, "%.1f", sets)

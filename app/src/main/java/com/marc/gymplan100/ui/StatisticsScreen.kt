@@ -2,6 +2,7 @@
 
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.data.*
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import androidx.compose.foundation.background
@@ -725,7 +726,7 @@ private fun MuscleLoadSection(loads: List<MuscleLoad.GroupLoad>) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            MuscleLoad.labelRes(carga.group)?.let { stringResource(it) } ?: carga.group.replace('-', ' '),
+                            MuscleLoad.etiqueta(carga.group),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(0.9f)
                         )

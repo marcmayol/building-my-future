@@ -1,11 +1,17 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
-import androidx.annotation.StringRes
-import com.marc.gymplan100.R
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
+import androidx.compose.runtime.Composable
+import com.marc.gymplan100.shared.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Cuánto trabajo se ha llevado cada músculo, contado en SERIES.
@@ -87,15 +93,15 @@ object MuscleLoad {
     fun recentDays(
         history: List<SessionRecord>,
         days: Int = 7,
-        zone: ZoneId = ZoneId.systemDefault(),
-        today: LocalDate = LocalDate.now(zone)
+        zone: TimeZone = TimeZone.currentSystemDefault(),
+        today: LocalDate = Clock.System.todayIn(zone)
     ): Set<Int> {
-        val desde = today.minusDays((days - 1).toLong())
+        val desde = today.minus(days - 1, DateTimeUnit.DAY)
         return history.asSequence()
             .filter { !it.extra && it.routineId == null }
             .filter {
-                val fecha = Instant.ofEpochMilli(it.endMillis).atZone(zone).toLocalDate()
-                !fecha.isBefore(desde) && !fecha.isAfter(today)
+                val fecha = Instant.fromEpochMilliseconds(it.endMillis).toLocalDateTime(zone).date
+                fecha >= desde && fecha <= today
             }
             .map { it.dayNumber }
             .toSet()
@@ -141,23 +147,23 @@ object MuscleLoad {
 
     /** El mismo nombre, como recurso traducible. Null si el slug no es conocido. */
     private val NOMBRES_RES = mapOf(
-        "chest" to R.string.est_musculo_chest,
-        "upper-back" to R.string.est_musculo_upper_back,
-        "lower-back" to R.string.est_musculo_lower_back,
-        "trapezius" to R.string.est_musculo_trapezius,
-        "deltoids" to R.string.est_musculo_deltoids,
-        "biceps" to R.string.est_musculo_biceps,
-        "triceps" to R.string.est_musculo_triceps,
-        "forearm" to R.string.est_musculo_forearm,
-        "abs" to R.string.est_musculo_abs,
-        "obliques" to R.string.est_musculo_obliques,
-        "quadriceps" to R.string.est_musculo_quadriceps,
-        "hamstring" to R.string.est_musculo_hamstring,
-        "gluteal" to R.string.est_musculo_gluteal,
-        "calves" to R.string.est_musculo_calves,
-        "adductors" to R.string.est_musculo_adductors,
-        "tibialis" to R.string.est_musculo_tibialis,
-        "neck" to R.string.est_musculo_neck
+        "chest" to Res.string.est_musculo_chest,
+        "upper-back" to Res.string.est_musculo_upper_back,
+        "lower-back" to Res.string.est_musculo_lower_back,
+        "trapezius" to Res.string.est_musculo_trapezius,
+        "deltoids" to Res.string.est_musculo_deltoids,
+        "biceps" to Res.string.est_musculo_biceps,
+        "triceps" to Res.string.est_musculo_triceps,
+        "forearm" to Res.string.est_musculo_forearm,
+        "abs" to Res.string.est_musculo_abs,
+        "obliques" to Res.string.est_musculo_obliques,
+        "quadriceps" to Res.string.est_musculo_quadriceps,
+        "hamstring" to Res.string.est_musculo_hamstring,
+        "gluteal" to Res.string.est_musculo_gluteal,
+        "calves" to Res.string.est_musculo_calves,
+        "adductors" to Res.string.est_musculo_adductors,
+        "tibialis" to Res.string.est_musculo_tibialis,
+        "neck" to Res.string.est_musculo_neck
     )
 
     /** El grupo, escrito como se llama en el gimnasio. */
@@ -165,18 +171,15 @@ object MuscleLoad {
     fun label(group: String): String = NOMBRES[group] ?: group.replace('-', ' ')
 
     /** El recurso con el nombre del grupo; null si el slug no es conocido. */
-    @StringRes
-    fun labelRes(group: String): Int? = NOMBRES_RES[group]
+    fun labelRes(group: String): StringResource? = NOMBRES_RES[group]
 
     /** El grupo, en el idioma de la app. */
-    fun label(context: Context, group: String): String =
-        labelRes(group)?.let { context.getString(it) } ?: group.replace('-', ' ')
+    @Composable
+    fun etiqueta(group: String): String =
+        labelRes(group)?.let { stringResource(it) } ?: group.replace('-', ' ')
 
     /** "3" o "4,5": las medias series salen de los músculos que solo ayudan. */
     fun formatSets(sets: Float): String =
-        if (sets % 1f == 0f) sets.toInt().toString() else "%.1f".format(sets).replace('.', ',')
+        if (sets % 1f == 0f) sets.toInt().toString() else unDecimal(sets.toDouble()).replace('.', ',')
 
-    /** Igual, con el separador decimal del idioma en uso: «4,5» en español, «4.5» en inglés. */
-    fun formatSets(sets: Float, locale: java.util.Locale): String =
-        if (sets % 1f == 0f) sets.toInt().toString() else String.format(locale, "%.1f", sets)
 }
