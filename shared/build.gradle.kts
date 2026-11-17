@@ -33,6 +33,10 @@ kotlin {
             api(libs.kotlinx.serialization.json)
             api(libs.kotlinx.datetime)
             api(libs.coroutines.core)
+            api(libs.androidx.datastore.preferences.core)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.datastore.preferences)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

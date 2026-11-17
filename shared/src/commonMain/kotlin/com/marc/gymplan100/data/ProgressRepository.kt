@@ -1,11 +1,9 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -13,7 +11,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "gym_progress")
 
 /**
  * Progreso e historial, separados por plan.
@@ -25,7 +22,9 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  *
  * La sesión en curso y el perfil siguen siendo únicos: no dependen del plan.
  */
-class ProgressRepository(private val context: Context) {
+class ProgressRepository(context: PlatformContext) {
+
+    private val dataStore: DataStore<Preferences> = context.almacenProgreso()
 
     private val legacyKey = stringPreferencesKey("progress_json")
     private val legacyHistoryKey = stringPreferencesKey("session_history_json")
@@ -53,35 +52,35 @@ class ProgressRepository(private val context: Context) {
         return runCatching { json.decodeFromString<List<SessionRecord>>(raw) }.getOrElse { emptyList() }
     }
 
-    val progress: Flow<ProgressState> = context.dataStore.data.map { readProgress(it, planId) }
+    val progress: Flow<ProgressState> = dataStore.data.map { readProgress(it, planId) }
 
     suspend fun save(state: ProgressState) {
         val id = planId
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[progressKey(id)] = json.encodeToString(state)
         }
     }
 
     /** Sesión de entrenamiento en curso (null si no hay ninguna). */
-    val activeSession: Flow<ActiveSession?> = context.dataStore.data.map { prefs ->
+    val activeSession: Flow<ActiveSession?> = dataStore.data.map { prefs ->
         val raw = prefs[activeKey]
         if (raw.isNullOrEmpty()) null
         else runCatching { json.decodeFromString<ActiveSession>(raw) }.getOrNull()
     }
 
     suspend fun saveActiveSession(session: ActiveSession?) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             if (session == null) prefs.remove(activeKey)
             else prefs[activeKey] = json.encodeToString(session)
         }
     }
 
     /** Historial de sesiones finalizadas del plan activo, de más antigua a más reciente. */
-    val history: Flow<List<SessionRecord>> = context.dataStore.data.map { readHistory(it, planId) }
+    val history: Flow<List<SessionRecord>> = dataStore.data.map { readHistory(it, planId) }
 
     suspend fun appendHistory(record: SessionRecord) {
         val id = planId
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[historyKey(id)] = json.encodeToString(readHistory(prefs, id) + record)
         }
     }
@@ -93,25 +92,25 @@ class ProgressRepository(private val context: Context) {
      * terminado, cuándo, y por qué vuelta va.
      */
     suspend fun progressOf(planId: String): ProgressState =
-        readProgress(context.dataStore.data.first(), planId)
+        readProgress(dataStore.data.first(), planId)
 
     /** Borra el progreso y el historial de un plan (al borrar el plan). */
     suspend fun clearPlanData(planId: String) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs.remove(progressKey(planId))
             prefs.remove(historyKey(planId))
         }
     }
 
     /** Perfil del usuario (peso para las calorías, género para las ilustraciones, reloj). */
-    val profile: Flow<UserProfile> = context.dataStore.data.map { prefs ->
+    val profile: Flow<UserProfile> = dataStore.data.map { prefs ->
         val raw = prefs[profileKey]
         if (raw.isNullOrEmpty()) UserProfile()
         else runCatching { json.decodeFromString<UserProfile>(raw) }.getOrElse { UserProfile() }
     }
 
     suspend fun saveProfile(profile: UserProfile) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[profileKey] = json.encodeToString(profile)
         }
     }
@@ -126,7 +125,7 @@ class ProgressRepository(private val context: Context) {
      * justo como se pierden los datos que creias salvados.
      */
     suspend fun exportAll(): Map<String, String> =
-        context.dataStore.data.first().asMap()
+        dataStore.data.first().asMap()
             .mapNotNull { (clave, valor) ->
                 (valor as? String)?.let { clave.name to it }
             }
@@ -140,7 +139,7 @@ class ProgressRepository(private val context: Context) {
      * seria ni lo de antes ni lo de ahora.
      */
     suspend fun importAll(values: Map<String, String>) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs.clear()
             values.forEach { (clave, valor) -> prefs[stringPreferencesKey(clave)] = valor }
         }

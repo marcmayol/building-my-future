@@ -1,6 +1,5 @@
 package com.marc.gymplan100.data
 
-import android.content.Context
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -27,21 +26,20 @@ object PlanStore {
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
-    private fun prefs(context: Context) =
-        context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) = context.preferencias(PREFS)
 
-    private fun storedDtos(context: Context): List<PlanDto> {
-        val raw = prefs(context).getString(KEY_PLANS, null)
+    private fun storedDtos(context: PlatformContext): List<PlanDto> {
+        val raw = prefs(context).getString(KEY_PLANS)
         if (raw.isNullOrBlank()) return emptyList()
         return runCatching { json.decodeFromString<List<PlanDto>>(raw) }.getOrElse { emptyList() }
     }
 
-    private fun writeDtos(context: Context, dtos: List<PlanDto>) {
-        prefs(context).edit().putString(KEY_PLANS, json.encodeToString(dtos)).apply()
+    private fun writeDtos(context: PlatformContext, dtos: List<PlanDto>) {
+        prefs(context).editar { putString(KEY_PLANS, json.encodeToString(dtos)) }
     }
 
     /** Planes del usuario, del importado más recientemente al más antiguo. */
-    fun customPlans(context: Context): List<TrainingPlan> =
+    fun customPlans(context: PlatformContext): List<TrainingPlan> =
         storedDtos(context)
             .mapNotNull { (PlanCodec.fromDto(it) as? PlanImport.Ok)?.plan }
             .sortedByDescending { it.importedAt }
@@ -50,15 +48,15 @@ object PlanStore {
      * Todos los planes disponibles: el reto de 100 días primero, después el resto de los que
      * vienen con la app (Arranque, Hipertrofia, los bloques extra…) y al final los del usuario.
      */
-    fun allPlans(context: Context): List<TrainingPlan> =
-        listOf(BuiltinPlan.plan) + BuiltinPlans.all(context) + customPlans(context)
+    fun allPlans(context: PlatformContext): List<TrainingPlan> =
+        listOf(BuiltinPlan.plan) + BuiltinPlans.all() + customPlans(context)
 
     /** El plan tal y como se guardó, para volver a editarlo sin perder nada por el camino. */
-    fun storedDto(context: Context, id: String): PlanDto? =
+    fun storedDto(context: PlatformContext, id: String): PlanDto? =
         storedDtos(context).firstOrNull { it.id == id }
 
-    fun activeId(context: Context): String =
-        prefs(context).getString(KEY_ACTIVE, null) ?: BuiltinPlan.ID
+    fun activeId(context: PlatformContext): String =
+        prefs(context).getString(KEY_ACTIVE) ?: BuiltinPlan.ID
 
     /**
      * ¿Hay que darle la bienvenida y ayudarle a elegir plan?
@@ -67,7 +65,7 @@ object PlanStore {
      * aunque jamás haya tocado la pantalla de planes: se detecta por [tieneProgreso] (días
      * completados o entrenos en el historial) y se marca como elegido sin molestar.
      */
-    fun necesitaBienvenida(context: Context, tieneProgreso: Boolean): Boolean {
+    fun necesitaBienvenida(context: PlatformContext, tieneProgreso: Boolean): Boolean {
         val p = prefs(context)
         if (p.getBoolean(KEY_ELEGIDO, false)) return false
         if (tieneProgreso || p.contains(KEY_ACTIVE)) {
@@ -78,8 +76,8 @@ object PlanStore {
     }
 
     /** Deja de dar la bienvenida: ya eligió (con el asistente, de la lista o creando uno). */
-    fun marcarPlanElegido(context: Context) {
-        prefs(context).edit().putBoolean(KEY_ELEGIDO, true).apply()
+    fun marcarPlanElegido(context: PlatformContext) {
+        prefs(context).editar { putBoolean(KEY_ELEGIDO, true) }
     }
 
     /**
@@ -90,7 +88,7 @@ object PlanStore {
      * recién llegado del que lleva un año. Por eso se decide a la vez que la bienvenida y se
      * guarda la respuesta, en lugar de volver a preguntarla más tarde.
      */
-    fun necesitaTour(context: Context, tieneProgreso: Boolean): Boolean {
+    fun necesitaTour(context: PlatformContext, tieneProgreso: Boolean): Boolean {
         val p = prefs(context)
         if (p.getBoolean(KEY_TOUR, false)) return false
         if (tieneProgreso || p.getBoolean(KEY_ELEGIDO, false)) {
@@ -101,21 +99,21 @@ object PlanStore {
     }
 
     /** Ya ha visto el recorrido (o lo ha saltado): no vuelve a salir solo. */
-    fun marcarTourVisto(context: Context) {
-        prefs(context).edit().putBoolean(KEY_TOUR, true).apply()
+    fun marcarTourVisto(context: PlatformContext) {
+        prefs(context).editar { putBoolean(KEY_TOUR, true) }
     }
 
     /** El plan activo; si el guardado ya no existe, se vuelve al de la app. */
-    fun activePlan(context: Context): TrainingPlan {
+    fun activePlan(context: PlatformContext): TrainingPlan {
         val id = activeId(context)
         if (id == BuiltinPlan.ID) return BuiltinPlan.plan
-        return BuiltinPlans.byId(context, id)
+        return BuiltinPlans.byId(id)
             ?: customPlans(context).firstOrNull { it.id == id }
             ?: BuiltinPlan.plan
     }
 
     /** Deja el plan activo cargado en [PlanData]. Se llama al arrancar el proceso. */
-    fun load(context: Context) {
+    fun load(context: PlatformContext) {
         PlanData.setActive(activePlan(context))
     }
 
@@ -123,14 +121,14 @@ object PlanStore {
      * Guarda un plan importado o editado. Si ya existía uno con su id, lo sustituye y el
      * progreso de ese plan se mantiene (es la vía para corregir un plan sin empezar de cero).
      */
-    fun save(context: Context, dto: PlanDto) {
+    fun save(context: PlatformContext, dto: PlanDto) {
         val id = dto.id ?: return
         val rest = storedDtos(context).filterNot { it.id == id }
         writeDtos(context, rest + dto)
     }
 
     /** Borra un plan del usuario. Si era el activo, se vuelve al plan de la app. */
-    fun delete(context: Context, id: String) {
+    fun delete(context: PlatformContext, id: String) {
         if (id == BuiltinPlan.ID) return
         writeDtos(context, storedDtos(context).filterNot { it.id == id })
         if (activeId(context) == id) setActive(context, BuiltinPlan.ID)
@@ -139,36 +137,36 @@ object PlanStore {
     // ----------------------------------------------------------- Copia de seguridad
 
     /** Los planes guardados y cual esta activo, para la copia. */
-    fun exportAll(context: Context): Map<String, String> {
+    fun exportAll(context: PlatformContext): Map<String, String> {
         val p = prefs(context)
         val out = mutableMapOf<String, String>()
-        p.getString(KEY_PLANS, null)?.let { out[KEY_PLANS] = it }
-        p.getString(KEY_ACTIVE, null)?.let { out[KEY_ACTIVE] = it }
+        p.getString(KEY_PLANS)?.let { out[KEY_PLANS] = it }
+        p.getString(KEY_ACTIVE)?.let { out[KEY_ACTIVE] = it }
         out[KEY_ELEGIDO] = p.getBoolean(KEY_ELEGIDO, false).toString()
         out[KEY_TOUR] = p.getBoolean(KEY_TOUR, false).toString()
         return out
     }
 
     /** Restaura los planes de una copia, dejando fuera lo que hubiera antes. */
-    fun importAll(context: Context, values: Map<String, String>) {
-        prefs(context).edit()
-            .clear()
-            .putString(KEY_PLANS, values[KEY_PLANS])
-            .putString(KEY_ACTIVE, values[KEY_ACTIVE])
-            .putBoolean(KEY_ELEGIDO, values[KEY_ELEGIDO]?.toBoolean() ?: true)
+    fun importAll(context: PlatformContext, values: Map<String, String>) {
+        prefs(context).editar(sincrono = true) {
+            clear()
+            putString(KEY_PLANS, values[KEY_PLANS])
+            putString(KEY_ACTIVE, values[KEY_ACTIVE])
+            putBoolean(KEY_ELEGIDO, values[KEY_ELEGIDO]?.toBoolean() ?: true)
             // Restaurar una copia NO es estrenar la app: el `clear()` de arriba se lleva por
             // delante la marca del recorrido, y sin esto volvería a salir en un móvil nuevo
             // con todo el progreso dentro. Ante la duda, por visto.
-            .putBoolean(KEY_TOUR, values[KEY_TOUR]?.toBoolean() ?: true)
-            .commit()
+            putBoolean(KEY_TOUR, values[KEY_TOUR]?.toBoolean() ?: true)
+        }
     }
 
     /** Cambia el plan activo y lo deja cargado. Devuelve el plan que queda activo. */
-    fun setActive(context: Context, id: String): TrainingPlan {
-        prefs(context).edit()
-            .putString(KEY_ACTIVE, id)
-            .putBoolean(KEY_ELEGIDO, true)
-            .apply()
+    fun setActive(context: PlatformContext, id: String): TrainingPlan {
+        prefs(context).editar {
+            putString(KEY_ACTIVE, id)
+            putBoolean(KEY_ELEGIDO, true)
+        }
         val plan = activePlan(context)
         PlanData.setActive(plan)
         return plan
