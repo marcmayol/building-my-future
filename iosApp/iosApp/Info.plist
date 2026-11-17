@@ -33,6 +33,10 @@
 	<array>
 		<string>youtube</string>
 	</array>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Building My Future reads your latest weight from Apple Health to estimate the calories of each workout.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Building My Future saves each workout you finish to Apple Health, with its duration and calories.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>

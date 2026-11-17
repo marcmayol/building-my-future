@@ -37,6 +37,14 @@ targets:
         CADisableMinimumFrameDurationOnPhone: true
         ITSAppUsesNonExemptEncryption: false
         LSApplicationQueriesSchemes: [youtube]
+        # HealthKit: guarda cada entreno terminado y lee el último peso (Ajustes).
+        NSHealthUpdateUsageDescription: Building My Future saves each workout you finish to Apple Health, with its duration and calories.
+        NSHealthShareUsageDescription: Building My Future reads your latest weight from Apple Health to estimate the calories of each workout.
+    entitlements:
+      path: iosApp/BuildingMyFuture.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.marcmayol.buildingmyfuture

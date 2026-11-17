@@ -1,0 +1,3 @@
+/* System texts in English (the rest of the app is translated by Compose). */
+"NSHealthUpdateUsageDescription" = "Building My Future saves each workout you finish to Apple Health, with its duration and calories.";
+"NSHealthShareUsageDescription" = "Building My Future reads your latest weight from Apple Health to estimate the calories of each workout.";

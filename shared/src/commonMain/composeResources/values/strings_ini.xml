@@ -220,6 +220,7 @@
     <string name="ini_rate_title">Rate the app</string>
     <string name="ini_rate_body">There's no company behind this app and it isn't advertised anywhere: people find it because someone rates it. If it's working for you, say so on the store page.</string>
     <string name="ini_rate_play">Rate on Google Play</string>
+    <string name="ini_rate_app_store">Rate on the App Store</string>
 
     <!-- Actualizaciones -->
     <string name="ini_upd_play_body">Updates come through Google Play, like any other app.</string>

@@ -82,6 +82,12 @@ interface Plataforma {
     @Composable
     fun SeccionActualizaciones()
 
+    /** Si Ajustes enseña la tarjeta de [SeccionActualizaciones] (en el iPhone no hay nada que poner). */
+    val hayActualizaciones: Boolean get() = true
+
+    /** Si Ajustes enseña la tarjeta de [SeccionValoracion]. */
+    val hayValoracion: Boolean get() = true
+
     @Composable
     fun BannerActualizacion()
 
@@ -95,6 +101,11 @@ interface Plataforma {
 
 /** Health Connect en Android, HealthKit en iOS. */
 interface Salud {
+    /**
+     * Cómo se llama el servicio en los textos, si no es el de Android. Los textos dicen
+     * «Google Health» y «Health Connect»; en el iPhone se cambian por esto (ver [conNombreSalud]).
+     */
+    val nombre: String? get() = null
     val disponible: Boolean
     val necesitaActualizar: Boolean
     suspend fun tienePermisos(): Boolean
@@ -114,3 +125,18 @@ interface Recordatorio {
 
 /** La de la plataforma en la que corre la app. Se pone al arrancar. */
 lateinit var plataforma: Plataforma
+
+/** El texto con el nombre del servicio de salud de esta plataforma («Salud» en el iPhone). */
+fun conNombreSalud(texto: String): String {
+    val n = plataforma.salud.nombre ?: return texto
+    return texto
+        .replace("Health Connect (la plataforma de Google Health)", n)
+        .replace("Health Connect (Google Health's platform)", n)
+        .replace("Health Connect", n)
+        .replace("Google Health", n)
+}
+
+/** [stringResource] pasado por [conNombreSalud]. */
+@Composable
+fun textoSalud(res: org.jetbrains.compose.resources.StringResource): String =
+    conNombreSalud(org.jetbrains.compose.resources.stringResource(res))

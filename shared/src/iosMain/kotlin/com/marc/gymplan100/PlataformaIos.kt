@@ -2,6 +2,9 @@ package com.marc.gymplan100
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -95,6 +98,9 @@ object PlataformaIos : Plataforma {
 
     override fun programarDescanso(alMs: Long, tipo: Int, dia: Int) {
         val segundos = (alMs - ahoraMs()) / 1000.0
+        // El sistema solo pregunta la primera vez; sin esto el aviso no llegaría si no se ha
+        // activado antes el recordatorio (que era el único que pedía permiso).
+        pedirPermisoAvisos()
         cancelarDescanso()
         if (segundos < 1) return
         scope.launch {
@@ -173,31 +179,45 @@ object PlataformaIos : Plataforma {
     // Sin reloj de Wear OS.
     override fun publicarEnReloj(sesion: ActiveSession?, siguienteDia: Int) = Unit
 
-    // HealthKit: pendiente. Mientras, la app dice que no está disponible.
-    override val salud: Salud = object : Salud {
-        override val disponible: Boolean = false
-        override val necesitaActualizar: Boolean = false
-        override suspend fun tienePermisos(): Boolean = false
-        override suspend fun escribirEntreno(titulo: String, notas: String, inicioMs: Long, finMs: Long, kcal: Double?) = Unit
-        override suspend fun ultimoPesoKg(): Double? = null
-    }
+    // HealthKit (la app Salud).
+    override val salud: Salud = SaludIos
 
     // --- Recordatorio para entrenar ---------------------------------------------------------
 
     override val recordatorio: Recordatorio = RecordatorioIos
 
-    override fun trasEntrenar() = Unit
+    override fun trasEntrenar() = ValoracionIos.trasEntrenar()
 
-    // Selector de ficheros: pendiente (copias de seguridad e importar planes).
+    // Selector de ficheros (Archivos): importar planes y la copia de seguridad.
     @Composable
-    override fun rememberAbrirTexto(tipos: List<String>, alLeer: (String?) -> Unit): () -> Unit = {}
+    override fun rememberAbrirTexto(tipos: List<String>, alLeer: (String?) -> Unit): () -> Unit {
+        val actual by rememberUpdatedState(alLeer)
+        return remember { { FicherosIos.abrir { texto -> actual(texto) } } }
+    }
 
     @Composable
-    override fun rememberGuardarTexto(alTerminar: (Boolean) -> Unit): (String, suspend () -> String) -> Unit =
-        { _, _ -> }
+    override fun rememberGuardarTexto(alTerminar: (Boolean) -> Unit): (String, suspend () -> String) -> Unit {
+        val actual by rememberUpdatedState(alTerminar)
+        val ambito = rememberCoroutineScope()
+        return remember {
+            { nombre, contenido ->
+                ambito.launch {
+                    val texto = runCatching { contenido() }.getOrNull()
+                    if (texto == null) actual(false) else FicherosIos.guardar(nombre, texto) { ok -> actual(ok) }
+                }
+            }
+        }
+    }
 
     @Composable
-    override fun rememberPedirPermisosSalud(alVolver: () -> Unit): () -> Unit = {}
+    override fun rememberPedirPermisosSalud(alVolver: () -> Unit): () -> Unit {
+        val actual by rememberUpdatedState(alVolver)
+        return remember { { SaludIos.pedirPermisos { actual() } } }
+    }
+
+    // Las actualizaciones las lleva el App Store.
+    override val hayActualizaciones: Boolean = false
+    override val hayValoracion: Boolean get() = ValoracionIos.hayFicha
 
     @Composable
     override fun SeccionActualizaciones() = Unit
@@ -206,7 +226,7 @@ object PlataformaIos : Plataforma {
     override fun BannerActualizacion() = Unit
 
     @Composable
-    override fun SeccionValoracion() = Unit
+    override fun SeccionValoracion() = ValoracionIos.SeccionAjustes()
 }
 
 /**

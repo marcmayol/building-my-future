@@ -2,6 +2,8 @@
 
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.plataforma.textoSalud
+import com.marc.gymplan100.plataforma.conNombreSalud
 import com.marc.gymplan100.plataforma.plataforma
 import com.marc.gymplan100.plataforma.fmt
 import com.marc.gymplan100.data.ahoraMs
@@ -1587,7 +1589,7 @@ private fun FinishedContent(
         onExit = onExit,
         contextCard = {
             Text(
-                stringResource(Res.string.ses_saved_google_health),
+                textoSalud(Res.string.ses_saved_google_health),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = Space.x3)
@@ -1644,7 +1646,7 @@ private fun FinishedContent(
                     }
                     Text(
                         if (viewModel.usesWatch)
-                            stringResource(Res.string.ses_kcal_watch)
+                            textoSalud(Res.string.ses_kcal_watch)
                         else stringResource(Res.string.ses_kcal_estimated),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

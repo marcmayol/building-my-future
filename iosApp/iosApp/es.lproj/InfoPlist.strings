@@ -1,0 +1,3 @@
+/* Textos del sistema en español (el resto de la app traduce con Compose). */
+"NSHealthUpdateUsageDescription" = "Building My Future guarda en Salud cada entreno que terminas, con su duración y sus calorías.";
+"NSHealthShareUsageDescription" = "Building My Future lee tu último peso en Salud para estimar las calorías de cada entreno.";

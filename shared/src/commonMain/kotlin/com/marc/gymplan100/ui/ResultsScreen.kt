@@ -2,6 +2,8 @@
 
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.plataforma.textoSalud
+import com.marc.gymplan100.plataforma.conNombreSalud
 import com.marc.gymplan100.plataforma.plataforma
 import com.marc.gymplan100.plataforma.formatearFecha
 import com.marc.gymplan100.plataforma.platformContext
@@ -178,16 +180,16 @@ private fun HealthConnectBlock(connected: Boolean, onConnect: () -> Unit) {
             )
             Spacer(Modifier.width(Space.x2))
             Text(
-                if (connected) stringResource(Res.string.est_health_conectado) else "Google Health",
+                if (connected) textoSalud(Res.string.est_health_conectado) else plataforma.salud.nombre ?: "Google Health",
                 style = MaterialTheme.typography.titleMedium
             )
         }
         Spacer(Modifier.height(Space.x2))
         Text(
             if (connected)
-                stringResource(Res.string.est_health_conectado_texto)
+                textoSalud(Res.string.est_health_conectado_texto)
             else
-                stringResource(Res.string.est_health_conectar_texto),
+                textoSalud(Res.string.est_health_conectar_texto),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -199,7 +201,7 @@ private fun HealthConnectBlock(connected: Boolean, onConnect: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = Touch.primary)
-            ) { Text(stringResource(Res.string.est_health_conectar)) }
+            ) { Text(textoSalud(Res.string.est_health_conectar)) }
         }
     }
 }

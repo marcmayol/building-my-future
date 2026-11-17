@@ -5,6 +5,8 @@
 
 package com.marc.gymplan100.ui
 
+import com.marc.gymplan100.plataforma.textoSalud
+import com.marc.gymplan100.plataforma.conNombreSalud
 import kotlinx.datetime.todayIn
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.plus
@@ -124,10 +126,10 @@ fun SettingsScreen(
         viewModel.importProfileFromHealth { imported ->
             scope.launch {
                 snackbar.showSnackbar(
-                    getString(
+                    conNombreSalud(getString(
                         if (imported) Res.string.ini_set_weight_imported
                         else Res.string.ini_set_weight_none
-                    )
+                    ))
                 )
             }
         }
@@ -212,7 +214,7 @@ fun SettingsScreen(
             item {
                 WheelCard(
                     title = stringResource(Res.string.ini_set_weight),
-                    explicacion = stringResource(Res.string.ini_set_weight_body)
+                    explicacion = textoSalud(Res.string.ini_set_weight_body)
                 ) {
                     CarrilDeScroll {
                         WheelPicker(
@@ -271,7 +273,7 @@ fun SettingsScreen(
                     }
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        stringResource(Res.string.ini_set_watch_body),
+                        textoSalud(Res.string.ini_set_watch_body),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -345,7 +347,7 @@ fun SettingsScreen(
 
             item { SeccionCopia(viewModel) }
 
-            item { Bloque { plataforma.SeccionActualizaciones() } }
+            if (plataforma.hayActualizaciones) item { Bloque { plataforma.SeccionActualizaciones() } }
 
             item {
                 Bloque {
@@ -366,19 +368,19 @@ fun SettingsScreen(
                 }
             }
 
-            item { Bloque { plataforma.SeccionValoracion() } }
+            if (plataforma.hayValoracion) item { Bloque { plataforma.SeccionValoracion() } }
 
             item { SeccionCreditos() }
 
             item {
                 Bloque {
                     Text(
-                        stringResource(Res.string.ini_set_health_title),
+                        textoSalud(Res.string.ini_set_health_title),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(Modifier.size(Space.x1))
                     Text(
-                        stringResource(Res.string.ini_set_health_body),
+                        textoSalud(Res.string.ini_set_health_body),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -396,10 +398,10 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(min = Touch.primary)
-                        ) { Text(stringResource(Res.string.ini_set_health_import)) }
+                        ) { Text(textoSalud(Res.string.ini_set_health_import)) }
                     } else {
                         Text(
-                            stringResource(Res.string.ini_set_health_unavailable),
+                            textoSalud(Res.string.ini_set_health_unavailable),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )

@@ -219,6 +219,7 @@
     <string name="ini_rate_title">Valorar la app</string>
     <string name="ini_rate_body">La app no tiene detrás ninguna empresa ni se anuncia en ningún sitio: se encuentra porque alguien la valora. Si te está sirviendo, dilo en la ficha.</string>
     <string name="ini_rate_play">Valorar en Google Play</string>
+    <string name="ini_rate_app_store">Valorar en el App Store</string>
 
     <!-- Actualizaciones -->
     <string name="ini_upd_play_body">Las actualizaciones llegan por Google Play, como en cualquier otra app.</string>
