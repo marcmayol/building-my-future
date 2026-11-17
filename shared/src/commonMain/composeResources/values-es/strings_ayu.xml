@@ -113,7 +113,7 @@
     <string name="ayu_welcome_empezar_con_este">Empezar con este</string>
     <string name="ayu_welcome_tambien">TAMBIÉN TE PEGAN</string>
     <string name="ayu_welcome_addons">Y si te sobra un día, encima de cualquiera de estos puedes montar %1$s.</string>
-    <string name="ayu_welcome_o">" o "</string>
+    <string name="ayu_welcome_o">\u0020o\u0020</string>
     <string name="ayu_welcome_lo_que_si">LO QUE SÍ TENGO DE ESTO</string>
     <string name="ayu_welcome_bloque_corto">Es un bloque corto: se hace solo o encima de cualquier plan, sin que te cambie la semana.</string>
     <string name="ayu_welcome_ver_todos">Ver todos los planes</string>

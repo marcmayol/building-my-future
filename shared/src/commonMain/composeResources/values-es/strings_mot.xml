@@ -6,16 +6,16 @@
     <string name="mot_advisor_and">%1$s y %2$s</string>
     <string name="mot_advisor_none">Con %1$s, no hay ningún plan %2$s que cuadre.</string>
     <plurals name="mot_advisor_days">
-        <item quantity="one">%d día</item>
-        <item quantity="many">%d días</item>
-        <item quantity="other">%d días</item>
+        <item quantity="one">%1$d día</item>
+        <item quantity="many">%1$d días</item>
+        <item quantity="other">%1$d días</item>
     </plurals>
     <string name="mot_advisor_days_no_gear">%1$s y sin material</string>
     <string name="mot_advisor_issue_gym">necesita gimnasio</string>
     <plurals name="mot_advisor_issue_days">
-        <item quantity="one">pide %d día por semana</item>
-        <item quantity="many">pide %d días por semana</item>
-        <item quantity="other">pide %d días por semana</item>
+        <item quantity="one">pide %1$d día por semana</item>
+        <item quantity="many">pide %1$d días por semana</item>
+        <item quantity="other">pide %1$d días por semana</item>
     </plurals>
     <string name="mot_advisor_issue_other_goal">va a otra cosa: es %1$s</string>
     <string name="mot_advisor_issue_other_goal_generic">va a otra cosa: es de eso</string>
@@ -32,9 +32,9 @@
     <string name="mot_advisor_shape_sometimes">entrenas de vez en cuando</string>
     <string name="mot_advisor_shape_regular">ya entrenas con constancia</string>
     <plurals name="mot_advisor_days_per_week">
-        <item quantity="one">%d día por semana</item>
-        <item quantity="many">%d días por semana</item>
-        <item quantity="other">%d días por semana</item>
+        <item quantity="one">%1$d día por semana</item>
+        <item quantity="many">%1$d días por semana</item>
+        <item quantity="other">%1$d días por semana</item>
     </plurals>
     <string name="mot_advisor_no_gear">sin material</string>
     <string name="mot_advisor_session_min_express">sesiones de unos %1$d min (con el exprés caben en %2$d)</string>
@@ -94,9 +94,9 @@
     <string name="mot_hc_free_guided">Sesión libre guiada.</string>
     <string name="mot_hc_duration">Duración: %1$d min · %2$s</string>
     <plurals name="mot_sets">
-        <item quantity="one">%d serie</item>
-        <item quantity="many">%d series</item>
-        <item quantity="other">%d series</item>
+        <item quantity="one">%1$d serie</item>
+        <item quantity="many">%1$d series</item>
+        <item quantity="other">%1$d series</item>
     </plurals>
 
     <!-- Apuntar el entreno libre (FreeSessionLog) -->

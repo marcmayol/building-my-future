@@ -51,3 +51,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
+
+compose.resources {
+    // Lo usan también :app (lógica que devuelve frases) y el iPhone.
+    publicResClass = true
+    packageOfResClass = "com.marc.gymplan100.shared"
+    generateResClass = always
+}

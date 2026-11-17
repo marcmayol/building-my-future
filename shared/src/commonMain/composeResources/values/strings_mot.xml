@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Recomendador de planes (PlanAdvisor) -->
-    <string name="mot_advisor_closest_plain">It\'s the closest to what you asked for.</string>
-    <string name="mot_advisor_closest_but">It\'s the closest match, but %1$s.</string>
+    <string name="mot_advisor_closest_plain">It's the closest to what you asked for.</string>
+    <string name="mot_advisor_closest_but">It's the closest match, but %1$s.</string>
     <string name="mot_advisor_and">%1$s and %2$s</string>
-    <string name="mot_advisor_none">With %1$s, there\'s no %2$s plan that fits.</string>
+    <string name="mot_advisor_none">With %1$s, there's no %2$s plan that fits.</string>
     <plurals name="mot_advisor_days">
-        <item quantity="one">%d day</item>
-        <item quantity="other">%d days</item>
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
     </plurals>
     <string name="mot_advisor_days_no_gear">%1$s and no equipment</string>
     <string name="mot_advisor_issue_gym">it needs a gym</string>
     <plurals name="mot_advisor_issue_days">
-        <item quantity="one">it asks for %d day a week</item>
-        <item quantity="other">it asks for %d days a week</item>
+        <item quantity="one">it asks for %1$d day a week</item>
+        <item quantity="other">it asks for %1$d days a week</item>
     </plurals>
-    <string name="mot_advisor_issue_other_goal">it\'s aimed at something else: it\'s a %1$s plan</string>
-    <string name="mot_advisor_issue_other_goal_generic">it\'s aimed at something else</string>
+    <string name="mot_advisor_issue_other_goal">it's aimed at something else: it's a %1$s plan</string>
+    <string name="mot_advisor_issue_other_goal_generic">it's aimed at something else</string>
     <string name="mot_advisor_issue_minutes">its sessions take about %1$d minutes</string>
     <string name="mot_advisor_goal_strength">strength</string>
     <string name="mot_advisor_goal_muscle">muscle</string>
@@ -26,12 +26,12 @@
     <string name="mot_advisor_goal_start">starter</string>
     <string name="mot_advisor_goal_other">matching</string>
     <string name="mot_advisor_shape_limited">moving is hard for you</string>
-    <string name="mot_advisor_shape_stopped">you\'re coming back after a break</string>
+    <string name="mot_advisor_shape_stopped">you're coming back after a break</string>
     <string name="mot_advisor_shape_sometimes">you train now and then</string>
     <string name="mot_advisor_shape_regular">you already train regularly</string>
     <plurals name="mot_advisor_days_per_week">
-        <item quantity="one">%d day a week</item>
-        <item quantity="other">%d days a week</item>
+        <item quantity="one">%1$d day a week</item>
+        <item quantity="other">%1$d days a week</item>
     </plurals>
     <string name="mot_advisor_no_gear">no equipment</string>
     <string name="mot_advisor_session_min_express">sessions of about %1$d min (Express fits them in %2$d)</string>
@@ -41,12 +41,12 @@
     <string name="mot_advisor_tail_lose_fat">lots of movement and plenty of sweat</string>
     <string name="mot_advisor_tail_muscle">the volume is spread out to build muscle</string>
     <string name="mot_advisor_tail_strength">low reps and real weight</string>
-    <string name="mot_advisor_tail_maintain">just enough to keep what you\'ve gained</string>
+    <string name="mot_advisor_tail_maintain">just enough to keep what you've gained</string>
     <string name="mot_advisor_tail_mobility">short sessions to get your range back</string>
     <string name="mot_advisor_tail_other">it fits what you asked for</string>
     <!-- "trozo, trozo, trozo: cola." -->
     <string name="mot_advisor_reason">%1$s: %2$s.</string>
-    <string name="mot_next_after_gentle">You\'re moving with ease now: time for a bit more work, with the same care.</string>
+    <string name="mot_next_after_gentle">You're moving with ease now: time for a bit more work, with the same care.</string>
 
     <!-- Progresión (Progression) -->
     <string name="mot_prog_first_weight">First time with this exercise: log the weight you use today.</string>
@@ -62,7 +62,7 @@
         <item quantity="one">Last time you hit %2$d on your set. Go up to %3$s kg and drop back to %4$d.</item>
         <item quantity="other">Last time you hit %2$d on all %1$d sets. Go up to %3$s kg and drop back to %4$d.</item>
     </plurals>
-    <string name="mot_prog_deload">%1$d sessions stuck here. Drop to %2$s kg and build back up: that\'s how you break through.</string>
+    <string name="mot_prog_deload">%1$d sessions stuck here. Drop to %2$s kg and build back up: that's how you break through.</string>
     <string name="mot_prog_more_reps">Last time you started with %1$d. Try %2$d with the same weight.</string>
     <!-- %1$d series del plan, %2$d repeticiones -->
     <plurals name="mot_prog_close_range">
@@ -74,8 +74,8 @@
     <string name="mot_warmup_short">w-up</string>
 
     <!-- PlanViewModel -->
-    <string name="mot_import_cant_open">Couldn\'t open the file.</string>
-    <string name="mot_import_not_plan">That file isn\'t a plan: pick a .md or .json file.</string>
+    <string name="mot_import_cant_open">Couldn't open the file.</string>
+    <string name="mot_import_not_plan">That file isn't a plan: pick a .md or .json file.</string>
     <string name="mot_draft_phase">Phase 1</string>
     <string name="mot_draft_day">Monday</string>
     <string name="mot_hc_military">Military Routine</string>
@@ -88,8 +88,8 @@
     <string name="mot_hc_free_guided">Guided free session.</string>
     <string name="mot_hc_duration">Duration: %1$d min · %2$s</string>
     <plurals name="mot_sets">
-        <item quantity="one">%d set</item>
-        <item quantity="other">%d sets</item>
+        <item quantity="one">%1$d set</item>
+        <item quantity="other">%1$d sets</item>
     </plurals>
 
     <!-- Apuntar el entreno libre (FreeSessionLog) -->
@@ -98,9 +98,9 @@
     <string name="mot_free_title_live">What have you done so far?</string>
     <string name="mot_free_title_review">Review what you logged</string>
     <string name="mot_free_title_done">What did you do?</string>
-    <string name="mot_free_intro_live">Log each exercise when you finish it, or set by set. It saves on its own, and when you finish I\'ll show it to you to review.</string>
-    <string name="mot_free_intro_review">This is what you\'ve logged. Fix anything that needs it or add what you missed.</string>
-    <string name="mot_free_intro_blank">Today\'s plan had no exercises listed, so you start from scratch: write down what you did, or just save the time.</string>
+    <string name="mot_free_intro_live">Log each exercise when you finish it, or set by set. It saves on its own, and when you finish I'll show it to you to review.</string>
+    <string name="mot_free_intro_review">This is what you've logged. Fix anything that needs it or add what you missed.</string>
+    <string name="mot_free_intro_blank">Today's plan had no exercises listed, so you start from scratch: write down what you did, or just save the time.</string>
     <string name="mot_free_intro_done">Log what you want and skip the rest. Each set gets its weight and reps, and the heaviest becomes your weight for that exercise.</string>
     <string name="mot_free_logged_count">%1$d of %2$d logged</string>
     <string name="mot_free_next_exercise">Next exercise ›</string>
@@ -111,7 +111,7 @@
     <string name="mot_free_keep_training">Keep training</string>
     <string name="mot_free_finish_no_log">Finish without logging</string>
     <string name="mot_free_time_label">WORKOUT TIME</string>
-    <string name="mot_free_time_saved">It\'s already saved, whatever you log.</string>
+    <string name="mot_free_time_saved">It's already saved, whatever you log.</string>
     <string name="mot_free_exercise">Exercise</string>
     <string name="mot_free_add_named">Add “%1$s”</string>
     <string name="mot_free_remove_named">Remove %1$s</string>

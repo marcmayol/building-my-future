@@ -14,7 +14,27 @@ val keystoreProps = Properties().apply {
     if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use { load(it) }
 }
 
+// Los textos de la app viven en :shared (composeResources), que es de donde los lee el
+// iPhone. Android los necesita también como recursos de siempre (R.string) para lo que se
+// pinta fuera de Compose: avisos, el reloj, Health Connect. Se copian al compilar; no se
+// editan aquí.
+val textosCompartidos = tasks.register<Sync>("textosCompartidos") {
+    from(rootProject.file("shared/src/commonMain/composeResources")) {
+        include("values*/strings_*.xml")
+        // La fuente lleva ' y " tal cual (Compose Multiplatform no quita las barras); Android
+        // los quiere escapados. Solo en el texto, no en los atributos (name="…").
+        filter { linea ->
+            linea.replace(Regex(">([^<]*)<")) { m ->
+                ">" + m.groupValues[1].replace("'", "\\'").replace("\"", "\\\"") + "<"
+            }
+        }
+    }
+    into(layout.buildDirectory.dir("generated/res/textos"))
+}
+tasks.named("preBuild") { dependsOn(textosCompartidos) }
+
 android {
+    sourceSets["main"].res.srcDir(layout.buildDirectory.dir("generated/res/textos"))
     namespace = "com.marc.gymplan100"
     compileSdk = 36
 

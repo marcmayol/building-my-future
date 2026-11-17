@@ -45,10 +45,10 @@
     <string name="plan_edit">Editar</string>
     <string name="plan_cannot_switch">No puedes cambiar con un entreno a medias.</string>
     <string name="plan_format_title">Formato del plan</string>
-    <string name="plan_format_text">Un plan es una lista de fases; cada fase dice cuántas semanas se repiten sus días, y cada día lleva sus ejercicios. Las series van en texto (\"4 x 8\", \"3 x 30 s\", \"3 vueltas\"). Si tu plan no tiene fases, escribe los días sin más y se tratará como una fase única.</string>
+    <string name="plan_format_text">Un plan es una lista de fases; cada fase dice cuántas semanas se repiten sus días, y cada día lleva sus ejercicios. Las series van en texto ("4 x 8", "3 x 30 s", "3 vueltas"). Si tu plan no tiene fases, escribe los días sin más y se tratará como una fase única.</string>
     <string name="plan_copy_example">Copiar ejemplo</string>
     <string name="plan_format_example_markdown"># Mi plan de fuerza\nTres días por semana durante ocho semanas.\n\n## Base (4 semanas)\nAprender el movimiento con peso cómodo.\nProgresión: sube peso cuando las 10 salgan fáciles.\n\n### Lunes — Empuje\nCalentamiento: 6 min bici + movilidad de hombros\n- Press de banca — 4 x 8\n- Press de hombros — 3 x 10 (sin bloquear el codo)\n- Plancha — 3 x 30 s\n\n### Jueves — Tirón\n- Jalón al pecho — 4 x 10\n- Remo sentado — 4 x 10\n\n## Carga (4 semanas)\n\n### Lunes — Fuerza\n- Sentadilla — 5 x 5\n- Press de banca — 5 x 5</string>
-    <string name="plan_format_example_json">{\n  \"nombre\": \"Mi plan de fuerza\",\n  \"descripcion\": \"Tres días por semana, 8 semanas.\",\n  \"fases\": [\n    {\n      \"nombre\": \"Base\",\n      \"semanas\": 4,\n      \"descripcion\": \"Aprender el movimiento con peso cómodo.\",\n      \"progresion\": \"Sube peso cuando las 10 repeticiones salgan fáciles.\",\n      \"dias\": [\n        {\n          \"dia\": \"Lunes\",\n          \"titulo\": \"Empuje\",\n          \"calentamiento\": \"6 min bici + movilidad de hombros\",\n          \"ejercicios\": [\n            { \"nombre\": \"Press de banca\", \"esquema\": \"4 x 8\" },\n            { \"nombre\": \"Press de hombros\", \"esquema\": \"3 x 10\", \"nota\": \"Sin bloquear el codo\" },\n            { \"nombre\": \"Plancha\", \"esquema\": \"3 x 30 s\" }\n          ]\n        }\n      ]\n    }\n  ]\n}</string>
+    <string name="plan_format_example_json">{\n  "nombre": "Mi plan de fuerza",\n  "descripcion": "Tres días por semana, 8 semanas.",\n  "fases": [\n    {\n      "nombre": "Base",\n      "semanas": 4,\n      "descripcion": "Aprender el movimiento con peso cómodo.",\n      "progresion": "Sube peso cuando las 10 repeticiones salgan fáciles.",\n      "dias": [\n        {\n          "dia": "Lunes",\n          "titulo": "Empuje",\n          "calentamiento": "6 min bici + movilidad de hombros",\n          "ejercicios": [\n            { "nombre": "Press de banca", "esquema": "4 x 8" },\n            { "nombre": "Press de hombros", "esquema": "3 x 10", "nota": "Sin bloquear el codo" },\n            { "nombre": "Plancha", "esquema": "3 x 30 s" }\n          ]\n        }\n      ]\n    }\n  ]\n}</string>
     <string name="plan_error_empty_file">El archivo está vacío.</string>
     <string name="plan_error_invalid_json">El archivo no es un JSON válido. Revisa que no falte una coma o una comilla.</string>
     <string name="plan_error_cannot_open">No se pudo abrir el archivo.</string>
@@ -59,11 +59,11 @@
     <string name="plan_error_day_without_exercises">«%1$s» de la fase «%2$s» no tiene ejercicios.</string>
     <string name="plan_error_too_many_exercises">«%1$s» tiene %2$d ejercicios; el máximo es %3$d.</string>
     <string name="plan_error_exercise_without_name">Hay un ejercicio sin nombre en «%1$s».</string>
-    <string name="plan_error_exercise_without_scheme">«%1$s» (%2$s) no dice las series. Escríbelas como \"4 x 8\", \"3 x 30 s\" o \"3 vueltas\".</string>
+    <string name="plan_error_exercise_without_scheme">«%1$s» (%2$s) no dice las series. Escríbelas como "4 x 8", "3 x 30 s" o "3 vueltas".</string>
     <string name="plan_error_too_many_days">El plan sale de %1$d días y el máximo son %2$d.</string>
     <string name="plan_error_reserved_id">Ese id está reservado para el plan que viene con la app.</string>
-    <string name="plan_error_markdown_no_title">Falta el nombre del plan. Empieza el archivo con una línea \"# Nombre del plan\".</string>
-    <string name="plan_error_markdown_no_days">No se ha encontrado ningún día. Escribe cada día con \"### Lunes — Empuje\" y sus ejercicios en una lista con guiones.</string>
+    <string name="plan_error_markdown_no_title">Falta el nombre del plan. Empieza el archivo con una línea "# Nombre del plan".</string>
+    <string name="plan_error_markdown_no_days">No se ha encontrado ningún día. Escribe cada día con "### Lunes — Empuje" y sus ejercicios en una lista con guiones.</string>
     <string name="plan_sheet_overline">DÍA %1$d · %2$s</string>
     <string name="plan_sheet_title">Plan de hoy</string>
     <string name="plan_sheet_warmup">Calentamiento · %1$s</string>
@@ -128,7 +128,7 @@
     <string name="plan_editor_not_in_catalog">No está en el catálogo: no tendrá ilustración ni ficha, solo el vídeo.</string>
     <string name="plan_editor_sets_label">SERIES</string>
     <string name="plan_editor_sets_placeholder">3 vueltas</string>
-    <string name="plan_editor_sets_free_hint">Escríbelo como quieras: \"4 x 8\", \"3 x 30 s\", \"3 vueltas\".</string>
+    <string name="plan_editor_sets_free_hint">Escríbelo como quieras: "4 x 8", "3 x 30 s", "3 vueltas".</string>
     <string name="plan_editor_seconds_label">SEGUNDOS</string>
     <string name="plan_editor_reps_label">REPS</string>
     <string name="plan_editor_reps_chip">Reps</string>
@@ -139,28 +139,28 @@
     <string name="plan_editor_note_placeholder">Controla la bajada</string>
     <string name="plan_editor_remove">Quitar</string>
     <plurals name="plan_days_count">
-        <item quantity="one">%d día</item>
-        <item quantity="other">%d días</item>
+        <item quantity="one">%1$d día</item>
+        <item quantity="other">%1$d días</item>
     </plurals>
     <plurals name="plan_phases_count">
-        <item quantity="one">%d fase</item>
-        <item quantity="other">%d fases</item>
+        <item quantity="one">%1$d fase</item>
+        <item quantity="other">%1$d fases</item>
     </plurals>
     <plurals name="plan_weeks_count">
-        <item quantity="one">%d semana</item>
-        <item quantity="other">%d semanas</item>
+        <item quantity="one">%1$d semana</item>
+        <item quantity="other">%1$d semanas</item>
     </plurals>
     <plurals name="plan_exercises_count">
-        <item quantity="one">%d ejercicio</item>
-        <item quantity="other">%d ejercicios</item>
+        <item quantity="one">%1$d ejercicio</item>
+        <item quantity="other">%1$d ejercicios</item>
     </plurals>
     <plurals name="plan_imported">
         <item quantity="one">«%1$s» importado: %2$d día</item>
         <item quantity="other">«%1$s» importado: %2$d días</item>
     </plurals>
     <plurals name="plan_completed_count">
-        <item quantity="one">%d completado</item>
-        <item quantity="other">%d completados</item>
+        <item quantity="one">%1$d completado</item>
+        <item quantity="other">%1$d completados</item>
     </plurals>
     <plurals name="plan_sheet_sets">
         <item quantity="one">%1$s  ·  %2$d/%3$d serie</item>
@@ -175,7 +175,7 @@
         <item quantity="other">%1$d de %2$d días</item>
     </plurals>
     <plurals name="plan_editor_weeks_repeat">
-        <item quantity="one">Los días de esta fase se repiten %d semana.</item>
-        <item quantity="other">Los días de esta fase se repiten %d semanas.</item>
+        <item quantity="one">Los días de esta fase se repiten %1$d semana.</item>
+        <item quantity="other">Los días de esta fase se repiten %1$d semanas.</item>
     </plurals>
 </resources>

@@ -87,7 +87,7 @@
         <item quantity="other">en %1$d semanas</item>
     </plurals>
     <string name="est_empezaste">%1$s · empezaste el %2$s</string>
-    <string name="est_fecha_inicio">d \'de\' MMMM</string>
+    <string name="est_fecha_inicio">d 'de' MMMM</string>
     <string name="est_cifra_entrenado">Entrenado</string>
     <string name="est_cifra_series">Series</string>
     <string name="est_cifra_mejor_racha">Mejor racha</string>

@@ -198,7 +198,7 @@
     <string name="ses_special_workout">Entrenamiento especial</string>
     <string name="ses_go_back">Volver</string>
     <string name="ses_special_confirm_title">¿Entrenamiento especial?</string>
-    <string name="ses_special_confirm_text">Este modo es para cuando entrenas guiado (p. ej. con tu tío). No habrá series ni pesos: solo un cronómetro contando el tiempo hasta que pulses \"Finalizar\". Se guardará como el entreno del día %1$d.</string>
+    <string name="ses_special_confirm_text">Este modo es para cuando entrenas guiado (p. ej. con tu tío). No habrá series ni pesos: solo un cronómetro contando el tiempo hasta que pulses "Finalizar". Se guardará como el entreno del día %1$d.</string>
     <string name="ses_special_confirm_yes">Sí, empezar especial</string>
     <string name="ses_cancel">Cancelar</string>
     <string name="ses_express_fits">Entero ya cabe en %1$d minutos.</string>

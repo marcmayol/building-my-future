@@ -7,12 +7,12 @@
     <string name="ini_title_dot_detail">%1$s · %2$s</string>
     <string name="ini_percent">%1$d %%</string>
     <plurals name="ini_days">
-        <item quantity="one">%d día</item>
-        <item quantity="other">%d días</item>
+        <item quantity="one">%1$d día</item>
+        <item quantity="other">%1$d días</item>
     </plurals>
     <plurals name="ini_exercises">
-        <item quantity="one">%d ejercicio</item>
-        <item quantity="other">%d ejercicios</item>
+        <item quantity="one">%1$d ejercicio</item>
+        <item quantity="other">%1$d ejercicios</item>
     </plurals>
     <string name="ini_action_start_now">Empezar ya</string>
     <string name="ini_action_set_done">Serie hecha</string>
@@ -55,11 +55,11 @@
     <string name="ini_home_plan_done">Plan terminado</string>
     <plurals name="ini_home_done_body">
         <item quantity="one">El día, hecho. Elige qué sigue cuando quieras.</item>
-        <item quantity="other">Los %d días, hechos. Elige qué sigue cuando quieras.</item>
+        <item quantity="other">Los %1$d días, hechos. Elige qué sigue cuando quieras.</item>
     </plurals>
     <string name="ini_home_pick_next">Elegir el siguiente</string>
     <string name="ini_home_see_summary">Ver el resumen del plan</string>
-    <string name="ini_home_date_pattern">d \'de\' MMMM</string>
+    <string name="ini_home_date_pattern">d 'de' MMMM</string>
     <string name="ini_home_finished_on">Terminado el %1$s.</string>
     <plurals name="ini_home_finished_on_weeks">
         <item quantity="one">Terminado el %2$s, en %1$d semana.</item>
@@ -163,8 +163,8 @@
     <string name="ini_backup_confirm_title">¿Restaurar esta copia?</string>
     <string name="ini_backup_confirm_body">La copia trae %1$s. Al restaurarla se sustituye TODO lo que hay ahora en la app: días, pesos, historial y planes.</string>
     <plurals name="ini_backup_completed_days">
-        <item quantity="one">%d día completado</item>
-        <item quantity="other">%d días completados</item>
+        <item quantity="one">%1$d día completado</item>
+        <item quantity="other">%1$d días completados</item>
     </plurals>
     <string name="ini_backup_restored">Copia restaurada.</string>
     <string name="ini_backup_restore_failed">No se ha podido restaurar la copia.</string>

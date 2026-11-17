@@ -7,12 +7,12 @@
     <string name="ini_title_dot_detail">%1$s · %2$s</string>
     <string name="ini_percent">%1$d%%</string>
     <plurals name="ini_days">
-        <item quantity="one">%d day</item>
-        <item quantity="other">%d days</item>
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
     </plurals>
     <plurals name="ini_exercises">
-        <item quantity="one">%d exercise</item>
-        <item quantity="other">%d exercises</item>
+        <item quantity="one">%1$d exercise</item>
+        <item quantity="other">%1$d exercises</item>
     </plurals>
     <string name="ini_action_start_now">Start now</string>
     <string name="ini_action_set_done">Set done</string>
@@ -47,15 +47,15 @@
     <string name="ini_home_battery_body">Turn off battery saving for this app. That way the rest alert rings on time even with the screen off.</string>
     <string name="ini_home_battery_adjust">Fix it</string>
     <string name="ini_home_battery_ok">OK</string>
-    <string name="ini_home_extra_running">Extra workout · doesn\'t count as a day</string>
+    <string name="ini_home_extra_running">Extra workout · doesn't count as a day</string>
     <string name="ini_home_special_running">Free session in progress</string>
     <string name="ini_home_phases">PLAN PHASES</string>
     <string name="ini_home_in_progress">IN PROGRESS · TAP TO RESUME</string>
     <string name="ini_home_resume">Resume</string>
     <string name="ini_home_plan_done">Plan complete</string>
     <plurals name="ini_home_done_body">
-        <item quantity="one">Your one day, done. Pick what\'s next whenever you like.</item>
-        <item quantity="other">All %d days, done. Pick what\'s next whenever you like.</item>
+        <item quantity="one">Your one day, done. Pick what's next whenever you like.</item>
+        <item quantity="other">All %1$d days, done. Pick what's next whenever you like.</item>
     </plurals>
     <string name="ini_home_pick_next">Pick the next one</string>
     <string name="ini_home_see_summary">See the plan summary</string>
@@ -79,7 +79,7 @@
     <string name="ini_home_free_body">No routine: train your way and log what you do</string>
     <string name="ini_home_free_start">Start</string>
     <string name="ini_home_specials">Special workouts</string>
-    <string name="ini_home_specials_note">don\'t count as days</string>
+    <string name="ini_home_specials_note">don't count as days</string>
 
     <!-- Día -->
     <string name="ini_day_phase">PHASE %1$d · %2$s</string>
@@ -109,20 +109,20 @@
     <string name="ini_set_weight_none">Google Health has no weight saved</string>
     <string name="ini_set_title">Settings</string>
     <string name="ini_set_plan_title">Training plan</string>
-    <string name="ini_set_plan_body">You\'re following “%1$s” · %2$s. You can bring your own plan and switch between plans without losing progress on any of them.</string>
+    <string name="ini_set_plan_body">You're following “%1$s” · %2$s. You can bring your own plan and switch between plans without losing progress on any of them.</string>
     <string name="ini_set_my_plans">My plans</string>
     <string name="ini_set_help">Help: how the app works</string>
     <string name="ini_set_your_data">YOUR DATA</string>
-    <string name="ini_set_your_data_body">The app only stores what it really uses. Each item says what it\'s for.</string>
+    <string name="ini_set_your_data_body">The app only stores what it really uses. Each item says what it's for.</string>
     <string name="ini_set_weight">Weight</string>
     <string name="ini_set_weight_body">Used to estimate the calories of each workout, which Google Health needs to count it towards your goals.</string>
     <string name="ini_set_gender">Gender</string>
-    <string name="ini_set_gender_body">Choose whether the exercise illustrations show a man or a woman. It\'s not used in any calculation.</string>
+    <string name="ini_set_gender_body">Choose whether the exercise illustrations show a man or a woman. It's not used in any calculation.</string>
     <string name="ini_gender_male">Man</string>
     <string name="ini_gender_female">Woman</string>
     <string name="ini_gender_other">Other</string>
     <string name="ini_set_watch">I use a watch or HR monitor</string>
-    <string name="ini_set_watch_body">If you start or control the workout from your watch, this applies on its own: Google Health uses the real calories from your heart rate and the app doesn\'t estimate (no double counting). Turn it on here to force it for workouts you start from your phone too.</string>
+    <string name="ini_set_watch_body">If you start or control the workout from your watch, this applies on its own: Google Health uses the real calories from your heart rate and the app doesn't estimate (no double counting). Turn it on here to force it for workouts you start from your phone too.</string>
     <string name="ini_set_theme">Theme</string>
     <string name="ini_set_theme_body">How the app looks. By default it follows your phone, but you can set it to light or dark.</string>
     <string name="ini_set_how">How it works</string>
@@ -131,16 +131,16 @@
     <string name="ini_set_health_title">Fill in from Google Health</string>
     <string name="ini_set_health_body">Brings in the latest weight you have saved in Google Health.</string>
     <string name="ini_set_health_import">Import from Google Health</string>
-    <string name="ini_set_health_unavailable">Google Health isn\'t available on this device.</string>
+    <string name="ini_set_health_unavailable">Google Health isn't available on this device.</string>
     <string name="ini_set_rests">Rest times</string>
-    <string name="ini_set_rests_body">How long the countdown lasts when the plan doesn\'t say otherwise. After each set you can say how it went: “Tough” adds 30 s and “Failure”, one minute.</string>
+    <string name="ini_set_rests_body">How long the countdown lasts when the plan doesn't say otherwise. After each set you can say how it went: “Tough” adds 30 s and “Failure”, one minute.</string>
     <string name="ini_set_rest_sets">Between sets</string>
     <string name="ini_set_rest_exercises">Between exercises</string>
     <string name="ini_set_rest_reset">Reset to 1:30 and 2:00</string>
     <string name="ini_set_remind">Remind me to go to the gym</string>
-    <string name="ini_set_remind_body">Pick the days you usually train and when you want the reminder. If you\'ve already trained that day, it won\'t bother you.</string>
+    <string name="ini_set_remind_body">Pick the days you usually train and when you want the reminder. If you've already trained that day, it won't bother you.</string>
     <string name="ini_set_remind_at">At %1$s</string>
-    <string name="ini_set_remind_no_days">No days picked, so there\'s nothing to remind you of.</string>
+    <string name="ini_set_remind_no_days">No days picked, so there's nothing to remind you of.</string>
     <string name="ini_weekday_mon">M</string>
     <string name="ini_weekday_tue">T</string>
     <string name="ini_weekday_wed">W</string>
@@ -155,8 +155,8 @@
     <string name="ini_set_license_url">https://creativecommons.org/licenses/by-sa/4.0/deed.en</string>
     <string name="ini_set_privacy">Privacy</string>
     <string name="ini_backup_saved">Backup saved.</string>
-    <string name="ini_backup_save_failed">Couldn\'t save the backup.</string>
-    <string name="ini_backup_read_failed">Couldn\'t read the file.</string>
+    <string name="ini_backup_save_failed">Couldn't save the backup.</string>
+    <string name="ini_backup_read_failed">Couldn't read the file.</string>
     <string name="ini_backup_title">Backup</string>
     <string name="ini_backup_body">Your days, weights, history and plans live only on this phone. Save a backup wherever you like and you can get it all back on another phone.</string>
     <string name="ini_backup_save">Save a backup</string>
@@ -164,21 +164,21 @@
     <string name="ini_backup_confirm_title">Restore this backup?</string>
     <string name="ini_backup_confirm_body">This backup has %1$s. Restoring it replaces EVERYTHING in the app right now: days, weights, history and plans.</string>
     <plurals name="ini_backup_completed_days">
-        <item quantity="one">%d completed day</item>
-        <item quantity="other">%d completed days</item>
+        <item quantity="one">%1$d completed day</item>
+        <item quantity="other">%1$d completed days</item>
     </plurals>
     <string name="ini_backup_restored">Backup restored.</string>
-    <string name="ini_backup_restore_failed">Couldn\'t restore the backup.</string>
+    <string name="ini_backup_restore_failed">Couldn't restore the backup.</string>
     <string name="ini_backup_restore">Restore</string>
     <string name="ini_backup_cancel">Cancel</string>
-    <string name="ini_backup_err_not_backup">This file isn\'t a Building My Future backup.</string>
+    <string name="ini_backup_err_not_backup">This file isn't a Building My Future backup.</string>
     <string name="ini_backup_err_other_app">This file is from another app.</string>
     <string name="ini_backup_err_newer">This backup was made with a newer version of the app. Update and try again.</string>
     <string name="ini_backup_err_empty">The backup is empty.</string>
 
     <!-- Health Connect -->
     <string name="ini_health_title">Building My Future and Health Connect</string>
-    <string name="ini_health_intro">When you finish a workout in the app, we save that session to Health Connect (Google Health\'s platform) so your workouts show up alongside the rest of your physical activity.</string>
+    <string name="ini_health_intro">When you finish a workout in the app, we save that session to Health Connect (Google Health's platform) so your workouts show up alongside the rest of your physical activity.</string>
     <string name="ini_health_what">What we write</string>
     <string name="ini_health_what_body">• The exercise session (strength type) with its date and duration.\n• The details of each exercise and the weights used, in the session notes.</string>
     <string name="ini_health_only_write">The app only writes this data: it never reads your health information. You can revoke the permission at any time from Health Connect settings.</string>
@@ -214,11 +214,11 @@
     <string name="ini_wear_busy_too">Taken too</string>
 
     <!-- Valoración -->
-    <string name="ini_rate_how">How\'s it going?</string>
-    <string name="ini_rate_how_body">This copy doesn\'t come from any store, so there are no stars to give. If something breaks or you miss something, email me: the email already includes your version.</string>
+    <string name="ini_rate_how">How's it going?</string>
+    <string name="ini_rate_how_body">This copy doesn't come from any store, so there are no stars to give. If something breaks or you miss something, email me: the email already includes your version.</string>
     <string name="ini_rate_write">Email me</string>
     <string name="ini_rate_title">Rate the app</string>
-    <string name="ini_rate_body">There\'s no company behind this app and it isn\'t advertised anywhere: people find it because someone rates it. If it\'s working for you, say so on the store page.</string>
+    <string name="ini_rate_body">There's no company behind this app and it isn't advertised anywhere: people find it because someone rates it. If it's working for you, say so on the store page.</string>
     <string name="ini_rate_play">Rate on Google Play</string>
 
     <!-- Actualizaciones -->
@@ -228,14 +228,14 @@
     <string name="ini_upd_check_now">Check now</string>
     <string name="ini_upd_update_to">Update to %1$s</string>
     <string name="ini_upd_checking">Checking…</string>
-    <string name="ini_upd_up_to_date">You\'re up to date ✓</string>
+    <string name="ini_upd_up_to_date">You're up to date ✓</string>
     <string name="ini_upd_downloading">Downloading… %1$d%%</string>
     <string name="ini_upd_verifying">Verifying the download…</string>
     <string name="ini_upd_err_offline">No connection. Try again later.</string>
-    <string name="ini_upd_err_check">Couldn\'t check for a new version.</string>
+    <string name="ini_upd_err_check">Couldn't check for a new version.</string>
     <string name="ini_upd_err_download">The download failed.</string>
     <string name="ini_upd_err_hash">The download was corrupted and has been deleted.</string>
-    <string name="ini_upd_err_install">Couldn\'t install.</string>
+    <string name="ini_upd_err_install">Couldn't install.</string>
     <string name="ini_upd_available">Version %1$s available</string>
     <string name="ini_upd_update">Update</string>
     <string name="ini_upd_banner_downloading">Downloading the new version… %1$d%%</string>
