@@ -1,8 +1,6 @@
 package com.marc.gymplan100.data
 
-import androidx.annotation.StringRes
-import com.marc.gymplan100.R
-import java.text.Normalizer
+import com.marc.gymplan100.shared.*
 
 /**
  * A qué grupo muscular va cada ejercicio en «Mis pesos», para no tener que buscar entre
@@ -18,18 +16,18 @@ import java.text.Normalizer
  */
 enum class ExerciseGroup(
     @Deprecated("usa labelRes") val label: String,
-    @StringRes val labelRes: Int
+    val labelRes: org.jetbrains.compose.resources.StringResource
 ) {
-    PECHO("Pecho", R.string.est_grupo_pecho),
-    ESPALDA("Espalda", R.string.est_grupo_espalda),
-    HOMBROS("Hombros", R.string.est_grupo_hombros),
-    BICEPS("Bíceps", R.string.est_grupo_biceps),
-    TRICEPS("Tríceps", R.string.est_grupo_triceps),
-    PIERNA("Pierna", R.string.est_grupo_pierna),
-    CORE("Core", R.string.est_grupo_core),
-    CARDIO("Cardio", R.string.est_grupo_cardio),
-    MOVILIDAD("Movilidad", R.string.est_grupo_movilidad),
-    OTROS("Otros", R.string.est_grupo_otros)
+    PECHO("Pecho", Res.string.est_grupo_pecho),
+    ESPALDA("Espalda", Res.string.est_grupo_espalda),
+    HOMBROS("Hombros", Res.string.est_grupo_hombros),
+    BICEPS("Bíceps", Res.string.est_grupo_biceps),
+    TRICEPS("Tríceps", Res.string.est_grupo_triceps),
+    PIERNA("Pierna", Res.string.est_grupo_pierna),
+    CORE("Core", Res.string.est_grupo_core),
+    CARDIO("Cardio", Res.string.est_grupo_cardio),
+    MOVILIDAD("Movilidad", Res.string.est_grupo_movilidad),
+    OTROS("Otros", Res.string.est_grupo_otros)
 }
 
 object ExerciseGroups {
@@ -100,7 +98,5 @@ object ExerciseGroups {
 
     /** Sin tildes y en minúsculas: «Jalón» y «jalon» tienen que ser lo mismo. */
     private fun fold(s: String): String =
-        Normalizer.normalize(s, Normalizer.Form.NFD)
-            .replace(Regex("\\p{M}+"), "")
-            .lowercase()
+        quitarTildes(s).lowercase()
 }

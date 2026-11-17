@@ -1,6 +1,6 @@
 package com.marc.gymplan100.data
 
-import com.marc.gymplan100.R
+import com.marc.gymplan100.shared.*
 
 /**
  * Qué toca hoy en un ejercicio, y por qué.
@@ -66,7 +66,7 @@ object Progression {
     fun weightIncrement(currentKg: Double): Double = if (currentKg < 20.0) 1.0 else 2.5
 
     /** Redondea a medio kilo, que es el escalón más fino que la app sabe escribir. */
-    fun roundToStep(kg: Double): Double = Math.round(kg / WEIGHT_STEP) * WEIGHT_STEP
+    fun roundToStep(kg: Double): Double = kotlin.math.floor(kg / WEIGHT_STEP + 0.5) * WEIGHT_STEP // como Math.round: .5 hacia arriba
 
     /**
      * Las sesiones en las que se hizo [exerciseName], de la más reciente a la más antigua, con
@@ -120,8 +120,8 @@ object Progression {
                 reps = rango.first.toString(),
                 // Pedirle los kilos a unas dominadas es la clase de detalle que hace dudar de
                 // todo lo demás que dice la app.
-                reason = if (hasWeight) frase(R.string.mot_prog_first_weight)
-                else frase(R.string.mot_prog_first_reps)
+                reason = if (hasWeight) frase(Res.string.mot_prog_first_weight)
+                else frase(Res.string.mot_prog_first_reps)
             )
 
         val reps = sessionReps(ultima)
@@ -140,8 +140,8 @@ object Progression {
                 weight = "",
                 reps = objetivoLibre.toString(),
                 reason = if (cerroElRango)
-                    frasePlural(R.plurals.mot_prog_bw_closed, reps.size, reps.size, rango.last)
-                else frase(R.string.mot_prog_bw_more, arranqueLibre, objetivoLibre)
+                    frasePlural(Res.plurals.mot_prog_bw_closed, reps.size, reps.size, rango.last)
+                else frase(Res.string.mot_prog_bw_more, arranqueLibre, objetivoLibre)
             )
         }
 
@@ -153,7 +153,7 @@ object Progression {
                 weight = formatKg(nuevo),
                 reps = rango.first.toString(),
                 reason = frasePlural(
-                    R.plurals.mot_prog_more_weight, reps.size,
+                    Res.plurals.mot_prog_more_weight, reps.size,
                     reps.size, rango.last, formatKg(nuevo), rango.first
                 )
             )
@@ -167,7 +167,7 @@ object Progression {
                     kind = Kind.DELOAD,
                     weight = formatKg(bajada),
                     reps = rango.first.toString(),
-                    reason = frase(R.string.mot_prog_deload, STALL_SESSIONS, formatKg(bajada))
+                    reason = frase(Res.string.mot_prog_deload, STALL_SESSIONS, formatKg(bajada))
                 )
             }
         }
@@ -183,8 +183,8 @@ object Progression {
             // falta es cerrarlo entero. Se dice como lo que hay que hacer hoy, no como un
             // reproche por lo de la última vez (que pudo pedir menos series que hoy).
             reason = if (objetivo > arranque)
-                frase(R.string.mot_prog_more_reps, arranque, objetivo)
-            else frasePlural(R.plurals.mot_prog_close_range, seriesDelPlan, seriesDelPlan, rango.last)
+                frase(Res.string.mot_prog_more_reps, arranque, objetivo)
+            else frasePlural(Res.plurals.mot_prog_close_range, seriesDelPlan, seriesDelPlan, rango.last)
         )
     }
 

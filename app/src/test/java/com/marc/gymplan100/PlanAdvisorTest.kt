@@ -1,5 +1,6 @@
 package com.marc.gymplan100
 
+import com.marc.gymplan100.shared.*
 import com.marc.gymplan100.data.Exercise
 import com.marc.gymplan100.data.Phase
 import com.marc.gymplan100.data.PlanAdvisor
@@ -119,9 +120,9 @@ class PlanAdvisorTest {
         assertNotNull(r.best)
         // El motivo es la frase "trozos: cola.", con lo que pesa (forma, días) y el porqué.
         val ids = r.best!!.reason.ids()
-        assertEquals(R.string.mot_advisor_reason, ids.first())
-        assertTrue(R.plurals.mot_advisor_days_per_week in ids)
-        assertTrue(R.string.mot_advisor_shape_regular in ids)
+        assertEquals(Res.string.mot_advisor_reason, ids.first())
+        assertTrue(Res.plurals.mot_advisor_days_per_week in ids)
+        assertTrue(Res.string.mot_advisor_shape_regular in ids)
     }
 
     /**
@@ -131,7 +132,7 @@ class PlanAdvisorTest {
     @Test fun `no se propone un plan de otro objetivo`() {
         val r = recomienda(PlanGoal.MOBILITY, Shape.REGULAR, Days.TWO, Place.HOME)
         assertNull(r.best)
-        assertTrue(R.string.mot_advisor_goal_mobility in r.whyNothing!!.ids())
+        assertTrue(Res.string.mot_advisor_goal_mobility in r.whyNothing!!.ids())
         assertTrue("y sí se ofrece el bloque de movilidad", r.addOns.any { it.id == "movilidad" })
     }
 
@@ -170,7 +171,7 @@ class PlanAdvisorTest {
         val r = recomiendaConSuaves(PlanGoal.MUSCLE, Shape.LIMITED, Days.TWO, Place.HOME)
         assertEquals("suave-casa", r.best?.plan?.id)
         assertTrue(r.alternatives.isEmpty())
-        assertTrue(R.string.mot_advisor_shape_limited in r.best!!.reason.ids())
+        assertTrue(Res.string.mot_advisor_shape_limited in r.best!!.reason.ids())
     }
 
     @Test fun `quien solo lleva tiempo parado sigue empezando por Arranque`() {

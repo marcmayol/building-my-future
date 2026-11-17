@@ -1,5 +1,6 @@
 package com.marc.gymplan100
 
+import com.marc.gymplan100.shared.*
 import com.marc.gymplan100.data.Progression
 import com.marc.gymplan100.data.SetLog
 import org.junit.Assert.assertEquals
@@ -66,7 +67,7 @@ class ProgressionTest {
         val s = Progression.suggest("3 x 8-12", atascado)!!
         assertEquals(Progression.Kind.DELOAD, s.kind)
         assertEquals("18", s.weight)
-        assertEquals(listOf(R.string.mot_prog_deload), s.reason.ids())
+        assertEquals(listOf(Res.string.mot_prog_deload), s.reason.ids())
     }
 
     @Test
@@ -119,7 +120,7 @@ class ProgressionTest {
         val s = Progression.suggest("3 x 8-12", dominadas)!!
         assertEquals(Progression.Kind.MORE_REPS, s.kind)
         assertEquals("", s.weight)
-        assertEquals(listOf(R.plurals.mot_prog_bw_closed), s.reason.ids())
+        assertEquals(listOf(Res.plurals.mot_prog_bw_closed), s.reason.ids())
     }
 
     @Test

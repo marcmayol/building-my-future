@@ -25,11 +25,11 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            api(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-            implementation(compose.components.resources)
+            api(compose.components.resources)
             api(libs.kotlinx.serialization.json)
             api(libs.kotlinx.datetime)
             api(libs.coroutines.core)

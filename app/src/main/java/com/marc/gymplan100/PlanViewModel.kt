@@ -1,5 +1,7 @@
 package com.marc.gymplan100
 
+import com.marc.gymplan100.shared.mot_next_after_gentle
+import com.marc.gymplan100.shared.Res as SharedRes
 import com.marc.gymplan100.data.*
 import android.app.Application
 import android.net.Uri
@@ -534,7 +536,7 @@ class PlanViewModel(app: Application) : AndroidViewModel(app) {
         if (terminado.level == PlanLevel.GENTLE) {
             val siguiente = if (terminado.equipment == PlanEquipment.GYM) "arranque" else "en-casa"
             return _plans.value.firstOrNull { it.id == siguiente }?.let {
-                PlanAdvisor.Suggestion(it, frase(R.string.mot_next_after_gentle))
+                PlanAdvisor.Suggestion(it, frase(SharedRes.string.mot_next_after_gentle))
             }
         }
         val objetivo = when (terminado.goal) {

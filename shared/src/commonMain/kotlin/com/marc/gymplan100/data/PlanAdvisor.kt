@@ -1,6 +1,6 @@
 package com.marc.gymplan100.data
 
-import com.marc.gymplan100.R
+import com.marc.gymplan100.shared.*
 
 /**
  * Elige qué plan proponerle a quien abre la app por primera vez.
@@ -123,20 +123,20 @@ object PlanAdvisor {
                 cercano = Suggestion(
                     candidato,
                     when {
-                        pegas.isEmpty() -> frase(R.string.mot_advisor_closest_plain)
+                        pegas.isEmpty() -> frase(Res.string.mot_advisor_closest_plain)
                         // Dos pegas ya explican el desencuentro; una tercera es ensañamiento.
-                        pegas.size == 1 -> frase(R.string.mot_advisor_closest_but, pegas[0])
+                        pegas.size == 1 -> frase(Res.string.mot_advisor_closest_but, pegas[0])
                         else -> frase(
-                            R.string.mot_advisor_closest_but,
-                            frase(R.string.mot_advisor_and, pegas[0], pegas[1])
+                            Res.string.mot_advisor_closest_but,
+                            frase(Res.string.mot_advisor_and, pegas[0], pegas[1])
                         )
                     }
                 )
             }
-            val dias = frasePlural(R.plurals.mot_advisor_days, a.days.n)
+            val dias = frasePlural(Res.plurals.mot_advisor_days, a.days.n)
             porque = frase(
-                R.string.mot_advisor_none,
-                if (a.place == Place.HOME) frase(R.string.mot_advisor_days_no_gear, dias) else dias,
+                Res.string.mot_advisor_none,
+                if (a.place == Place.HOME) frase(Res.string.mot_advisor_days_no_gear, dias) else dias,
                 deQue(a.goal)
             )
         }
@@ -221,33 +221,33 @@ object PlanAdvisor {
     /** Qué habría que ceder para que este plan cuadrase con lo que ha pedido. */
     private fun pegasDe(plan: TrainingPlan, a: Answers): List<Frase> = buildList {
         if (a.place == Place.HOME && plan.equipment == PlanEquipment.GYM) {
-            add(frase(R.string.mot_advisor_issue_gym))
+            add(frase(Res.string.mot_advisor_issue_gym))
         }
         if (plan.daysPerWeek > a.days.n) {
-            add(frasePlural(R.plurals.mot_advisor_issue_days, plan.daysPerWeek))
+            add(frasePlural(Res.plurals.mot_advisor_issue_days, plan.daysPerWeek))
         }
         if (plan.goal != a.goal && !parientes(plan.goal, a.goal)) {
             add(
-                if (plan.goal == null) frase(R.string.mot_advisor_issue_other_goal_generic)
-                else frase(R.string.mot_advisor_issue_other_goal, deQue(plan.goal))
+                if (plan.goal == null) frase(Res.string.mot_advisor_issue_other_goal_generic)
+                else frase(Res.string.mot_advisor_issue_other_goal, deQue(plan.goal))
             )
         }
         a.time?.let { t ->
             val dura = typicalMinutes(plan)
-            if (dura > t.minutes + MARGEN_MIN) add(frase(R.string.mot_advisor_issue_minutes, dura))
+            if (dura > t.minutes + MARGEN_MIN) add(frase(Res.string.mot_advisor_issue_minutes, dura))
         }
     }
 
     /** Cómo se llama un objetivo cuando hay que meterlo en una frase. */
     private fun deQue(goal: PlanGoal?): Frase = frase(
         when (goal) {
-            PlanGoal.STRENGTH -> R.string.mot_advisor_goal_strength
-            PlanGoal.MUSCLE -> R.string.mot_advisor_goal_muscle
-            PlanGoal.LOSE_FAT -> R.string.mot_advisor_goal_lose_fat
-            PlanGoal.MAINTAIN -> R.string.mot_advisor_goal_maintain
-            PlanGoal.MOBILITY -> R.string.mot_advisor_goal_mobility
-            PlanGoal.START -> R.string.mot_advisor_goal_start
-            null -> R.string.mot_advisor_goal_other
+            PlanGoal.STRENGTH -> Res.string.mot_advisor_goal_strength
+            PlanGoal.MUSCLE -> Res.string.mot_advisor_goal_muscle
+            PlanGoal.LOSE_FAT -> Res.string.mot_advisor_goal_lose_fat
+            PlanGoal.MAINTAIN -> Res.string.mot_advisor_goal_maintain
+            PlanGoal.MOBILITY -> Res.string.mot_advisor_goal_mobility
+            PlanGoal.START -> Res.string.mot_advisor_goal_start
+            null -> Res.string.mot_advisor_goal_other
         }
     )
 
@@ -278,31 +278,31 @@ object PlanAdvisor {
         val trozos = mutableListOf<Frase>()
         trozos += frase(
             when (a.shape) {
-                Shape.LIMITED -> R.string.mot_advisor_shape_limited
-                Shape.STOPPED -> R.string.mot_advisor_shape_stopped
-                Shape.SOMETIMES -> R.string.mot_advisor_shape_sometimes
-                Shape.REGULAR -> R.string.mot_advisor_shape_regular
+                Shape.LIMITED -> Res.string.mot_advisor_shape_limited
+                Shape.STOPPED -> Res.string.mot_advisor_shape_stopped
+                Shape.SOMETIMES -> Res.string.mot_advisor_shape_sometimes
+                Shape.REGULAR -> Res.string.mot_advisor_shape_regular
             }
         )
-        trozos += frasePlural(R.plurals.mot_advisor_days_per_week, a.days.n)
-        if (a.place == Place.HOME) trozos += frase(R.string.mot_advisor_no_gear)
+        trozos += frasePlural(Res.plurals.mot_advisor_days_per_week, a.days.n)
+        if (a.place == Place.HOME) trozos += frase(Res.string.mot_advisor_no_gear)
         a.time?.let { t ->
             val dura = typicalMinutes(plan)
-            trozos += if (dura > t.minutes) frase(R.string.mot_advisor_session_min_express, dura, t.minutes)
-            else frase(R.string.mot_advisor_session_min, dura)
+            trozos += if (dura > t.minutes) frase(Res.string.mot_advisor_session_min_express, dura, t.minutes)
+            else frase(Res.string.mot_advisor_session_min, dura)
         }
 
         val cola = if (plan.level == PlanLevel.GENTLE) {
-            R.string.mot_advisor_tail_gentle
+            Res.string.mot_advisor_tail_gentle
         } else when (plan.goal) {
-            PlanGoal.START -> R.string.mot_advisor_tail_start
-            PlanGoal.LOSE_FAT -> R.string.mot_advisor_tail_lose_fat
-            PlanGoal.MUSCLE -> R.string.mot_advisor_tail_muscle
-            PlanGoal.STRENGTH -> R.string.mot_advisor_tail_strength
-            PlanGoal.MAINTAIN -> R.string.mot_advisor_tail_maintain
-            PlanGoal.MOBILITY -> R.string.mot_advisor_tail_mobility
-            null -> R.string.mot_advisor_tail_other
+            PlanGoal.START -> Res.string.mot_advisor_tail_start
+            PlanGoal.LOSE_FAT -> Res.string.mot_advisor_tail_lose_fat
+            PlanGoal.MUSCLE -> Res.string.mot_advisor_tail_muscle
+            PlanGoal.STRENGTH -> Res.string.mot_advisor_tail_strength
+            PlanGoal.MAINTAIN -> Res.string.mot_advisor_tail_maintain
+            PlanGoal.MOBILITY -> Res.string.mot_advisor_tail_mobility
+            null -> Res.string.mot_advisor_tail_other
         }
-        return frase(R.string.mot_advisor_reason, Frase.Lista(trozos), frase(cola))
+        return frase(Res.string.mot_advisor_reason, Frase.Lista(trozos), frase(cola))
     }
 }

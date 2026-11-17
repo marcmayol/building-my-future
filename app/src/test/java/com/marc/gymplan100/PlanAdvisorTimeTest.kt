@@ -1,5 +1,6 @@
 package com.marc.gymplan100
 
+import com.marc.gymplan100.shared.*
 import com.marc.gymplan100.data.BuiltinPlan
 import com.marc.gymplan100.data.PlanAdvisor
 import com.marc.gymplan100.data.PlanAdvisor.Days
@@ -65,8 +66,8 @@ class PlanAdvisorTimeTest {
         } else {
             val ids = r.best!!.reason.ids()
             assertTrue(
-                R.string.mot_advisor_session_min in ids ||
-                    R.string.mot_advisor_session_min_express in ids
+                Res.string.mot_advisor_session_min in ids ||
+                    Res.string.mot_advisor_session_min_express in ids
             )
         }
     }

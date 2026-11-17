@@ -157,7 +157,7 @@ fun ExerciseWeightsScreen(
                 val abierto = grupo.name in abiertos
                 item(key = "grupo-${grupo.name}") {
                     GroupHeader(
-                        label = stringResource(grupo.labelRes),
+                        label = org.jetbrains.compose.resources.stringResource(grupo.labelRes),
                         count = nombres.size,
                         open = abierto,
                         onClick = { alternar(grupo) }

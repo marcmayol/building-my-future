@@ -65,6 +65,11 @@ object AppLanguage {
         // El contenido de serie (ejercicios, planes, fichas) se traduce sin contexto: hay que
         // decirle en qué idioma se está pintando.
         Contenido.sync(envuelto)
+        // Los textos de :shared (Compose Multiplatform) no miran el contexto sino
+        // Locale.getDefault(): se pone el idioma que ya han resuelto los recursos de Android
+        // para que las dos partes hablen igual (con [catalán, español], español).
+        val resuelto = locale(envuelto)
+        if (Locale.getDefault() != resuelto) Locale.setDefault(resuelto)
         return envuelto
     }
 
