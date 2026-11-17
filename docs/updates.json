@@ -1,8 +1,8 @@
 {
-  "versionCode": 47,
-  "versionName": "2.23.0",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.23.0/building-my-future-v2.23.0.apk",
-  "sha256": "0f561b7186c7c63fd0778c5edc5013ec31db75f7caed791efae70c19318f620e",
-  "notas": "Para las vacaciones: en Ajustes, «Pausar hasta el…» calla el aviso de entrenamiento hasta la fecha que elijas, y vuelve solo. También hay arreglos. Con la letra grande ya no se corta ningún texto en la sesión ni en la portada, y la cuenta atrás del descanso se ve siempre. Y en la versión de Google Play el idioma de Ajustes funciona aunque el móvil esté en otro.",
+  "versionCode": 48,
+  "versionName": "2.24.0",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.24.0/building-my-future-v2.24.0.apk",
+  "sha256": "5189560924b6ad41e618f25815d50c5f8a10bfc6efd315249cc5d4d7a817d673",
+  "notas": "Contenido de serie en inglés. Arreglos con la letra grande y en móviles pequeños (inicio del día, sesión, rutinas fijas). El idioma automático respeta el segundo idioma del móvil (catalán → español). Base compartida con la futura versión de iPhone.",
   "check_horas": 24
 }
