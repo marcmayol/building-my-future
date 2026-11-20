@@ -1,8 +1,8 @@
 {
-  "versionCode": 48,
-  "versionName": "2.24.0",
-  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.24.0/building-my-future-v2.24.0.apk",
-  "sha256": "5189560924b6ad41e618f25815d50c5f8a10bfc6efd315249cc5d4d7a817d673",
-  "notas": "Contenido de serie en inglés. Arreglos con la letra grande y en móviles pequeños (inicio del día, sesión, rutinas fijas). El idioma automático respeta el segundo idioma del móvil (catalán → español). Base compartida con la futura versión de iPhone.",
+  "versionCode": 49,
+  "versionName": "2.24.1",
+  "url": "https://github.com/marcmayol/building-my-future/releases/download/v2.24.1/building-my-future-v2.24.1.apk",
+  "sha256": "58294f56a83cd711808bd045af18ea63f079ec0cd1310e8dc2c3da361433c67c",
+  "notas": "Arreglos: un descanso de más de una hora (al reanudar una sesión días después) se lee en horas y minutos, y la hora de la barra de estado ya no se pinta encima del texto al bajar en Inicio.",
   "check_horas": 24
 }
