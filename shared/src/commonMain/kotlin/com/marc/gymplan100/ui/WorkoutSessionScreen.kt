@@ -1952,5 +1952,8 @@ private fun formatClock(ms: Long): String {
 
 private fun formatSecs(seconds: Int): String {
     val s = seconds.coerceAtLeast(0)
+    // Una sesión reanudada días después llevaría «+4456:44» de descanso: desde la hora se
+    // cuenta en horas y minutos.
+    if (s >= 3600) return "%d h %02d".fmt(s / 3600, s % 3600 / 60)
     return "%d:%02d".fmt(s / 60, s % 60)
 }

@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -133,6 +136,7 @@ fun HomeScreen(
     // app y pedirlo a mano (WindowInsets.systemBars) lo contaba dos veces. Van en el
     // contentPadding y no en la pantalla para que la lista siga pasando por debajo al bajar.
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { inner ->
+    Box {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(
@@ -383,6 +387,15 @@ fun HomeScreen(
                 onClick = { onOpenPhase(phase.number) }
             )
         }
+    }
+    // Franja del color del fondo bajo la barra de estado: la lista sigue pasando por debajo,
+    // pero la hora y la batería no se pintan encima del texto al bajar.
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .windowInsetsTopHeight(WindowInsets.statusBars)
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.94f))
+    )
     }
     }
 }
